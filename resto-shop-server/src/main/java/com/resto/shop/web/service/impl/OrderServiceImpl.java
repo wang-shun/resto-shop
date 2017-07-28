@@ -408,7 +408,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return jsonResult;
         }
 
-
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
             int orderCount = orderMapper.checkTableNumber(order.getShopDetailId(), order.getTableNumber(), order.getCustomerId(), brandSetting.getCloseContinueTime());
             if (orderCount > 0) {
@@ -5187,7 +5186,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (shopDetail.getTemplateType().equals(Common.YES)) {
                     String other = "其他销量";
                     BigDecimal strLength = new BigDecimal(other.length()).multiply(new BigDecimal(2));
-                    Integer length = new BigDecimal(48).subtract(strLength).divide(new BigDecimal(2)).intValue();
+                    Integer length = new BigDecimal(40).subtract(strLength).divide(new BigDecimal(2)).intValue();
                     String string = "-";
                     for (int i = 1; i < length; i++) {
                         string = string.concat("-");
@@ -5195,20 +5194,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     itemMap.put("PRODUCT_NAME", string.concat(other).concat(string));
                     saledProducts.add(itemMap);
                 }
+//                服务费销量、销售额不计入菜品销量和销售额中
                 if (!nowService.equals(BigDecimal.ZERO)) {
                     itemMap = new HashMap<>();
                     itemMap.put("PRODUCT_NAME", serviceMap.get("serviceName"));
                     itemMap.put("SUBTOTAL", nowService);
                     saledProducts.add(itemMap);
-                    //服务费不计入总销量
-//                saledProductAmount = saledProductAmount.add(nowService);
+//                    saledProductAmount = saledProductAmount.add(nowService);
                 }
                 if (!nowMeal.equals(BigDecimal.ZERO)) {
                     itemMap = new HashMap<>();
                     itemMap.put("PRODUCT_NAME", mealMap.get("mealName"));
                     itemMap.put("SUBTOTAL", nowMeal);
                     saledProducts.add(itemMap);
-                    //餐盒费不计入总销量    小确幸SB又改了， 又要加上去。 妈的！  拿来怎么多B事 -- 2017-06-22改为计入
+                    //餐盒费销量不计入总销量
                     saledProductAmount = saledProductAmount.add(nowMeal);
                 }
             }
@@ -9654,4 +9653,150 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		s.setOneToThree(oneToThreeStar);
     	return  s;
 	}
+
+    @Override
+    public List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap) {
+        return orderMapper.selectMealServiceSales(selectMap);
+    }
+
+    @Override
+    public List<Map<String, Object>> badAppraisePrintOrder(String orderId) {
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        //得到订单信息
+        Order order = selectById(orderId);
+        //得到店铺信息
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        //得到所有打印机信息
+        List<Printer> printerList = new ArrayList<>();
+        if (shopDetail.getBadAppraisePrintReceipt()){
+            printerList.addAll(printerService.selectPrintByType(order.getShopDetailId(), 2));
+        }
+        if (shopDetail.getBadAppraisePrintKitchen()){
+            printerList.addAll(printerService.selectPrintByType(order.getShopDetailId(), 1));
+        }
+        //得到桌号
+        TableQrcode tableQrcode =  tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(), Integer.valueOf(order.getTableNumber()));
+        //得到该笔订单的评论信息
+        Appraise appraise = appraiseService.selectDeatilByOrderId(order.getId());
+        //得到该笔订单给差评的菜品Id
+        String[] articleIds = appraise.getArticleId().split(",");
+        //得到差评菜品的订单信息
+        List<OrderItem> orderItems = orderItemService.selectByArticleIds(articleIds);
+        OrderItem[] orderItemList  = new OrderItem[orderItems.size()];
+        for (int i = 0; i < orderItems.size() ; i++){
+            orderItemList[i] = orderItems.get(i);
+        }
+        //封装打印模板
+        for (Printer printer : printerList) {
+            badAppraiseOrderGetKitchenModel(orderItemList, order, printer, appraise, tableQrcode, printTask);
+        }
+        return printTask;
+    }
+
+
+    /**
+     * 得到差评订单的打印模板
+     * @param orderItemList
+     * @param order
+     * @param printer
+     * @param appraise
+     * @param tableQrcode
+     * @param printTask
+     */
+    private void badAppraiseOrderGetKitchenModel(OrderItem[] orderItemList, Order order, Printer printer, Appraise appraise, TableQrcode tableQrcode, List<Map<String, Object>> printTask) {
+        //保存 菜品的名称和数量
+        List<Map<String, Object>> items = new ArrayList<>();
+        //封装菜品信息
+        OrderItem orderItem;
+        for (int i = 1; i < orderItemList.length; i++) {
+            for (int j = 0; j < orderItemList.length - i; j++) {
+                if (orderItemList[j].getArticleName().length() > orderItemList[j+1].getArticleName().length()){
+                    orderItem = orderItemList[j];
+                    orderItemList[j] = orderItemList[j+1];
+                    orderItemList[j+1] = orderItem;
+                }
+            }
+        }
+        //得到最小的菜品名称的长度
+        Integer minLength = orderItemList[0].getArticleName().length();
+        Map<String, Object> item = new HashMap<>();
+        for (OrderItem article : orderItemList){
+            if (article.getArticleName().length() > minLength){
+                item.put("ARTICLE_NAME", getSpaceNumber(10 - ((article.getArticleName().length() - minLength) * 2)).concat(article.getCount().toString()));
+            }else{
+                item.put("ARTICLE_NAME", getSpaceNumber(10).concat(article.getCount().toString()));
+            }
+            item.put("ARTICLE_COUNT", article.getArticleName());
+            items.add(item);
+            item = new HashMap<>();
+        }
+        String serialNumber = order.getSerialNumber();//序列号
+        String modeText = DistributionType.getModeText(DistributionType.BAD_APPRAISE_ORDER);//就餐模式
+        //保存打印信息
+        Map<String, Object> print = new HashMap<>();
+        print.put("PORT", printer.getPort());
+        print.put("OID", order.getId());
+        print.put("IP", printer.getIp());
+        print.put("PRINT_TASK_ID", ApplicationUtils.randomUUID());
+        print.put("ORDER_ID", serialNumber);
+        Map<String, Object> data = new HashMap<>();
+        //订单Id
+        data.put("ORDER_ID", serialNumber);
+        //订单时间
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        //订单模式
+        data.put("DISTRIBUTION_MODE", modeText);
+        //桌号
+        data.put("TABLE_NUMBER", order.getTableNumber());
+        //该桌号所在区域
+        data.put("ORDER_NUMBER", tableQrcode != null && StringUtils.isNotBlank(tableQrcode.getAreaName()) ? tableQrcode.getAreaName() : "-");
+        data.put("ITEMS", items);
+        //得到当前评论星级
+        StringBuilder star = new StringBuilder();
+        if (appraise != null) {
+            if (appraise != null && appraise.getLevel() < 5) {
+                for (int i = 0; i < appraise.getLevel(); i++) {
+                    star.append("★");
+                }
+                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
+                    star.append("☆");
+                }
+            } else if (appraise != null && appraise.getLevel() == 5) {
+                star.append("★★★★★");
+            }
+        } else {
+            star.append("☆☆☆☆☆");
+        }
+        data.put("CUSTOMER_SATISFACTION", star.toString());
+        //评价内容
+        String[] feedBacks = appraise.getFeedback().split(",");
+        StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        for (String feedBack : feedBacks){
+            if (feedBack.indexOf("差") != -1){
+                builder.append(feedBack).append(",");
+            }
+        }
+        String content = builder.toString();
+        content = content.substring(0, content.length() - 1).concat(")").concat(appraise.getContent());
+        data.put("MEMO", "评价内容：" + content);
+        print.put("DATA", data);
+        print.put("STATUS", "0");
+        print.put("TICKET_TYPE", TicketType.KITCHEN);
+        //添加到 打印集合
+        printTask.add(print);
+    }
+
+    /**
+     * 得到空格字符串
+     * @param spaceNumber
+     * @return
+     */
+    private String getSpaceNumber(Integer spaceNumber){
+        StringBuilder builder = new StringBuilder();
+        for (int i =0; i < spaceNumber; i++){
+            builder.append(" ");
+        }
+        return builder.toString();
+    }
 }

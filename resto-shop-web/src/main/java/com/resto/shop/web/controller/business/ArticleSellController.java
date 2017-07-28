@@ -19,6 +19,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.AppendToExcelUtil;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -216,6 +217,51 @@ public class ArticleSellController extends GenericController{
                 }
             }
             object.put("brandArticleType",brandArticleType);
+            ShopDetail shopDetail = new ShopDetail();
+            ArticleSellDto mealSellDto = new ArticleSellDto();
+            List<Map<String, Object>> mealSalesList = orderService.selectMealServiceSales(selectMap);
+            List<ArticleSellDto> mealSellList = new ArrayList<>();
+            for (Map mealSales : mealSalesList) {
+                shopDetail = shopDetailService.selectById(mealSales.get("shopId").toString());
+                //判断店铺是否开启餐盒费，如开启了无论产没产生都要显示出来
+                if ((StringUtils.isNotBlank(shopDetail.getMealFeeName()) && shopDetail.getIsMealFee().equals(Common.YES))) {
+                    mealSellDto.setArticleName(shopDetail.getMealFeeName());
+                    mealSellDto.setBrandSellNum(mealSales == null ? 0 : Integer.valueOf(mealSales.get("mealSellNum").toString()));
+                    mealSellDto.setSalles(mealSales == null ? BigDecimal.ZERO : new BigDecimal(mealSales.get("mealSalles").toString()));
+                    mealSellDto.setRefundCount(mealSales == null ? 0 : Integer.valueOf(mealSales.get("refundMealNum").toString()));
+                    mealSellDto.setRefundTotal(mealSales == null ? BigDecimal.ZERO : new BigDecimal(mealSales.get("refundMealSalles").toString()));
+                    mealSellList.add(mealSellDto);
+                } else if (mealSales != null && mealSales.get("mealSellNum") != null && Integer.valueOf(mealSales.get("mealSellNum").toString()) != 0) {
+                    //如店铺没有开启餐盒费但有餐盒售卖记录产生也显示出来
+                    mealSellDto.setArticleName(shopDetail.getMealFeeName());
+                    mealSellDto.setBrandSellNum(Integer.valueOf(mealSales.get("mealSellNum").toString()));
+                    mealSellDto.setSalles(new BigDecimal(mealSales.get("mealSalles").toString()));
+                    mealSellDto.setRefundCount(Integer.valueOf(mealSales.get("refundMealNum").toString()));
+                    mealSellDto.setRefundTotal(new BigDecimal(mealSales.get("refundMealSalles").toString()));
+                    mealSellList.add(mealSellDto);
+                }
+                //判断店铺是否开启服务费，如开启了无论产没产生都要显示出来
+                if ((StringUtils.isNotBlank(shopDetail.getServiceName()) && shopDetail.getIsUseServicePrice().equals(Common.YES))) {
+                    mealSellDto = new ArticleSellDto();
+                    mealSellDto.setArticleName(shopDetail.getServiceName());
+                    mealSellDto.setBrandSellNum(mealSales == null ? 0 : Integer.valueOf(mealSales.get("serviceSellNum").toString()));
+                    mealSellDto.setSalles(mealSales == null ? BigDecimal.ZERO : new BigDecimal(mealSales.get("serviceSalles").toString()));
+                    mealSellDto.setRefundCount(mealSales == null ? 0 : Integer.valueOf(mealSales.get("refundServiceCount").toString()));
+                    mealSellDto.setRefundTotal(mealSales == null ? BigDecimal.ZERO : new BigDecimal(mealSales.get("refundServiceSalles").toString()));
+                    mealSellList.add(mealSellDto);
+                } else if (mealSales != null && mealSales.get("serviceSellNum") != null && Integer.valueOf(mealSales.get("serviceSellNum").toString()) != 0) {
+                    mealSellDto = new ArticleSellDto();
+                    //如店铺没有开启服务费但有服务费售卖记录产生也显示出来
+                    mealSellDto.setArticleName(shopDetail.getServiceName());
+                    mealSellDto.setBrandSellNum(Integer.valueOf(mealSales.get("serviceSellNum").toString()));
+                    mealSellDto.setSalles(new BigDecimal(mealSales.get("serviceSalles").toString()));
+                    mealSellDto.setRefundCount(Integer.valueOf(mealSales.get("refundServiceCount").toString()));
+                    mealSellDto.setRefundTotal(new BigDecimal(mealSales.get("refundServiceSalles").toString()));
+                    mealSellList.add(mealSellDto);
+                }
+                mealSellDto = new ArticleSellDto();
+            }
+            object.put("brandMealSalesDtos", mealSellList);
         }catch (Exception e){
             log.error("查询菜品销售报表出错！");
             e.printStackTrace();
@@ -291,6 +337,8 @@ public class ArticleSellController extends GenericController{
         String[][] headers = {{"品牌名称/菜品类型","25"},{"菜品类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
         String[] columnsType = {"articleFamilyName","brandSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
         String[][] headersType = {{"品牌名称/菜品类别","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
+        String[] columnsMeal = {"articleName","brandSellNum","salles","refundCount","refundTotal"};
+        String[][] headersMeal = {{"品牌名称/菜品名称","25"},{"销量(份)","25"},{"销售额(元)","25"},{"退菜数量(份)","25"},{"退菜金额(元)","25"}};
         //获取店铺名称
         List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
         String shopName="";
@@ -308,14 +356,18 @@ public class ArticleSellController extends GenericController{
         filter.getExcludes().add("shopArticleFamily");
         filter.getExcludes().add("brandArticleType");
         filter.getExcludes().add("shopArticleType");
+        filter.getExcludes().add("shopMealSeals");
+        filter.getExcludes().add("brandMealSeals");
         List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
         if (articleSellDto.getBrandReport() != null) {
             ArticleSellDto brandReport = new ArticleSellDto();
             Map<String, Object> brandReportMap = articleSellDto.getBrandReport();
             if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
                 brandReport.setTypeName(brandReportMap.get("brandName").toString());
-            }else {
+            }else if (type.equals(3)){
                 brandReport.setArticleFamilyName(brandReportMap.get("brandName").toString());
+            }else {
+                brandReport.setArticleName(brandReportMap.get("brandName").toString());
             }
             brandReport.setBrandSellNum(Integer.valueOf(brandReportMap.get("totalNum").toString()));
             brandReport.setSalles(new BigDecimal(brandReportMap.get("sellIncome").toString()));
@@ -332,8 +384,10 @@ public class ArticleSellController extends GenericController{
         map.put("endDate", endDate);
         if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
             map.put("num", "10");//显示的位置
-        }else {
+        }else if (type.equals(3)){
             map.put("num","8");
+        }else {
+            map.put("num","4");
         }
         map.put("timeType", "yyyy-MM-dd");
         //如果是单品
@@ -361,7 +415,7 @@ public class ArticleSellController extends GenericController{
                 List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
                 result.addAll(articleSellDtos);
             }
-        }else{
+        }else if (type.equals(3)){
             //导出文件名
             fileName = "品牌菜品销售报表(类别)"+beginDate+"至"+endDate+".xls";
             path = request.getSession().getServletContext().getRealPath(fileName);
@@ -373,6 +427,18 @@ public class ArticleSellController extends GenericController{
                 List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
                 result.addAll(articleSellDtos);
             }
+        }else {
+            //导出文件名
+            fileName = "品牌菜品销售报表(其他销量)"+beginDate+"至"+endDate+".xls";
+            path = request.getSession().getServletContext().getRealPath(fileName);
+            map.put("reportType", "品牌菜品销售报表(其他销量)");//表的头，第一行内容
+            map.put("reportTitle", "品牌菜品销售报表(其他销量)");//表的名字
+            //定义数据
+            if (articleSellDto.getBrandMealSeals() != null){
+                String json = JSON.toJSONString(articleSellDto.getBrandMealSeals(), filter);
+                List<ArticleSellDto> articleSellDtos = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
+                result.addAll(articleSellDtos);
+            }
         }
         //定义excel工具类对象
         ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
@@ -380,8 +446,10 @@ public class ArticleSellController extends GenericController{
             OutputStream out = new FileOutputStream(path);
             if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
                 excelUtil.ExportExcel(headers, columns, result, out, map);
-            }else {
+            }else if (type.equals(3)){
                 excelUtil.ExportExcel(headersType, columnsType, result, out, map);
+            }else {
+                excelUtil.ExportExcel(headersMeal, columnsMeal, result, out, map);
             }
             out.close();
         }catch(Exception e){
@@ -598,6 +666,50 @@ public class ArticleSellController extends GenericController{
                 }
             }
             object.put("shopArticleTypeDtos",shopArticleType);
+            ShopDetail shopDetail = shopDetailService.selectById(shopId);
+            ArticleSellDto mealSellDto = new ArticleSellDto();
+            List<Map<String, Object>> mealSalesList = orderService.selectMealServiceSales(selectMap);
+            List<ArticleSellDto> mealSellList = new ArrayList<>();
+            for (Map mealSales : mealSalesList) {
+                //判断店铺是否开启餐盒费，如开启了无论产没产生都要显示出来
+                if ((StringUtils.isNotBlank(shopDetail.getMealFeeName()) && shopDetail.getIsMealFee().equals(Common.YES))) {
+                    mealSellDto.setArticleName(shopDetail.getMealFeeName());
+                    mealSellDto.setShopSellNum(mealSales == null ? 0 : Integer.valueOf(mealSales.get("mealSellNum").toString()));
+                    mealSellDto.setSalles(mealSales == null ? BigDecimal.ZERO : new BigDecimal(mealSales.get("mealSalles").toString()));
+                    mealSellDto.setRefundCount(mealSales == null ? 0 : Integer.valueOf(mealSales.get("refundMealNum").toString()));
+                    mealSellDto.setRefundTotal(mealSales == null ? BigDecimal.ZERO : new BigDecimal(mealSales.get("refundMealSalles").toString()));
+                    mealSellList.add(mealSellDto);
+                } else if (mealSales != null && mealSales.get("mealSellNum") != null && Integer.valueOf(mealSales.get("mealSellNum").toString()) != 0) {
+                    //如店铺没有开启餐盒费但有餐盒售卖记录产生也显示出来
+                    mealSellDto.setArticleName(shopDetail.getMealFeeName());
+                    mealSellDto.setShopSellNum(Integer.valueOf(mealSales.get("mealSellNum").toString()));
+                    mealSellDto.setSalles(new BigDecimal(mealSales.get("mealSalles").toString()));
+                    mealSellDto.setRefundCount(Integer.valueOf(mealSales.get("refundMealNum").toString()));
+                    mealSellDto.setRefundTotal(new BigDecimal(mealSales.get("refundMealSalles").toString()));
+                    mealSellList.add(mealSellDto);
+                }
+                //判断店铺是否开启服务费，如开启了无论产没产生都要显示出来
+                if ((StringUtils.isNotBlank(shopDetail.getServiceName()) && shopDetail.getIsUseServicePrice().equals(Common.YES))) {
+                    mealSellDto = new ArticleSellDto();
+                    mealSellDto.setArticleName(shopDetail.getServiceName());
+                    mealSellDto.setShopSellNum(mealSales == null ? 0 : Integer.valueOf(mealSales.get("serviceSellNum").toString()));
+                    mealSellDto.setSalles(mealSales == null ? BigDecimal.ZERO : new BigDecimal(mealSales.get("serviceSalles").toString()));
+                    mealSellDto.setRefundCount(mealSales == null ? 0 : Integer.valueOf(mealSales.get("refundServiceCount").toString()));
+                    mealSellDto.setRefundTotal(mealSales == null ? BigDecimal.ZERO : new BigDecimal(mealSales.get("refundServiceSalles").toString()));
+                    mealSellList.add(mealSellDto);
+                } else if (mealSales != null && mealSales.get("serviceSellNum") != null && Integer.valueOf(mealSales.get("serviceSellNum").toString()) != 0) {
+                    mealSellDto = new ArticleSellDto();
+                    //如店铺没有开启服务费但有服务费售卖记录产生也显示出来
+                    mealSellDto.setArticleName(shopDetail.getServiceName());
+                    mealSellDto.setShopSellNum(Integer.valueOf(mealSales.get("serviceSellNum").toString()));
+                    mealSellDto.setSalles(new BigDecimal(mealSales.get("serviceSalles").toString()));
+                    mealSellDto.setRefundCount(Integer.valueOf(mealSales.get("refundServiceCount").toString()));
+                    mealSellDto.setRefundTotal(new BigDecimal(mealSales.get("refundServiceSalles").toString()));
+                    mealSellList.add(mealSellDto);
+                }
+                mealSellDto = new ArticleSellDto();
+            }
+            object.put("shopMealSalesDtos", mealSellList);
         }catch (Exception e){
             log.error("查询店铺菜品销售报表出错！");
             e.printStackTrace();
@@ -622,6 +734,8 @@ public class ArticleSellController extends GenericController{
         String[][] headers = {{"菜品类型","25"},{"菜品类别","25"},{"菜品名称","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
         String[]columnsType={"articleFamilyName","shopSellNum","numRatio","salles","discountMoney","salesRatio","refundCount","refundTotal","likes"};
         String[][] headersType = {{"菜品类别","25"},{"销量(份)","25"},{"销量占比","25"},{"销售额(元)","25"},{"折扣金额(元)","25"},{"销售额占比","25"},{"退菜数量","25"},{"退菜金额","25"},{"点赞数量","25"}};
+        String[]columnsMeals={"articleName","shopSellNum","salles","refundCount","refundTotal"};
+        String[][] headersMeals = {{"菜品名称","25"},{"销量(份)","25"},{"销售额(元)","25"},{"退菜数量(份)","25"},{"退菜金额(元)","25"}};
         String shopName= shopDetailService.selectById(shopId).getName();
         //定义数据
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
@@ -632,6 +746,8 @@ public class ArticleSellController extends GenericController{
         filter.getExcludes().add("shopArticleFamily");
         filter.getExcludes().add("brandArticleType");
         filter.getExcludes().add("shopArticleType");
+        filter.getExcludes().add("shopMealSeals");
+        filter.getExcludes().add("brandMealSeals");
         List<ArticleSellDto> result = new ArrayList<ArticleSellDto>();
         Map<String,String> map = new HashMap<>();
         //定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
@@ -641,8 +757,10 @@ public class ArticleSellController extends GenericController{
         map.put("endDate", endDate);
         if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
             map.put("num", "10");//显示的位置
-        } else{
-            map.put("num", "8");//显示的位置
+        }else if (type.equals(3)){
+            map.put("num","8");
+        }else {
+            map.put("num","4");
         }
         map.put("timeType", "yyyy-MM-dd");
         //如果是单品
@@ -668,7 +786,7 @@ public class ArticleSellController extends GenericController{
                 String json = JSON.toJSONString(articleSellDto.getShopArticleFamily(), filter);
                 result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
             }
-        }else{
+        }else if(type.equals(3)){
             //导出文件名
             fileName = "店铺菜品销售报表(类别)"+beginDate+"至"+endDate+".xls";
             path = request.getSession().getServletContext().getRealPath(fileName);
@@ -679,6 +797,17 @@ public class ArticleSellController extends GenericController{
                 String json = JSON.toJSONString(articleSellDto.getShopArticleType(), filter);
                 result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
             }
+        }else{
+            //导出文件名
+            fileName = "店铺菜品销售报表(其他销量)"+beginDate+"至"+endDate+".xls";
+            path = request.getSession().getServletContext().getRealPath(fileName);
+            map.put("reportType", "店铺菜品销售报表(其他销量)");//表的头，第一行内容
+            map.put("reportTitle", "店铺菜品销售报表(其他销量)");//表的名字
+            //定义数据
+            if (articleSellDto.getShopMealSeals() != null){
+                String json = JSON.toJSONString(articleSellDto.getShopMealSeals(), filter);
+                result = JSON.parseObject(json, new TypeReference<List<ArticleSellDto>>(){});
+            }
         }
         //定义excel工具类对象
         ExcelUtil<ArticleSellDto> excelUtil=new ExcelUtil<ArticleSellDto>();
@@ -686,8 +815,10 @@ public class ArticleSellController extends GenericController{
             OutputStream out = new FileOutputStream(path);
             if (type.equals(ArticleType.SIMPLE_ARTICLE) || type.equals(ArticleType.TOTAL_ARTICLE)) {
                 excelUtil.ExportExcel(headers, columns, result, out, map);
-            }else {
+            }else if (type.equals(3)){
                 excelUtil.ExportExcel(headersType, columnsType, result, out, map);
+            }else {
+                excelUtil.ExportExcel(headersMeals, columnsMeals, result, out, map);
             }
             out.close();
         }catch(Exception e){

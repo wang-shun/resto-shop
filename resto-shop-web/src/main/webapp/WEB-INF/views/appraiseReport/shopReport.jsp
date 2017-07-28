@@ -112,7 +112,10 @@
                         },
                         {
                             title :"评论时间",
-                            data : "createTime"
+                            data : "createTime",
+                            createdCell: function (td, tdData, rowData) {
+                                $(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+                            }
                         },
                         {
                             title : "手机号",

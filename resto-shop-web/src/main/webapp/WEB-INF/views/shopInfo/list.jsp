@@ -533,6 +533,33 @@
 						</div>
 					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label" :class="{ formBox : m.openBadAppraisePrintOrder == 1}">差评是否打印通知：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="openBadAppraisePrintOrder"v-model="m.openBadAppraisePrintOrder" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="openBadAppraisePrintOrder" v-model="m.openBadAppraisePrintOrder" value="0"> 否
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group" v-show="m.openBadAppraisePrintOrder == 1">
+						<label class="col-md-4 control-label" :class="{ formBox : m.openBadAppraisePrintOrder == 1}">打印方式：</label>
+						<input type="hidden" name="daySmsType" v-model="getDaySmsType">
+						<div  class="col-md-6 radio-list checkbox">
+							<label style="margin-left: 16px;">
+								<input type="checkbox" name="badAppraisePrintReceipt" :true-value="1" v-model="m.badAppraisePrintReceipt">
+								&nbsp;&nbsp;前台打印
+							</label>
+							<label style="margin-left: 16px;">
+								<input type="checkbox" name="badAppraisePrintKitchen" :true-value="1"  v-model="m.badAppraisePrintKitchen" >
+								&nbsp;&nbsp;厨房打印
+							</label>
+						</div>
+					</div>
+
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>

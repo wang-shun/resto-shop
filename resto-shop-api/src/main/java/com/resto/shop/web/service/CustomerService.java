@@ -98,4 +98,6 @@ public interface CustomerService extends GenericService<Customer, String> {
 
 
     List<Customer> selectByTelePhones(List<String> telePhones);
+
+    List<Customer> getCommentCustomer(String startTime,Integer time,Integer type);
 }

@@ -174,4 +174,9 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
     public List<OrderItem> selectRefundArticleItem(String orderId) {
         return orderitemMapper.selectRefundArticleItem(orderId);
     }
+
+    @Override
+    public List<OrderItem> selectByArticleIds(String[] articleIds) {
+        return orderitemMapper.selectByArticleIds(articleIds);
+    }
 }

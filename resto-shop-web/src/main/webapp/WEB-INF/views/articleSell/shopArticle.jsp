@@ -49,6 +49,11 @@
                 <strong>类别</strong>
            </a>
         </li>
+	    <li role="presentation" @click="chooseType(4)">
+		   <a href="#mealSeals" aria-controls="mealSeals" role="tab" data-toggle="tab">
+			  <strong>其他销量</strong>
+	       </a>
+	    </li>
 	  </ul>
 	  <div class="tab-content">
 	  	<!-- 单品 -->
@@ -99,6 +104,23 @@
                   </div>
               </div>
           </div>
+
+		  <!-- 其他销量 -->
+		  <div role="tabpanel" class="tab-pane" id="mealSeals">
+			  <div class="panel panel-info" style="border-color:white;">
+				  <!-- 品牌菜品销售表(其他销量) -->
+				  <div class="panel panel-success">
+					  <div class="panel-heading text-center">
+						  <strong style="margin-right:100px;font-size:22px">店铺菜品销售表(其他销量)</strong>
+					  </div>
+					  <div class="panel-body">
+						  <table id="shopMealSealsTable" class="table table-striped table-bordered table-hover"
+								 style="width: 100%;">
+						  </table>
+					  </div>
+				  </div>
+			  </div>
+		  </div>
 	    </div>
 	  </div>
 	    </div>
@@ -143,6 +165,7 @@
 	var shopUnitAPI = null;
 	var shopFamilyAPI = null;
     var shopTypeAPI = null;
+	var shopMealSealsAPI = null;
 	var vueObjShop = new Vue({
 	    el : "#controlShop",
 	    data : {
@@ -154,10 +177,12 @@
 	        shopArticleUnitTable:{},//单品dataTables对象
 	        shopArticleFamilyTable:{},//套餐datatables对象
             shopArticleTypeTable:{},//类别datatables对象
+			shopMealSealsTable : {}, //其他销量datatable对象
 	        api:{},
             shopArticleUnitDtos:[],
             shopArticleFamilyDtos:[],
-            shopArticleTypeDtos:[]
+            shopArticleTypeDtos:[],
+			shopMealSealsDtos:[]
 	    },
 	    created : function() {
 	        this.searchDate.beginDate = beginDate;
@@ -353,6 +378,38 @@
                         shopTypeAPI = this.api();
                     }
                 });
+
+				//其他销量datatable对象
+				that.shopMealSealsTable=$("#shopMealSealsTable").DataTable({
+					lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
+					order: [[ 2, "desc" ]],
+					columns : [
+						{
+							title : "菜品名称",
+							data : "articleName",
+							orderable : false
+						},
+						{
+							title : "销量(份)",
+							data : "shopSellNum",
+						},
+						{
+							title : "销售额(元)",
+							data : "salles"
+						},
+						{
+							title:"退菜数量" ,
+							data:"refundCount"
+						},
+						{
+							title:"退菜金额" ,
+							data:"refundTotal"
+						}
+					],
+					initComplete: function () {
+						shopMealSealsAPI = this.api();
+					}
+				});
 	        },
 	        //切换单品、套餐 type 1:单品 2:套餐 3:类别
 	        chooseType:function (type) {
@@ -376,6 +433,7 @@
 		            var api1 = shopUnitAPI;
 		            var api2 = shopFamilyAPI;
                     var api3 = shopTypeAPI;
+					var api4 = shopMealSealsAPI;
                     $.post("articleSell/queryShopOrderArtcile", this.getDate(), function(result) {
                         if(result.success == true){//清空datatable的column搜索条件
                             toastr.clear();
@@ -383,6 +441,7 @@
                             that.shopArticleUnitDtos = result.data.shopArticleUnitDtos;
                             that.shopArticleFamilyDtos = result.data.shopArticleFamilyDtos;
                             that.shopArticleTypeDtos = result.data.shopArticleTypeDtos;
+							that.shopMealSealsDtos = result.data.shopMealSalesDtos;
                             api1.search('');
                             var column1 = api1.column(1);
                             column1.search('', true, false);
@@ -403,6 +462,10 @@
                             api3.search('');
                             that.shopArticleTypeTable.clear();
                             that.shopArticleTypeTable.rows.add(result.data.shopArticleTypeDtos).draw();
+							//其他销量
+							api4.search('');
+							that.shopMealSealsTable.clear();
+							that.shopMealSealsTable.rows.add(result.data.shopMealSalesDtos).draw();
                         }else{
 							toastr.clear();
                             toastr.error("查询报表出错");
@@ -464,6 +527,17 @@
                                 }
                             });
                             break;
+						case 4:
+							object.shopMealSeals = that.shopMealSealsDtos;
+							$.post("articleSell/createShopArticle",object,function (result) {
+								if(result.success){
+									window.location.href="articleSell/downloadShopArticle?path="+result.data+"";
+								}else{
+									toastr.clear();
+									toastr.error("下载报表出错");
+								}
+							});
+						break;
                     }
                 }catch (e){
 					toastr.clear();

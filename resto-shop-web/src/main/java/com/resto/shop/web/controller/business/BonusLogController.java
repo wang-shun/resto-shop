@@ -142,6 +142,9 @@ public class BonusLogController extends GenericController{
         bonusLog.setShopownerId(shopownerId);
         bonusLog.setEmployeeId(employeeId);
 	    try{
+	        if (bonusLog.getState() == 2){
+	            return new Result("奖励已发放，请勿重新操作", true);
+            }
             BonusSetting bonusSetting = bonusSettingService.selectById(bonusLog.getBonusSettingId());
             WechatConfig wechatConfig = wechatConfigService.selectByBrandId(bonusSetting.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectById(bonusSetting.getShopDetailId());

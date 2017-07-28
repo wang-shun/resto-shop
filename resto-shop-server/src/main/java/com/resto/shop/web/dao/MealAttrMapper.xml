@@ -72,6 +72,7 @@
         inner join tb_order tr
         on toi.order_id = tr.id
         where tr.order_state in (2,10,11,12) and IF(tr.is_pos_pay = 1,tr.is_pos_pay = 1,tr.production_status in (2,3))
+        and toi.type = 3
         and toi.article_id = #{articleId}
         and toi.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
         and toi.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
