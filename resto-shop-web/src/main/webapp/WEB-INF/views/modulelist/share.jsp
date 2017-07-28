@@ -96,19 +96,19 @@
 			</div>
 		</div>
 		<div class="form-group" v-if="m.openMultipleRebates==1">
-			<label  class="col-sm-3 control-label" :class="{ formBox : m.openMultipleRebates == 1}">首单返利(%)</label>
+			<label  class="col-sm-3 control-label" :class="{ formBox : m.openMultipleRebates == 1}">以后订单返利(%)</label>
 			<div class="col-sm-8">
 				<input type="text" class="form-control" name="afterRebate" v-model="m.afterRebate">
 			</div>
 		</div>
 		<div class="form-group" v-if="m.openMultipleRebates==1">
-			<label  class="col-sm-3 control-label" :class="{ formBox : m.openMultipleRebates == 1}">首单最小金额</label>
+			<label  class="col-sm-3 control-label" :class="{ formBox : m.openMultipleRebates == 1}">以后订单最小金额</label>
 			<div class="col-sm-8">
 				<input type="text" class="form-control" name="afterMinMoney" v-model="m.afterMinMoney">
 			</div>
 		</div>
 		<div class="form-group" v-if="m.openMultipleRebates==1">
-			<label  class="col-sm-3 control-label" :class="{ formBox : m.openMultipleRebates == 1}">首单最大金额</label>
+			<label  class="col-sm-3 control-label" :class="{ formBox : m.openMultipleRebates == 1}">以后订单最大金额</label>
 			<div class="col-sm-8">
 				<input type="text" class="form-control" name="afterMaxMoney" v-model="m.afterMaxMoney">
 			</div>
