@@ -68,6 +68,12 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         return list;
     }
 
+    @Override
+    public List<Coupon> listCouponUsed(Coupon coupon) {
+        List<Coupon> list=couponMapper.listCouponUsed(coupon);
+        return list;
+    }
+
 	@Resource
 	OrderPaymentItemService orderPaymentItemService;
 
