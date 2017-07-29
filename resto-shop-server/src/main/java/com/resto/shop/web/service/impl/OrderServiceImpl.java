@@ -4032,7 +4032,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     /**
      * 2016-11-2
      */
-    public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate, String brandId, String brandName) {
+    public brandArticleReportDto callBrandArticleNum(String beginDate, String endDate, String brandId, String brandName) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         Integer totalNum = 0;
@@ -4073,7 +4073,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate, String brandId, List<ShopDetail> shopDetails) {
+    public List<ShopArticleReportDto> callShopArticleDetails(String beginDate, String endDate, String brandId, List<ShopDetail> shopDetails) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         if (shopDetails.isEmpty()) {

@@ -231,7 +231,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param endDate
 	 * @return
 	 */
-	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate,String brandId,String brandName);
+	public brandArticleReportDto callBrandArticleNum(String beginDate, String endDate,String brandId,String brandName);
 
 	
 	/**
@@ -241,7 +241,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param endDate
 	 * @return
 	 */
-	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate,String brandId,List<ShopDetail> shopDetails);
+	public List<ShopArticleReportDto> callShopArticleDetails(String beginDate, String endDate,String brandId,List<ShopDetail> shopDetails);
 	
 	/**
 	 * 根据时间 查询 当前品牌已完成的订单的 菜品分类销售详情(品牌端显示)
