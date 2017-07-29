@@ -215,4 +215,15 @@
         )
         GROUP BY td.id) r),0))) useOrder;
     </select>
+
+    <select id="selectShareMoneyList" resultType="com.resto.shop.web.dto.ShareMoneyDto">
+        select trp.id id, trp.customer_id cid, trp.order_id orderId, trp.red_money `value`,
+        trp.create_time createTime, o.customer_id customerId, c.nickname nickName, c.head_photo headPhoto
+        from tb_red_packet trp
+        LEFT JOIN tb_order o ON  trp.order_id = o.id
+        LEFT JOIN tb_customer c ON  o.customer_id = c.id
+        where trp.customer_id = #{customerId}
+        and trp.order_id is not null and trp.red_type = 1
+        order by trp.create_time desc  LIMIT #{currentPage},#{showCount}
+    </select>
 </mapper>
