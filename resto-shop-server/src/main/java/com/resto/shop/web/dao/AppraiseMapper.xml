@@ -81,7 +81,7 @@
   <select id="listAppraise" resultType="Appraise">
   	 SELECT a.id,a.CUSTOMER_ID,a.PICTURE_URL,a.ARTICLE_ID,a.shop_detail_id,a.TYPE,a.create_time,a.LEVEL,a.CONTENT,a.STATUS,a.FEEDBACK,a.feedback_article,c.NICKNAME,c.head_photo,c.sex
   	  from tb_appraise a LEFT JOIN tb_customer c on a.customer_id = c.id   	  
-  	  where shop_detail_id=#{currentShopId} and LEVEL &gt;= #{minLevel}
+  	  where shop_detail_id=#{currentShopId} and LEVEL &gt;= #{minLevel} and content not like '%系统%'
   	  	and LEVEL &lt;= #{maxLevel} ORDER BY create_time DESC LIMIT #{currentPage},#{showCount}
   </select>
   <select id="selectDetailedById" resultType="Appraise">
@@ -152,7 +152,8 @@
      a.article_id,
      a.shop_detail_id,
      c.nickname,
-     c.head_photo
+     c.head_photo,
+     c.sex
      FROM
      tb_appraise a
      LEFT JOIN tb_customer c
@@ -173,7 +174,7 @@
         WHEN 5 THEN '五星'
         END levelName,
         ta.feedback feedBack,
-        DATE_FORMAT(ta.create_time,'%Y-%m-%d %H:%I:%s') createTime,
+        ta.create_time createTime,
         IFNULL(tc.telephone,'--') telephone,
         td.order_money orderMoney,
         ta.red_money redMoney,
@@ -188,4 +189,31 @@
         and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
         and td.shop_detail_id = #{shopId}
     </select>
+
+	<select id="selectByTimeAndBrandId" resultType="Appraise" >
+		SELECT
+			 a.id,
+			 a.picture_url,
+			 a.level,
+			 a.create_time,
+			 a.content,
+			 a.status,
+			 a.type,
+			 a.feedback,
+			 a.red_money,
+			 a.customer_id,
+			 a.order_id,
+			 a.article_id,
+			 a.shop_detail_id,
+			 c.nickname,
+			 c.head_photo,
+			 c.sex
+			 FROM
+			 tb_appraise a
+			 LEFT JOIN tb_customer c
+			 on a.customer_id = c.id
+			 WHERE
+			 <![CDATA[ a.create_time >= #{beginDate} AND a.create_time <= #{endDate}]]>
+	</select>
+
 </mapper>

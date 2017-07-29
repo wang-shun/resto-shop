@@ -37,6 +37,12 @@ public class JdbcSmsUtils {
 
     static   Logger log = LoggerFactory.getLogger(JdbcSmsUtils.class);
 
+    private static Boolean todayAppraiseFlag = true;
+
+    private static Boolean goodTopFlag = true;
+
+    private static Boolean badTopFlag = true;
+
     /**
      * 获得数据库的连接
      *
@@ -105,9 +111,11 @@ public class JdbcSmsUtils {
      * @param dayDataMessage
      * @return
      * 插入日结短信数据
+     * 这里面的数据是一次性插入所以可以不管flag
      */
     public  static  void saveDayDataMessage(DayDataMessage dayDataMessage,String shopId) {
         //初始化连接
+        log.info("开始插入日结短信数据---");
         getConnection();
         //删除今日数据
         String deleteSql = "delete from tb_day_data_message where shop_id = ? and date = ?";
@@ -170,24 +178,29 @@ public class JdbcSmsUtils {
     /**
      * 存今日评论数据
      * @param a
+     * 这数据是循环插入 所以不能每次都删除原有数据 第一次删除
+     *
      */
     public static void saveTodayAppraise(Appraise a,String brandId,String shopId) {
         //初始化连接
         log.info("开始存当日评论数据---");
         getConnection();
-        //首先删除今日店铺的评论数据(防止多次结店)
-        String deleteSql = "DELETE FROM tb_sms_appraise WHERE shop_detail_id = ? and create_time > ? and create_time<?";
-        List<Object> dparams = new ArrayList<>();
-        dparams.add(shopId);
-        dparams.add(DateUtil.getDateBegin(new Date()));
-        dparams.add(DateUtil.getDateEnd(new Date()));
-        try {
-            updateByPreparedStatement(deleteSql,dparams);
-        }catch (SQLException e){
-            e.printStackTrace();
+        if(todayAppraiseFlag){
+            //首先删除今日店铺的评论数据(防止多次结店)
+            String deleteSql = "DELETE FROM tb_sms_appraise WHERE shop_detail_id = ? and create_time > ? and create_time<?";
+            List<Object> dparams = new ArrayList<>();
+            dparams.add(shopId);
+            dparams.add(DateUtil.getDateBegin(new Date()));
+            dparams.add(DateUtil.getDateEnd(new Date()));
+            try {
+                updateByPreparedStatement(deleteSql,dparams);
+                //第一次删除后
+                todayAppraiseFlag = false;
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
         }
-
-        String sql = "INSERT into tb_sms_appraise (id,picture_url,level,create_time,content,status,type,feedback,shop_detail_id,brand_id,head_photo,nick_name) values (?,?,?,?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT into tb_sms_appraise (id,picture_url,level,create_time,content,status,type,feedback,shop_detail_id,brand_id,head_photo,nick_name,sex) values (?,?,?,?,?,?,?,?,?,?,?,?,?)";
         List<Object> params = new ArrayList<>();
         params.add(ApplicationUtils.randomUUID());
         params.add(a.getPictureUrl());
@@ -207,6 +220,7 @@ public class JdbcSmsUtils {
             a.setNickName("");
         }
         params.add(EmojiFilter.filterEmoji(a.getNickName()));
+        params.add(a.getSex());
         try{
           updateByPreparedStatement(sql,params);
 
@@ -217,6 +231,14 @@ public class JdbcSmsUtils {
         close();
     }
 
+    /**
+     * 这个数据也是一次性 所以每次删除就可以不用考虑 flag
+     * @param todaySatisfaction
+     * @param xunSatisfaction
+     * @param monthSatisfaction
+     * @param brandId
+     * @param shopId
+     */
     public static void saveStations(String todaySatisfaction, String xunSatisfaction, String monthSatisfaction,String brandId,String shopId) {
 
         //初始化连接
@@ -263,21 +285,27 @@ public class JdbcSmsUtils {
      * @param type
      * @param sum
      * @param sort
+     * 该数据是循环插入所以需要判断flag
+     *
      */
     public static void saveGoodTop(ArticleTopDto articleTopDto, Brand b, ShopDetail s ,int type,int sum,int sort) {
         //初始化连接
         getConnection();
-        //删除数据(防止多次结店数据多)
-        String dsql = "delete from tb_good_top where shop_id = ? and date = ? and type = ? and sort = ?";
-        List<Object> dparams = new ArrayList<>();
-        dparams.add(s.getId());
-        dparams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
-        dparams.add(type);
-        dparams.add(sort);
-        try {
-            updateByPreparedStatement(dsql,dparams);
-        }catch (SQLException e){
-            e.printStackTrace();
+
+        if(goodTopFlag){
+            //删除数据(防止多次结店数据多)
+            String dsql = "delete from tb_good_top where shop_id = ? and date = ? and type = ? and sort = ?";
+            List<Object> dparams = new ArrayList<>();
+            dparams.add(s.getId());
+            dparams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+            dparams.add(type);
+            dparams.add(sort);
+            try {
+                updateByPreparedStatement(dsql,dparams);
+                goodTopFlag = false;
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
         }
 
         //新增数据
@@ -316,18 +344,23 @@ public class JdbcSmsUtils {
 
         //初始化连接
         getConnection();
-        //删除数据(防止多次结店数据多)
-        String dsql = "delete from tb_bad_top where shop_id = ? and date = ? and type = ? and sort = ?";
-        List<Object> dparams = new ArrayList<>();
-        dparams.add(s.getId());
-        dparams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
-        dparams.add(type);
-        dparams.add(sort);
 
-        try {
-            updateByPreparedStatement(dsql,dparams);
-        }catch (SQLException e){
-            e.printStackTrace();
+        if(badTopFlag){
+            //删除数据(防止多次结店数据多)
+            String dsql = "delete from tb_bad_top where shop_id = ? and date = ? and type = ? and sort = ?";
+            List<Object> dparams = new ArrayList<>();
+            dparams.add(s.getId());
+            dparams.add(DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+            dparams.add(type);
+            dparams.add(sort);
+
+            try {
+                updateByPreparedStatement(dsql,dparams);
+                badTopFlag = false;
+            }catch (SQLException e){
+                e.printStackTrace();
+            }
+
         }
 
         //新增数据

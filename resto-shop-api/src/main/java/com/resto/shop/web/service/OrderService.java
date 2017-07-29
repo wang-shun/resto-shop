@@ -8,6 +8,7 @@ import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
+import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.model.Order;
@@ -89,6 +90,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	 
 	public Order confirmOrder(Order order);
+
+	public Order confirmWaiMaiOrder(Order order);
 
 	public Order confirmBossOrder(Order order);
 
@@ -674,4 +677,35 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
 	Order customerByOrderForMyPage(String customerId, String shopId);
 	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate);
+
+	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
+
+	List<Map<String, Object>> badAppraisePrintOrder(String orderId);
+
+	/**
+	 * yz
+	 * 2017-07-27
+	 * 测试获取店铺 (用户消费笔数 -- 折扣比率 -- ==相关的数据
+	 * 本次获取店铺数据为 鲁肉范 -- 田林路店
+	 * )
+	 * @param beginDate
+	 * @param endDate
+	 * @param currentShopId
+	 * @return
+	 */
+	Summarry selctSummaryShopData(String beginDate, String endDate, String currentShopId);
+
+	/**
+	 *  * yz
+	 * 2017-07-28
+	 * 测试获取品牌 (用户消费笔数 -- 折扣比率 -- ==相关的数据
+	 * 本次获取品牌数据为 嫩绿茶
+	 * )
+	 * @param beginDate
+	 * @param endDate
+	 * @param currentBrandId
+	 * @return
+
+	 */
+	Summarry selctSummaryBrandData(String beginDate, String endDate, String currentBrandId);
 }

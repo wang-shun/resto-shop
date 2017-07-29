@@ -126,7 +126,9 @@ public class OrderAspect {
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
             if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
-                MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
+                BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+                MQMessageProducer.sendPlatformOrderMessage(order.getId(), PlatformType.R_VERSION, order.getBrandId(), order.getShopDetailId());
+                MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
             }
 
             //自动取消订单，大boss模式下  先付2小时未付款 自动取消订单
@@ -353,21 +355,33 @@ public class OrderAspect {
 //                (ShopMode.TABLE_MODE != order.getOrderMode() || ShopMode.BOSS_ORDER != order.getOrderMode())) {//坐下点餐模式不发送该消息
 //            sendPaySuccessMsg(order);
 //        }
+
+        //R+外卖走消息队列  (订单不为空 支付模式不为空  支付为微信或者支付宝支付  已支付  已下单 外卖模式)
+        if(order != null && order.getPayMode() != null && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY) &&
+                order.getOrderState().equals(OrderState.PAYMENT)&& !order.getProductionStatus().equals(ProductionStatus.PRINTED) && order.getDistributionModeId()==2){
+            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+            MQMessageProducer.sendPlatformOrderMessage(order.getId(), PlatformType.R_VERSION, order.getBrandId(), order.getShopDetailId());
+            MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
+            return;
+        }
+
+        //订单不为空 支付模式不为空  支付为支付宝支付  已支付  已下单
         if (order != null && order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY &&
                 order.getOrderState().equals(OrderState.PAYMENT)
                 && order.getProductionStatus().equals(ProductionStatus.HAS_ORDER)) {
             if (order.getPayType() == PayType.NOPAY) {
-                order.setPrintTimes(1);
+                order.setPrintTimes(1);//打印次数
                 orderService.update(order);
             }
-            if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
+            /*if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
                 MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
-            }else{
+            }else{*/
                 MQMessageProducer.sendPlaceOrderMessage(order);
-            }
+            //}
         }
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        //订单不为空  已支付   桌号不为空或者外带   坐下点餐模式或者大Boss模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
                 && (order.getTableNumber() != null || (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.NO))
                 && (order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER)) {
@@ -382,16 +396,19 @@ public class OrderAspect {
             shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
         }
 
+        //订单不为空  已支付  电视叫号模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
                 && order.getOrderMode() == ShopMode.CALL_NUMBER) {
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
+
+        //稍后支付  大Boss模式  支付宝或微信支付
         if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)){
-            if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
+            /*if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
                 MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
-            }else{
+            }else{*/
                 MQMessageProducer.sendAutoConfirmOrder(order, 5 * 1000);
-            }
+            //}
             Order o = orderService.getOrderAccount(order.getShopDetailId());
             RedisUtil.set(order.getShopDetailId()+"shopOrderCount",o.getOrderCount());
             RedisUtil.set(order.getShopDetailId()+"shopOrderTotal",o.getOrderTotal());
@@ -572,6 +589,12 @@ public class OrderAspect {
 
     ;
 
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmWaiMaiOrder(..))")
+    public void confirmWaiMaiOrder() {
+    }
+
+    ;
+
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.confirmBossOrder(..))")
     public void confirmBossOrder() {
     }
@@ -719,11 +742,14 @@ public class OrderAspect {
 //
 //    }
 
-    @AfterReturning(value = "confirmOrder()||confirmBossOrder()", returning = "order")
+    @AfterReturning(value = "confirmOrder()||confirmBossOrder()||confirmWaiMaiOrder()", returning = "order")
     public void confirmOrderAfter(Order order) {
         if (order != null) {
             log.info("确认订单成功后回调:" + order.getId());
             Customer customer = customerService.selectById(order.getCustomerId());
+            if(customer == null){
+                return;
+            }
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
             Brand brand = brandService.selectById(customer.getBrandId());
@@ -761,6 +787,18 @@ public class OrderAspect {
                             } else {
                                 log.info("准备发送返利通知  but品牌没有设置返利  so返利0元");
                                 sendRewardShareMsg(shareCustomer, customer, config, setting, BigDecimal.ZERO, order);
+                            }
+                        }
+                    }
+                }else{
+                    if (customer.getShareCustomer() != null){
+                        Customer shareCustomer = customerService.selectById(customer.getShareCustomer());
+                        if (shareCustomer != null) {
+                            ShareSetting shareSetting = shareSettingService.selectValidSettingByBrandId(customer.getBrandId());
+                            if (shareSetting != null && shareSetting.getOpenMultipleRebates() == 1) {
+                                BigDecimal rewardMoney = customerService.rewareShareCustomerAgain(shareSetting, order, shareCustomer, customer);
+                                log.info("准备发送返利通知");
+                                sendRewardShareMsg(shareCustomer, customer, config, setting, rewardMoney, order);
                             }
                         }
                     }
@@ -949,5 +987,34 @@ public class OrderAspect {
         }
         sb.append("订单金额：" + order.getOrderMoney() + "\n");
         WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+    }
+
+    /**
+     * 切到评论方法
+     */
+    @Pointcut("execution(* com.resto.shop.web.service.AppraiseService.saveAppraise(..))")
+    public void saveAppraise() {
+    }
+
+
+    /**
+     * 订单评论完成后执行， 如是差评则发送消息队列执行打单操作
+     * @param appraise
+     */
+    @AfterReturning(value = "saveAppraise()", returning = "appraise")
+    public void saveAppraise(Appraise appraise) {
+        if (appraise != null){
+            log.info("订单评论完成");
+            ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
+            //判断是否开启差评打单
+            if (shopDetail.getOpenBadAppraisePrintOrder()) {
+                //如满足差评条件则打印订单
+                if (appraise.getLevel() <= 4) {
+                    log.info("订单评论满足差评推送消息队列");
+                    //发送队列消息
+                    MQMessageProducer.sendBadAppraisePrintOrderMessage(appraise.getOrderId(), appraise.getShopDetailId());
+                }
+            }
+        }
     }
 }

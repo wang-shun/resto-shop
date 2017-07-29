@@ -91,6 +91,26 @@ public class Customer implements Serializable{
 
     private String shareLink;
 
+    private String orderId;
+
+    private String shopDetailId;
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getShopDetailId() {
+        return shopDetailId;
+    }
+
+    public void setShopDetailId(String shopDetailId) {
+        this.shopDetailId = shopDetailId;
+    }
+
     public String getShareLink() {
         return shareLink;
     }

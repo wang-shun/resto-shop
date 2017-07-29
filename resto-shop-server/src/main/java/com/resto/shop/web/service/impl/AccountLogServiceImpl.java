@@ -48,4 +48,9 @@ public class AccountLogServiceImpl extends GenericServiceImpl<AccountLog, String
     public BigDecimal selectByShareMoney(String accountId) {
         return accountlogMapper.selectByShareMoney(accountId);
     }
+
+    @Override
+    public Integer selectByShareMoneyCount(String accountId) {
+        return accountlogMapper.selectByShareMoneyCount(accountId);
+    }
 }

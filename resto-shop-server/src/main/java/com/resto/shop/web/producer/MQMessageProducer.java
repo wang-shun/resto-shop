@@ -94,6 +94,7 @@ public class MQMessageProducer {
 		obj.put("brandId", order.getBrandId());
 		obj.put("id", order.getId());
 		obj.put("orderMode",order.getOrderMode());
+		obj.put("productionStatus",order.getProductionStatus());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_AUTO_CONFIRM_ORDER,obj.toJSONString().getBytes());
 		long delay = System.currentTimeMillis()+delayTime;
 		message.setStartDeliverTime(delay);
@@ -317,6 +318,18 @@ public class MQMessageProducer {
 		JSONObject obj  = new JSONObject();
 		obj.put("shopId",shopId);
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PRINT_SUCCESS,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
+	/**
+	 * 发送打印差评订单的消息队列
+	 * @param orderId
+	 */
+	public static void sendBadAppraisePrintOrderMessage(String orderId, String shopId){
+		JSONObject obj  = new JSONObject();
+		obj.put("orderId",orderId);
+		obj.put("shopId",shopId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_BAD_APPRAISE_PRINT_ORDER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
 }
