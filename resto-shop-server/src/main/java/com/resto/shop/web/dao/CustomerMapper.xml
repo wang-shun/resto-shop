@@ -641,4 +641,9 @@ and wechat_id != '0'
 
 
     </select>
+
+    <select id="selectShareCustomerList" resultType="Customer">
+        select * from tb_customer where share_customer = #{customerId}
+        order by bind_phone_time desc LIMIT #{currentPage},#{showCount}
+    </select>
 </mapper>

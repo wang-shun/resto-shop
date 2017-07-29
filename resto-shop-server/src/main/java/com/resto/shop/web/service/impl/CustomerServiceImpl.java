@@ -290,4 +290,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public List<Customer> getCommentCustomer(String startTime, Integer time,Integer type) {
 		return customerMapper.getCommentCustomer(startTime,time,type);
 	}
+
+	@Override
+	public List<Customer> selectShareCustomerList(String customerId, Integer currentPage, Integer showCount) {
+		return customerMapper.selectShareCustomerList(customerId, currentPage, showCount);
+	}
 }
