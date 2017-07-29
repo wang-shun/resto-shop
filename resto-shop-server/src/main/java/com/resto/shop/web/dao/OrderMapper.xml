@@ -3196,4 +3196,138 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         AND td.parent_order_id is null
         GROUP BY td.shop_detail_id
     </select>
+
+	<!-- yz 2017/07/28 -->
+	<select id="selectNewCustomerOrderByBrandIdAndTime" resultMap="NewCustomerOrderByShopIdAndTimeMap">
+		 SELECT
+        o.id,
+        o.order_mode,
+        o.pay_type,
+        o.customer_id,
+        c.share_customer,
+        o.order_money,
+        o.amount_with_children,
+        oi.payment_mode_id
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi
+        ON o.id = oi.order_id
+        LEFT JOIN tb_customer c
+        ON o.customer_id = c.id
+        WHERE
+        o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND o.brand_id = #{brandId}
+        <![CDATA[
+          AND o.create_time>#{beginDate}
+           AND o.create_time < #{endDate}
+         ]]>
+        AND o.customer_id NOT IN (
+        SELECT
+        customer_id
+        FROM
+        tb_order
+        WHERE
+        order_state IN (2, 10, 11, 12)
+        AND production_status IN (2, 3)
+        AND brand_id = #{brandId}
+        AND
+        <![CDATA[
+           create_time<#{beginDate}
+        ]]>
+        )
+
+	</select>
+
+	<select id="selectBackCustomerByBrandIdAndTime" resultType="com.resto.brand.web.dto.BackCustomerDto">
+			SELECT
+			o.customer_id,
+			COUNT(*)num
+			FROM
+			tb_order o
+			WHERE
+			o.order_state IN (2, 10, 11, 12)
+			AND o.production_status IN (2, 3)
+			AND
+			<![CDATA[
+        o.create_time <#{beginDate}
+       ]]>
+			AND o.brand_id = #{brandId}
+			AND o.customer_id in (
+			SELECT customer_id FROM tb_order
+			WHERE order_state in(2,10,11,12)
+			AND production_status in(2,3)
+			AND
+			<![CDATA[
+            create_time>#{beginDate} AND create_time<#{endDate}
+        ]]>
+			AND brand_id=#{brandId}
+			)
+			GROUP BY customer_id
+
+	</select>
+
+	<select id="selectCompleteByBrandIdAndTime" resultMap="CompleteByShopIdAndTimeMap">
+		SELECT
+        o.id,
+        o.order_mode,
+        o.pay_type,
+        o.print_order_time,
+        o.customer_id,
+        o.order_money,
+        o.create_time,
+        o.amount_with_children,
+        oi.id orderPaymentItem_id,
+        oi.payment_mode_id
+        FROM tb_order o
+        INNER JOIN tb_order_payment_item oi
+        on o.id = oi.order_id
+        WHERE o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND o.brand_id = #{brandId}
+        AND
+        <![CDATA[
+          o.create_time > #{beginDate}
+        AND o.create_time < #{endDate}
+        ]]>
+
+
+	</select>
+
+	<select id="selectListsmsByBrandId" resultMap="everdayReport">
+			SELECT
+			o.id,
+			o.order_mode,
+			o.pay_type,
+			o.order_state,
+			o.production_status,
+			o.order_money,
+			o.shop_detail_id,
+			o.parent_order_id,
+			o.count_with_child,
+			o.amount_with_children,
+			o.order_mode,
+			o.create_time,
+			oi.id orderPaymentId,
+			oi.payment_mode_id,
+			oi.pay_value,
+			o.customer_id,
+			c.nickname,
+			c.regiest_time,
+			c.share_customer,
+			c.is_share
+			FROM
+			tb_order o
+			INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+			LEFT JOIN tb_customer c ON c.id = o.customer_id
+			WHERE  o.brand_id =#{brandId}
+			and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+			AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3) ANd o.parent_order_id is null
+		</select>
+
+
+
+
+
+
 </mapper>
