@@ -637,6 +637,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      */
     List<Order> selectNewCustomerOrderByShopIdAndTime(@Param("shopId") String id, @Param("beginDate") Date todayBegin,@Param("endDate") Date todayEnd);
 
+
     /**
      * 回头用户
      * 2017-03-07
@@ -716,4 +717,43 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<RefundArticleOrder> addRefundArticleDto(@Param("beginDate") String beginDate,@Param("endDate") String endDate);
 
 	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
+
+	/**
+	 * yz 2017/07/28
+	 * 新增用户的订单 以品牌为基准
+	 * @param brandId
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+	List<Order> selectNewCustomerOrderByBrandIdAndTime(@Param("brandId") String brandId, @Param("beginDate") Date begin, @Param("endDate") Date end);
+
+	/**
+	 * yz 2017/07/28
+	 * 品牌回头用户
+	 * @param brandId
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+	List<BackCustomerDto> selectBackCustomerByBrandIdAndTime(@Param("brandId") String brandId,@Param("beginDate") Date begin, @Param("endDate") Date end);
+
+	/**
+	 * yz 2017/07/28
+	 * 品牌回头订单
+	 * @param brandId
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+	List<Order> selectCompleteByBrandIdAndTime(@Param("brandId") String brandId, @Param("beginDate") Date begin, @Param("endDate") Date end);
+
+	/**
+	 * yz 2017/07/28
+	 * @param begin
+	 * @param end
+	 * @param brandId
+	 * @return
+	 */
+	List<Order> selectListsmsByBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 }

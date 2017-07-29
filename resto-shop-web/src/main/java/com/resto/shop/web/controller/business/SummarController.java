@@ -26,14 +26,23 @@
 	@Resource
  	private OrderService orderService;
 
-	@RequestMapping("getData")
+	@RequestMapping("getShopData")
 	@ResponseBody
- 	public Summarry getDataByTime(String beginDate,String endDate){
+ 	public Summarry getShopDataByTime(String beginDate,String endDate){
 
-		Summarry s = orderService.selctSummaryData(beginDate,endDate,getCurrentShopId());
+		Summarry s = orderService.selctSummaryShopData(beginDate,endDate,getCurrentShopId());
 		return s;
 
 	}
+
+	 @RequestMapping("getBrandData")
+	 @ResponseBody
+	 public Summarry getBrandDataByTime(String beginDate,String endDate){
+
+		 Summarry s = orderService.selctSummaryBrandData(beginDate,endDate,getCurrentBrandId());
+		 return s;
+
+	 }
 
 
  }

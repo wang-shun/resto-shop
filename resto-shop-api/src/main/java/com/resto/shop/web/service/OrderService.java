@@ -693,5 +693,19 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	 * @param currentShopId
 	 * @return
 	 */
-	Summarry selctSummaryData(String beginDate, String endDate, String currentShopId);
+	Summarry selctSummaryShopData(String beginDate, String endDate, String currentShopId);
+
+	/**
+	 *  * yz
+	 * 2017-07-28
+	 * 测试获取品牌 (用户消费笔数 -- 折扣比率 -- ==相关的数据
+	 * 本次获取品牌数据为 嫩绿茶
+	 * )
+	 * @param beginDate
+	 * @param endDate
+	 * @param currentBrandId
+	 * @return
+
+	 */
+	Summarry selctSummaryBrandData(String beginDate, String endDate, String currentBrandId);
 }
