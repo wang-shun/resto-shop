@@ -65,10 +65,9 @@ public interface CustomerService extends GenericService<Customer, String> {
      * 得到某个时间段店铺的会员信息和订单情况
      * @param beginDate
      * @param endDate
-     * @param brandId
      * @return
      */
-    List<MemberUserDto> selectListMemberUser(String beginDate,String endDate);
+    List<MemberUserDto> callListMemberUser(String beginDate,String endDate);
     /**
      * 查询某个时间段的店铺会员信息
      * @param beginDate

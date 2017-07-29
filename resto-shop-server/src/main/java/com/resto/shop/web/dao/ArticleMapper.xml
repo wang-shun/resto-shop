@@ -802,49 +802,14 @@ GROUP BY article_id
     </select>
 
     <select id="queryOrderArtcile" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
-        select
-            ta.id articleId,
-            if(ta.article_type = 1,'单品','套餐') typeName,
-            taf.id articleFamilyId,
-            IFNULL(taf.`name`,'其他')articleFamilyName,
-            ta.`name` articleName,
-            IFNULL(SUM(IF(toi.type != 4, toi.count, 0)),0)
-            <if test="shopDetailId != null and shopDetailId !=''">shopSellNum</if>
-            <if test="shopDetailId == null or shopDetailId ==''">brandSellNum</if>,
-            IFNULL(SUM(IF(toi.type != 4,toi.final_price,0))
-            <if test="type == 2">
-                + IFNULL(SUM((select SUM(trd.unit_price * trd.count) from tb_order_item trd where trd.parent_id = toi.id)),0)
-            </if>,0) salles,
-            IFNULL(SUM(IF(toi.type != 4,toi.refund_count,0)),0) refundCount,
-            IFNULL(SUM(IF(toi.type != 4,toi.refund_count * toi.unit_price,0))
-            <if test="type == 2">
-                + IFNULL(SUM((select SUM(trd.unit_price * trd.refund_count) from tb_order_item trd where trd.parent_id = toi.id)),0)
-            </if>,0) refundTotal,
-            IFNULL(SUM((toi.original_price - toi.unit_price) * toi.count),0) discountMoney,
-            ta.likes likes
-            from tb_article ta
-            left join tb_article_family taf
-            on ta.article_family_id = taf.id
-            left join tb_article_price tap
-            on ta.id = tap.article_id
-            inner join tb_order_item toi
-            on ta.id = toi.article_id
-            or tap.id = toi.article_id
-            inner join tb_order td
-            on toi.order_id = td.id
-            and IF(td.production_status = 6,td.production_status = 6,td.order_state in (2,10,11,12)
-            and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3)))
-            and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-            and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-        where ta.article_type = ${type}
-		<if test="shopDetailId != null and shopDetailId !=''">
-			and ta.shop_detail_id = #{shopDetailId}
+        CALL
+		<if test="shopDetailId != null">
+            proc_order_artcile_shop(#{beginDate},#{endDate},#{shopDetailId},${type})
 		</if>
-        group by ta.id
+        <if test="shopDetailId == null">
+            proc_order_artcile(#{beginDate},#{endDate},${type})
+        </if>
     </select>
-
-
-
 
     <select id="getArticleListByFamily" resultType="Article">
         SELECT * from tb_article a
@@ -883,24 +848,12 @@ GROUP BY article_id
     </select>
 
     <select id="selectArticleOrderCount" parameterType="java.util.Map" resultType="java.util.Map">
-        select
-        IFNULL(SUM(IF(toi.type != 4, toi.count, 0)),0) sellNum,
-        IFNULL(SUM(toi.final_price),0) salles
-        from tb_article ta
-        left join tb_article_price tap
-        on ta.id = tap.article_id
-        inner join tb_order_item toi
-        on ta.id = toi.article_id
-        or tap.id = toi.article_id
-        inner join tb_order td
-        on toi.order_id = td.id
-        and IF(td.production_status = 6,td.production_status = 6,td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3)))
-        and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-        and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-        where ta.article_type = ${type}
-        <if test="shopDetailId != null and shopDetailId !=''">
-            and ta.shop_detail_id = #{shopDetailId}
+        CALL
+        <if test="shopDetailId != null">
+            proc_article_order_count_shop(#{beginDate},#{endDate},${type},#{shopDetailId})
+        </if>
+        <if test="shopDetailId == null">
+            proc_article_order_count(#{beginDate},#{endDate},${type})
         </if>
     </select>
 

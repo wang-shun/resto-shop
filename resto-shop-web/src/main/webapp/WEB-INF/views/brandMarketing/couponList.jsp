@@ -26,7 +26,7 @@
 		 	 <button type="button" class="btn btn-primary" @click="today"> 今日</button>
              <button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
              <button type="button" class="btn btn-primary" @click="week">本周</button>
-             <%--<button type="button" class="btn btn-primary" @click="month">本月</button>--%>
+             <button type="button" class="btn btn-primary" @click="month">本月</button>
              <button type="button" class="btn btn-primary" @click="searchInfo()">查询报表</button>
              <button type="button" class="btn btn-primary" @click="downloadExcel">下载报表</button>
              <br/>
@@ -217,13 +217,13 @@
                     toastr.clear();
                     toastr.error("使用周期开始时间应该少于结束时间！");
                     return false
-                }else if(timeCha1 > 604800000){
+                }else if(timeCha1 > 2678400000){
                     toastr.clear();
-                    toastr.error("发放周期暂时未开放大于一周以内的查询！");
+                    toastr.error("发放周期暂时未开放大于一月以内的查询！");
                     return false;
-                }else if(timeCha2 > 604800000){
+                }else if(timeCha2 > 2678400000){
                     toastr.clear();
-                    toastr.error("使用周期暂时未开放大于一周以内的查询！");
+                    toastr.error("使用周期暂时未开放大于一月以内的查询！");
                     return false;
                 }
                 toastr.clear();
