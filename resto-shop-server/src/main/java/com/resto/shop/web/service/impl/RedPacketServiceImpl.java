@@ -134,7 +134,7 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
     }
 
     @Override
-    public List<ShareMoneyDto> selectShareMoneyList(String customerId) {
-        return redPacketMapper.selectShareMoneyList(customerId);
+    public List<ShareMoneyDto> selectShareMoneyList(String customerId, Integer currentPage, Integer showCount) {
+        return redPacketMapper.selectShareMoneyList(customerId, currentPage, showCount);
     }
 }
