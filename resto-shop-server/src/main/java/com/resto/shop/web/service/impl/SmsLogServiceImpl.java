@@ -64,13 +64,13 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     
     
 	@Override
-	public com.alibaba.fastjson.JSONObject sendCode(String phone, String code, String brandId, String shopId, int smsLogType, Map<String,String> logMap) {
+	public com.alibaba.fastjson.JSONObject sendCode(String phone, String code, String brandId, String shopId, int smsLogType, Map<String,String> logMap,Boolean openBrandAccount,AccountSetting accountSetting) {
         BrandUser brandUser = brandUserService.selectOneByBrandId(brandId);
 		Brand brand = brandService.selectByPrimaryKey(brandId);
 		//发送阿里短信返回 默认使用阿里发送短信
-		com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
+		com.alibaba.fastjson.JSONObject aliResult = new com.alibaba.fastjson.JSONObject();
 		if(smsLogType == SmsLogType.AUTO_CODE){
-			jsonObject = sendMsg(code, phone,brandUser,logMap);
+			aliResult = sendMsg(code, phone,brandUser,logMap);
 		}
 		SmsLog smsLog = new SmsLog();
 		smsLog.setBrandId(brandId);
@@ -79,21 +79,29 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		smsLog.setSmsType(SmsLogType.AUTO_CODE);
 		smsLog.setCreateTime(new Date());
 		smsLog.setPhone(phone);
-		smsLog.setSmsResult(com.alibaba.fastjson.JSONObject.toJSONString(jsonObject));
+		smsLog.setSmsResult(com.alibaba.fastjson.JSONObject.toJSONString(aliResult));
+
+		BrandSetting brandSetting = brandSettingService.selectByBrandId(brandId);
+		Boolean flag = false;
+		if(openBrandAccount!=null&&openBrandAccount){
+			flag = true;
+		}else {
+			flag = brandSetting.getOpenBrandAccount()==1;
+		}
 
 		//返回值中有"success":"false"时说明商家无法发短信或者该条短信发送失败,此时不更新短信账户
-			if(jsonObject.getBoolean("success")){ //返回成功
+			if(aliResult.getBoolean("success")){ //返回成功
 				try{
-					//判断该品牌是否开启了品牌账户的信息
-					BrandSetting brandSetting = brandSettingService.selectByBrandId(brandId);
-					if(brandSetting.getOpenBrandAccount()==1){//开启的品牌账户
-						/**
-						 * yz 2017/07/28 计费系统 (验证码短信发送需要扣除账户信息 记录)
+					/**
+					 * yz 2017/07/28 计费系统 (验证码短信发送需要扣除账户信息 记录)
 
-						 */
+					 */
+					if(flag){
 						log.info("该品牌开启了品牌账户信息--------");
 						//获取品牌账户设置
-						AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+						if(accountSetting==null){
+							 accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+						}
 						//定义每条短信的单价
 						BigDecimal sms_unit = BigDecimal.ZERO;
 						if(accountSetting.getOpenSendSms()==1){
@@ -103,7 +111,6 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 						//剩余账户余额
 						BigDecimal remain = brandAccount.getAccountBalance().subtract(sms_unit);
 
-						//记录品牌账户的更新日志
 						BrandAccountLog blog = new BrandAccountLog();
 						blog.setCreateTime(new Date());
 						blog.setGroupName(brand.getBrandName());
@@ -115,14 +122,12 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 						blog.setBrandId(brandId);
 						blog.setShopId(shopId);
 						blog.setSerialNumber(DateUtil.getRandomSerialNumber());//这个流水号目前使用当前时间搓+4位随机字符串
-						brandAccountLogService.insert(blog);
-						//更新品牌账户
-
-						brandAccountService.updateBlance(sms_unit,brandAccount.getId().longValue());
-						//yz TODO
-						//判断品牌账户是否需要发送通知(账户不足通知)---
-
-
+						Integer accountId = brandAccount.getId();
+						brandAccount = new BrandAccount();
+						brandAccount.setId(accountId);
+						brandAccount.setAccountBalance(remain);
+						//记录品牌账户的更新日志 + 更新账户
+						brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
 					}else {
 						log.info("该品牌未开启品牌账户 -- ");
 						insert(smsLog);
@@ -140,8 +145,8 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 				insert(smsLog);
 			}
 
-		log.info("短信发送结果:"+ com.alibaba.fastjson.JSONObject.toJSONString(jsonObject));
-		return jsonObject;
+		log.info("短信发送结果:"+ com.alibaba.fastjson.JSONObject.toJSONString(aliResult));
+		return aliResult;
 	}
 
 	private void sendNotice(BrandUser brandUser,Map<String,String>logMap) {

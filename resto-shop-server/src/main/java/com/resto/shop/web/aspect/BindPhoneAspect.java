@@ -151,13 +151,14 @@ public class BindPhoneAspect {
 				blog.setShopId(shopId);
 				blog.setBrandId(brand.getId());
 				blog.setSerialNumber(DateUtil.getRandomSerialNumber());
-				//记录 品牌账户更新日志
-				brandAccountLogService.insert(blog);
-
-				//更新品牌账户信息
+				//记录 品牌账户更新日志 + 更新账户
+				Integer brandAccountId = brandAccount.getId();
+				brandAccount = new BrandAccount();
+				brandAccount.setId(brandAccountId);
 				brandAccount.setAccountBalance(remain);
 				brandAccount.setUpdateTime(new Date());
-				brandAccountService.update(brandAccount);
+				brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+
 			}
 			log.info("首次绑定手机，执行指定动作");
 

@@ -5,12 +5,13 @@ import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.generic.GenericService;
+import com.resto.brand.web.model.AccountSetting;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.SmsLog;
 
 public interface SmsLogService extends GenericService<SmsLog, Long> {
 
-	JSONObject sendCode(String phone, String code, String brandId, String shopId, int smsLogType, Map<String,String> logMap);
+	JSONObject sendCode(String phone, String code, String brandId, String shopId, int smsLogType, Map<String,String> logMap, Boolean openBrandAccount, AccountSetting accountSetting);
 
     /**
      * 根据店铺ID查询短信记录
