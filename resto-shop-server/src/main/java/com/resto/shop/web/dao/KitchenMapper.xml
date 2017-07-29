@@ -73,9 +73,9 @@
   	SELECT * from tb_kitchen where id in (SELECT kitchen_id from tb_article_kitchen where article_id = #{articleId})
   </select>
   <select id="selectKitchenByMealsItemId" resultType="Kitchen">
- 	 select * from (SELECT ak.kitchen_id FROM (SELECT article_id FROM tb_order_item WHERE parent_id=#{0}) as tempa
-		LEFT JOIN tb_article_kitchen ak on ak.article_id = tempa.article_id  ) as tempb , tb_kitchen
-		 where tb_kitchen.id = tempb.kitchen_id LIMIT 0,1
+    select * from (SELECT ak.kitchen_id FROM (SELECT article_id FROM tb_order_item WHERE parent_id=#{0}) as tempa
+    LEFT JOIN tb_article_kitchen ak on ak.article_id = tempa.article_id  ) as tempb , tb_kitchen
+    where tb_kitchen.id = tempb.kitchen_id LIMIT 0,1
   </select>
 
     <select id="selectKitchenByOrderItem" resultType="Kitchen">

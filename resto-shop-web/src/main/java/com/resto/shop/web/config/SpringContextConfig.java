@@ -430,6 +430,9 @@ public class SpringContextConfig {
     @Bean
     public WaitPictureService waitPictureService() {return  proxy.create(WaitPictureService.class);}
 
+    @Bean
+    public ShopTvConfigService shopTvConfigService() {return  proxy.create(ShopTvConfigService.class);}
+
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }
