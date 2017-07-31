@@ -182,7 +182,34 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
         redPacket.setShopDetailId(customer.getBindPhoneShop());
         redPacket.setRedRemainderMoney(rewardMoney);
         redPacket.setRedType(RedType.SHARE_RED);
+		redPacket.setOrderId(order.getId());
         redPacketService.insert(redPacket);
+		log.info("分享奖励用户:"+rewardMoney+" 元"+"  分享者:"+shareCustomer.getId());
+		return rewardMoney;
+	}
+
+	@Override
+	public BigDecimal rewareShareCustomerAgain(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer) {
+		BigDecimal rebate = shareSetting.getAfterRebate();
+		BigDecimal money = order.getOrderMoney();
+		BigDecimal rewardMoney = money.multiply(rebate).divide(new BigDecimal(100)).setScale(BigDecimal.ROUND_HALF_DOWN, 2);
+		if(rewardMoney.compareTo(shareSetting.getAfterMinMoney())<0){
+			rewardMoney = shareSetting.getAfterMinMoney();
+		}else if(rewardMoney.compareTo(shareSetting.getAfterMaxMoney())>0){
+			rewardMoney = shareSetting.getAfterMaxMoney();
+		}
+		accountService.addAccount(rewardMoney, shareCustomer.getAccountId(), "分享奖励", AccountLog.SOURCE_SHARE_REWARD,customer.getBindPhoneShop());
+		RedPacket redPacket = new RedPacket();
+		redPacket.setId(ApplicationUtils.randomUUID());
+		redPacket.setRedMoney(rewardMoney);
+		redPacket.setCreateTime(new Date());
+		redPacket.setCustomerId(shareCustomer.getId());
+		redPacket.setBrandId(customer.getBrandId());
+		redPacket.setShopDetailId(customer.getBindPhoneShop());
+		redPacket.setRedRemainderMoney(rewardMoney);
+		redPacket.setRedType(RedType.SHARE_RED);
+		redPacket.setOrderId(order.getId());
+		redPacketService.insert(redPacket);
 		log.info("分享奖励用户:"+rewardMoney+" 元"+"  分享者:"+shareCustomer.getId());
 		return rewardMoney;
 	}
@@ -262,5 +289,10 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	@Override
 	public List<Customer> getCommentCustomer(String startTime, Integer time,Integer type) {
 		return customerMapper.getCommentCustomer(startTime,time,type);
+	}
+
+	@Override
+	public List<Customer> selectShareCustomerList(String customerId, Integer currentPage, Integer showCount) {
+		return customerMapper.selectShareCustomerList(customerId, currentPage, showCount);
 	}
 }

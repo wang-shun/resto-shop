@@ -140,6 +140,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
             redPacket.setShopDetailId(order.getShopDetailId());
             redPacket.setRedRemainderMoney(money);
             redPacket.setRedType(RedType.APPRAISE_RED);
+			redPacket.setOrderId(order.getId());
             redPacketService.insert(redPacket);
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
 		}
@@ -230,4 +231,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
     public List<AppraiseShopDto> selectAppraiseShopDto(Map<String, Object> selectMap) {
         return appraiseMapper.selectAppraiseShopDto(selectMap);
     }
+
+	@Override
+	public List<Appraise> selectByTimeAndBrandId(Date begin, Date end) {
+		return appraiseMapper.selectByTimeAndBrandId(begin,end);
+	}
 }

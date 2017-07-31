@@ -449,7 +449,7 @@
 //                        that.cancel();
 //                        tb.ajax.reload();
 //                    });
-                    if(that.m.couponMinMoney < that.m.couponValue){
+                    if(parseInt(that.m.couponMinMoney) < parseInt(that.m.couponValue)){
                         toastr.clear();
                         toastr.error("优惠券最低消费额度不得小于优惠券价值！");
                         return;

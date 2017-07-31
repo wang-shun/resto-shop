@@ -533,7 +533,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //判断折扣是否匹配，如果不匹配则不允许买单
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(item.getName());
-                    if (a.getFansPrice() != null) {
+                    if(a.getDiscount() != 100){
+                        org_price = a.getPrice();
+                    }else if (a.getFansPrice() != null) {
                         org_price = item.getPrice().subtract(a.getFansPrice()).add(a.getPrice());
                     } else {
                         org_price = item.getPrice();
@@ -8372,6 +8374,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 redPacket.setShopDetailId(order.getShopDetailId());
                                 redPacket.setRedRemainderMoney(backMoney);
                                 redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+                                redPacket.setOrderId(order.getId());
                                 redPacketService.insert(redPacket);
                                 Map map = new HashMap(4);
                                 map.put("brandName", brand.getBrandName());
@@ -8447,6 +8450,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 redPacket.setShopDetailId(order.getShopDetailId());
                                 redPacket.setRedRemainderMoney(backMoney);
                                 redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+                                redPacket.setOrderId(order.getId());
                                 redPacketService.insert(redPacket);
                                 Map accountMap = new HashMap(4);
                                 accountMap.put("brandName", brand.getBrandName());
@@ -8502,6 +8506,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             redPacket.setShopDetailId(order.getShopDetailId());
             redPacket.setRedRemainderMoney(order.getRefundMoney());
             redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+            redPacket.setOrderId(order.getId());
             redPacketService.insert(redPacket);
             Map map = new HashMap(4);
             map.put("brandName", brand.getBrandName());
@@ -9658,7 +9663,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 	@Override
-	public Summarry selctSummaryData(String beginDate, String endDate, String shopId) {
+	public Summarry selctSummaryShopData(String beginDate, String endDate, String shopId) {
 		//定义时间
 		Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginDate));
 		Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
@@ -9833,8 +9838,146 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return printTask;
     }
 
+	@Override
+	public Summarry selctSummaryBrandData(String beginDate, String endDate, String brandId) {
+			//定义时间
+			Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginDate));
+			Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
 
-    /**
+			//查询该段时间内的新增用户订单
+			List<Order> newCustomerOrders = orderMapper.selectNewCustomerOrderByBrandIdAndTime(brandId,begin,end);
+
+			//新增用户的订单总数
+			int newCustomerOrderNum = 0;
+
+			//分享用户的订单总数
+			int newShareCustomerOrderNum = 0;
+
+			if(!newCustomerOrders.isEmpty()){
+				for(Order o:newCustomerOrders){
+					newCustomerOrderNum++;
+					if(o.getCustomer()!=null&& StringUtil.isNotEmpty(o.getCustomer().getShareCustomer())){
+						//说明是分享用户
+						newShareCustomerOrderNum++;
+					}
+				}
+			}
+			//获取到 新用户消费笔数 + 分享用户消费笔数
+			Summarry s = new Summarry();
+			s.setNewCustomerOrder(newCustomerOrderNum);
+			s.setShareCustomerOrder(newShareCustomerOrderNum);
+
+			//查询回头用户
+			List<BackCustomerDto> backCustomerDtos = orderMapper.selectBackCustomerByBrandIdAndTime(brandId, begin, end);
+			Set<String> backCustomerId = new HashSet<>();
+			if(!backCustomerDtos.isEmpty()){
+				for(BackCustomerDto b:backCustomerDtos){
+					backCustomerId.add(b.getCustomerId());
+				}
+			}
+
+
+			//定义回头用户消费笔数
+			int backCustomerOrderNum = 0;
+			List<Order> orders = orderMapper.selectCompleteByBrandIdAndTime(brandId,begin,end);
+			if(!orders.isEmpty()){
+				for(Order o:orders){
+					if(backCustomerId.contains(o.getCustomerId())){
+						backCustomerOrderNum++;
+					}
+				}
+			}
+			//用户消费笔数= 新用户消费笔数+回头用户消费笔数
+			s.setCustomerOrder(newCustomerOrderNum+backCustomerOrderNum);
+
+			//折扣比率
+			String discountRatio = "";
+
+			//resto订单总额
+			BigDecimal restoTotal = BigDecimal.ZERO;
+			//红包
+			BigDecimal redPackTotal = BigDecimal.ZERO;
+			//优惠券
+			BigDecimal couponTotal = BigDecimal.ZERO;
+			//充值赠送
+			BigDecimal chargeReturn = BigDecimal.ZERO;
+			//折扣合计
+			BigDecimal discountTotal = BigDecimal.ZERO;
+
+
+
+			List<Order> orderList = orderMapper.selectListsmsByBrandId(begin, end, brandId);
+			if(!orderList.isEmpty()){
+				for(Order o:orderList){
+					//resto订单总额
+					restoTotal = restoTotal.add(getOrderMoney(o.getOrderMode(),o.getPayType(),o.getOrderMoney(),o.getAmountWithChildren()));
+					if(!o.getOrderPaymentItems().isEmpty()){
+						//订单支付项
+						for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
+							if (oi.getPaymentModeId() == PayMode.ACCOUNT_PAY) {
+								redPackTotal = redPackTotal.add(oi.getPayValue());
+							} else if (oi.getPaymentModeId() == PayMode.COUPON_PAY) {
+								couponTotal = couponTotal.add(oi.getPayValue());
+							} else if (oi.getPaymentModeId() == PayMode.REWARD_PAY) {
+								chargeReturn = chargeReturn.add(oi.getPayValue());
+							}
+						}
+					}
+					discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
+					discountRatio = discountTotal.divide(restoTotal.add(discountTotal),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
+
+				}
+			}
+
+			s.setStatisfaction(discountRatio);
+
+			//评论数
+			int fiveStar = 0;
+
+			int fourStar = 0;
+
+			int oneToThreeStar = 0;
+
+			//总评价数
+			int appraiseNum = 0;
+			//总分数
+
+			double appraiseSum = 0;
+
+
+			/**
+			 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
+			 * 去评价 而现在 是查当天下单当天评价所以需要单独查询
+			 *
+			 *
+			 */
+
+			//单独查询评价和分数
+			List<Appraise> appraises = appraiseService.selectByTimeAndBrandId(begin, end);
+			if(!appraises.isEmpty()){
+				for(Appraise a:appraises){
+					appraiseNum++;
+					appraiseSum+=a.getLevel()*20;
+					if(a.getLevel() == 5){
+						fiveStar++;
+					}else if(a.getLevel() == 4){
+						fourStar++;
+					}else{
+						oneToThreeStar++;
+					}
+				}
+			}
+
+			//评论数
+			s.setFiveStar(fiveStar);
+			s.setFourStar(fourStar);
+			s.setOneToThree(oneToThreeStar);
+			return  s;
+
+	}
+
+
+	/**
      * 得到差评订单的打印模板
      * @param orderItemList
      * @param order
