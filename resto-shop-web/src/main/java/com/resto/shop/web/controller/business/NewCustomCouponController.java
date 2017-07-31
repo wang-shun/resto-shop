@@ -168,4 +168,10 @@ public class NewCustomCouponController extends GenericController{
         return distributionmodeService.selectById(id);
     }
 
+    @RequestMapping("/goToGrant")
+    public String goToGrant(String couponId, HttpServletRequest request){
+        request.setAttribute("couponId", couponId);
+        return "newcustomcoupon/grantCoupon";
+    }
+
 }	
