@@ -98,14 +98,14 @@ public class ArticleSellController extends GenericController{
             List<ArticleSellDto> brandArticleType = articleFamilyService.selectByShopId(null);
             BigDecimal brandSellNum = new BigDecimal(0);
             BigDecimal salles = new BigDecimal(0);
-            brandArticleReportDto brandCount = orderService.selectBrandArticleNum(beginDate, endDate, getCurrentBrandId(), getBrandName());
+            brandArticleReportDto brandCount = orderService.callBrandArticleNum(beginDate, endDate, getCurrentBrandId(), getBrandName());
             object.put("brandReport", brandCount);
             selectMap.put("beginDate", beginDate);
             selectMap.put("endDate", endDate);
             selectMap.put("type", ArticleType.SIMPLE_ARTICLE);
-            List<ArticleSellDto> articleUnitSellDtos = articleService.queryOrderArtcile(selectMap);
+            List<ArticleSellDto> articleUnitSellDtos = articleService.callOrderArtcile(selectMap);
             List<ArticleSellDto> articleUnitSell = articleService.selectArticleByType(selectMap);
-            Map<String, Object> unitMap = articleService.selectArticleOrderCount(selectMap);
+            Map<String, Object> unitMap = articleService.callArticleOrderCount(selectMap);
             for (ArticleSellDto articleUnitSellDto : articleUnitSellDtos){
                 if (unitMap.get("sellNum").toString().equalsIgnoreCase("0")){
                     articleUnitSellDto.setNumRatio("0.00%");
@@ -151,9 +151,9 @@ public class ArticleSellController extends GenericController{
             }
             object.put("brandArticleUnit", articleUnitSellDtos);
             selectMap.put("type", ArticleType.TOTAL_ARTICLE);
-            List<ArticleSellDto> articleFamilySellDtos = articleService.queryOrderArtcile(selectMap);
+            List<ArticleSellDto> articleFamilySellDtos = articleService.callOrderArtcile(selectMap);
             List<ArticleSellDto> articleFamilySell = articleService.selectArticleByType(selectMap);
-            Map<String, Object> familyMap = articleService.selectArticleOrderCount(selectMap);
+            Map<String, Object> familyMap = articleService.callArticleOrderCount(selectMap);
             for (ArticleSellDto articleFamilySellDto : articleFamilySellDtos){
                 if (familyMap.get("sellNum").toString().equalsIgnoreCase("0")){
                     articleFamilySellDto.setNumRatio("0.00%");
@@ -558,9 +558,9 @@ public class ArticleSellController extends GenericController{
             List<ArticleSellDto> shopArticleType = articleFamilyService.selectByShopId(shopId);
             BigDecimal shopSellNum = new BigDecimal(0);
             BigDecimal salles = new BigDecimal(0);
-            List<ArticleSellDto> articleUnitSellDtos = articleService.queryOrderArtcile(selectMap);
+            List<ArticleSellDto> articleUnitSellDtos = articleService.callOrderArtcile(selectMap);
             List<ArticleSellDto> articleUnitSell = articleService.selectArticleByType(selectMap);
-            Map<String, Object> unitMap = articleService.selectArticleOrderCount(selectMap);
+            Map<String, Object> unitMap = articleService.callArticleOrderCount(selectMap);
             for (ArticleSellDto articleUnitSellDto : articleUnitSellDtos) {
                 if (unitMap.get("sellNum").toString().equalsIgnoreCase("0") || Double.parseDouble(unitMap.get("sellNum").toString()) == 0) {
                     articleUnitSellDto.setNumRatio("0.00%");
@@ -606,9 +606,9 @@ public class ArticleSellController extends GenericController{
             }
             object.put("shopArticleUnitDtos", articleUnitSellDtos);
             selectMap.put("type", ArticleType.TOTAL_ARTICLE);
-            List<ArticleSellDto> articleFamilySellDtos = articleService.queryOrderArtcile(selectMap);
+            List<ArticleSellDto> articleFamilySellDtos = articleService.callOrderArtcile(selectMap);
             List<ArticleSellDto> articleFamilySell = articleService.selectArticleByType(selectMap);
-            Map<String, Object> familyMap = articleService.selectArticleOrderCount(selectMap);
+            Map<String, Object> familyMap = articleService.callArticleOrderCount(selectMap);
             for (ArticleSellDto articleFamilySellDto : articleFamilySellDtos) {
                 if (familyMap.get("sellNum").toString().equalsIgnoreCase("0") || Double.parseDouble(familyMap.get("sellNum").toString()) == 0) {
                     articleFamilySellDto.setNumRatio("0.00%");
@@ -859,7 +859,7 @@ public class ArticleSellController extends GenericController{
     public Result list_shop(String beginDate,String endDate){
         JSONObject object = new JSONObject();
         try {
-            List<ShopArticleReportDto> list = orderService.selectShopArticleDetails(beginDate, endDate, getCurrentBrandId(), getCurrentShopDetails());
+            List<ShopArticleReportDto> list = orderService.callShopArticleDetails(beginDate, endDate, getCurrentBrandId(), getCurrentShopDetails());
             object.put("list",list);
         }catch (Exception e){
             log.error("查询店铺菜品销售报表出错！");

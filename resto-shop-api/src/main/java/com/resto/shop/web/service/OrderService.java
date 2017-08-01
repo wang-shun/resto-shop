@@ -231,7 +231,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param endDate
 	 * @return
 	 */
-	public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate,String brandId,String brandName);
+	public brandArticleReportDto callBrandArticleNum(String beginDate, String endDate,String brandId,String brandName);
 
 	
 	/**
@@ -241,7 +241,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param endDate
 	 * @return
 	 */
-	public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate,String brandId,List<ShopDetail> shopDetails);
+	public List<ShopArticleReportDto> callShopArticleDetails(String beginDate, String endDate,String brandId,List<ShopDetail> shopDetails);
 	
 	/**
 	 * 根据时间 查询 当前品牌已完成的订单的 菜品分类销售详情(品牌端显示)
@@ -273,7 +273,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @return
 	 */
 
-	public Map<String,Object> selectMoneyAndNumByDate(String beginDate, String endDate,String brandId, String brandName, List<ShopDetail> shopDetails);
+	public Map<String,Object> callMoneyAndNumByDate(String beginDate, String endDate,String brandId, String brandName, List<ShopDetail> shopDetails);
 
 
 	/**
@@ -299,7 +299,7 @@ public interface OrderService extends GenericService<Order, String> {
 			String sort);
 
 //	public List<Order> selectListByTime(String beginDate, String endDate, String shopId);
-public List<Order> selectListByTime(String beginDate, String endDate, String shopId,String customerId);
+public List<Order> callListByTime(String beginDate, String endDate, String shopId,String customerId);
 
 	//查询订单的详细信息(客户和菜品以及菜品信息分类 )
 
@@ -655,9 +655,9 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
     List<Map<String, Object>> reminder(String orderItemId);
 
-	List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap);
+	List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap);
 
-	List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap);
+	List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap);
 
     //修复加菜时间过后 任然允许加菜的bug
     void fixErrorOrder();
