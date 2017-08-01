@@ -135,7 +135,7 @@ public class SmsLogoInfoController extends GenericController{
 	public JSONObject sendCode(@RequestParam("phone")String phone, @RequestParam("code")String code, @RequestParam("brandId")String brandId, @RequestParam("shopId")String shopId, @RequestParam("smsLogType")int smsLogType){
 
 //		return smsLogService.sendCode(phone, code, brandId, shopId);
-		return smsLogService.sendCode(phone, code, brandId, shopId, smsLogType,null);
+		return smsLogService.sendCode(phone, code, brandId, shopId, smsLogType,null,false,null);
 	}
 	
 }

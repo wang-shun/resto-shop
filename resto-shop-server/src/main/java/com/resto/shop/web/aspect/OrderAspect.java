@@ -17,7 +17,6 @@ import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -607,7 +606,19 @@ public class OrderAspect {
                 || order.getPayMode() == OrderPayMode.ALI_PAY)) {
             String shopId = order.getShopDetailId();
             Integer orderCount = (Integer) RedisUtil.get(shopId + "shopOrderCount");
+			/**
+			 *yz 2017/07/31 这个代码是由于本地拿不了redis中的数据 orderCount为 null 所以线上代码需要删除这个--
+			 */
+			if(orderCount == null){
+            	orderCount =1;
+			}
+			//--------------
+
             BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId + "shopOrderTotal");
+			if(orderTotal == null){
+				orderTotal = new BigDecimal(100);
+			}
+
             if (order.getParentOrderId() == null) {
                 orderCount++;
             }

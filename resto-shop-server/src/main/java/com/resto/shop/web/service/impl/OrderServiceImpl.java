@@ -6,6 +6,8 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.enums.BehaviorType;
+import com.resto.brand.core.enums.DetailType;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
@@ -170,6 +172,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     private DayDataMessageService dayDataMessageService;
 
+
+    @Resource
+	private BrandAccountLogService brandAccountLogService;
+
     @Override
     public GenericDao<Order, String> getDao() {
         return orderMapper;
@@ -207,6 +213,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Autowired
     private DayAppraiseMessageService dayAppraiseMessageService;
+
+
+    @Resource
+	private  AccountSettingService accountSettingService;
+
+
+    @Resource
+	private BrandAccountService brandAccountService;
+
 
 
     Logger log = LoggerFactory.getLogger(getClass());
@@ -1726,7 +1741,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Order printSuccess(String orderId) throws AppException {
+    public Order printSuccess(String orderId,Boolean openBrandAccount,AccountSetting accountSetting) throws AppException {
         Order order = selectById(orderId);
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
@@ -1756,7 +1771,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setProductionStatus(ProductionStatus.PRINTED);
         order.setPrintOrderTime(new Date());
         order.setAllowCancel(false);
-        update(order);
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
+        //yz 2017/07/29计费系统
+        Boolean flag = false;
+        if(openBrandAccount!=null&&openBrandAccount){
+        	flag = true;
+        	if(accountSetting==null){
+        		accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+			}
+		}else {
+        	flag = brandSetting.getOpenBrandAccount()==1;
+
+		}
+        updateOrderAndBrandAccount(order,flag,accountSetting);
 //        Map map = new HashMap(4);
 //        map.put("brandName", brand.getBrandName());
 //        map.put("fileName", shopDetail.getName());
@@ -1776,7 +1803,141 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
         return order;
     }
-    @Override
+
+	/**
+	 * yz 2017 07/31 计费系统
+	 * 下单成功后 根据计费系统的设置 更新账户余额 和记录账户流水日志
+	 * @param order
+	 * @param openBrandAccount
+	 * @param accountSetting
+	 */
+	private void updateOrderAndBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting) {
+    	BigDecimal money = BigDecimal.ZERO;
+		BrandAccountLog blog = new BrandAccountLog();
+		BrandAccount brandAccount = brandAccountService.selectByBrandId(order.getBrandId());
+		ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+
+		if(accountSetting==null){
+			BrandSetting bt = brandSettingService.selectByBrandId(order.getBrandId());
+			accountSetting = accountSettingService.selectByBrandSettingId(bt.getId());
+			openBrandAccount = bt.getOpenBrandAccount()==1;
+		}
+
+		//根据用户id查询 用户已经消费的订单
+		List<Order> list = orderMapper.selectOrderListByCustomerIdAndShopId(order.getShopDetailId(),order.getCustomerId());
+		Boolean flag = false;
+		if(!list.isEmpty()){//这个人在这个店铺有过订单 说明是回头用户
+			flag = true;
+		}
+		update(order);
+
+    	if(openBrandAccount){//说明开启了品牌账户设置
+				//就算出应收金额
+			money = getJifeiMoney(order,accountSetting,flag);
+			BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
+			blog.setSerialNumber(order.getSerialNumber());
+			blog.setCreateTime(new Date());
+			blog.setBrandId(order.getBrandId());
+			blog.setShopId(order.getShopDetailId());
+			blog.setFoundChange(money.negate());
+			blog.setGroupName(shopDetail.getName());
+			blog.setAccountId(brandAccount.getId());
+			blog.setRemain(remain);
+			if(flag){
+				blog.setDetail(DetailType.BACK_CUSTOMER_SELL);
+			}else {
+				blog.setDetail(DetailType.NEW_CUSTOMER_SELL);
+			}
+			blog.setBehavior(BehaviorType.SELL);
+
+			// 创建账户日志流水 和更新账户
+			Integer id = brandAccount.getId();
+			brandAccount = new BrandAccount();
+			brandAccount.setId(id);
+			brandAccount.setUpdateTime(new Date());
+			brandAccount.setAccountBalance(remain);
+			brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+		}
+	}
+
+	/**
+	 * 获取 所有订单的计费 / 回头用户消费订单计费
+	 * @param order
+	 * @param accountSetting
+	 * @return
+	 */
+	private BigDecimal getJifeiMoney(Order order, AccountSetting accountSetting,Boolean flag) {
+
+		//定义抽成比率后的价格
+		BigDecimal money = BigDecimal.ZERO;
+
+		//定义订单的总额(实际支付的金额)
+		BigDecimal jifeiMoney = BigDecimal.ZERO;
+
+		if(accountSetting.getOpenAllOrder()==1){//说明是 所有订单是/订单总额 抽成
+			if(order.getPayType()==0){//如果是先付
+				jifeiMoney = order.getOrderMoney();
+			}else if(order.getPayType()==1){//如果是后付
+				if(order.getAmountWithChildren().compareTo(BigDecimal.ZERO)>0){
+					jifeiMoney = order.getAmountWithChildren();
+				}else {
+					jifeiMoney = order.getOrderMoney();
+				}
+			}
+			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
+		}else if(accountSetting.getOpenAllOrder()==2) {//说明是 所有订单/实际支付金额抽成
+			List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+			if(!orderPaymentItems.isEmpty()){
+				//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
+				for(OrderPaymentItem oi:orderPaymentItems){
+					if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+					   oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
+					   oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+					   oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
+							){
+						jifeiMoney = jifeiMoney.add(oi.getPayValue());
+					}
+				}
+			}
+			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
+		}else if(accountSetting.getOpenBackCustomerOrder()==1){//回头用户订单  /订单总额抽成
+			if(flag){//是回头用户才会计算金额
+				if(order.getPayType()==0){//如果是先付
+					jifeiMoney = order.getOrderMoney();
+				}else if(order.getPayType()==1){//如果是后付
+					if(order.getAmountWithChildren().compareTo(BigDecimal.ZERO)>0){
+						jifeiMoney = order.getAmountWithChildren();
+					}else {
+						jifeiMoney = order.getOrderMoney();
+					}
+				}
+				money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
+			}
+
+		}else if(accountSetting.getOpenBackCustomerOrder()==2){//回头用户 /实际支付总额抽成
+			if(flag){//是回头用户才会计算金额
+				List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+				if(!orderPaymentItems.isEmpty()){
+					//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
+					for(OrderPaymentItem oi:orderPaymentItems){
+						if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+								oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
+								oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+								oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
+								){
+							jifeiMoney = jifeiMoney.add(oi.getPayValue());
+						}
+					}
+				}
+				money = jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
+
+			}
+		}
+
+		return money;
+	}
+
+	@Override
     public int printUpdate(String orderId){
         Order o=new Order();
         o.setId(orderId);

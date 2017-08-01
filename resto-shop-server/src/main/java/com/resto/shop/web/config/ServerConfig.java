@@ -2,11 +2,13 @@ package com.resto.shop.web.config;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.web.model.AccountAddressInfo;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.service.DayAppraiseMessageService;
 import com.resto.shop.web.service.DayDataMessageService;
 import com.resto.shop.web.service.LogBaseService;
 import com.resto.shop.web.service.ThirdService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -153,7 +155,11 @@ public class ServerConfig {
 		return proxy.create(AccountSettingService.class);
 	}
 
+	@Bean
+	public AccountAddressInfoService accountAddressInfoService(){
 
+		return proxy.create(AccountAddressInfoService.class);
+	}
 
 
 
