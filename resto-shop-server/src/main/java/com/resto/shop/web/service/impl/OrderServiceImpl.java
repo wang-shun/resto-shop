@@ -8742,7 +8742,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     case OrderPayMode.WX_PAY:
                         order.setPaymentAmount(pay);
 //                        order.setPrintTimes(1);
-                        order.setIsPay(OrderPayState.PAYING);
                         break;
                     case OrderPayMode.ALI_PAY:
                         order.setPaymentAmount(pay);
