@@ -1,12 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div id="controller">
-    <c:if test="${!empty couponId}">
-        <a class="btn btn-info ajaxify" href="newcustomcoupon/list">
-            <span class="glyphicon glyphicon-circle-arrow-left"></span>
-            返回
-        </a>
-    </c:if>
+    <a class="btn btn-info ajaxify" href="newcustomcoupon/list">
+        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+        返回
+    </a>
     <br/><br/>
     <ul class="nav nav-tabs" role="tablist" id="ulTab">
         <li role="presentation" class="active" @click="chooseType(1)">
@@ -27,7 +24,7 @@
             <form class="form-inline">
                 <div class="form-group">
                     <label>消费次数&nbsp;大于</label>&nbsp;&nbsp;
-                    <input type="text" class="form-control" placeholder="请录入消费次数">&nbsp;&nbsp;次
+                    <input type="text" class="form-control" v-model="selectObject.orderCount" placeholder="请录入消费次数">&nbsp;&nbsp;次
                 </div>
                 <%--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--%>
                 <%--<div class="form-group">--%>
@@ -39,11 +36,11 @@
             <form class="form-inline">
                 <div class="form-group">
                     <label>消费总额&nbsp;大于</label>&nbsp;&nbsp;
-                    <input type="text" class="form-control" placeholder="请录入消费总额">&nbsp;&nbsp;元
+                    <input type="text" class="form-control" v-model="selectObject.orderTotal" placeholder="请录入消费总额">&nbsp;&nbsp;元
                 </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <div class="form-group">
                     <label>平均消费金额&nbsp;大于</label>&nbsp;&nbsp;
-                    <input type="text" class="form-control" placeholder="请录入消费总额">&nbsp;&nbsp;元
+                    <input type="text" class="form-control" v-model="selectObject.avgOrderMoney" placeholder="请录入消费总额">&nbsp;&nbsp;元
                 </div>
             </form>
             <br/>
@@ -134,7 +131,9 @@
         data : {
             groupReleaseTable : {},
             personalLoansTable : {},
-            selectAll : false
+            groupReleaseSelectAll : false,
+            personalLoanSelectAll : false,
+            selectObject : {}
         },
         created : function() {
             this.initDataTables();
@@ -216,12 +215,14 @@
                         {
                             title : "用户类型",
                             data : "customerType",
-                            orderable : false
+                            orderable : false,
+                            s_filter: true
                         },
                         {
                             title : "储值",
                             data : "isValue",
-                            orderable : false
+                            orderable : false,
+                            s_filter: true
                         },
                         {
                             title : "昵称",
@@ -231,7 +232,8 @@
                         {
                             title : "性别",
                             data : "sex",
-                            orderable : false
+                            orderable : false,
+                            s_filter: true
                         },
                         {
                             title : "手机号",
@@ -295,7 +297,7 @@
                                 column.search(val ? '^' + val + '$' : '', true, false).draw();
                             });
                         }else {
-                            var select = $("<input type='checkbox' @click='selectAll' :checked='selectAll'>");
+                            var select = $("<input type='checkbox' @click='groupReleaseSelectAll = true' :checked='groupReleaseSelectAll'>");
                             select.appendTo($(column.header()).empty()).on('click', function () {
                             });
                         }
@@ -320,15 +322,12 @@
                                 column.search(val ? '^' + val + '$' : '', true, false).draw();
                             });
                         }else {
-                            var select = $("<input type='checkbox' @click='selectAll' :checked='selectAll'>");
+                            var select = $("<input type='checkbox' @click='personalLoanSelectAll = true' :checked='personalLoanSelectAll'>");
                             select.appendTo($(column.header()).empty()).on('click', function () {
                             });
                         }
                     }
                 });
-            },
-            selectAll : function () {
-                this.selectAll = true;
             }
         }
     });
