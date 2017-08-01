@@ -44,19 +44,21 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
         //扣除红包，扣除顺序 评论红包-->分享红包-->退菜红包
         Integer[] redType = {0,1,2};
         for(Integer type : redType){
-            boolean flg = useRedPacket(type,redPay,customerId,order,brand,shopDetail);
+            redPay = useRedPacket(type,redPay,customerId,order,brand,shopDetail);
             //如果已扣完则不再扣除
-            if(flg){
+            if(redPay.compareTo(BigDecimal.ZERO) == 0){
                 break;
             }
         }
     }
 
-    private boolean useRedPacket(Integer redType, BigDecimal redPay, String customerId, Order order, Brand brand, ShopDetail shopDetail){
+    private BigDecimal useRedPacket(Integer redType, BigDecimal redPay, String customerId, Order order, Brand brand, ShopDetail shopDetail){
+        //获得要扣除的红包
         RedPacket redPacket = redPacketMapper.selectFirstRedPacket(customerId,redType);
         if (redPacket == null && redPay.compareTo(BigDecimal.ZERO) > 0){
-            return false;
+            return redPay;
         }
+        //声明Map集合封装要修改的信息
         Map<String, Object> param = new HashMap<>();
         if(redPay.compareTo(redPacket.getRedRemainderMoney()) >= 0){
             param.put("id",redPacket.getId());
@@ -114,7 +116,7 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
             UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                     "订单使用"+RedType.GETREDTYPE.get(redType)+"支付了：" + item.getPayValue());
         }
-        return true;
+        return BigDecimal.ZERO;
     }
 
     @Override
