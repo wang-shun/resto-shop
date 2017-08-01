@@ -441,7 +441,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 jsonResult.setMessage("下单失败，订单金额变动，请重新下单！");
                 return jsonResult;
             }
-            if(farOrder.getIsPay() == OrderPayState.PAYING && farOrder.getPayMode() == OrderPayMode.WX_PAY
+            if((farOrder.getIsPay() == OrderPayState.PAYING || farOrder.getIsPay() == OrderPayState.NOT_PAY) && farOrder.getPayMode() == OrderPayMode.WX_PAY
                     && farOrder.getOrderState() == OrderState.SUBMIT && farOrder.getPayType() == PayType.NOPAY){
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("正在微信付款中，请稍微加菜！");
