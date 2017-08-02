@@ -60,6 +60,7 @@
 
 		 if(!brandAccountLogList.isEmpty()){
 		 	for(BrandAccountLog blog: brandAccountLogList){
+				System.out.println("");
 
 			}
 		 }
