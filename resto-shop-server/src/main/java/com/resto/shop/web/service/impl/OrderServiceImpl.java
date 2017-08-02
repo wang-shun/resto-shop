@@ -1812,6 +1812,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	 * @param accountSetting
 	 */
 	private void updateOrderAndBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting) {
+		if(order.getPayType()==PayType.NOPAY&&order.getOrderState()==1){//后付会走两次paySuccess 所以如果是后付 并且支付状态为1的时候就不记录
+			update(order);
+			return;
+		}
+
     	BigDecimal money = BigDecimal.ZERO;
 		BrandAccountLog blog = new BrandAccountLog();
 		BrandAccount brandAccount = brandAccountService.selectByBrandId(order.getBrandId());
@@ -1843,10 +1848,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			blog.setGroupName(shopDetail.getName());
 			blog.setAccountId(brandAccount.getId());
 			blog.setRemain(remain);
+			blog.setOrderMoney(order.getOrderMoney());
 			if(flag){
-				blog.setDetail(DetailType.BACK_CUSTOMER_SELL);
+				if(order.getParentOrderId()!=null){//说明是主订单
+					blog.setDetail(DetailType.BACK_CUSTOMER_SELL);
+				}else {
+					blog.setDetail(DetailType.BACK_CUSTOMER_SELL_PART);
+				}
 			}else {
-				blog.setDetail(DetailType.NEW_CUSTOMER_SELL);
+				if(order.getParentOrderId()!=null){
+					blog.setDetail(DetailType.NEW_CUSTOMER_SELL);
+				}else {
+					blog.setDetail(DetailType.NEW_CUSTOMER_SELL_PART);
+				}
 			}
 			blog.setBehavior(BehaviorType.SELL);
 
