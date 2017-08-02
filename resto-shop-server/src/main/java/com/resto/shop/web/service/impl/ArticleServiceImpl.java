@@ -715,4 +715,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         return articleMapper.selectHasResourcePhotoList(currentBrandId);
     }
 
+    @Override
+    public List<Article> selectArticleByShopId(String shopId) {
+        return articleMapper.selectArticleByShopId(shopId);
+    }
+
 }

@@ -654,4 +654,12 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 	Order colseOrder(String orderId);
 
     List<Map<String, Object>> reminder(String orderItemId);
+
+	/**
+	 * 	【Pos 2.0】
+	 * 	本地 Pos 订单上传接口
+	 * 	lmx			2017年6月20日 19:56:21
+	 * @param orderList
+	 */
+	void uploadLocalPosOrderList(List<Map<String, Object>> orderList);
 }

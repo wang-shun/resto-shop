@@ -956,4 +956,8 @@ GROUP BY article_id
       SELECT * FROM tb_article WHERE photo_small like '%http://%'
     </select>
 
+    <select id="selectArticleByShopId" resultType="Article">
+        SELECT * from tb_article where shop_detail_id = #{shopId}
+    </select>
+
 </mapper>

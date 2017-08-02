@@ -16,5 +16,11 @@ public interface MealAttrService extends GenericService<MealAttr, Integer> {
 
 	List<MealAttr> selectFullByArticleId(String articleId,String show);
 
-
+	/**
+	 * 根据 店铺ID 查询店铺下的所有  MealAttr  数据
+	 * Pos2.0 数据拉取接口			By___lmx
+	 * @param shopId
+	 * @return
+	 */
+	List<MealAttr> selectMealAttrByShopId(String shopId);
 }

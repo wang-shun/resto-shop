@@ -51,4 +51,20 @@ public interface UnitMapper extends GenericDao<Unit, String> {
     Integer getUnitByRelation(@Param("detailId") String detailId,@Param("relationId") String relationId);
 
     List<UnitArticle> selectUnitDetail(String id);
+
+    /**
+     * 根据 店铺ID 查询店铺下的所有  Unit  数据
+     * Pos2.0 数据拉取接口			By___lmx
+     * @param shopId
+     * @return
+     */
+    List<Unit> selectUnitByShopId(@Param("shopId") String shopId);
+
+    /**
+     * 根据 店铺ID 查询店铺下的所有  UnitDetail  数据
+     * Pos2.0 数据拉取接口			By___lmx
+     * @param shopId
+     * @return
+     */
+    List<UnitDetail> selectUnitDetailByShopId(String shopId);
 }

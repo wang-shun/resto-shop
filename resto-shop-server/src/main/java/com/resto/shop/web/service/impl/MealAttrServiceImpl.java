@@ -87,6 +87,10 @@ public class MealAttrServiceImpl extends GenericServiceImpl<MealAttr, Integer> i
 		return list;
 	}
 
+    @Override
+    public List<MealAttr> selectMealAttrByShopId(String shopId) {
+        return mealattrMapper.selectMealAttrByShopId(shopId);
+    }
 
 
 }

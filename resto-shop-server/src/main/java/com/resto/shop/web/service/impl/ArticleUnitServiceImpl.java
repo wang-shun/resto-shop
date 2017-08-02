@@ -1,16 +1,16 @@
 package com.resto.shop.web.service.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.ArticleUnitMapper;
 import com.resto.shop.web.model.ArticleUnit;
+import com.resto.shop.web.model.ArticleUnitDetail;
+import com.resto.shop.web.model.ArticleUnitNew;
 import com.resto.shop.web.service.ArticleUnitService;
 
-import cn.restoplus.rpc.server.RpcService;
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  *
@@ -39,5 +39,20 @@ public class ArticleUnitServiceImpl extends GenericServiceImpl<ArticleUnit, Inte
     @Override
     public ArticleUnit selectSame(String name, String attrId) {
         return articleunitMapper.selectSame(name, attrId);
+    }
+
+    @Override
+    public List<ArticleUnit> selectByShopId(String shopId) {
+        return articleunitMapper.selectByShopId(shopId);
+    }
+
+    @Override
+    public List<ArticleUnitDetail> selectArticleUnitDetailByShopId(String shopId) {
+        return articleunitMapper.selectArticleUnitDetailByShopId(shopId);
+    }
+
+    @Override
+    public List<ArticleUnitNew> selectArticleUnitNewByShopId(String shopId) {
+        return articleunitMapper.selectArticleUnitNewByShopId(shopId);
     }
 }
