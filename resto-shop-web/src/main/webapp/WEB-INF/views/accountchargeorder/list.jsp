@@ -187,10 +187,8 @@
 		var vueObj = new Vue({
 			el:"#control",
 			data:{
-			    order:{
-			        chargeMoney:0,
-			        payType:''
-			    }
+				chargeMoney:0,
+				payType:''
 			},
 			mixins:[C.formVueMix],
 			methods:{
@@ -218,6 +216,10 @@
                         str = type;
                     }
                     return str;
+                },
+                changeMoney:function (money) {
+                    console.log("....")
+					this.chargeMoney = money;
                 }
 			}
 		});

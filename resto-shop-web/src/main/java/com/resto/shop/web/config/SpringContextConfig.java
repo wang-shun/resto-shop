@@ -512,6 +512,11 @@ public class SpringContextConfig {
 		return proxy.create(AccountAddressInfoService.class);
 	}
 
+	@Bean
+	public AccountSettingService accountSettingService(){
+		return proxy.create(AccountSettingService.class);
+	}
+
 	//-----------------------
 
 

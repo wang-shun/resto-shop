@@ -161,6 +161,14 @@ public class ServerConfig {
 		return proxy.create(AccountAddressInfoService.class);
 	}
 
+	@Bean
+	public AccountChargeOrderService accountChargeOrderService(){
+		return proxy.create(AccountChargeOrderService.class);
+	}
+
+
+
+
 
 
 

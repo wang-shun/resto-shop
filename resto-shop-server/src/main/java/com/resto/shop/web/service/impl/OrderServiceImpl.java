@@ -1951,11 +1951,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		return money;
 	}
 
+
+
 	@Override
     public int printUpdate(String orderId){
         Order o=new Order();
         o.setId(orderId);
-        o.setProductionStatus(4);
+        o.setProductionStatus(ProductionStatus.GET_IT);
         int count=orderMapper.updateByPrimaryKeySelective(o);
         return count;
     }

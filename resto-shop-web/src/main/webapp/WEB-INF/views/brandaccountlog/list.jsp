@@ -198,6 +198,13 @@
                         case 21:
                             temp = "回头用户消费";
                             break;
+                        case 22:
+                            temp = "新用户消费";
+                            break;
+                        case 23:
+                            temp = "回头用户消费";
+                            break;
+
                         case 30:
                             temp = "注册验证吗";
                             break;

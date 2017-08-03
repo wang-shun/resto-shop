@@ -99,49 +99,46 @@
 			data:{
                 accountBalance:0,
 				logInfo:{
-                    registerCustomer:0,
-					smsSend:0,
-					orderNum:0,
-					orderMoney:0
+                    registerCustomer:0,//注册用户数
+					smsSend:0,//发短信数
+					orderNum:0,//订单数
+					orderMoney:0//订单总额
 				},
 				accountLog:{
-                    registerCustomerOrder:0,
-					smsOrder:0,
-					orderMoney:0,
-					chargeMoney:0
+                    registerCustomerOrder:0,//注册用户支出
+					smsOrder:0, //短信支出
+					orderMoney:0, //订单支出
+					chargeMoney:0 //账户充值
 				}
 			},
 			methods:{
 
 			},
 			created:function () {
+			    var that = this;
+
 			    $.ajax({
 					url:"brandaccount/initData",
 					data:{
 
 					},
 					success:function (result) {
+						var obj = result.data;
+                        //初始化账户余额
+                        that.accountBalance = obj.accountBalance;
+                        //初始化今日记录
+                        that.logInfo.registerCustomer = obj.registerCustoemrNum;
+                        that.logInfo.smsSend = obj.smsNum;
+                        that.logInfo.orderNum = obj.orderNum;
+                        that.logInfo.orderMoney = obj.orderMoney;
 
+                        //初始化账户概要
+                        that.accountLog.registerCustomerOrder = obj.registerCustomerMoney;
+                        that.accountLog.smsOrder = obj.smsMoney;
+                        that.accountLog.orderMoney = obj.orderOutMoney;
+                        that.accountLog.chargeMoney = obj.brandAccountCharge
                     }
-
-				})
-
-
-			    //初始化账户余额
-				var that = this;
-				that.accountBalance = 1836.30;
-				//初始化今日记录
-				that.logInfo.registerCustomer = 383;
-				that.logInfo.smsSend = 566;
-				that.logInfo.orderNum = 613;
-				that.logInfo.orderMoney = 67339.50;
-
-				//初始化账户概要
-				that.accountLog.registerCustomerOrder = -383;
-                that.accountLog.smsOrder = -56.6;
-                that.accountLog.orderMoney = -67.34;
-                that.accountLog.chargeMoney = 1000
-
+				});
             }
 
 
