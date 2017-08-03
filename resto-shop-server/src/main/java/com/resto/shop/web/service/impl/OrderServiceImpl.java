@@ -3628,12 +3628,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
         if (order.getPrintTimes() != 1) {
-            if (orderList.contains(orderId)) {
+            if(!MemcachedUtils.add(orderId,1)){
                 return printTask;
-            } else {
-                orderList.add(orderId);
             }
-
+        }else{
+            if(!MemcachedUtils.add(orderId+"print",1)){
+                return printTask;
+            }
         }
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
 
