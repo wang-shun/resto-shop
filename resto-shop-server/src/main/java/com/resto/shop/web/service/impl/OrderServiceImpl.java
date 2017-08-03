@@ -1954,13 +1954,35 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
 	@Override
-    public int printUpdate(String orderId){
-        Order o=new Order();
-        o.setId(orderId);
-        o.setProductionStatus(ProductionStatus.GET_IT);
-        int count=orderMapper.updateByPrimaryKeySelective(o);
-        return count;
-    }
+    public int printUpdate(String orderId) {
+		Order o = new Order();
+		o.setId(orderId);
+		o.setProductionStatus(ProductionStatus.GET_IT);
+		int count = orderMapper.updateByPrimaryKeySelective(o);
+		//yz 2017/08/03 计费系统 添加账户设置(简单版)
+		BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
+		if (brandSetting.getOpenBrandAccount() == 1) {//说明开启了品牌账户
+			//查询品牌账户设置
+			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+			//定义抽成的金额
+			BigDecimal money = BigDecimal.ZERO;
+
+			if (accountSetting.getOpenOutFoodOrder() == 1) {//开启resto外卖订单 并且按订单总额抽成
+				//计算resto外卖 的 抽成金额 (外卖都是先付所以就直接计算)
+				money = o.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? o.getAmountWithChildren() : o.getOrderMoney();
+			} else if (accountSetting.getOpenOutFoodOrder() == 2) {//开启resto外卖订单 并且按实际支付 抽成
+				List<OrderPaymentItem> orderPaymentItemList = orderPaymentItemService.selectByOrderId(o.getId());
+				for (OrderPaymentItem oi : orderPaymentItemList) {
+					//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
+
+
+				}
+
+
+			}
+		}
+			return count;
+		}
 
     @Override
     public List<Order> selectTodayOrder(String shopId, int[] proStatus) {
