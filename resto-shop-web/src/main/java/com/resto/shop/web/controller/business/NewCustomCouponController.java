@@ -1,5 +1,6 @@
 package com.resto.shop.web.controller.business;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -17,6 +18,7 @@ import com.resto.shop.web.service.OrderService;
 import com.resto.shop.web.util.RedisUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.DistributionMode;
@@ -194,13 +196,14 @@ public class NewCustomCouponController extends GenericController{
      */
     @RequestMapping("/selectCustomer")
     @ResponseBody
-    public Result selectCustomer(Map<String, String> selectMap){
+    public Result selectCustomer(@RequestParam Map<String, String> selectMap){
         try{
             //封装最后的返回值
             JSONArray array = new JSONArray();
             JSONObject object = new JSONObject();
             //根据查询条件先得到所有用户
             List<Customer> customers = customerService.selectBySelectMap(selectMap);
+            Iterator<Customer> iterator = customers.iterator();
             //得到当前时间的字符串
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             String newDateString = format.format(new Date());
@@ -220,7 +223,9 @@ public class NewCustomCouponController extends GenericController{
             boolean isValue;
             //声明标识判断该用户是否满足储值条件默认不满足
             boolean meetChargeOrder;
-            for (Customer customer : customers){
+
+            while (iterator.hasNext()){
+                Customer customer = iterator.next();
                 isOrder = false;
                 order = false;
                 meetOrder = false;
@@ -232,13 +237,13 @@ public class NewCustomCouponController extends GenericController{
                     isOrder = true;
                     for (Map orderMap : orderList){
                         if (customer.getId().equalsIgnoreCase(orderMap.get("customerId").toString())) {
-                            isOrder = true;
+                            order = true;
                             daysBetween = daysBetween(orderMap.get("lastOrderTime").toString(), newDateString);
                             //判断该用户满不满足订单条件
-                            if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((selectMap.get("orderCount") == null ? "0" : selectMap.get("orderCount")))) > 0
-                                    && Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((selectMap.get("orderTotal") == null ? "0" : selectMap.get("orderTotal")))) > 0
-                                    && Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf((selectMap.get("avgOrderMoney") == null ? "0" : selectMap.get("avgOrderMoney")))) > 0
-                                    && daysBetween.compareTo(Integer.valueOf((selectMap.get("lastOrderDay") == null ? "0" : selectMap.get("lastOrderDay")))) > 0) {
+                            if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount")) ? "0" : selectMap.get("orderCount")))) > 0
+                                    && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("orderTotal")) ? "0" : selectMap.get("orderTotal")))) > 0
+                                    && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("avgOrderMoney")) ? "0" : selectMap.get("avgOrderMoney")))) > 0
+                                    && daysBetween.compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("lastOrderDay")) ? "0" : selectMap.get("lastOrderDay")))) > 0) {
                                 meetOrder = true;
                             }
                             break;
@@ -246,14 +251,14 @@ public class NewCustomCouponController extends GenericController{
                     }
                 }
                 if (isOrder && !meetOrder) { //如果录如过订单条件但该用户没有满足订单条件则将该用户从列表中移除掉
-                    customers.remove(customer);
-                    break;
+                    iterator.remove();
+                    continue;
                 }else if (isOrder && !order){ //如果录如过订单条件但该用户没有订单将该用户从列表中移除掉
-                    customers.remove(customer);
-                    break;
+                    iterator.remove();
+                    continue;
                 }
                 //判断是否录如过储值条件，有则进行筛选
-                if (StringUtils.isNotBlank(selectMap.get("isValue"))) {
+                if (StringUtils.isNotBlank(selectMap.get("isValue")) && !"2".equalsIgnoreCase(selectMap.get("isValue"))) {
                     isValue = true;
                     if (selectMap.get("isValue").equalsIgnoreCase("1")){
                         //筛选储值过的用户
@@ -266,7 +271,7 @@ public class NewCustomCouponController extends GenericController{
                     }else {
                         //筛选未储值过的用户
                         for (String customerId : chargeOrderList){
-                            if (!customerId.equalsIgnoreCase(customer.getId())){
+                            if (customerId.equalsIgnoreCase(customer.getId())){
                                 meetChargeOrder = true;
                                 break;
                             }
@@ -274,9 +279,12 @@ public class NewCustomCouponController extends GenericController{
                     }
                 }
                 //判断如果有录入过是否储值的条件，如有则移除没有满足条件的用户
-                if (isValue && !meetChargeOrder){
-                    customers.remove(customer);
-                    break;
+                if (isValue && selectMap.get("isValue").equalsIgnoreCase("1") && !meetChargeOrder){
+                    iterator.remove();
+                    continue;
+                }else if (isValue && selectMap.get("isValue").equalsIgnoreCase("0") && meetChargeOrder){
+                    iterator.remove();
+                    continue;
                 }
                 object.put("customerId", customer.getId());
                 object.put("customerType", customer.getIsBindPhone() ? "注册" : "未注册");

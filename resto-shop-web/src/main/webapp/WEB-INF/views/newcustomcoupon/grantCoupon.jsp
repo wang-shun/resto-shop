@@ -24,7 +24,7 @@
             <form class="form-inline">
                 <div class="form-group">
                     <label>消费次数&nbsp;大于</label>&nbsp;&nbsp;
-                    <input type="text" class="form-control" v-model="selectObject.orderCount" placeholder="请录入消费次数">&nbsp;&nbsp;次
+                    <input type="number" class="form-control" v-model="selectObject.orderCount" placeholder="请录入消费次数">&nbsp;&nbsp;次
                 </div>
                 <%--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--%>
                 <%--<div class="form-group">--%>
@@ -47,7 +47,7 @@
             <form class="form-inline">
                 <div class="form-group">
                     <label>最后消费日期距今&nbsp;超过</label>&nbsp;&nbsp;
-                    <input type="text" class="form-control" v-model="selectObject.lastOrderDay" placeholder="请录入天数">&nbsp;&nbsp;天
+                    <input type="number" class="form-control" v-model="selectObject.lastOrderDay" placeholder="请录入天数">&nbsp;&nbsp;天
                 </div>
             </form>
             <br/>
@@ -70,6 +70,8 @@
                     <input type="radio" name="register" v-model="selectObject.register" value="1">注册
                     &nbsp;&nbsp;
                     <input type="radio" name="register" v-model="selectObject.register" value="0">未注册
+                    &nbsp;&nbsp;
+                    <input type="radio" name="register" v-model="selectObject.register" checked value="2">不限
                 </div>
             </form>
             <br/>
@@ -79,6 +81,8 @@
                     <input type="radio" name="value" v-model="selectObject.isValue" value="1">是
                     &nbsp;&nbsp;
                     <input type="radio" name="value" v-model="selectObject.isValue" value="0">否
+                    &nbsp;&nbsp;
+                    <input type="radio" name="value" v-model="selectObject.isValue" checked value="2">不限
                 </div>
             </form>
             <br/>
@@ -90,6 +94,8 @@
                     <input type="radio" name="sex" v-model="selectObject.sex" value="2">女
                     &nbsp;&nbsp;
                     <input type="radio" name="sex" v-model="selectObject.sex" value="0">未知
+                    &nbsp;&nbsp;
+                    <input type="radio" name="sex" v-model="selectObject.sex" checked value="3">不限
                 </div>
             </form>
             <br/>&nbsp;&nbsp;
@@ -120,6 +126,9 @@
 </div>
 <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
+    String.prototype.trim = function () {
+        return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, "");
+    };
     //时间插件
     $('.form_datetime').datetimepicker({
         endDate:new Date(),
@@ -141,8 +150,6 @@
         data : {
             groupReleaseTable : {}, //群体发放datatables对象
             personalLoansTable : {}, //个人发放datatables对象
-            groupReleaseSelectAll : false, // 群体发放全选
-            personalLoanSelectAll : false, //个人发放全体
             selectObject : null, //群体发放查询对象
             personalLoanSelectObject : null, //个人发放查询对象
             currentType : 1, //当前所在模块位置 1：群体发放 2：个人发放
@@ -157,19 +164,9 @@
                 //that代表 vue对象
                 var that = this;
                 that.groupReleaseTable=$("#groupReleaseTable").DataTable({
-                    lengthMenu: [ [10, 50, 100, -1], [10, 50, 100, "All"] ],
+                    lengthMenu: [ [100, 50, 10], [100, 50, 10] ],
                     order: [[ 7, "desc" ]],
                     columns : [
-                        {
-                            title : "全选",
-                            data : "customerId",
-                            s_filter: true,
-                            orderable : false,
-                            createdCell: function (td, tdData) {
-                                var checkbox = $("<input id='groupRelease' type='checkbox' value='"+tdData+"'>");
-                                $(td).html(checkbox);
-                            }
-                        },
                         {
                             title : "用户类型",
                             data : "customerType",
@@ -221,19 +218,9 @@
                     }
                 });
                 that.personalLoansTable=$("#personalLoansTable").DataTable({
-                    lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
+                    lengthMenu: [ [100, 50, 10], [100, 50, 10] ],
                     order: [[ 7, "desc" ]],
                     columns : [
-                        {
-                            title : "全选",
-                            data : "customerId",
-                            s_filter: true,
-                            orderable : false,
-                            createdCell: function (td, tdData) {
-                                var checkbox = $("<input id='personalLoans' type='checkbox' value='"+tdData+"'>");
-                                $(td).html(checkbox);
-                            }
-                        },
                         {
                             title : "用户类型",
                             data : "customerType",
@@ -292,16 +279,29 @@
             searchInfo : function() {
                 var that = this;
                 if (that.currentType == 1) {
-                    if (that.selectObject == null) {
+                    if (that.selectObject == null || ((that.selectObject.orderCount == null || that.selectObject.orderCount.trim() == "")
+                        && (that.selectObject.orderTotal == null || that.selectObject.orderTotal.trim() == "")
+                        && (that.selectObject.avgOrderMoney == null || that.selectObject.avgOrderMoney.trim() == "")
+                        && (that.selectObject.lastOrderDay == null || that.selectObject.lastOrderDay.trim() == "")
+                        && (that.selectObject.registerBeginDate == null || that.selectObject.registerBeginDate.trim() == "")
+                        && (that.selectObject.registerEndDate == null || that.selectObject.registerEndDate.trim() == "")
+                        && (that.selectObject.register == null || that.selectObject.register.trim() == "")
+                        && (that.selectObject.isValue == null || that.selectObject.isValue.trim() == "")
+                        && (that.selectObject.sex == null || that.selectObject.sex.trim() == "")
+                        )) {
                         that.showDialog(function () {
                             that.selectFunction();
                         });
+                    }else {
+                        that.selectFunction();
                     }
                 }else {
                     if (that.personalLoanSelectObject == null) {
                         that.showDialog(function () {
                             that.selectFunction();
                         });
+                    }else {
+                        that.selectFunction();
                     }
                 }
             },
@@ -332,7 +332,6 @@
                     var api2 = personalLoansTableAPI;
                     switch (that.currentType){
                         case 1:
-                            that.groupReleaseSelectAll = false;
                             $.post("newcustomcoupon/selectCustomer", that.selectObject, function (result) {
                                 toastr.clear();
                                 if (result.success) {
@@ -356,7 +355,7 @@
                             break;
                         case 2:
                             that.personalLoanSelectAll = false;
-                            $.post("newcustomcoupon/selectCustomer", that.personalLoanSelectObject, function () {
+                            $.post("newcustomcoupon/selectCustomer", that.personalLoanSelectObject, function (result) {
                                 toastr.clear();
                                 if (result.success) {
                                     api2.search('');
@@ -388,18 +387,8 @@
                 try{
                     switch (that.currentType){
                         case 1:
-                            if (that.selectObject == null){
-                                toastr.clear();
-                                toastr.error("请录入查询条件");
-                                return;
-                            }
                             break;
                         case 2:
-                            if (that.personalLoanSelectObject == null){
-                                toastr.clear();
-                                toastr.error("请录入查询条件");
-                                return;
-                            }
                             break;
                     }
                 }catch(e){
@@ -408,85 +397,42 @@
                 }
             },
             groupReleaseTables : function(){
-                var that = this;
                 var api = groupReleaseTableAPI;
                 var columnsSetting = api.settings()[0].oInit.columns;
                 $(columnsSetting).each(function (i) {
                     if (this.s_filter) {
                         var column = api.column(i);
-                        if (this.title != "全选"){
-                            var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
-                            column.data().unique().each(function (d) {
-                                select.append('<option value="' + d + '">' + d + '</option>')
-                            });
-                            select.appendTo($(column.header()).empty()).on('change', function () {
-                                var val = $.fn.dataTable.util.escapeRegex(
-                                    $(this).val()
-                                );
-                                column.search(val ? '^' + val + '$' : '', true, false).draw();
-                            });
-                        }else {
-                            var select = $("<input type='checkbox'>");
-                            select.click(function () {
-                                that.groupReleaseSelectAllfun();
-                            });
-                            select.appendTo($(column.header()).empty());
-                        }
+                        var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
+                        column.data().unique().each(function (d) {
+                            select.append('<option value="' + d + '">' + d + '</option>')
+                        });
+                        select.appendTo($(column.header()).empty()).on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                            );
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
                     }
                 });
             },
-            groupReleaseSelectAllfun : function () {
-                if (this.groupReleaseSelectAll){
-                    //全不选
-                    this.groupReleaseSelectAll = false;
-                    $("#groupRelease").each(function(){
-                        alert($(this).val());
-                    });
-                }else {
-                    //全选
-                    this.groupReleaseSelectAll = true;
-                    $("#groupRelease").each(function(){
-                        alert($(this).val());
-                    });
-                }
-                alert(this.groupReleaseSelectAll);
-            },
             personalLoansTables : function(){
-                var that = this;
                 var api = personalLoansTableAPI;
                 var columnsSetting = api.settings()[0].oInit.columns;
                 $(columnsSetting).each(function (i) {
                     if (this.s_filter) {
                         var column = api.column(i);
-                        if (this.title != "全选"){
-                            var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
-                            column.data().unique().each(function (d) {
-                                select.append('<option value="' + d + '">' + d + '</option>')
-                            });
-                            select.appendTo($(column.header()).empty()).on('change', function () {
-                                var val = $.fn.dataTable.util.escapeRegex(
-                                    $(this).val()
-                                );
-                                column.search(val ? '^' + val + '$' : '', true, false).draw();
-                            });
-                        }else {
-                            var select = $("<input type='checkbox'>");
-                            select.click(function () {
-                                that.personalLoanSelectAllfun();
-                            });
-                            select.appendTo($(column.header()).empty());
-                        }
+                        var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
+                        column.data().unique().each(function (d) {
+                            select.append('<option value="' + d + '">' + d + '</option>')
+                        });
+                        select.appendTo($(column.header()).empty()).on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                            );
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
                     }
                 });
-            },
-            personalLoanSelectAllfun : function () {
-                if (this.personalLoanSelectAll){
-                    //全不选
-                    this.personalLoanSelectAll = false;
-                }else {
-                    //全选
-                    this.personalLoanSelectAll = true;
-                }
             }
         }
     });

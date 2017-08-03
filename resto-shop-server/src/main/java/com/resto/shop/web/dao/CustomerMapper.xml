@@ -652,10 +652,10 @@ and wechat_id != '0'
         inner join tb_customer_detail tcd
         on tc.customer_detail_id = tcd.id
         <where>
-            <if test="register != null">
+            <if test="register != null and register != '2' and register != 2">
                 and tc.is_bind_phone = #{register}
             </if>
-            <if test="sex != null">
+            <if test="sex != null and sex != '3' and sex != 3">
                 and tc.sex = #{sex}
             </if>
             <if test="registerBeginDate != null">
@@ -669,6 +669,9 @@ and wechat_id != '0'
                 <foreach collection="customerIds" item="customerId" open="(" separator="," close=")">
                     #{customerId}
                 </foreach>
+            </if>
+            <if test="text != null">
+                and tc.nickname like CONCAT('%',#{text},'%') or tc.telephone like CONCAT('%',#{text},'%')
             </if>
         </where>
     </select>
