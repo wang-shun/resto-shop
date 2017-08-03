@@ -47,7 +47,7 @@
             <form class="form-inline">
                 <div class="form-group">
                     <label>最后消费日期距今&nbsp;超过</label>&nbsp;&nbsp;
-                    <input type="text" class="form-control" v-model="selectObject.lastOrderTime" placeholder="请录入天数">&nbsp;&nbsp;天
+                    <input type="text" class="form-control" v-model="selectObject.lastOrderDay" placeholder="请录入天数">&nbsp;&nbsp;天
                 </div>
             </form>
             <br/>
@@ -67,32 +67,33 @@
             <form class="form-inline">
                 <div class="form-group">
                     <label>是否注册</label>&nbsp;&nbsp;
-                    <input type="radio" name="register" v-model="selectObject.register" value="1">注册&nbsp;&nbsp;
-                    <input type="radio" name="register" v-model="selectObject.register" value="0">未注册&nbsp;&nbsp;
-                    <input type="radio" name="register" v-model="selectObject.register" value="2">不限
+                    <input type="radio" name="register" v-model="selectObject.register" value="1">注册
+                    &nbsp;&nbsp;
+                    <input type="radio" name="register" v-model="selectObject.register" value="0">未注册
                 </div>
             </form>
             <br/>
             <form class="form-inline">
                 <div class="form-group">
                     <label>是否储值</label>&nbsp;&nbsp;
-                    <input type="radio" name="value" v-model="selectObject.isValue" value="1">是&nbsp;&nbsp;
-                    <input type="radio" name="value" v-model="selectObject.isValue" value="0">否&nbsp;&nbsp;
-                    <input type="radio" name="value" v-model="selectObject.isValue" value="2">不限
+                    <input type="radio" name="value" v-model="selectObject.isValue" value="1">是
+                    &nbsp;&nbsp;
+                    <input type="radio" name="value" v-model="selectObject.isValue" value="0">否
                 </div>
             </form>
             <br/>
             <form class="form-inline">
                 <div class="form-group">
                     <label>性别</label>&nbsp;&nbsp;
-                    <input type="radio" name="sex" v-model="selectObject.sex" value="1">男&nbsp;&nbsp;
-                    <input type="radio" name="sex" v-model="selectObject.sex" value="2">女&nbsp;&nbsp;
-                    <input type="radio" name="sex" v-model="selectObject.sex" value="0">未知&nbsp;&nbsp;
-                    <input type="radio" name="sex" v-model="selectObject.sex" value="3">不限
+                    <input type="radio" name="sex" v-model="selectObject.sex" value="1">男
+                    &nbsp;&nbsp;
+                    <input type="radio" name="sex" v-model="selectObject.sex" value="2">女
+                    &nbsp;&nbsp;
+                    <input type="radio" name="sex" v-model="selectObject.sex" value="0">未知
                 </div>
             </form>
             <br/>&nbsp;&nbsp;
-            <button type="button" class="btn btn-success">查询</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <button type="button" class="btn btn-success" @click="searchInfo">查询</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <button type="button" class="btn btn-primary">发放</button>
             <br/><br/>
             <table id="groupReleaseTable" class="table table-striped table-bordered table-hover"
@@ -106,7 +107,7 @@
                 <div class="form-group">
                     <label>查询用户</label>&nbsp;&nbsp;
                     <input type="text" class="form-control" v-model="personalLoanSelectObject.text" placeholder="请录入手机号/昵称">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <button type="button" class="btn btn-success">查询</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <button type="button" class="btn btn-success" @click="searchInfo">查询</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <button type="button" class="btn btn-primary">发放</button>
                 </div>
             </form>
@@ -138,12 +139,15 @@
     new Vue({
         el : "#controller",
         data : {
-            groupReleaseTable : {},
-            personalLoansTable : {},
-            groupReleaseSelectAll : false,
-            personalLoanSelectAll : false,
-            selectObject : null,
-            personalLoanSelectObject : null
+            groupReleaseTable : {}, //群体发放datatables对象
+            personalLoansTable : {}, //个人发放datatables对象
+            groupReleaseSelectAll : false, // 群体发放全选
+            personalLoanSelectAll : false, //个人发放全体
+            selectObject : null, //群体发放查询对象
+            personalLoanSelectObject : null, //个人发放查询对象
+            currentType : 1, //当前所在模块位置 1：群体发放 2：个人发放
+            groupReleaseCustomerIds : null, //群体发放用户的Id
+            personalLoansCustomerIds : null //个人发放用户的Id
         },
         created : function() {
             this.initDataTables();
@@ -153,17 +157,16 @@
                 //that代表 vue对象
                 var that = this;
                 that.groupReleaseTable=$("#groupReleaseTable").DataTable({
-                    lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
+                    lengthMenu: [ [10, 50, 100, -1], [10, 50, 100, "All"] ],
                     order: [[ 7, "desc" ]],
                     columns : [
-
                         {
                             title : "全选",
                             data : "customerId",
                             s_filter: true,
                             orderable : false,
                             createdCell: function (td, tdData) {
-                                var checkbox = $("<input id='groupRelease' type='checkbox' value='"+tdData+"' :checked='groupReleaseSelectAll'>");
+                                var checkbox = $("<input id='groupRelease' type='checkbox' value='"+tdData+"'>");
                                 $(td).html(checkbox);
                             }
                         },
@@ -227,7 +230,7 @@
                             s_filter: true,
                             orderable : false,
                             createdCell: function (td, tdData) {
-                                var checkbox = $("<input id='personalLoans' type='checkbox' value='"+tdData+"' :checked='personalLoanSelectAll'>");
+                                var checkbox = $("<input id='personalLoans' type='checkbox' value='"+tdData+"'>");
                                 $(td).html(checkbox);
                             }
                         },
@@ -284,24 +287,118 @@
             },
             //切换单品、套餐 type 1:单品 2:套餐 3:类别
             chooseType:function (type) {
-                this.currentType= type;
+                this.currentType = type;
             },
             searchInfo : function() {
                 var that = this;
+                if (that.currentType == 1) {
+                    if (that.selectObject == null) {
+                        that.showDialog(function () {
+                            that.selectFunction();
+                        });
+                    }
+                }else {
+                    if (that.personalLoanSelectObject == null) {
+                        that.showDialog(function () {
+                            that.selectFunction();
+                        });
+                    }
+                }
+            },
+            showDialog : function (successcbk) {
+                var cDialog = new dialog({
+                    title:"提示",
+                    content:"未录入查询条件，你确定要查询所有用户吗？",
+                    width:350,
+                    ok:function(){
+                        if(typeof successcbk=="function"){
+                            successcbk();
+                        }
+                    },
+                    cancel:function(){
+                        if(typeof cancelcbk=="function"){
+                            cancelcbk();
+                        }
+                    }
+                });
+                cDialog.showModal();
+            },
+            selectFunction : function () {
+                var that = this;
                 toastr.clear();
                 toastr.success("查询中...");
+                try{
+                    var api1 = groupReleaseTableAPI;
+                    var api2 = personalLoansTableAPI;
+                    switch (that.currentType){
+                        case 1:
+                            that.groupReleaseSelectAll = false;
+                            $.post("newcustomcoupon/selectCustomer", that.selectObject, function (result) {
+                                toastr.clear();
+                                if (result.success) {
+                                    api1.search('');
+                                    var column1 = api1.column(1);
+                                    column1.search('', true, false);
+                                    var column2 = api1.column(2);
+                                    column2.search('', true, false);
+                                    var column4 = api1.column(4);
+                                    column4.search('', true, false);
+                                    //清空表格
+                                    that.groupReleaseTable.clear();
+                                    that.groupReleaseTable.rows.add(result.data).draw();
+                                    //重绘搜索列
+                                    that.groupReleaseTables();
+                                    toastr.success("查询成功");
+                                }else {
+                                    toastr.error("查询失败");
+                                }
+                            });
+                            break;
+                        case 2:
+                            that.personalLoanSelectAll = false;
+                            $.post("newcustomcoupon/selectCustomer", that.personalLoanSelectObject, function () {
+                                toastr.clear();
+                                if (result.success) {
+                                    api2.search('');
+                                    var column1 = api2.column(1);
+                                    column1.search('', true, false);
+                                    var column2 = api2.column(2);
+                                    column2.search('', true, false);
+                                    var column4 = api2.column(4);
+                                    column4.search('', true, false);
+                                    //清空表格
+                                    that.personalLoansTable.clear();
+                                    that.personalLoansTable.rows.add(result.data).draw();
+                                    //重绘搜索列
+                                    that.personalLoansTables();
+                                    toastr.success("查询成功");
+                                }else {
+                                    toastr.error("查询失败");
+                                }
+                            });
+                            break;
+                    }
+                }catch(e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            grantCoupon : function(){
+                var that = this;
                 try{
                     switch (that.currentType){
                         case 1:
                             if (that.selectObject == null){
                                 toastr.clear();
                                 toastr.error("请录入查询条件");
+                                return;
                             }
                             break;
                         case 2:
                             if (that.personalLoanSelectObject == null){
                                 toastr.clear();
                                 toastr.error("请录入查询条件");
+                                return;
                             }
                             break;
                     }
@@ -310,9 +407,8 @@
                     toastr.error("系统异常，请刷新重试");
                 }
             },
-            download : function(){
-            },
             groupReleaseTables : function(){
+                var that = this;
                 var api = groupReleaseTableAPI;
                 var columnsSetting = api.settings()[0].oInit.columns;
                 $(columnsSetting).each(function (i) {
@@ -330,7 +426,10 @@
                                 column.search(val ? '^' + val + '$' : '', true, false).draw();
                             });
                         }else {
-                            var select = $("<input type='checkbox' @click='groupReleaseSelectAllfun'>");
+                            var select = $("<input type='checkbox'>");
+                            select.click(function () {
+                                that.groupReleaseSelectAllfun();
+                            });
                             select.appendTo($(column.header()).empty());
                         }
                     }
@@ -338,12 +437,22 @@
             },
             groupReleaseSelectAllfun : function () {
                 if (this.groupReleaseSelectAll){
+                    //全不选
                     this.groupReleaseSelectAll = false;
+                    $("#groupRelease").each(function(){
+                        alert($(this).val());
+                    });
                 }else {
+                    //全选
                     this.groupReleaseSelectAll = true;
+                    $("#groupRelease").each(function(){
+                        alert($(this).val());
+                    });
                 }
+                alert(this.groupReleaseSelectAll);
             },
             personalLoansTables : function(){
+                var that = this;
                 var api = personalLoansTableAPI;
                 var columnsSetting = api.settings()[0].oInit.columns;
                 $(columnsSetting).each(function (i) {
@@ -361,7 +470,10 @@
                                 column.search(val ? '^' + val + '$' : '', true, false).draw();
                             });
                         }else {
-                            var select = $("<input type='checkbox' @click='personalLoanSelectAllfun'>");
+                            var select = $("<input type='checkbox'>");
+                            select.click(function () {
+                                that.personalLoanSelectAllfun();
+                            });
                             select.appendTo($(column.header()).empty());
                         }
                     }
@@ -369,8 +481,10 @@
             },
             personalLoanSelectAllfun : function () {
                 if (this.personalLoanSelectAll){
+                    //全不选
                     this.personalLoanSelectAll = false;
                 }else {
+                    //全选
                     this.personalLoanSelectAll = true;
                 }
             }

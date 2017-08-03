@@ -756,4 +756,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	List<Order> selectListsmsByBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+
+	List<Map<String, String>> selectAllCustomerOrderCount();
 }

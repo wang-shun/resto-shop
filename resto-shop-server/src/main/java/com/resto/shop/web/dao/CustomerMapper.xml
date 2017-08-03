@@ -646,4 +646,30 @@ and wechat_id != '0'
         select * from tb_customer where share_customer = #{customerId}
         order by bind_phone_time desc LIMIT #{currentPage},#{showCount}
     </select>
+
+    <select id="selectBySelectMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select * from tb_customer tc
+        inner join tb_customer_detail tcd
+        on tc.customer_detail_id = tcd.id
+        <where>
+            <if test="register != null">
+                and tc.is_bind_phone = #{register}
+            </if>
+            <if test="sex != null">
+                and tc.sex = #{sex}
+            </if>
+            <if test="registerBeginDate != null">
+                and tc.bind_phone_time &gt;= #{registerBeginDate}
+            </if>
+            <if test="registerEndDate != null">
+                and tc.bind_phone_time &lt;= #{registerEndDate}
+            </if>
+            <if test="customerIds != null and customerIds.size() >= 0">
+                and id in
+                <foreach collection="customerIds" item="customerId" open="(" separator="," close=")">
+                    #{customerId}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>

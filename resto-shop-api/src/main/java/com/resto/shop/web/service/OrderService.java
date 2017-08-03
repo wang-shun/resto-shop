@@ -715,4 +715,6 @@ public List<Order> selectListByTime(String beginDate, String endDate, String sho
 
 	 */
 	Summarry selctSummaryBrandData(String beginDate, String endDate, String currentBrandId);
+
+	List<Map<String, String>> selectAllCustomerOrderCount();
 }

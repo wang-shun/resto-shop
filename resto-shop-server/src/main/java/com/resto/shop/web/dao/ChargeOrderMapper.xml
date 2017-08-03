@@ -570,4 +570,8 @@ AND u.id =#{customerId}
       GROUP BY customer_id
     </if>
   </select>
+
+    <select id="selectAllCustomerChargeOrder" resultType="java.lang.String">
+        select customer_id from tb_charge_order where order_state = 1
+    </select>
 </mapper>

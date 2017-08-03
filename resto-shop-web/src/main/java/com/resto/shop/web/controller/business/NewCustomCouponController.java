@@ -1,23 +1,27 @@
 package com.resto.shop.web.controller.business;
 
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import com.resto.brand.core.util.MemcachedUtils;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.resto.brand.core.util.StringUtils;
+import com.resto.shop.web.model.Customer;
+import com.resto.shop.web.service.ChargeOrderService;
+import com.resto.shop.web.service.CustomerService;
+import com.resto.shop.web.service.OrderService;
 import com.resto.shop.web.util.RedisUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.DistributionMode;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.DistributionModeService;
-import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.constant.TimeConsType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.NewCustomCoupon;
@@ -35,6 +39,15 @@ public class NewCustomCouponController extends GenericController{
 
     @Resource
     BrandService brandService;
+
+    @Resource
+    OrderService orderService;
+
+    @Resource
+    ChargeOrderService chargeOrderService;
+
+    @Resource
+    CustomerService customerService;
 
     @RequestMapping("/list")
     public void list(){
@@ -174,4 +187,140 @@ public class NewCustomCouponController extends GenericController{
         return "newcustomcoupon/grantCoupon";
     }
 
+    /**
+     * 根据条件查询发放流失唤醒优惠卷的用户
+     * @param selectMap
+     * @return
+     */
+    @RequestMapping("/selectCustomer")
+    @ResponseBody
+    public Result selectCustomer(Map<String, String> selectMap){
+        try{
+            //封装最后的返回值
+            JSONArray array = new JSONArray();
+            JSONObject object = new JSONObject();
+            //根据查询条件先得到所有用户
+            List<Customer> customers = customerService.selectBySelectMap(selectMap);
+            //得到当前时间的字符串
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+            String newDateString = format.format(new Date());
+            //初始差距天数
+            Integer daysBetween;
+            //获取所有下过单的用户
+            List<Map<String, String>> orderList = orderService.selectAllCustomerOrderCount();
+            //获取充值过的所有用户
+            List<String>  chargeOrderList = chargeOrderService.selectAllCustomerChargeOrder();
+            //声明标识判断是否录入过订单条件默认无
+            boolean isOrder;
+            //声明标识判断该用户是否有过订单默认无
+            boolean order;
+            //声明标识判断该用户是否满足订单条件默认不满足
+            boolean meetOrder;
+            //声明标识判断是否录入过是否储值条件默认无
+            boolean isValue;
+            //声明标识判断该用户是否满足储值条件默认不满足
+            boolean meetChargeOrder;
+            for (Customer customer : customers){
+                isOrder = false;
+                order = false;
+                meetOrder = false;
+                isValue = false;
+                meetChargeOrder = false;
+                //判断是否录入过订单条件，有则进行筛选
+                if (StringUtils.isNotBlank(selectMap.get("orderCount")) || StringUtils.isNotBlank(selectMap.get("orderTotal"))
+                    || StringUtils.isNotBlank(selectMap.get("avgOrderMoney")) || StringUtils.isNotBlank(selectMap.get("lastOrderDay"))) {
+                    isOrder = true;
+                    for (Map orderMap : orderList){
+                        if (customer.getId().equalsIgnoreCase(orderMap.get("customerId").toString())) {
+                            isOrder = true;
+                            daysBetween = daysBetween(orderMap.get("lastOrderTime").toString(), newDateString);
+                            //判断该用户满不满足订单条件
+                            if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((selectMap.get("orderCount") == null ? "0" : selectMap.get("orderCount")))) > 0
+                                    && Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((selectMap.get("orderTotal") == null ? "0" : selectMap.get("orderTotal")))) > 0
+                                    && Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf((selectMap.get("avgOrderMoney") == null ? "0" : selectMap.get("avgOrderMoney")))) > 0
+                                    && daysBetween.compareTo(Integer.valueOf((selectMap.get("lastOrderDay") == null ? "0" : selectMap.get("lastOrderDay")))) > 0) {
+                                meetOrder = true;
+                            }
+                            break;
+                        }
+                    }
+                }
+                if (isOrder && !meetOrder) { //如果录如过订单条件但该用户没有满足订单条件则将该用户从列表中移除掉
+                    customers.remove(customer);
+                    break;
+                }else if (isOrder && !order){ //如果录如过订单条件但该用户没有订单将该用户从列表中移除掉
+                    customers.remove(customer);
+                    break;
+                }
+                //判断是否录如过储值条件，有则进行筛选
+                if (StringUtils.isNotBlank(selectMap.get("isValue"))) {
+                    isValue = true;
+                    if (selectMap.get("isValue").equalsIgnoreCase("1")){
+                        //筛选储值过的用户
+                        for (String customerId : chargeOrderList){
+                            if (customerId.equalsIgnoreCase(customer.getId())){
+                                meetChargeOrder = true;
+                                break;
+                            }
+                        }
+                    }else {
+                        //筛选未储值过的用户
+                        for (String customerId : chargeOrderList){
+                            if (!customerId.equalsIgnoreCase(customer.getId())){
+                                meetChargeOrder = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                //判断如果有录入过是否储值的条件，如有则移除没有满足条件的用户
+                if (isValue && !meetChargeOrder){
+                    customers.remove(customer);
+                    break;
+                }
+                object.put("customerId", customer.getId());
+                object.put("customerType", customer.getIsBindPhone() ? "注册" : "未注册");
+                String value = "否";
+                for (String customerId : chargeOrderList){
+                    if (customerId.equalsIgnoreCase(customer.getId())){
+                        value = "是";
+                        break;
+                    }
+                }
+                object.put("isValue", value);
+                object.put("nickname", customer.getNickname());
+                String sex = "男";
+                if(customer.getSex() == 2) {
+                    sex = "女";
+                }else if (customer.getSex() == 0){
+                    sex = "未知";
+                }
+                object.put("sex", sex);
+                object.put("telephone", customer.getTelephone() == null ? "--" : customer.getTelephone());
+                object.put("birthday", customer.getCustomerDetail() != null && customer.getCustomerDetail().getBirthDate() != null
+                        ? new SimpleDateFormat("yyyy-MM-dd").format(customer.getCustomerDetail().getBirthDate()) : "--");
+                String orderCount = "0";
+                String orderMoney = "0";
+                String AVGOrderMoney = "0";
+                for (Map orderMap : orderList){
+                    if (customer.getId().equalsIgnoreCase(orderMap.get("customerId").toString())) {
+                        orderCount = orderMap.get("orderCount").toString();
+                        orderMoney = orderMap.get("orderTotal").toString();
+                        AVGOrderMoney = orderMap.get("avgOrderMoney").toString();
+                        break;
+                    }
+                }
+                object.put("orderCount", orderCount);
+                object.put("orderMoney", orderMoney);
+                object.put("AVGOrderMoney", AVGOrderMoney);
+                array.add(object);
+                object = new JSONObject();
+            }
+            return getSuccessResult(array);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            return new Result(false);
+        }
+    }
 }	

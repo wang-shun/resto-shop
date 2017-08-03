@@ -67,7 +67,6 @@ public interface CustomerService extends GenericService<Customer, String> {
      * 得到某个时间段店铺的会员信息和订单情况
      * @param beginDate
      * @param endDate
-     * @param brandId
      * @return
      */
     List<MemberUserDto> selectListMemberUser(String beginDate,String endDate);
@@ -104,4 +103,6 @@ public interface CustomerService extends GenericService<Customer, String> {
     List<Customer> getCommentCustomer(String startTime,Integer time,Integer type);
 
 	List<Customer> selectShareCustomerList(String customerId, Integer currentPage, Integer showCount);
+
+	List<Customer> selectBySelectMap(Map<String, String> selectMap);
 }

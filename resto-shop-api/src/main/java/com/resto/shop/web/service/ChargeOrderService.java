@@ -101,4 +101,6 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	RechargeLogDto selectShopRechargeLog(String beginDate,String endDate,String shopId);
 
 	List<Map<String, Object>> getChargeSumInfo(Map<String, Object> selectMap);
+
+	List<String> selectAllCustomerChargeOrder();
 }
