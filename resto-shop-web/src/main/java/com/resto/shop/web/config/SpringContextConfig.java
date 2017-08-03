@@ -474,6 +474,9 @@ public class SpringContextConfig {
     @Bean
     public PlatformOrderService platformOrderService(){return  proxy.create(PlatformOrderService.class);}
 
+    @Bean
+    public ShopTvConfigService shopTvConfigService() {return  proxy.create(ShopTvConfigService.class);}
+
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }

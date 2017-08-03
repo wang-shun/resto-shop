@@ -3876,12 +3876,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
         if (order.getPrintTimes() != 1) {
-            if (orderList.contains(orderId)) {
+            if(!MemcachedUtils.add(orderId,1)){
                 return printTask;
-            } else {
-                orderList.add(orderId);
             }
-
+        }else{
+            if(!MemcachedUtils.add(orderId+"print",1)){
+                return printTask;
+            }
         }
         List<OrderItem> items = orderItemService.listByOrderId(orderId);
 
@@ -4280,7 +4281,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     /**
      * 2016-11-2
      */
-    public brandArticleReportDto selectBrandArticleNum(String beginDate, String endDate, String brandId, String brandName) {
+    public brandArticleReportDto callBrandArticleNum(String beginDate, String endDate, String brandId, String brandName) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         Integer totalNum = 0;
@@ -4321,7 +4322,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public List<ShopArticleReportDto> selectShopArticleDetails(String beginDate, String endDate, String brandId, List<ShopDetail> shopDetails) {
+    public List<ShopArticleReportDto> callShopArticleDetails(String beginDate, String endDate, String brandId, List<ShopDetail> shopDetails) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         if (shopDetails.isEmpty()) {
@@ -4470,7 +4471,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Map<String, Object> selectMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
+    public Map<String, Object> callMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
         //封装品牌的数据
         OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
         //封装店铺的数据
@@ -4495,8 +4496,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
                 || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
             selectMap.put("pageNo", pageNo * 1000);
-            shopIncomeDtosItem = orderMapper.selectDayAllOrderItem(selectMap);
-            shopIncomeDtosPayMent = orderMapper.selectDayAllOrderPayMent(selectMap);
+            shopIncomeDtosItem = orderMapper.callProcDayAllOrderItem(selectMap);
+            shopIncomeDtosPayMent = orderMapper.callProcDayAllOrderPayMent(selectMap);
             shopIncomeDtosItems.addAll(shopIncomeDtosItem);
             shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
         }
@@ -4649,7 +4650,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //    }
 
     @Override
-    public List<Order> selectListByTime(String beginDate, String endDate, String shopId, String customerId) {
+    public List<Order> callListByTime(String beginDate, String endDate, String shopId, String customerId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         return orderMapper.selectListByTime(begin, end, shopId, customerId);
@@ -8410,7 +8411,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 redPacket.setShopDetailId(order.getShopDetailId());
                                 redPacket.setRedRemainderMoney(backMoney);
                                 redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
-                                redPacket.setOrderId(order.getId());
                                 redPacketService.insert(redPacket);
                                 Map map = new HashMap(4);
                                 map.put("brandName", brand.getBrandName());
@@ -8486,7 +8486,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 redPacket.setShopDetailId(order.getShopDetailId());
                                 redPacket.setRedRemainderMoney(backMoney);
                                 redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
-                                redPacket.setOrderId(order.getId());
                                 redPacketService.insert(redPacket);
                                 Map accountMap = new HashMap(4);
                                 accountMap.put("brandName", brand.getBrandName());
@@ -8542,7 +8541,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             redPacket.setShopDetailId(order.getShopDetailId());
             redPacket.setRedRemainderMoney(order.getRefundMoney());
             redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
-            redPacket.setOrderId(order.getId());
             redPacketService.insert(redPacket);
             Map map = new HashMap(4);
             map.put("brandName", brand.getBrandName());
@@ -9683,13 +9681,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap) {
-        return orderMapper.selectDayAllOrderItem(selectMap);
+    public List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap) {
+        return orderMapper.callProcDayAllOrderItem(selectMap);
     }
 
     @Override
-    public List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap) {
-        return orderMapper.selectDayAllOrderPayMent(selectMap);
+    public List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap) {
+        return orderMapper.callProcDayAllOrderPayMent(selectMap);
     }
 
     @Override

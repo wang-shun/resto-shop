@@ -698,9 +698,9 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 
 
-	List<ShopIncomeDto> selectDayAllOrderItem(Map<String, Object> selectMap);
+	List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap);
 
-	List<ShopIncomeDto> selectDayAllOrderPayMent(Map<String, Object> selectMap);
+	List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap);
 
 	void fixAllowContinueOrder(@Param("beginDate") Date begin);
 

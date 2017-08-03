@@ -691,7 +691,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
-    public List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap) {
+    public List<ArticleSellDto> callOrderArtcile(Map<String, Object> selectMap) {
         return articleMapper.queryOrderArtcile(selectMap);
     }
 
@@ -702,7 +702,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
-    public Map<String, Object> selectArticleOrderCount(Map<String, Object> selectMap) {
+    public Map<String, Object> callArticleOrderCount(Map<String, Object> selectMap) {
         return articleMapper.selectArticleOrderCount(selectMap);
     }
 
