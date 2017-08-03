@@ -150,6 +150,16 @@ public class Article implements Serializable{
 
     private String recommendCategoryId;
 
+    private Integer monthlySales;          //菜品月销售量
+
+    public Integer getMonthlySales() {
+        return monthlySales;
+    }
+
+    public void setMonthlySales(Integer monthlySales) {
+        this.monthlySales = monthlySales;
+    }
+
     public Integer getCount() {
         return count;
     }

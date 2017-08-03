@@ -1059,4 +1059,9 @@ GROUP BY article_id
         GROUP BY article_name
     </select>
 
+
+    <select id="selectSumByMonthlySales" resultType="java.lang.Integer">
+        select sum(count) from tb_order_item
+        where article_id = #{articleId} and create_time like CONCAT('%',#{time},'%')
+    </select>
 </mapper>

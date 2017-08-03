@@ -29,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
@@ -148,7 +149,12 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> selectListFull(String currentShopId, Integer distributionModeId, String show) {
         List<Article> articleList = articleMapper.selectListByShopIdAndDistributionId(currentShopId, distributionModeId);
+        //当前时间的年月
+        Date d = new Date();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
+        String dateNowStr = sdf.format(d);
         for (Article article : articleList) {
+            article.setMonthlySales(articleMapper.selectSumByMonthlySales(article.getId(), dateNowStr));
 //            Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
             Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
             if (count != null) {
