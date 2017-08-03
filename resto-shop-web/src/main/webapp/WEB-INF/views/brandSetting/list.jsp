@@ -220,6 +220,12 @@
                                    v-model="m.recommendTime" required="required" min="0">
                         </div>
                         <div class="form-group">
+                            <label>优惠券间隔使用时间（单位：小时）：</label>
+                            <input type="number" class="form-control"
+                                   name="couponCD" placeholder="(输入整数)"
+                                   v-model="m.couponCD" required="required" min="0">
+                        </div>
+                        <div class="form-group">
                             <div class="control-label">是否启动评论红包提醒：</div>
 
                             <label>
