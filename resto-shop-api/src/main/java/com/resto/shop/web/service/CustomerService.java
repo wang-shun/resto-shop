@@ -104,5 +104,5 @@ public interface CustomerService extends GenericService<Customer, String> {
 
 	List<Customer> selectShareCustomerList(String customerId, Integer currentPage, Integer showCount);
 
-	List<Customer> selectBySelectMap(Map<String, String> selectMap);
+	List<Customer> selectBySelectMap(Map<String, Object> selectMap);
 }

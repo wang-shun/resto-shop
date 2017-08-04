@@ -83,5 +83,5 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 
     List<Customer> selectShareCustomerList(@Param("customerId")String customerId,@Param("currentPage") Integer currentPage,@Param("showCount") Integer showCount);
 
-    List<Customer> selectBySelectMap(Map<String, String> selectMap);
+    List<Customer> selectBySelectMap(Map<String, Object> selectMap);
 }

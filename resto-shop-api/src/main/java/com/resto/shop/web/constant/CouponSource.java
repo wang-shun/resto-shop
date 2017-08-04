@@ -14,4 +14,23 @@ public class CouponSource {
         public static final String SHARE_COUPON = "5"; //分享赠送优惠卷
         public static final String REAL_TIME_COUPON = "6"; //实时优惠卷
         public static final String DRAIN_AROUSAL_COUPON = "7"; //流失唤醒优惠卷
+
+        public static final String getCouponSourceByType(Integer couponType){
+                switch (couponType) {
+                        case 0:
+                                return NEW_CUSTOMER_COUPON;
+                        case 1:
+                                return WECHAT_PROMOTION_REBATE;
+                        case 2:
+                                return BIRTHDAY_COUPON;
+                        case 3:
+                                return SHARE_COUPON;
+                        case 4:
+                                return REAL_TIME_COUPON;
+                        case 5:
+                                return DRAIN_AROUSAL_COUPON;
+                        default:
+                                return "-1";
+                }
+        }
 }

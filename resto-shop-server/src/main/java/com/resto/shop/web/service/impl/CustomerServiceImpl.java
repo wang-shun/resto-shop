@@ -297,7 +297,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	}
 
 	@Override
-	public List<Customer> selectBySelectMap(Map<String, String> selectMap) {
+	public List<Customer> selectBySelectMap(Map<String, Object> selectMap) {
 		return customerMapper.selectBySelectMap(selectMap);
 	}
 }

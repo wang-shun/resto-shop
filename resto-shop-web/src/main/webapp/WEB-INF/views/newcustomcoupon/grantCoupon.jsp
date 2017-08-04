@@ -100,7 +100,7 @@
             </form>
             <br/>&nbsp;&nbsp;
             <button type="button" class="btn btn-success" @click="searchInfo">查询</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <button type="button" class="btn btn-primary">发放</button>
+            <button type="button" class="btn btn-primary" @click="grantCoupon">发放</button>
             <br/><br/>
             <table id="groupReleaseTable" class="table table-striped table-bordered table-hover"
                    style="width: 100%;">
@@ -114,7 +114,7 @@
                     <label>查询用户</label>&nbsp;&nbsp;
                     <input type="text" class="form-control" v-model="personalLoanSelectObject.text" placeholder="请录入手机号/昵称">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <button type="button" class="btn btn-success" @click="searchInfo">查询</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <button type="button" class="btn btn-primary">发放</button>
+                    <button type="button" class="btn btn-primary" @click="grantCoupon">发放</button>
                 </div>
             </form>
             <br/><br/>
@@ -165,7 +165,7 @@
                 var that = this;
                 that.groupReleaseTable=$("#groupReleaseTable").DataTable({
                     lengthMenu: [ [100, 50, 10], [100, 50, 10] ],
-                    order: [[ 7, "desc" ]],
+                    order: [[ 6, "desc" ]],
                     columns : [
                         {
                             title : "用户类型",
@@ -219,7 +219,7 @@
                 });
                 that.personalLoansTable=$("#personalLoansTable").DataTable({
                     lengthMenu: [ [100, 50, 10], [100, 50, 10] ],
-                    order: [[ 7, "desc" ]],
+                    order: [[ 6, "desc" ]],
                     columns : [
                         {
                             title : "用户类型",
@@ -343,16 +343,16 @@
                                     column2.search('', true, false);
                                     var column4 = api1.column(4);
                                     column4.search('', true, false);
+                                    for (var index in result.data){
+                                        that.groupReleaseCustomerIds = that.groupReleaseCustomerIds + result.data[index].customerId + ",";
+                                    }
+                                    that.groupReleaseCustomerIds = that.groupReleaseCustomerIds.substring(0,that.groupReleaseCustomerIds.length-1);
                                     //清空表格
                                     that.groupReleaseTable.clear();
                                     that.groupReleaseTable.rows.add(result.data).draw();
                                     //重绘搜索列
                                     that.groupReleaseTables();
                                     toastr.success("查询成功");
-                                    for (var index in result.data){
-                                        that.groupReleaseCustomerIds = that.groupReleaseCustomerIds + result.data[index].customerId + ",";
-                                    }
-                                    that.groupReleaseCustomerIds = that.groupReleaseCustomerIds.substring(0,that.groupReleaseCustomerIds.length-1);
                                     console.log(that.groupReleaseCustomerIds);
                                 }else {
                                     toastr.error("查询失败");
@@ -372,16 +372,16 @@
                                     column2.search('', true, false);
                                     var column4 = api2.column(4);
                                     column4.search('', true, false);
+                                    for (var index in result.data){
+                                        that.personalLoansCustomerIds = that.personalLoansCustomerIds + result.data[index].customerId + ",";
+                                    }
+                                    that.personalLoansCustomerIds = that.personalLoansCustomerIds.substring(0,that.personalLoansCustomerIds.length-1);
                                     //清空表格
                                     that.personalLoansTable.clear();
                                     that.personalLoansTable.rows.add(result.data).draw();
                                     //重绘搜索列
                                     that.personalLoansTables();
                                     toastr.success("查询成功");
-                                    for (var index in result.data){
-                                        that.personalLoansCustomerIds = that.personalLoansCustomerIds + result.data[index].customerId + ",";
-                                    }
-                                    that.personalLoansCustomerIds = that.personalLoansCustomerIds.substring(0,that.personalLoansCustomerIds.length-1);
                                     console.log(that.personalLoansCustomerIds);
                                 }else {
                                     toastr.error("查询失败");
@@ -399,8 +399,36 @@
                 try{
                     switch (that.currentType){
                         case 1:
+                            if (that.groupReleaseCustomerIds.trim() == ""){
+                                toastr.clear();
+                                toastr.error("暂无发放用户");
+                                return;
+                            }
+                            $.post("newcustomcoupon/grantCoupon",{customerId : that.groupReleaseCustomerIds, couponId : couponId} , function (result) {
+                                if (result.success){
+                                    toastr.clear();
+                                    toastr.success("发放成功");
+                                }else {
+                                    toastr.clear();
+                                    toastr.error("发放失败");
+                                }
+                            });
                             break;
                         case 2:
+                            if (that.personalLoansCustomerIds.trim() == ""){
+                                toastr.clear();
+                                toastr.error("暂无发放用户");
+                                return;
+                            }
+                            $.post("newcustomcoupon/grantCoupon",{customerId : that.personalLoansCustomerIds, couponId : couponId} , function (result) {
+                                if (result.success){
+                                    toastr.clear();
+                                    toastr.success("发放成功");
+                                }else {
+                                    toastr.clear();
+                                    toastr.error("发放失败");
+                                }
+                            });
                             break;
                     }
                 }catch(e){
