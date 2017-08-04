@@ -208,12 +208,8 @@ public class NewCustomCouponController extends GenericController{
             String newDateString = format.format(new Date());
             //初始差距天数
             Integer daysBetween;
-            //声明标识判断是否录入过订单条件默认无
-//            boolean isOrder;
-            //声明标识判断该用户是否满足订单条件默认不满足
+            //声明标识判断该用户是否满足订单条件默认满足
             boolean meetOrder;
-            //声明标识判断是否录入过是否储值条件默认无
-//            boolean isValue;
             //声明标识判断该用户是否满足储值条件默认不满足
             boolean meetChargeOrder;
             List<String> customerIds = new ArrayList<>();
@@ -247,63 +243,41 @@ public class NewCustomCouponController extends GenericController{
             array = new ArrayList<>();
             while (iterator.hasNext()){
                 object = iterator.next();
-//                isOrder = false;
                 meetOrder = true;
-//                isValue = false;
-                meetChargeOrder = true;
-                //判断是否录入过订单条件，有则进行筛选
-//                if (StringUtils.isNotBlank(selectMap.get("orderCount")) || StringUtils.isNotBlank(selectMap.get("orderTotal"))
-//                    || StringUtils.isNotBlank(selectMap.get("avgOrderMoney")) || StringUtils.isNotBlank(selectMap.get("lastOrderDay"))) {
-//                    isOrder = true;
-                    for (Map orderMap : orderList){
-                        if (object.get("customerId").toString().equalsIgnoreCase(orderMap.get("customerId").toString())) {
-                            daysBetween = daysBetween(orderMap.get("lastOrderTime").toString(), newDateString);
-                            //判断该用户满不满足订单条件
-                            if (!(Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount")) ? "0" : selectMap.get("orderCount")))) > 0
-                                    && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("orderTotal")) ? "0" : selectMap.get("orderTotal")))) > 0
-                                    && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("avgOrderMoney")) ? "0" : selectMap.get("avgOrderMoney")))) > 0
-                                    && daysBetween.compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("lastOrderDay")) ? "0" : selectMap.get("lastOrderDay")))) > 0)) {
-                                meetOrder = false;
-                            }
-                            object.put("orderCount", orderMap.get("orderCount").toString());
-                            object.put("orderMoney", orderMap.get("orderTotal").toString());
-                            object.put("AVGOrderMoney", orderMap.get("avgOrderMoney").toString());
-                            break;
+                meetChargeOrder = false;
+                for (Map orderMap : orderList){
+                    if (object.get("customerId").toString().equalsIgnoreCase(orderMap.get("customerId").toString())) {
+                        daysBetween = daysBetween(orderMap.get("lastOrderTime").toString(), newDateString);
+                        //判断该用户满不满足订单条件
+                        if (!(Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount")) ? "0" : selectMap.get("orderCount")))) > 0
+                                && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("orderTotal")) ? "0" : selectMap.get("orderTotal")))) > 0
+                                && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("avgOrderMoney")) ? "0" : selectMap.get("avgOrderMoney")))) > 0
+                                && daysBetween.compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("lastOrderDay")) ? "0" : selectMap.get("lastOrderDay")))) > 0)) {
+                            meetOrder = false;
                         }
-//                    }
+                        object.put("orderCount", orderMap.get("orderCount").toString());
+                        object.put("orderMoney", orderMap.get("orderTotal").toString());
+                        object.put("AVGOrderMoney", orderMap.get("avgOrderMoney").toString());
+                        break;
+                    }
                 }
                 if (!meetOrder) { //如果录如过订单条件但该用户没有满足订单条件则将该用户从列表中移除掉
                     iterator.remove();
                     continue;
                 }
                 //判断是否录如过储值条件，有则进行筛选
-                if (StringUtils.isNotBlank(selectMap.get("isValue")) && !"2".equalsIgnoreCase(selectMap.get("isValue"))) {
-                    isValue = true;
-                    if (selectMap.get("isValue").equalsIgnoreCase("1")){
-                        //筛选储值过的用户
-                        for (String customerId : chargeOrderList){
-                            if (customerId.equalsIgnoreCase(object.get("customerId").toString())){
-                                meetChargeOrder = true;
-                                object.put("isValue", "是");
-                                break;
-                            }
-                        }
-                    }else {
-                        //筛选未储值过的用户
-                        for (String customerId : chargeOrderList){
-                            if (customerId.equalsIgnoreCase(object.get("customerId").toString())){
-                                meetChargeOrder = true;
-                                object.put("isValue", "是");
-                                break;
-                            }
-                        }
+                for (String customerId : chargeOrderList){
+                    if (customerId.equalsIgnoreCase(object.get("customerId").toString())){
+                        meetChargeOrder = true;
+                        object.put("isValue", "是");
+                        break;
                     }
                 }
                 //判断如果有录入过是否储值的条件，如有则移除没有满足条件的用户
-                if (isValue && selectMap.get("isValue").equalsIgnoreCase("1") && !meetChargeOrder){
+                if ("1".equalsIgnoreCase(selectMap.get("isValue")) && !meetChargeOrder){
                     iterator.remove();
                     continue;
-                }else if (isValue && selectMap.get("isValue").equalsIgnoreCase("0") && meetChargeOrder){
+                }else if ("0".equalsIgnoreCase(selectMap.get("isValue")) && meetChargeOrder){
                     iterator.remove();
                     continue;
                 }
