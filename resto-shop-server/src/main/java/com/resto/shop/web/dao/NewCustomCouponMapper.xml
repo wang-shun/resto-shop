@@ -21,9 +21,10 @@
         <result column="distance_birthday_day" property="distanceBirthdayDay"/>
         <result column="real_time_coupon_begin_time" property="realTimeCouponBeginTime"/>
         <result column="real_time_coupon_end_time" property="realTimeCouponEndTime"/>
+        <result column="is_brand" property="isBrand"/>
     </resultMap>
     <sql id="Base_Column_List">id, name, coupon_value, coupon_validay, coupon_number, create_time, use_with_account, coupon_name, coupon_min_money, begin_time, end_time, is_activty, brand_id, distribution_mode_id
-,recommend_delay_time,distance_birthday_day,real_time_coupon_begin_time,real_time_coupon_end_time</sql>
+,recommend_delay_time,distance_birthday_day,real_time_coupon_begin_time,real_time_coupon_end_time,is_brand</sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select
         <include refid="Base_Column_List"/> from tb_new_custom_coupon where id = #{id,jdbcType=BIGINT}
     </select>

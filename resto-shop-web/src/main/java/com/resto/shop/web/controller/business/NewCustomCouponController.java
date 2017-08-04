@@ -11,17 +11,22 @@ import javax.validation.Valid;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.util.StringUtils;
+import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.service.*;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.DistributionMode;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.DistributionModeService;
 import com.resto.shop.web.constant.TimeConsType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.NewCustomCoupon;
@@ -50,6 +55,15 @@ public class NewCustomCouponController extends GenericController{
 
     @Resource
     CouponService couponService;
+
+    @Resource
+    ShopDetailService shopDetailService;
+
+    @Resource
+    BrandSettingService brandSettingService;
+
+    @Resource
+    WechatConfigService wechatConfigService;
 
     @RequestMapping("/list")
     public void list(){
@@ -317,9 +331,24 @@ public class NewCustomCouponController extends GenericController{
             objectMap.put("customerIds", customerIds);
             List<Customer> customerList = customerService.selectBySelectMap(objectMap);
             List<NewCustomCoupon> newCustomCoupons = new ArrayList<>();
-            newCustomCoupons.add(newcustomcouponService.selectById(Long.valueOf(couponId)));
+            NewCustomCoupon newCustomCoupon = newcustomcouponService.selectById(Long.valueOf(couponId));
+            newCustomCoupons.add(newCustomCoupon);
+            ShopDetail shopDetail = new ShopDetail();
+            BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+            WechatConfig config = wechatConfigService.selectByBrandId(getCurrentBrandId());
+            if (newCustomCoupon.getIsBrand().equals(Common.NO)){
+                shopDetail = shopDetailService.selectById(newCustomCoupon.getShopDetailId());
+            }
+            Map<String, Object> valueMap = new HashMap<>();
+            valueMap.put("name", newCustomCoupon.getIsBrand() == 0 ? shopDetail.getName() : getBrandName());
+            valueMap.put("value", newCustomCoupon.getCouponValue().multiply(new BigDecimal(newCustomCoupon.getCouponNumber())));
+            valueMap.put("url", newCustomCoupon.getIsBrand() == 0 ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId="+shopDetail.getId()+"" : brandSetting.getWechatWelcomeUrl() + "?subpage=tangshi");
+            String text = "好久不见，你最近好吗？${name}给您寄来价值${value}元的“回归礼券”，<a href='${url}'>赶紧来尝尝我们的新品吧！~</a>";
+            StrSubstitutor substitutor = new StrSubstitutor(valueMap);
+            text = substitutor.replace(text);
             for (Customer customer : customerList){
                 couponService.addRealTimeCoupon(newCustomCoupons, customer);
+                WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
             }
             return getSuccessResult();
         }catch (Exception e){
