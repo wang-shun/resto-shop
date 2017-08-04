@@ -404,6 +404,8 @@
                                 toastr.error("暂无发放用户");
                                 return;
                             }
+                            toastr.clear();
+                            toastr.success("发放中，请稍后");
                             $.post("newcustomcoupon/grantCoupon",{customerId : that.groupReleaseCustomerIds, couponId : couponId} , function (result) {
                                 if (result.success){
                                     toastr.clear();
@@ -420,6 +422,8 @@
                                 toastr.error("暂无发放用户");
                                 return;
                             }
+                            toastr.clear();
+                            toastr.success("发放中，请稍后");
                             $.post("newcustomcoupon/grantCoupon",{customerId : that.personalLoansCustomerIds, couponId : couponId} , function (result) {
                                 if (result.success){
                                     toastr.clear();
