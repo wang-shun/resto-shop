@@ -268,4 +268,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public List<Customer> selectShareCustomerList(String customerId, Integer currentPage, Integer showCount) {
 		return customerMapper.selectShareCustomerList(customerId, currentPage, showCount);
 	}
+
+	@Override
+	public List<Customer> selectBySelectMap(Map<String, Object> selectMap) {
+		return customerMapper.selectBySelectMap(selectMap);
+	}
 }

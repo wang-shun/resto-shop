@@ -95,6 +95,28 @@ public class Customer implements Serializable{
 
     private String shopDetailId;
 
+    //表示该用户是否有订单
+    private Boolean useOrder;
+
+    public Boolean getUseOrder() {
+        return useOrder;
+    }
+
+    public void setUseOrder(Boolean useOrder) {
+        this.useOrder = useOrder;
+    }
+
+    //表示该用户是否有充值订单
+    private Boolean chargeOrder;
+
+    public Boolean getChargeOrder() {
+        return chargeOrder;
+    }
+
+    public void setChargeOrder(Boolean chargeOrder) {
+        this.chargeOrder = chargeOrder;
+    }
+
     public String getOrderId() {
         return orderId;
     }

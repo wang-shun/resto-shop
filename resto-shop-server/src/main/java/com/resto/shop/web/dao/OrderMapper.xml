@@ -3218,7 +3218,26 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 
 
 
-
-
-
+    <!-- 所有查询用户的订单总额-->
+    <select id="selectCustomerOrderCount" resultType="java.util.Map">
+        SELECT
+            td.customer_id customerId,
+            COUNT(1) orderCount,
+            SUM(td.order_money) orderTotal,
+            AVG(td.order_money) avgOrderMoney,
+            DATE_FORMAT(td.create_time,'%Y-%m-%d %H:%i:%s') lastOrderTime
+        FROM
+            tb_order td
+        WHERE
+            td.order_state IN (2, 10, 11, 12)
+        AND td.production_status IN (2, 3)
+        AND td.customer_id in
+        <foreach collection="list" item="customerId" open="(" separator="," close=")">
+            #{customerId}
+        </foreach>
+        GROUP BY
+            td.customer_id
+        ORDER BY
+            td.customer_id,td.create_time desc
+    </select>
 </mapper>

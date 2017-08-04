@@ -10121,4 +10121,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         return builder.toString();
     }
+
+    @Override
+    public List<Map<String, String>> selectCustomerOrderCount(List<String> customerIds) {
+        return orderMapper.selectCustomerOrderCount(customerIds);
+    }
 }
