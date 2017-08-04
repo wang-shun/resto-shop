@@ -571,7 +571,11 @@ AND u.id =#{customerId}
     </if>
   </select>
 
-    <select id="selectAllCustomerChargeOrder" resultType="java.lang.String">
+    <select id="selectCustomerChargeOrder" resultType="java.lang.String">
         select customer_id from tb_charge_order where order_state = 1
+        and customer_id in
+        <foreach collection="list" item="customerId" open="(" separator="," close=")">
+            #{customerId}
+        </foreach>
     </select>
 </mapper>

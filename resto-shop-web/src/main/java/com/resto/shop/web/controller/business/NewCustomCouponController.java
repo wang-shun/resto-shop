@@ -199,61 +199,80 @@ public class NewCustomCouponController extends GenericController{
     public Result selectCustomer(@RequestParam Map<String, String> selectMap){
         try{
             //封装最后的返回值
-            JSONArray array = new JSONArray();
+            List<JSONObject> array = new ArrayList<>();
             JSONObject object = new JSONObject();
             //根据查询条件先得到所有用户
             List<Customer> customers = customerService.selectBySelectMap(selectMap);
-            Iterator<Customer> iterator = customers.iterator();
             //得到当前时间的字符串
             SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
             String newDateString = format.format(new Date());
             //初始差距天数
             Integer daysBetween;
-            //获取所有下过单的用户
-            List<Map<String, String>> orderList = orderService.selectAllCustomerOrderCount();
-            //获取充值过的所有用户
-            List<String>  chargeOrderList = chargeOrderService.selectAllCustomerChargeOrder();
             //声明标识判断是否录入过订单条件默认无
-            boolean isOrder;
-            //声明标识判断该用户是否有过订单默认无
-            boolean order;
+//            boolean isOrder;
             //声明标识判断该用户是否满足订单条件默认不满足
             boolean meetOrder;
             //声明标识判断是否录入过是否储值条件默认无
-            boolean isValue;
+//            boolean isValue;
             //声明标识判断该用户是否满足储值条件默认不满足
             boolean meetChargeOrder;
-
+            List<String> customerIds = new ArrayList<>();
+            for (Customer customer : customers){
+                object.put("customerId", customer.getId());
+                object.put("customerType", customer.getIsBindPhone() ? "注册" : "未注册");
+                object.put("isValue", "否");
+                object.put("nickname", customer.getNickname());
+                String sex = "男";
+                if(customer.getSex() == 2) {
+                    sex = "女";
+                }else if (customer.getSex() == 0){
+                    sex = "未知";
+                }
+                object.put("sex", sex);
+                object.put("telephone", customer.getTelephone() == null ? "--" : customer.getTelephone());
+                object.put("birthday", customer.getCustomerDetail() != null && customer.getCustomerDetail().getBirthDate() != null
+                        ? new SimpleDateFormat("yyyy-MM-dd").format(customer.getCustomerDetail().getBirthDate()) : "--");
+                object.put("orderCount", 0);
+                object.put("orderMoney", 0);
+                object.put("AVGOrderMoney", 0);
+                array.add(object);
+                object = new JSONObject();
+                customerIds.add(customer.getId());
+            }
+            //获取所有下过单的用户
+            List<Map<String, String>> orderList = orderService.selectCustomerOrderCount(customerIds);
+            //获取充值过的所有用户
+            List<String>  chargeOrderList = chargeOrderService.selectCustomerChargeOrder(customerIds);
+            Iterator<JSONObject> iterator = array.iterator();
+            array = new ArrayList<>();
             while (iterator.hasNext()){
-                Customer customer = iterator.next();
-                isOrder = false;
-                order = false;
-                meetOrder = false;
-                isValue = false;
-                meetChargeOrder = false;
+                object = iterator.next();
+//                isOrder = false;
+                meetOrder = true;
+//                isValue = false;
+                meetChargeOrder = true;
                 //判断是否录入过订单条件，有则进行筛选
-                if (StringUtils.isNotBlank(selectMap.get("orderCount")) || StringUtils.isNotBlank(selectMap.get("orderTotal"))
-                    || StringUtils.isNotBlank(selectMap.get("avgOrderMoney")) || StringUtils.isNotBlank(selectMap.get("lastOrderDay"))) {
-                    isOrder = true;
+//                if (StringUtils.isNotBlank(selectMap.get("orderCount")) || StringUtils.isNotBlank(selectMap.get("orderTotal"))
+//                    || StringUtils.isNotBlank(selectMap.get("avgOrderMoney")) || StringUtils.isNotBlank(selectMap.get("lastOrderDay"))) {
+//                    isOrder = true;
                     for (Map orderMap : orderList){
-                        if (customer.getId().equalsIgnoreCase(orderMap.get("customerId").toString())) {
-                            order = true;
+                        if (object.get("customerId").toString().equalsIgnoreCase(orderMap.get("customerId").toString())) {
                             daysBetween = daysBetween(orderMap.get("lastOrderTime").toString(), newDateString);
                             //判断该用户满不满足订单条件
-                            if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount")) ? "0" : selectMap.get("orderCount")))) > 0
+                            if (!(Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount")) ? "0" : selectMap.get("orderCount")))) > 0
                                     && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("orderTotal")) ? "0" : selectMap.get("orderTotal")))) > 0
                                     && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("avgOrderMoney")) ? "0" : selectMap.get("avgOrderMoney")))) > 0
-                                    && daysBetween.compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("lastOrderDay")) ? "0" : selectMap.get("lastOrderDay")))) > 0) {
-                                meetOrder = true;
+                                    && daysBetween.compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("lastOrderDay")) ? "0" : selectMap.get("lastOrderDay")))) > 0)) {
+                                meetOrder = false;
                             }
+                            object.put("orderCount", orderMap.get("orderCount").toString());
+                            object.put("orderMoney", orderMap.get("orderTotal").toString());
+                            object.put("AVGOrderMoney", orderMap.get("avgOrderMoney").toString());
                             break;
                         }
-                    }
+//                    }
                 }
-                if (isOrder && !meetOrder) { //如果录如过订单条件但该用户没有满足订单条件则将该用户从列表中移除掉
-                    iterator.remove();
-                    continue;
-                }else if (isOrder && !order){ //如果录如过订单条件但该用户没有订单将该用户从列表中移除掉
+                if (!meetOrder) { //如果录如过订单条件但该用户没有满足订单条件则将该用户从列表中移除掉
                     iterator.remove();
                     continue;
                 }
@@ -263,16 +282,18 @@ public class NewCustomCouponController extends GenericController{
                     if (selectMap.get("isValue").equalsIgnoreCase("1")){
                         //筛选储值过的用户
                         for (String customerId : chargeOrderList){
-                            if (customerId.equalsIgnoreCase(customer.getId())){
+                            if (customerId.equalsIgnoreCase(object.get("customerId").toString())){
                                 meetChargeOrder = true;
+                                object.put("isValue", "是");
                                 break;
                             }
                         }
                     }else {
                         //筛选未储值过的用户
                         for (String customerId : chargeOrderList){
-                            if (customerId.equalsIgnoreCase(customer.getId())){
+                            if (customerId.equalsIgnoreCase(object.get("customerId").toString())){
                                 meetChargeOrder = true;
+                                object.put("isValue", "是");
                                 break;
                             }
                         }
@@ -286,43 +307,7 @@ public class NewCustomCouponController extends GenericController{
                     iterator.remove();
                     continue;
                 }
-                object.put("customerId", customer.getId());
-                object.put("customerType", customer.getIsBindPhone() ? "注册" : "未注册");
-                String value = "否";
-                for (String customerId : chargeOrderList){
-                    if (customerId.equalsIgnoreCase(customer.getId())){
-                        value = "是";
-                        break;
-                    }
-                }
-                object.put("isValue", value);
-                object.put("nickname", customer.getNickname());
-                String sex = "男";
-                if(customer.getSex() == 2) {
-                    sex = "女";
-                }else if (customer.getSex() == 0){
-                    sex = "未知";
-                }
-                object.put("sex", sex);
-                object.put("telephone", customer.getTelephone() == null ? "--" : customer.getTelephone());
-                object.put("birthday", customer.getCustomerDetail() != null && customer.getCustomerDetail().getBirthDate() != null
-                        ? new SimpleDateFormat("yyyy-MM-dd").format(customer.getCustomerDetail().getBirthDate()) : "--");
-                String orderCount = "0";
-                String orderMoney = "0";
-                String AVGOrderMoney = "0";
-                for (Map orderMap : orderList){
-                    if (customer.getId().equalsIgnoreCase(orderMap.get("customerId").toString())) {
-                        orderCount = orderMap.get("orderCount").toString();
-                        orderMoney = orderMap.get("orderTotal").toString();
-                        AVGOrderMoney = orderMap.get("avgOrderMoney").toString();
-                        break;
-                    }
-                }
-                object.put("orderCount", orderCount);
-                object.put("orderMoney", orderMoney);
-                object.put("AVGOrderMoney", AVGOrderMoney);
                 array.add(object);
-                object = new JSONObject();
             }
             return getSuccessResult(array);
         }catch (Exception e){

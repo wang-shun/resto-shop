@@ -153,8 +153,8 @@
             selectObject : null, //群体发放查询对象
             personalLoanSelectObject : null, //个人发放查询对象
             currentType : 1, //当前所在模块位置 1：群体发放 2：个人发放
-            groupReleaseCustomerIds : null, //群体发放用户的Id
-            personalLoansCustomerIds : null //个人发放用户的Id
+            groupReleaseCustomerIds : "", //群体发放用户的Id
+            personalLoansCustomerIds : "" //个人发放用户的Id
         },
         created : function() {
             this.initDataTables();
@@ -296,7 +296,7 @@
                         that.selectFunction();
                     }
                 }else {
-                    if (that.personalLoanSelectObject == null) {
+                    if (that.personalLoanSelectObject == null || that.personalLoanSelectObject.text == null || that.personalLoanSelectObject.text.trim() == "") {
                         that.showDialog(function () {
                             that.selectFunction();
                         });
@@ -335,6 +335,7 @@
                             $.post("newcustomcoupon/selectCustomer", that.selectObject, function (result) {
                                 toastr.clear();
                                 if (result.success) {
+                                    that.groupReleaseCustomerIds = "";
                                     api1.search('');
                                     var column1 = api1.column(1);
                                     column1.search('', true, false);
@@ -348,6 +349,11 @@
                                     //重绘搜索列
                                     that.groupReleaseTables();
                                     toastr.success("查询成功");
+                                    for (var index in result.data){
+                                        that.groupReleaseCustomerIds = that.groupReleaseCustomerIds + result.data[index].customerId + ",";
+                                    }
+                                    that.groupReleaseCustomerIds = that.groupReleaseCustomerIds.substring(0,that.groupReleaseCustomerIds.length-1);
+                                    console.log(that.groupReleaseCustomerIds);
                                 }else {
                                     toastr.error("查询失败");
                                 }
@@ -358,6 +364,7 @@
                             $.post("newcustomcoupon/selectCustomer", that.personalLoanSelectObject, function (result) {
                                 toastr.clear();
                                 if (result.success) {
+                                    that.personalLoansCustomerIds = "";
                                     api2.search('');
                                     var column1 = api2.column(1);
                                     column1.search('', true, false);
@@ -371,6 +378,11 @@
                                     //重绘搜索列
                                     that.personalLoansTables();
                                     toastr.success("查询成功");
+                                    for (var index in result.data){
+                                        that.personalLoansCustomerIds = that.personalLoansCustomerIds + result.data[index].customerId + ",";
+                                    }
+                                    that.personalLoansCustomerIds = that.personalLoansCustomerIds.substring(0,that.personalLoansCustomerIds.length-1);
+                                    console.log(that.personalLoansCustomerIds);
                                 }else {
                                     toastr.error("查询失败");
                                 }

@@ -378,7 +378,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	}
 
 	@Override
-	public List<String> selectAllCustomerChargeOrder() {
-		return chargeOrderMapper.selectAllCustomerChargeOrder();
+	public List<String> selectCustomerChargeOrder(List<String> customerIds) {
+		return chargeOrderMapper.selectCustomerChargeOrder(customerIds);
 	}
 }

@@ -102,5 +102,5 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 
 	List<Map<String, Object>> getChargeSumInfo(Map<String, Object> selectMap);
 
-	List<String> selectAllCustomerChargeOrder();
+	List<String> selectCustomerChargeOrder(List<String> customerIds);
 }

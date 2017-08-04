@@ -3328,7 +3328,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 
 
     <!-- 所有查询用户的订单总额-->
-    <select id="selectAllCustomerOrderCount" resultType="java.util.Map">
+    <select id="selectCustomerOrderCount" resultType="java.util.Map">
         SELECT
             td.customer_id customerId,
             COUNT(1) orderCount,
@@ -3340,6 +3340,10 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         WHERE
             td.order_state IN (2, 10, 11, 12)
         AND td.production_status IN (2, 3)
+        AND td.customer_id in
+        <foreach collection="list" item="customerId" open="(" separator="," close=")">
+            #{customerId}
+        </foreach>
         GROUP BY
             td.customer_id
         ORDER BY
