@@ -26,7 +26,7 @@
 	 @RequestMapping("/list_all")
 	 @ResponseBody
 	 public List<BrandAccountLog> listData(){
-		 return brandaccountlogService.selectList();
+		 return brandaccountlogService.selectListByBrandId(getCurrentBrandId());
 	 }
 
 	 @RequestMapping("list_one")

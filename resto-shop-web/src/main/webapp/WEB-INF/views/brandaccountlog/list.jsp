@@ -193,16 +193,28 @@
                             temp = "新用户注册";
                             break;
                         case 20:
-                            temp = "新用户消费";
+                            temp = "消费订单抽成";
                             break;
                         case 21:
-                            temp = "回头用户消费";
+                            temp = "消费订单实付抽成";
                             break;
                         case 22:
-                            temp = "新用户消费";
+                            temp = "回头用户消费订单抽成";
                             break;
                         case 23:
-                            temp = "回头用户消费";
+                            temp = "回头用户消费实付订单抽成";
+                            break;
+                        case 24:
+                            temp = "R+外卖订单抽成";
+                            break;
+                        case 25:
+                            temp = "R+外卖实付抽成";
+                            break;
+                        case 26:
+                            temp = "第三方外卖订单抽成";
+                            break;
+                        case 27:
+                            temp = "第三方外卖订单实付抽成";
                             break;
 
                         case 30:

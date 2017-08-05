@@ -51,7 +51,7 @@
 
 	 @RequestMapping("initData")
 	 @ResponseBody
-	 public Result initData(){
+	 public Result initData(String beginDate,String endDate){
 		 BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
 		 AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
 		 System.err.println(JSONObject.toJSONString(accountSetting));
@@ -61,10 +61,6 @@
 		 BrandAccount brandAccount = brandAccountService.selectByBrandId(getCurrentBrandId());
 		 b.setAccountBalance(brandAccount.getAccountBalance());//账户余额
 		 b.setBrandAccountId(brandAccount.getId());
-
-		 String beginDate = DateUtil.formatDate(new Date(),"yyyy-MM-dd");
-		 String endDate = DateUtil.formatDate(new Date(),"yyyy-MM-dd");
-
 		 List<BrandAccountLog> brandAccountLogList = brandAccountLogService.selectListByBrandIdAndTime(beginDate,endDate,getCurrentBrandId());
 		 int registerCustomerNum = 0; //注册用户个数
 		 BigDecimal registerCustomerMoney = BigDecimal.ZERO;//注册用户支出
@@ -90,16 +86,14 @@
 				}
 
 				//订单
-				if(blog.getDetail() == DetailType.NEW_CUSTOMER_SELL||blog.getDetail()==DetailType.BACK_CUSTOMER_SELL
-			        ||blog.getDetail()== DetailType.NEW_CUSTOMER_SELL_PART || blog.getDetail() == DetailType.BACK_CUSTOMER_SELL_PART){
-					orderMoney = orderMoney.add(blog.getOrderMoney());
+				if(blog.getDetail() == DetailType.ORDER_SELL || blog.getDetail() == DetailType.ORDER_REAL_SELL||
+				   blog.getDetail() == DetailType.BACK_CUSTOMER_ORDER_SELL || blog.getDetail() == DetailType.BACK_CUSTOMER_ORDER_REAL_SELL) {
 					orderPayMoney = orderPayMoney.add(blog.getFoundChange());
+					//订单数
+					if (blog.getIsParent()) {
+						orderNum++;
+					}
 				}
-				//订单数
-				if(blog.getDetail() == DetailType.NEW_CUSTOMER_SELL||blog.getDetail()==DetailType.BACK_CUSTOMER_SELL){
-					orderNum++;
-				}
-
 			}
 		 }
 
@@ -126,5 +120,51 @@
 	 	return getSuccessResult(b);
 	 }
 
+	 @RequestMapping("getAccountData")
+	 @ResponseBody
+	 public Result getAccountData(String beginDate,String endDate){
+		 BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+		 AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+		 System.err.println(JSONObject.toJSONString(accountSetting));
+		 BrandAccountManager b = new BrandAccountManager();
+		 BrandAccount brandAccount = brandAccountService.selectByBrandId(getCurrentBrandId());
+		 b.setAccountBalance(brandAccount.getAccountBalance());//账户余额
+		 b.setBrandAccountId(brandAccount.getId());
+		 List<BrandAccountLog> brandAccountLogList = brandAccountLogService.selectListByBrandIdAndTime(beginDate,endDate,getCurrentBrandId());
+		 BigDecimal registerCustomerMoney = BigDecimal.ZERO;//注册用户支出
+		 BigDecimal smsMoney = BigDecimal.ZERO;//短信支出
+		 BigDecimal orderPayMoney = BigDecimal.ZERO;//订单支出
+
+		 if(!brandAccountLogList.isEmpty()){
+			 for(BrandAccountLog blog: brandAccountLogList){
+				 if(blog.getDetail()== DetailType.NEW_CUSTOMER_REGISTER){//新用户注册
+					 registerCustomerMoney = registerCustomerMoney.add(blog.getFoundChange());
+				 }
+				 if(blog.getDetail() == DetailType.SMS_CODE){//发短信
+					 smsMoney = smsMoney.add(blog.getFoundChange());
+				 }
+
+				 //订单
+				 if(blog.getDetail() == DetailType.ORDER_SELL || blog.getDetail() == DetailType.ORDER_REAL_SELL||
+						 blog.getDetail() == DetailType.BACK_CUSTOMER_ORDER_SELL || blog.getDetail() == DetailType.BACK_CUSTOMER_ORDER_REAL_SELL) {
+					 orderPayMoney = orderPayMoney.add(blog.getFoundChange());
+				 }
+			 }
+		 }
+
+		 //账户充值
+		 BigDecimal chargeMoney = BigDecimal.ZERO;
+		 List<AccountChargeOrder> accountChargeOrders = accountChargeOrderService.selectListByBrandIdAndTime(beginDate,endDate,getCurrentBrandId());
+		 if(!accountChargeOrders.isEmpty())	{
+			 for(AccountChargeOrder o:accountChargeOrders){
+				 chargeMoney = chargeMoney.add(o.getChargeMoney());
+			 }
+		 }
+		 b.setBrandAccountCharge(chargeMoney);
+		 b.setRegisterCustomerMoney(registerCustomerMoney);
+		 b.setSmsMoney(smsMoney);
+		 b.setOrderOutMoney(orderPayMoney);
+		 return getSuccessResult(b);
+	 }
 
  }

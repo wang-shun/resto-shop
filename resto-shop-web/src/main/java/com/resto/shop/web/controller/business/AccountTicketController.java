@@ -33,7 +33,7 @@
 	 @RequestMapping("/list_all")
 	 @ResponseBody
 	 public Result listData(){
-		 List<AccountTicket> list = accountticketService.selectList();
+		 List<AccountTicket> list = accountticketService.selectListByBrandId(getCurrentBrandId());
 		 return getSuccessResult(list);
 	 }
 

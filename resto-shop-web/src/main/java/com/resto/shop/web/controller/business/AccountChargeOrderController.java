@@ -44,7 +44,7 @@
      @RequestMapping("/list_all")
      @ResponseBody
      public List<AccountChargeOrder> listData(){
-         return accountchargeorderService.selectHasPayList();
+         return accountchargeorderService.selectHasPayListByBrandId(getCurrentBrandId());
      }
 
      @RequestMapping("list_one")

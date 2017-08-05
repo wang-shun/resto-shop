@@ -58,10 +58,10 @@
 							账户概要
 						</div>
 						<div class="col-md-6" style="text-align: right">
-							<button class="btn btn-success" type="button">今日</button>
-							<button class="btn btn-success" type="button">昨日</button>
-							<button class="btn btn-success" type="button">本周</button>
-							<button class="btn btn-success" type="button">本月</button>
+							<button class="btn btn-success" type="button" @click = "todayInfo(1)">今日</button>
+							<button class="btn btn-success" type="button" @click="yesterDayInfo(2)">昨日</button>
+							<button class="btn btn-success" type="button" @click="weekInfo(3)">本周</button>
+							<button class="btn btn-success" type="button" @click="monthInfo(4)" >本月</button>
 							<button class="btn btn-success" type="button">查看详情</button>
 						</div>
 					</div>
@@ -98,6 +98,10 @@
 			el:"#control",
 			data:{
                 accountBalance:0,
+				date:{
+                  beginDate:'',
+				  endDate:''
+				},
 				logInfo:{
                     registerCustomer:0,//注册用户数
 					smsSend:0,//发短信数
@@ -112,33 +116,133 @@
 				}
 			},
 			methods:{
+                todayInfo:function(count){
+					var that = this;
+                    that.date.beginDate = new Date().format("yyyy-MM-dd");
+                    that.date.endDate  = new Date().format("yyyy-MM-dd");
+					that.querryAccountInfo(count);
+				},
+				yesterDayInfo:function (count) {
+                    var that = this;
+                    this.date.beginDate = that.GetDateStr(-1);
+                    this.date.endDate  = that.GetDateStr(-1);
+                    that.querryAccountInfo(count);
+                },
+				weekInfo:function (count) {
+                    var that = this;
+                    that.date.beginDate = that.getWeekStartDate();
+                    that.date.endDate  = new Date().format("yyyy-MM-dd");
+                    that.querryAccountInfo(count);
+                },
+				monthInfo:function (count) {
+                    var that = this;
+                    that.date.beginDate = that.getMonthStartDate();
+                    that.date.endDate  = new Date().format("yyyy-MM-dd");
+                    that.querryAccountInfo(count);
+                },
+                GetDateStr:function(AddDayCount){
+                    var dd = new Date()
+                    dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+                    var y = dd.getFullYear();
+                    var m = dd.getMonth()+1;//获取当前月份的日期
+                    var d = dd.getDate();
+                    return y+"-"+m+"-"+d;
+				},
+                getWeekStartDate:function () {
+                    var now = new Date(); //当前日期
+                    var nowYear = now.getYear(); //当前年
+					var nowMonth = now.getMonth(); //当前月
+					var nowDay = now.getDate(); //当前日
+					var nowDayOfWeek = now.getDay(); //今天本周的第几天
+                    var weekStartDate = new Date(nowYear, nowMonth, nowDay - nowDayOfWeek);
+                    return this.formatDate(weekStartDate);
+                },
+                getMonthStartDate:function () {
+                    var now = new Date();//当前日期
+					var nowYear = now.getYear(); //当前年
+					var nowMonth = now.getMonth(); //当前月
+                    var monthStartDate = new Date(nowYear, nowMonth, 1);
+                    return this.formatDate(monthStartDate);
+                },
+                formatDate:function (date) {
+                    var myyear = date.getFullYear();
+                    var mymonth = date.getMonth()+1;
+                    var myweekday = date.getDate();
+
+                    if(mymonth < 10){
+                        mymonth = "0" + mymonth;
+                    }
+                    if(myweekday < 10){
+                        myweekday = "0" + myweekday;
+                    }
+                    return (myyear+"-"+mymonth + "-" + myweekday);
+                },
+                querryInfo:function () {
+                    var that = this;
+                    $.ajax({
+                        url:"brandaccount/initData",
+                        data:{
+                            beginDate:that.date.beginDate,
+                            endDate: that.date.endDate
+                        },
+                        success:function (result) {
+                            var obj = result.data;
+                            //初始化账户余额
+                            that.accountBalance = obj.accountBalance;
+                            //初始化今日记录
+                            that.logInfo.registerCustomer = obj.registerCustoemrNum;
+                            that.logInfo.smsSend = obj.smsNum;
+                            that.logInfo.orderNum = obj.orderNum;
+                            that.logInfo.orderMoney = obj.orderMoney;
+
+                            //初始化账户概要
+                            that.accountLog.registerCustomerOrder = obj.registerCustomerMoney;
+                            that.accountLog.smsOrder = obj.smsMoney;
+                            that.accountLog.orderMoney = obj.orderOutMoney;
+                            that.accountLog.chargeMoney = obj.brandAccountCharge
+                        }
+                    });
+                },
+				querryAccountInfo:function (count) {
+                    var that = this;
+                    $.ajax({
+                        url:"brandaccount/getAccountData",
+                        data:{
+                            beginDate:that.date.beginDate,
+                            endDate: that.date.endDate
+                        },
+                        success:function (result) {
+                            var obj = result.data;
+                            //初始化账户概要
+                            that.accountLog.registerCustomerOrder = obj.registerCustomerMoney;
+                            that.accountLog.smsOrder = obj.smsMoney;
+                            that.accountLog.orderMoney = obj.orderOutMoney;
+                            that.accountLog.chargeMoney = obj.brandAccountCharge
+							switch (count){
+								case 1:
+								    toastr.success("查询今日数据成功..")
+									break;
+                                case 2:
+                                    toastr.success("查询昨日数据成功..")
+                                    break;
+                                case 3:
+                                    toastr.success("查询本周数据成功..")
+                                    break;
+                                case 4:
+                                    toastr.success("查询本月数据成功..")
+                                    break;
+							}
+
+                        }
+                    });
+                }
 
 			},
 			created:function () {
-			    var that = this;
-
-			    $.ajax({
-					url:"brandaccount/initData",
-					data:{
-
-					},
-					success:function (result) {
-						var obj = result.data;
-                        //初始化账户余额
-                        that.accountBalance = obj.accountBalance;
-                        //初始化今日记录
-                        that.logInfo.registerCustomer = obj.registerCustoemrNum;
-                        that.logInfo.smsSend = obj.smsNum;
-                        that.logInfo.orderNum = obj.orderNum;
-                        that.logInfo.orderMoney = obj.orderMoney;
-
-                        //初始化账户概要
-                        that.accountLog.registerCustomerOrder = obj.registerCustomerMoney;
-                        that.accountLog.smsOrder = obj.smsMoney;
-                        that.accountLog.orderMoney = obj.orderOutMoney;
-                        that.accountLog.chargeMoney = obj.brandAccountCharge
-                    }
-				});
+                var that = this;
+                that.date.beginDate = new Date().format("yyyy-MM-dd");
+                that.date.endDate  = new Date().format("yyyy-MM-dd");
+                that.querryInfo();
             }
 
 
