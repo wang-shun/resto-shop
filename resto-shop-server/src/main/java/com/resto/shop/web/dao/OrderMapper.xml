@@ -3231,7 +3231,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         WHERE
             td.order_state IN (2, 10, 11, 12)
         AND td.production_status IN (2, 3)
-        <if test="customerIds != null customerIds.size() > 0">
+        <if test="customerIds != null and customerIds.size() > 0">
             AND td.customer_id in
             <foreach collection="list" item="customerId" open="(" separator="," close=")">
                 #{customerId}
