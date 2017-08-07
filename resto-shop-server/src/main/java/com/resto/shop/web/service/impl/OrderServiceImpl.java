@@ -1783,7 +1783,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         	flag = brandSetting.getOpenBrandAccount()==1;
 
 		}
-        updateOrderAndBrandAccount(order,flag,accountSetting);
+        updateOrderAndBrandAccount(order,flag,accountSetting,true);
 //        Map map = new HashMap(4);
 //        map.put("brandName", brand.getBrandName());
 //        map.put("fileName", shopDetail.getName());
@@ -1811,10 +1811,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	 * @param openBrandAccount
 	 * @param accountSetting
 	 */
-	private void updateOrderAndBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting) {
+	private void updateOrderAndBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting,Boolean updateOrder) {
 		if(order.getPayType()==PayType.NOPAY&&order.getOrderState()==1){//后付会走两次paySuccess 所以如果是后付 并且支付状态为1的时候就不记录
-			update(order);
-			return;
+			if(updateOrder){
+				update(order);
+				return;
+			}
 		}
 
     	BigDecimal money = BigDecimal.ZERO;
@@ -1834,8 +1836,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		if(!list.isEmpty()){//这个人在这个店铺有过订单 说明是回头用户
 			flag = true;
 		}
-		update(order);
-
     	if(openBrandAccount){//说明开启了品牌账户设置
 				//就算出应收金额
 			money = getJifeiMoney(order,accountSetting,flag);
@@ -1862,7 +1862,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //					blog.setDetail(DetailType.NEW_CUSTOMER_SELL_PART);
 //				}
 //			}
-			if(order.getParentOrderId()!=null){
+			if(order.getParentOrderId()==null){
 				blog.setIsParent(true);
 			}
 
@@ -9705,9 +9705,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             paymentItem.setOrderId(orderId);
             orderPaymentItemService.insert(paymentItem);
         }
-        if (!payMode.equals(1) && !payMode.equals(2)) {
+        if (!payMode.equals(PayMode.WEIXIN_PAY) && !payMode.equals(PayMode.ACCOUNT_PAY)) {
             orderMapper.confirmOrderPos(orderId);
         }
+        //yz 计费系统 后付款 pos端 结算时计费
+		BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
+		//yz 2017/07/29计费系统
+		if(brandSetting.getOpenBrandAccount()==1){//说明开启了品牌账户
+			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+			updateOrderAndBrandAccount(order,true,accountSetting,false);
+		}
         return order;
     }
 
