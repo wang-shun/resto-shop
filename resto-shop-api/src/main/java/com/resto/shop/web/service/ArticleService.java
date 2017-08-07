@@ -101,7 +101,7 @@ public interface ArticleService extends GenericService<Article, String> {
 	
 	List<Article> selectsingleItem(String shopId);
 	
-	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
+	List<ArticleSellDto> callOrderArtcile(Map<String, Object> selectMap);
 	
 
 
@@ -135,7 +135,7 @@ public interface ArticleService extends GenericService<Article, String> {
      * @param selectMap
      * @return
      */
-    Map<String, Object> selectArticleOrderCount(Map<String, Object> selectMap);
+    Map<String, Object> callArticleOrderCount(Map<String, Object> selectMap);
 
     List<String> selectArticleSort(Map<String, Object> selectMap);
 

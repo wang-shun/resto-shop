@@ -68,6 +68,12 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         return list;
     }
 
+    @Override
+    public List<Coupon> listCouponUsed(Coupon coupon) {
+        List<Coupon> list=couponMapper.listCouponUsed(coupon);
+        return list;
+    }
+
 	@Resource
 	OrderPaymentItemService orderPaymentItemService;
 
@@ -230,19 +236,21 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
                 coupon.setName(customCoupon.getCouponName());
                 coupon.setValue(customCoupon.getCouponValue());
                 coupon.setMinAmount(customCoupon.getCouponMinMoney());
-                coupon.setCouponType(4);
+                coupon.setCouponType(customCoupon.getCouponType());
                 coupon.setBeginTime(customCoupon.getBeginTime());
                 coupon.setEndTime(customCoupon.getEndTime());
                 coupon.setUseWithAccount(customCoupon.getUseWithAccount());
                 coupon.setDistributionModeId(customCoupon.getDistributionModeId());
-                coupon.setCouponSource(CouponSource.REAL_TIME_COUPON);
+                coupon.setCouponSource(CouponSource.getCouponSourceByType(coupon.getCouponType()));
                 coupon.setCustomerId(customer.getId());
                 coupon.setRecommendDelayTime(0);
                 for(int i = 0; i < customCoupon.getCouponNumber(); i++){
                     insertCoupon(coupon);
                     coupons.add(coupon);
                 }
-                realTimeCouponIds = realTimeCouponIds.concat(customCoupon.getId().toString()).concat(",");
+                if (coupon.getCouponSource().equalsIgnoreCase(CouponSource.REAL_TIME_COUPON)) {
+                    realTimeCouponIds = realTimeCouponIds.concat(customCoupon.getId().toString()).concat(",");
+                }
             }
             if (org.apache.commons.lang3.StringUtils.isNotBlank(realTimeCouponIds)){
                 Customer newCustomer = new Customer();

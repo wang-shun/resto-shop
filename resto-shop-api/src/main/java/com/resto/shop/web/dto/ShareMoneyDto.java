@@ -24,6 +24,8 @@ public class ShareMoneyDto {
 
     private String headPhoto;    //消费人的头像
 
+    private String shopName;     //店铺名称
+
     public String getId() {
         return id;
     }
@@ -86,5 +88,13 @@ public class ShareMoneyDto {
 
     public void setHeadPhoto(String headPhoto) {
         this.headPhoto = headPhoto;
+    }
+
+    public String getShopName() {
+        return shopName;
+    }
+
+    public void setShopName(String shopName) {
+        this.shopName = shopName;
     }
 }

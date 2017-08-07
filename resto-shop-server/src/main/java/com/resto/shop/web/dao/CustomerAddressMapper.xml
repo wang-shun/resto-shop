@@ -168,7 +168,7 @@
   <update id="updateState">
     update tb_customer_address
     set
-    state = null
+    state = 0
     where customer_id = #{customer_id,jdbcType=VARCHAR}
   </update>
 </mapper>

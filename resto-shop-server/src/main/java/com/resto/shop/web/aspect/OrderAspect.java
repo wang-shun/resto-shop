@@ -1,10 +1,7 @@
 package com.resto.shop.web.aspect;
 
 import com.resto.brand.core.entity.JSONResult;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.LogUtils;
-import com.resto.brand.core.util.MQSetting;
-import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
@@ -93,11 +90,11 @@ public class OrderAspect {
 
     @AfterReturning(value = "createOrder()", returning = "jsonResult")
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
-        String time= DateUtil.formatDate(new Date(),"yyyy-MM-dd hh:mm:ss");
+        String time = DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
-            log.info("(createOrderAround)创建订单时候订单状态为：orderstate："+order.getOrderState()+"production："+order.getProductionStatus()+"订单id："+order.getId()+"当前时间为："+time);
-            if(order.getCustomerId().equals("0")){
+            log.info("(createOrderAround)创建订单时候订单状态为：orderstate：" + order.getOrderState() + "production：" + order.getProductionStatus() + "订单id：" + order.getId() + "当前时间为：" + time);
+            if (order.getCustomerId().equals("0")) {
                 //pos端点餐
                 MQMessageProducer.sendPlaceOrderMessage(order);
                 String shopId = order.getShopDetailId();
@@ -124,7 +121,7 @@ public class OrderAspect {
 //                shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
-            if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
+            if (order.getDistributionModeId() == 2 && order.getOrderState() == OrderState.PAYMENT) {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 MQMessageProducer.sendPlatformOrderMessage(order.getId(), PlatformType.R_VERSION, order.getBrandId(), order.getShopDetailId());
                 MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
@@ -307,8 +304,8 @@ public class OrderAspect {
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟两小时，禁止继续加菜
         Order o = orderService.getOrderAccount(order.getShopDetailId());
-        RedisUtil.set(order.getShopDetailId()+"shopOrderCount",o.getOrderCount());
-        RedisUtil.set(order.getShopDetailId()+"shopOrderTotal",o.getOrderTotal());
+        RedisUtil.set(order.getShopDetailId() + "shopOrderCount", o.getOrderCount());
+        RedisUtil.set(order.getShopDetailId() + "shopOrderTotal", o.getOrderTotal());
         MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
 
         if (order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY) {
@@ -356,8 +353,8 @@ public class OrderAspect {
 //        }
 
         //R+外卖走消息队列  (订单不为空 支付模式不为空  支付为微信或者支付宝支付  已支付  已下单 外卖模式)
-        if(order != null && order.getPayMode() != null && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY) &&
-                order.getOrderState().equals(OrderState.PAYMENT)&& !order.getProductionStatus().equals(ProductionStatus.PRINTED) && order.getDistributionModeId()==2){
+        if (order != null && order.getPayMode() != null && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY) &&
+                order.getOrderState().equals(OrderState.PAYMENT) && !order.getProductionStatus().equals(ProductionStatus.PRINTED) && order.getDistributionModeId() == 2) {
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             MQMessageProducer.sendPlatformOrderMessage(order.getId(), PlatformType.R_VERSION, order.getBrandId(), order.getShopDetailId());
             MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
@@ -375,7 +372,7 @@ public class OrderAspect {
             /*if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
                 MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
             }else{*/
-                MQMessageProducer.sendPlaceOrderMessage(order);
+            MQMessageProducer.sendPlaceOrderMessage(order);
             //}
         }
 
@@ -402,15 +399,15 @@ public class OrderAspect {
         }
 
         //稍后支付  大Boss模式  支付宝或微信支付
-        if(order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)){
+        if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)) {
             /*if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
                 MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
             }else{*/
-                MQMessageProducer.sendAutoConfirmOrder(order, 5 * 1000);
+            MQMessageProducer.sendAutoConfirmOrder(order, 5 * 1000);
             //}
             Order o = orderService.getOrderAccount(order.getShopDetailId());
-            RedisUtil.set(order.getShopDetailId()+"shopOrderCount",o.getOrderCount());
-            RedisUtil.set(order.getShopDetailId()+"shopOrderTotal",o.getOrderTotal());
+            RedisUtil.set(order.getShopDetailId() + "shopOrderCount", o.getOrderCount());
+            RedisUtil.set(order.getShopDetailId() + "shopOrderTotal", o.getOrderTotal());
             MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
 //            orderService.confirmOrder(order);
         }
@@ -481,9 +478,9 @@ public class OrderAspect {
 
     }
 
-    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", argNames = "joinPoint,order",returning = "order")
-    public void pushOrderAfter(JoinPoint joinPoint,Order order) throws Throwable {
-        log.info("切面pushOrderAfter"+joinPoint.getSignature().getName());
+    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", argNames = "joinPoint,order", returning = "order")
+    public void pushOrderAfter(JoinPoint joinPoint, Order order) throws Throwable {
+        log.info("切面pushOrderAfter" + joinPoint.getSignature().getName());
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
                 if (order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)) {
@@ -605,27 +602,18 @@ public class OrderAspect {
         if (order.getPayType() == PayType.PAY && (order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.WX_PAY
                 || order.getPayMode() == OrderPayMode.ALI_PAY)) {
             String shopId = order.getShopDetailId();
-            Integer orderCount = (Integer) RedisUtil.get(shopId + "shopOrderCount");
-			/**
-			 *yz 2017/07/31 这个代码是由于本地拿不了redis中的数据 orderCount为 null 所以线上代码需要删除这个--
-			 */
-			if(orderCount == null){
-            	orderCount =1;
-			}
-			//--------------
-
-            BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId + "shopOrderTotal");
-			if(orderTotal == null){
-				orderTotal = new BigDecimal(100);
-			}
-
-            if (order.getParentOrderId() == null) {
-                orderCount++;
+            if (!MemcachedUtils.add(order.getId(), 1)) {
+                Integer orderCount = (Integer) RedisUtil.get(shopId + "shopOrderCount");
+                BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId + "shopOrderTotal");
+                if (order.getParentOrderId() == null) {
+                    orderCount++;
+                }
+                orderTotal = orderTotal.add(order.getOrderMoney());
+                RedisUtil.set(shopId + "shopOrderCount", orderCount);
+                RedisUtil.set(shopId + "shopOrderTotal", orderTotal);
+                MQMessageProducer.sendPrintSuccess(shopId);
             }
-            orderTotal = orderTotal.add(order.getOrderMoney());
-            RedisUtil.set(shopId + "shopOrderCount", orderCount);
-            RedisUtil.set(shopId + "shopOrderTotal", orderTotal);
-            MQMessageProducer.sendPrintSuccess(shopId);
+
         }
 
         if (order != null
@@ -758,7 +746,7 @@ public class OrderAspect {
         if (order != null) {
             log.info("确认订单成功后回调:" + order.getId());
             Customer customer = customerService.selectById(order.getCustomerId());
-            if(customer == null){
+            if (customer == null) {
                 return;
             }
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
@@ -920,8 +908,8 @@ public class OrderAspect {
 //			}
 
             Order o = orderService.getOrderAccount(order.getShopDetailId());
-            RedisUtil.set(order.getShopDetailId()+"shopOrderCount",o.getOrderCount());
-            RedisUtil.set(order.getShopDetailId()+"shopOrderTotal",o.getOrderTotal());
+            RedisUtil.set(order.getShopDetailId() + "shopOrderCount", o.getOrderCount());
+            RedisUtil.set(order.getShopDetailId() + "shopOrderTotal", o.getOrderTotal());
             MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
 
         }
@@ -1010,11 +998,12 @@ public class OrderAspect {
 
     /**
      * 订单评论完成后执行， 如是差评则发送消息队列执行打单操作
+     *
      * @param appraise
      */
     @AfterReturning(value = "saveAppraise()", returning = "appraise")
     public void saveAppraise(Appraise appraise) {
-        if (appraise != null){
+        if (appraise != null) {
             log.info("订单评论完成");
             ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
             //判断是否开启差评打单

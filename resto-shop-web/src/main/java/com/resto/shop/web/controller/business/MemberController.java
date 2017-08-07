@@ -112,7 +112,7 @@ public class MemberController extends GenericController{
             brandCustomerCount.put("maleCustomerCount", maleCustomerCount);
             brandCustomerCount.put("femaleCustomerCount", femaleCustomerCount);
             brandCustomerCount.put("unknownCustomerCount", unknownCustomerCount);
-            List<MemberUserDto> memberUserDtos = customerService.selectListMemberUser(beginDate, endDate);
+            List<MemberUserDto> memberUserDtos = customerService.callListMemberUser(beginDate, endDate);
             object.put("brandCustomerCount", brandCustomerCount);
             object.put("memberUserDtos", memberUserDtos);
         }catch (Exception e){

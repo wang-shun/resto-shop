@@ -182,4 +182,11 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	List<Article> getStockBySuit(String shopId);
 
+	/**
+	 * 菜品月销售量
+	 * @param articleId
+	 * @param time
+     * @return
+     */
+	Integer selectSumByMonthlySales(@Param("articleId") String articleId, @Param("time") String time);
 }

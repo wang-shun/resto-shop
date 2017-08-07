@@ -153,6 +153,9 @@
                                 <label class="radio-inline">
                                     <input type="radio" name="couponType" id="inlineRadio6" value="4" v-model="m.couponType">实&nbsp;时
                                 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="couponType" id="inlineRadio7" value="5" v-model="m.couponType">礼&nbsp;品
+                                </label>
                             </div>
 
                             <div class="form-group" v-if="m.couponType == 1">
@@ -276,6 +279,8 @@
                             $(td).html("<span class='label label-warning'>分&nbsp;享</span>");
                         }else if(tdData == 4){
                             $(td).html("<span class='label label-danger'>实&nbsp;时</span>");
+                        }else if (tdData == 5){
+                            $(td).html("<span class='label label-default'>礼&nbsp;品</span>");
                         }
                     }
                 },
@@ -355,11 +360,17 @@
                             <s:hasPermission name="newcustomcoupon/edit">
                             C.createEditBtn(rowData),
                             </s:hasPermission>
+                            createGrantBtn(rowData)
                         ];
                         $(td).html(operator);
                     }
                 }],
         });
+        
+        function createGrantBtn(rowData) {
+            var button = (rowData.isActivty == 1 && rowData.couponType == 5) ? $("<a href='newcustomcoupon/goToGrant?couponId="+rowData.id+"' class='btn btn-xs btn-success ajaxify '>发放</a>") : "";
+            return button;
+        }
 
         C = new Controller(cid,tb);
         var option = {
@@ -449,7 +460,7 @@
 //                        that.cancel();
 //                        tb.ajax.reload();
 //                    });
-                    if(that.m.couponMinMoney < that.m.couponValue){
+                    if(parseInt(that.m.couponMinMoney) < parseInt(that.m.couponValue)){
                         toastr.clear();
                         toastr.error("优惠券最低消费额度不得小于优惠券价值！");
                         return;

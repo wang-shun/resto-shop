@@ -244,7 +244,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	}
 
 	@Override
-	public List<MemberUserDto> selectListMemberUser(String beginDate,String endDate) {
+	public List<MemberUserDto> callListMemberUser(String beginDate,String endDate) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
 		return customerMapper.selectListMemberUser(begin,end);
@@ -294,5 +294,10 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	@Override
 	public List<Customer> selectShareCustomerList(String customerId, Integer currentPage, Integer showCount) {
 		return customerMapper.selectShareCustomerList(customerId, currentPage, showCount);
+	}
+
+	@Override
+	public List<Customer> selectBySelectMap(Map<String, Object> selectMap) {
+		return customerMapper.selectBySelectMap(selectMap);
 	}
 }

@@ -76,7 +76,7 @@ public class OrderController extends GenericController{
 	}
 
 	private Map<String,Object> getResult(String beginDate,String endDate){
-		return orderService.selectMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
+		return orderService.callMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
 	}
 
 
@@ -192,7 +192,7 @@ public class OrderController extends GenericController{
             shopDetails = shopDetailService.selectByBrandId(getCurrentBrandId());
         }
 		List<OrderDetailDto> listDto = new ArrayList<>();
-		List<Order> list = orderService.selectListByTime(beginDate,endDate,shopId,customerId);
+		List<Order> list = orderService.callListByTime(beginDate,endDate,shopId,customerId);
 		for (Order o : list) {
 			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),"",o.getCreateTime(),"--",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
             ,"0",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"--","--","--","--",BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
