@@ -1015,6 +1015,6 @@ GROUP BY article_id
 
     <select id="selectSumByMonthlySales" resultType="java.lang.Integer">
         select sum(count) from tb_order_item
-        where article_id = #{articleId} and create_time like CONCAT('%',#{time},'%')
+        where article_id like CONCAT(#{articleId},'%') and create_time like CONCAT('%',#{time},'%')
     </select>
 </mapper>
