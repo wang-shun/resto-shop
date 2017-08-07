@@ -1912,10 +1912,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//定义订单的总额(实际支付的金额)
 		BigDecimal jifeiMoney = BigDecimal.ZERO;
 
-		if(accountSetting.getOpenAllOrder()==1){//说明是 所有订单是/订单总额 抽成
-			if(order.getPayType()==0){//如果是先付
+		if(accountSetting.getOpenAllOrder()==BrandAccountPayType.ALL_ORDER_MONEY){//说明是 所有订单是/订单总额 抽成
+			if(order.getPayType()==PayType.PAY){//如果是先付
 				jifeiMoney = order.getOrderMoney();
-			}else if(order.getPayType()==1){//如果是后付
+			}else if(order.getPayType()==PayType.NOPAY){//如果是后付
 				if(order.getAmountWithChildren().compareTo(BigDecimal.ZERO)>0){
 					jifeiMoney = order.getAmountWithChildren();
 				}else {
@@ -1923,7 +1923,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				}
 			}
 			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
-		}else if(accountSetting.getOpenAllOrder()==2) {//说明是 所有订单/实际支付金额抽成
+		}else if(accountSetting.getOpenAllOrder()==BrandAccountPayType.ALL_ORDER_MONEY) {//说明是 所有订单/实际支付金额抽成
 			List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
 			if(!orderPaymentItems.isEmpty()){
 				//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
@@ -1938,7 +1938,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				}
 			}
 			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
-		}else if(accountSetting.getOpenBackCustomerOrder()==1){//回头用户订单  /订单总额抽成
+		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.ALL_ORDER_MONEY){//回头用户订单  /订单总额抽成
 			if(flag){//是回头用户才会计算金额
 				if(order.getPayType()==0){//如果是先付
 					jifeiMoney = order.getOrderMoney();
@@ -1952,7 +1952,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
 			}
 
-		}else if(accountSetting.getOpenBackCustomerOrder()==2){//回头用户 /实际支付总额抽成
+		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.REAL_ORDER_MONEY){//回头用户 /实际支付总额抽成
 			if(flag){//是回头用户才会计算金额
 				List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
 				if(!orderPaymentItems.isEmpty()){
