@@ -182,6 +182,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
         redPacket.setShopDetailId(customer.getBindPhoneShop());
         redPacket.setRedRemainderMoney(rewardMoney);
         redPacket.setRedType(RedType.SHARE_RED);
+		redPacket.setOrderId(order.getId());
         redPacketService.insert(redPacket);
 		log.info("分享奖励用户:"+rewardMoney+" 元"+"  分享者:"+shareCustomer.getId());
 		return rewardMoney;
