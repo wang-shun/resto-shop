@@ -824,9 +824,9 @@ public class OrderAspect {
         String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         //logBaseService.insertLogBaseInfoState(shopDetailService.selectById(order.getShopDetailId()),customer,shareCustomer.getId(),LogBaseState.FIRST_SHARE_PAY);
 //        log.info("发送返利通知成功:" + shareCustomer.getId() + " MSG: " + msg + result);
-//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                "订单发送推送：" + msg.toString());
-        Map map = new HashMap(4);
+//                "订单发送推送：" + msg.toString());//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+
+		Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shareCustomer.getId());
         map.put("type", "UserAction");

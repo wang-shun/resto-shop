@@ -137,6 +137,13 @@ dt, dd {
 	</div>
 </div>
 
+
+
+<!--短信充值---end -->
+
+
+
+
 <!-- 立即支付 -->
 <div class="modal fade" id="payAgainModal" tabindex="-1" role="dialog">
 	<div class="modal-dialog" role="document">
