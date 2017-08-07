@@ -1890,10 +1890,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 			// 创建账户日志流水 和更新账户
 			Integer id = brandAccount.getId();
+			BigDecimal amountUsed = brandAccount.getAmountUsed();
+
 			brandAccount = new BrandAccount();
 			brandAccount.setId(id);
 			brandAccount.setUpdateTime(new Date());
 			brandAccount.setAccountBalance(remain);
+			brandAccount.setAmountUsed(amountUsed.add(money));
 			brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
 		}
 	}
