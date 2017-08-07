@@ -670,7 +670,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	Order colseOrder(String orderId);
 
-    List<Map<String, Object>> reminder(String orderItemId);
+    List<Map<String, Object>> reminder(String orderItemIds, String orderId);
 
 	List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap);
 

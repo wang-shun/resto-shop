@@ -9626,14 +9626,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Map<String, Object>> reminder(String orderItemId) {
-        OrderItem orderItem = orderitemMapper.selectByPrimaryKey(orderItemId);
-        List<OrderItem> orderItems = orderitemMapper.getListByParentId(orderItemId);
-        orderItems.add(orderItem);
-        Order order = orderMapper.selectByPrimaryKey(orderItem.getOrderId());
+    public List<Map<String, Object>> reminder(String orderItemIds, String orderId) {
+        String[] itemIds = orderItemIds.split(",");
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        Integer oldDis = order.getDistributionModeId();
         order.setDistributionModeId(DistributionType.REMINDER_ORDER);
-        List<OrderItem> orderItemList = getOrderItemsWithChild(orderItems);
-        return printKitchen(order, orderItemList);
+        for (String itemId : itemIds){
+            OrderItem orderItem = orderitemMapper.selectByPrimaryKey(itemId);
+            List<OrderItem> orderItems = orderitemMapper.getListByParentId(itemId);
+            orderItems.add(orderItem);
+            List<OrderItem> orderItemList = getOrderItemsWithChild(orderItems);
+            printTask.addAll(printKitchen(order, orderItemList));
+        }
+        Order newOrder = new Order();
+        newOrder.setId(orderId);
+        newOrder.setDistributionModeId(oldDis);
+        orderMapper.updateByPrimaryKeySelective(newOrder);
+        return printTask;
     }
 
     List<OrderItem> getOrderItemsWithChild(List<OrderItem> orderItems) {
