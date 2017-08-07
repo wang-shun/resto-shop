@@ -1818,9 +1818,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	 * @param accountSetting
 	 */
 	private void updateOrderAndBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting,Boolean updateOrder) {
+		update(order);
 		if(order.getPayType()==PayType.NOPAY&&order.getOrderState()==1){//后付会走两次paySuccess 所以如果是后付 并且支付状态为1的时候就不记录
 			if(updateOrder){
-				update(order);
 				return;
 			}
 		}
