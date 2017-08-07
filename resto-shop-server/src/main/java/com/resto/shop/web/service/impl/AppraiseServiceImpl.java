@@ -140,6 +140,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
             redPacket.setShopDetailId(order.getShopDetailId());
             redPacket.setRedRemainderMoney(money);
             redPacket.setRedType(RedType.APPRAISE_RED);
+			redPacket.setOrderId(order.getId());
             redPacketService.insert(redPacket);
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
 		}
