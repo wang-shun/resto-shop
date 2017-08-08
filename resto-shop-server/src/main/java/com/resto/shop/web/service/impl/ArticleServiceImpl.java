@@ -186,11 +186,18 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         }
         getArticleDiscount(currentShopId, articleList, show);
         RecommendCategory recommendCategory=recommendCategoryService.selectById(recommendCcategoryId);
-        ListSortUtil<Article> sortList = new ListSortUtil<Article>();
         if(recommendCategory!=null){
-            if(recommendCategory.getType()==1){
-                sortList.sort(articleList, "monthlySales", "asc");
-                articleList=(List)sortList;
+            if(recommendCategory.getType()==0){
+                Collections.sort(articleList, new Comparator<Article>() {
+                    public int compare(Article o1, Article o2) {
+                        Integer a = o1.getMonthlySales();
+                        Integer b = o2.getMonthlySales();
+                        // 升序
+                        //return a.compareTo(b);
+                        // 降序
+                         return b.compareTo(a);
+                    }
+                });
             }
         }
         return articleList;
