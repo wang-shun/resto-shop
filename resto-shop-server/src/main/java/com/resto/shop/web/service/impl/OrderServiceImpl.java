@@ -1789,7 +1789,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         	flag = brandSetting.getOpenBrandAccount()==1;
 
 		}
-        updateOrderAndBrandAccount(order,flag,accountSetting,true);
+		update(order);
+        updateBrandAccount(order,flag,accountSetting);
 //        Map map = new HashMap(4);
 //        map.put("brandName", brand.getBrandName());
 //        map.put("fileName", shopDetail.getName());
@@ -1817,12 +1818,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	 * @param openBrandAccount
 	 * @param accountSetting
 	 */
-	private void updateOrderAndBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting,Boolean updateOrder) {
+	private void updateBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting) {
 		if(order.getPayType()==PayType.NOPAY&&order.getOrderState()==1){//后付会走两次paySuccess 所以如果是后付 并且支付状态为1的时候就不记录
-			if(updateOrder){
-				update(order);
-				return;
-			}
+			return;
 		}
 
     	BigDecimal money = BigDecimal.ZERO;
@@ -1992,82 +1990,82 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		o.setProductionStatus(ProductionStatus.GET_IT);
 		int count = orderMapper.updateByPrimaryKeySelective(o);
 		//yz 2017/08/03 计费系统 添加账户设置(简单版) ---resto+外卖订单
-		BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
-		if (brandSetting.getOpenBrandAccount() == 1) {//说明开启了品牌账户
-			//查询品牌账户设置
-			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-			//定义抽成的金额
-			BigDecimal money = BigDecimal.ZERO;
-
-			if (accountSetting.getOpenOutFoodOrder() == 1) {//开启resto外卖订单 并且按订单总额抽成
-				//计算resto外卖 的 抽成金额 (外卖都是先付所以就直接计算)
-				money = o.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? o.getAmountWithChildren() : o.getOrderMoney();
-			} else if (accountSetting.getOpenOutFoodOrder() == 2) {//开启resto外卖订单 并且按实际支付 抽成
-				List<OrderPaymentItem> orderPaymentItemList = orderPaymentItemService.selectByOrderId(o.getId());
-
-				if(!orderPaymentItemList.isEmpty()){
-					for (OrderPaymentItem oi : orderPaymentItemList) {
-						//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
-						if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
-								oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
-								oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
-								oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
-								){
-							money = money.add(oi.getPayValue());
-						}
-					}
-				}
-			}
-			//记录日志 和更新账户
-			BrandAccount brandAccount = brandAccountService.selectByBrandId(o.getBrandId());
-			ShopDetail s = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
-
-			BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
-			BrandAccountLog blog = new BrandAccountLog();
-			blog.setSerialNumber(o.getSerialNumber());
-			blog.setCreateTime(new Date());
-			blog.setBrandId(o.getBrandId());
-			blog.setShopId(o.getShopDetailId());
-			blog.setFoundChange(money.negate());
-			blog.setGroupName(s.getName());
-			blog.setAccountId(brandAccount.getId());
-			blog.setRemain(remain);
-			blog.setOrderMoney(o.getOrderMoney());
-//			if(flag){
-//				if(order.getParentOrderId()!=null){//说明是主订单
-//					blog.setDetail(DetailType.BACK_CUSTOMER_SELL);
-//				}else {
-//					blog.setDetail(DetailType.BACK_CUSTOMER_SELL_PART);
-//				}
-//			}else {
-//				if(order.getParentOrderId()!=null){
-//					blog.setDetail(DetailType.NEW_CUSTOMER_SELL);
-//				}else {
-//					blog.setDetail(DetailType.NEW_CUSTOMER_SELL_PART);
+//		BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
+//		if (brandSetting.getOpenBrandAccount() == 1) {//说明开启了品牌账户
+//			//查询品牌账户设置
+//			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+//			//定义抽成的金额
+//			BigDecimal money = BigDecimal.ZERO;
+//
+//			if (accountSetting.getOpenOutFoodOrder() == 1) {//开启resto外卖订单 并且按订单总额抽成
+//				//计算resto外卖 的 抽成金额 (外卖都是先付所以就直接计算)
+//				money = o.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? o.getAmountWithChildren() : o.getOrderMoney();
+//			} else if (accountSetting.getOpenOutFoodOrder() == 2) {//开启resto外卖订单 并且按实际支付 抽成
+//				List<OrderPaymentItem> orderPaymentItemList = orderPaymentItemService.selectByOrderId(o.getId());
+//
+//				if(!orderPaymentItemList.isEmpty()){
+//					for (OrderPaymentItem oi : orderPaymentItemList) {
+//						//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
+//						if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+//								oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
+//								oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+//								oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
+//								){
+//							money = money.add(oi.getPayValue());
+//						}
+//					}
 //				}
 //			}
-			if(o.getParentOrderId()!=null){
-				blog.setIsParent(true);
-			}
-
-			if(accountSetting.getOpenOutFoodOrder()==1){//Resto+外卖订单抽成
-				blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_SELL);
-			}
-			if(accountSetting.getOpenOutFoodOrder()==2){ //Resto+外卖订单实付抽成
-				blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_REAL_SELL);
-			}
-
-			blog.setBehavior(BehaviorType.SELL);
-
-			// 创建账户日志流水 和更新账户
-			Integer id = brandAccount.getId();
-			brandAccount = new BrandAccount();
-			brandAccount.setId(id);
-			brandAccount.setUpdateTime(new Date());
-			brandAccount.setAccountBalance(remain);
-			brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
-
-		}
+//			//记录日志 和更新账户
+//			BrandAccount brandAccount = brandAccountService.selectByBrandId(o.getBrandId());
+//			ShopDetail s = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
+//
+//			BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
+//			BrandAccountLog blog = new BrandAccountLog();
+//			blog.setSerialNumber(o.getSerialNumber());
+//			blog.setCreateTime(new Date());
+//			blog.setBrandId(o.getBrandId());
+//			blog.setShopId(o.getShopDetailId());
+//			blog.setFoundChange(money.negate());
+//			blog.setGroupName(s.getName());
+//			blog.setAccountId(brandAccount.getId());
+//			blog.setRemain(remain);
+//			blog.setOrderMoney(o.getOrderMoney());
+////			if(flag){
+////				if(order.getParentOrderId()!=null){//说明是主订单
+////					blog.setDetail(DetailType.BACK_CUSTOMER_SELL);
+////				}else {
+////					blog.setDetail(DetailType.BACK_CUSTOMER_SELL_PART);
+////				}
+////			}else {
+////				if(order.getParentOrderId()!=null){
+////					blog.setDetail(DetailType.NEW_CUSTOMER_SELL);
+////				}else {
+////					blog.setDetail(DetailType.NEW_CUSTOMER_SELL_PART);
+////				}
+////			}
+//			if(o.getParentOrderId()!=null){
+//				blog.setIsParent(true);
+//			}
+//
+//			if(accountSetting.getOpenOutFoodOrder()==1){//Resto+外卖订单抽成
+//				blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_SELL);
+//			}
+//			if(accountSetting.getOpenOutFoodOrder()==2){ //Resto+外卖订单实付抽成
+//				blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_REAL_SELL);
+//			}
+//
+//			blog.setBehavior(BehaviorType.SELL);
+//
+//			// 创建账户日志流水 和更新账户
+//			Integer id = brandAccount.getId();
+//			brandAccount = new BrandAccount();
+//			brandAccount.setId(id);
+//			brandAccount.setUpdateTime(new Date());
+//			brandAccount.setAccountBalance(remain);
+//			brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+//
+//		}
 			return count;
 		}
 
@@ -9897,7 +9895,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//yz 2017/07/29计费系统
 		if(brandSetting.getOpenBrandAccount()==1){//说明开启了品牌账户
 			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-			updateOrderAndBrandAccount(order,true,accountSetting,false);
+			updateBrandAccount(order,true,accountSetting);
 		}
         return order;
     }

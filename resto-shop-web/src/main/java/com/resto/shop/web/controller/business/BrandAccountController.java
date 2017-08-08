@@ -85,7 +85,7 @@
 					smsMoney = smsMoney.add(blog.getFoundChange());
 				}
 
-				orderMoney = orderMoney.add(blog.getOrderMoney());
+				orderMoney = orderMoney.add(blog.getOrderMoney()==null?BigDecimal.ZERO:blog.getOrderMoney());
 
 				//订单
 				if(blog.getDetail() == DetailType.ORDER_SELL || blog.getDetail() == DetailType.ORDER_REAL_SELL||
