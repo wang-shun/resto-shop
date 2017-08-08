@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import com.alibaba.fastjson.JSONObject;
 import com.resto.shop.web.model.Customer;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -126,14 +127,15 @@ public class SmsLogoInfoController extends GenericController{
 	}
 	
 	/**
+	 * shop端
 	 * 测试发短信功能
 	 * @return
 	 */
 	@RequestMapping("/sendCode")
-	public String sendCode(@RequestParam("phone")String phone, @RequestParam("code")String code, @RequestParam("brandId")String brandId, @RequestParam("shopId")String shopId, @RequestParam("smsLogType")int smsLogType){
+	public JSONObject sendCode(@RequestParam("phone")String phone, @RequestParam("code")String code, @RequestParam("brandId")String brandId, @RequestParam("shopId")String shopId, @RequestParam("smsLogType")int smsLogType){
 
 //		return smsLogService.sendCode(phone, code, brandId, shopId);
-		return smsLogService.sendCode(phone, code, brandId, shopId, smsLogType,null);
+		return smsLogService.sendCode(phone, code, brandId, shopId, smsLogType,null,false,null);
 	}
 	
 }

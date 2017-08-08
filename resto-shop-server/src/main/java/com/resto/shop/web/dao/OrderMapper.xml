@@ -3216,7 +3216,26 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 			AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3) ANd o.parent_order_id is null
 		</select>
 
-
+	<select id="selectOrderListByCustomerIdAndShopId" resultType="Order">
+	  SELECT
+        o.id,
+        o.order_mode,
+        o.pay_type,
+        o.print_order_time,
+        o.customer_id,
+        o.order_money,
+        o.create_time,
+        o.amount_with_children,
+        oi.id orderPaymentItem_id,
+        oi.payment_mode_id
+        FROM tb_order o
+        INNER JOIN tb_order_payment_item oi
+        on o.id = oi.order_id
+        WHERE o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND o.shop_detail_id = #{shopId}
+        AND o.customer_id = #{customerId}
+    </select>
 
     <!-- 所有查询用户的订单总额-->
     <select id="selectCustomerOrderCount" resultType="java.util.Map">

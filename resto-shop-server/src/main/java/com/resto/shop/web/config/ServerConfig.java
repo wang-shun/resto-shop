@@ -2,11 +2,13 @@ package com.resto.shop.web.config;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.web.model.AccountAddressInfo;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.service.DayAppraiseMessageService;
 import com.resto.shop.web.service.DayDataMessageService;
 import com.resto.shop.web.service.LogBaseService;
 import com.resto.shop.web.service.ThirdService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -132,4 +134,42 @@ public class ServerConfig {
     public DayAppraiseMessageService dayAppraiseMessageService(){
         return proxy.create(DayAppraiseMessageService.class);
     }
+
+    //品牌账户
+	@Bean
+	public BrandAccountService brandAccountService(){
+
+    	return proxy.create(BrandAccountService.class);
+	}
+
+	//品牌账户日志(流水)
+	@Bean
+	public  BrandAccountLogService brandAccountLogService(){
+		return proxy.create(BrandAccountLogService.class);
+	}
+
+	//品牌账户设置
+	@Bean
+	public AccountSettingService accountSettingService(){
+
+		return proxy.create(AccountSettingService.class);
+	}
+
+	@Bean
+	public AccountAddressInfoService accountAddressInfoService(){
+
+		return proxy.create(AccountAddressInfoService.class);
+	}
+
+	@Bean
+	public AccountChargeOrderService accountChargeOrderService(){
+		return proxy.create(AccountChargeOrderService.class);
+	}
+
+
+
+
+
+
+
 }

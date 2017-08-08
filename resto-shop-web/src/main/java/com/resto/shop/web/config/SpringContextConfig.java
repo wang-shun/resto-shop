@@ -1,9 +1,11 @@
 package com.resto.shop.web.config;
 
 import cn.restoplus.rpc.client.RpcProxy;
+import com.resto.brand.web.model.AccountAddressInfo;
 import com.resto.brand.web.service.*;
 import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.EmployeeService;
 import com.resto.shop.web.service.OrderRemarkService;
 import com.resto.shop.web.service.PermissionService;
@@ -90,6 +92,11 @@ public class SpringContextConfig {
         return getProxy(AccountLogService.class);
     }
 
+    /**
+     * 引用店铺端 -- 下面有一个会引用品牌端
+     * 2017-07-19
+     * @return
+     */
     @Bean
     public AccountService accountService() {
         return getProxy(AccountService.class);
@@ -476,6 +483,45 @@ public class SpringContextConfig {
 
     @Bean
     public ShopTvConfigService shopTvConfigService() {return  proxy.create(ShopTvConfigService.class);}
+
+
+    //yz 2017-07-19-----------------
+    @Bean
+    public BrandAccountService brandAccountService(){
+        return proxy.create(BrandAccountService.class);
+    }
+
+    @Bean
+    public AccountChargeOrderService accountChargeOrderService(){
+        return proxy.create(AccountChargeOrderService.class);
+    }
+
+	@Bean
+	public  BrandAccountLogService brandAccountLogService(){
+    	return proxy.create(BrandAccountLogService.class);
+	}
+
+
+	@Bean
+	public  AccountTicketService accountTicketService(){
+
+		return  proxy.create(AccountTicketService.class);
+	}
+
+
+	@Bean
+	public AccountAddressInfoService accountAddressInfoService(){
+
+		return proxy.create(AccountAddressInfoService.class);
+	}
+
+	@Bean
+	public AccountSettingService accountSettingService(){
+		return proxy.create(AccountSettingService.class);
+	}
+
+	//-----------------------
+
 
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);

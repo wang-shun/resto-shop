@@ -5,6 +5,7 @@ import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.*;
+import com.resto.brand.web.model.AccountSetting;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
@@ -59,7 +60,7 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	public List<Map<String,Object>> getPrintData(String order);
 	
-	public Order printSuccess(String orderId) throws AppException;
+	public Order printSuccess(String orderId, Boolean openBrandAccount, AccountSetting accountSetting) throws AppException;
 
 	public int printUpdate(String orderId);
 
@@ -670,7 +671,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	Order colseOrder(String orderId);
 
-    List<Map<String, Object>> reminder(String orderItemId);
+    List<Map<String, Object>> reminder(String orderItemIds, String orderId);
 
 	List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap);
 
