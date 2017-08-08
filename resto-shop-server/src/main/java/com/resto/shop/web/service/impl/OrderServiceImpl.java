@@ -1789,7 +1789,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         	flag = brandSetting.getOpenBrandAccount()==1;
 
 		}
-        updateOrderAndBrandAccount(order,flag,accountSetting,true);
+		update(order);
+        updateBrandAccount(order,flag,accountSetting);
 //        Map map = new HashMap(4);
 //        map.put("brandName", brand.getBrandName());
 //        map.put("fileName", shopDetail.getName());
@@ -1817,12 +1818,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	 * @param openBrandAccount
 	 * @param accountSetting
 	 */
-	private void updateOrderAndBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting,Boolean updateOrder) {
+	private void updateBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting) {
 		if(order.getPayType()==PayType.NOPAY&&order.getOrderState()==1){//后付会走两次paySuccess 所以如果是后付 并且支付状态为1的时候就不记录
-			if(updateOrder){
-				update(order);
-				return;
-			}
+			return;
 		}
 
     	BigDecimal money = BigDecimal.ZERO;
@@ -9898,7 +9896,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//yz 2017/07/29计费系统
 		if(brandSetting.getOpenBrandAccount()==1){//说明开启了品牌账户
 			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-			updateOrderAndBrandAccount(order,true,accountSetting,false);
+			updateBrandAccount(order,true,accountSetting);
 		}
         return order;
     }
