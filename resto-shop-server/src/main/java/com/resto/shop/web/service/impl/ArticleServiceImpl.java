@@ -99,7 +99,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 article.setDiscount(discountMap.get(article.getId()).getDiscount());
             }
         }
-        return articleMapper.selectList(currentShopId);
+        return articleList;
     }
 
     @Override
