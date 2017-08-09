@@ -508,7 +508,7 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("ALREADY_PAYED", "已在线支付");
         data.put("DELIVERY_SOURCE", "R+外卖");
         CustomerAddress customerAddress=customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
-        data.put("DELIVERY_ADDRESS", customerAddress.getAddress()+customerAddress.getAddressReality() + "\n\n【备注】：");
+        data.put("DELIVERY_ADDRESS", customerAddress.getAddress()+customerAddress.getAddressReality() + "\n\n【备注】："+order.getRemark());
 
         String phone = customerAddress.getMobileNo().replace("\"", "").replace("[", "").replace("]", "");
 
@@ -631,7 +631,7 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("ALREADY_PAYED", "已在线支付");
         data.put("DELIVERY_SOURCE", "R+外卖");
         CustomerAddress customerAddress=customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
-        data.put("DELIVERY_ADDRESS", customerAddress.getAddress()+customerAddress.getAddressReality()+ "\n\n【备注】：");
+        data.put("DELIVERY_ADDRESS", customerAddress.getAddress()+customerAddress.getAddressReality()+ "\n\n【备注】："+order.getRemark());
 
         String phone = customerAddress.getMobileNo().replace("\"", "").replace("[", "").replace("]", "");
         String sex="";
