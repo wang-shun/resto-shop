@@ -1187,7 +1187,8 @@
         ver_code,
         article_count,
         table_number,
-        order_money
+        order_money,
+        distribution_mode_id
         FROM
         tb_order
         WHERE

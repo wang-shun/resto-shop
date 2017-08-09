@@ -402,6 +402,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } else if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
+        if(customer != null) {
+            if (!MemcachedUtils.add(customer.getId() + "createOrder", 1, 30)) {
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("下单过于频繁，请稍后再试！");
+                return jsonResult;
+            }
+        }
 
 
         if (!StringUtils.isEmpty(order.getTableNumber()) && order.getTableNumber().length() > 5) {
@@ -3250,7 +3257,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
         }
         child.addAll(orderItems);
-
+        Map logMap = new HashMap(4);
+        Brand brand = brandService.selectById(order.getBrandId());
+        logMap.put("brandName", brand.getBrandName());
+        logMap.put("fileName", shopDetail.getName());
+        logMap.put("type", "posAction");
+        logMap.put("content", "订单:" + order.getId() + "被商家手动打印总单，请求服务器地址为:" + MQSetting.getLocalIP());
         List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         if (selectPrinterId == null) {
             if (printer.size() > 0) {
@@ -4160,6 +4172,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 return printTask;
             }
         }else{
+            if(order.getProductionStatus() >= ProductionStatus.PRINTED){
+                return printTask;
+            }
             if(!MemcachedUtils.add(orderId+"print",1)){
                 return printTask;
             }
@@ -5085,6 +5100,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
         }
+        Map logMap = new HashMap(4);
+        Brand brand = brandService.selectById(order.getBrandId());
+        logMap.put("brandName", brand.getBrandName());
+        logMap.put("fileName", shop.getName());
+        logMap.put("type", "posAction");
+        logMap.put("content", "订单:" + order.getId() + "被商家手动打印厨打，请求服务器地址为:" + MQSetting.getLocalIP());
         return printTask;
     }
 

@@ -239,6 +239,8 @@ public class Order implements Serializable{
      */
     private String remarkSupply;
 
+    private Integer type;
+
     public Integer getTag() {
         return tag;
     }
@@ -966,6 +968,14 @@ public class Order implements Serializable{
 
     public void setRemarkSupply(String remarkSupply) {
         this.remarkSupply = remarkSupply;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     @Override
