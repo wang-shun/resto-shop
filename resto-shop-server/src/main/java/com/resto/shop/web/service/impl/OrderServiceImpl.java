@@ -403,7 +403,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
 
-        if(!MemcachedUtils.add(customer.getId()+"createOrder",1,60)){
+        if(!MemcachedUtils.add(customer.getId()+"createOrder",1,30)){
             jsonResult.setSuccess(false);
             jsonResult.setMessage("下单过于频繁，请稍后再试！");
             return jsonResult;
