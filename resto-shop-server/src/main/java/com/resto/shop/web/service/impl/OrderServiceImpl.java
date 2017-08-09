@@ -370,6 +370,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
 
+        if(!MemcachedUtils.add(customer.getId()+"createOrder",1,60)){
+            jsonResult.setSuccess(false);
+            jsonResult.setMessage("下单过于频繁，请稍后再试！");
+            return jsonResult;
+        }
+
 
         if (!StringUtils.isEmpty(order.getTableNumber()) && order.getTableNumber().length() > 5) {
             jsonResult.setSuccess(false);
@@ -3632,6 +3638,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 return printTask;
             }
         }else{
+            if(order.getProductionStatus() >= ProductionStatus.PRINTED){
+                return printTask;
+            }
             if(!MemcachedUtils.add(orderId+"print",1)){
                 return printTask;
             }
