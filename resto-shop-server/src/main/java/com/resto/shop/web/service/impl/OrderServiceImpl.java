@@ -3644,10 +3644,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if(!MemcachedUtils.add(orderId,1)){
                 return printTask;
             }
-        }else{
             if(order.getProductionStatus() >= ProductionStatus.PRINTED){
                 return printTask;
             }
+        }else{
+
             if(!MemcachedUtils.add(orderId+"print",1)){
                 return printTask;
             }
