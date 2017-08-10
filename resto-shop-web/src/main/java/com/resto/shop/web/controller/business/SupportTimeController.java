@@ -5,6 +5,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.resto.shop.web.service.PosService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,7 +22,10 @@ public class SupportTimeController extends GenericController{
 
 	@Resource
 	SupportTimeService supporttimeService;
-	
+
+	@Autowired
+	PosService posService;
+
 	@RequestMapping("/list")
            public void list(){
         }
@@ -62,6 +67,7 @@ public class SupportTimeController extends GenericController{
 			brand.setEndTime(brand.getEndTime()+":59");
 		}
 		supporttimeService.insert(brand);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
@@ -87,6 +93,7 @@ public class SupportTimeController extends GenericController{
 			brand.setEndTime(brand.getEndTime()+":59");
 		}
 		supporttimeService.update(brand);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
@@ -94,6 +101,7 @@ public class SupportTimeController extends GenericController{
 	@ResponseBody
 	public Result delete(Integer id){
 		supporttimeService.delete(id);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 }

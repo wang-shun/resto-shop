@@ -5,6 +5,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.resto.shop.web.service.PosService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +23,9 @@ public class MealTempController extends GenericController{
 
 	@Resource
 	MealTempService mealtempService;
+
+	@Autowired
+	PosService posService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -50,6 +55,7 @@ public class MealTempController extends GenericController{
 	public Result create(@Valid @RequestBody MealTemp mealTemp){
 		mealTemp.setBrandId(getCurrentBrandId());
 		mealtempService.create(mealTemp);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
@@ -58,6 +64,7 @@ public class MealTempController extends GenericController{
 	public Result modify(@Valid @RequestBody MealTemp mealTemp){
 		mealTemp.setBrandId(getCurrentBrandId());
 		mealtempService.update(mealTemp);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
@@ -65,6 +72,7 @@ public class MealTempController extends GenericController{
 	@ResponseBody
 	public Result delete(Integer id){
 		mealtempService.delete(id);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 }

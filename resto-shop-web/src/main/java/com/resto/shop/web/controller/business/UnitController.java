@@ -5,6 +5,7 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Unit;
+import com.resto.shop.web.service.PosService;
 import com.resto.shop.web.service.UnitService;
 import com.resto.shop.web.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class UnitController extends GenericController {
 
     @Autowired
     private UnitService unitService;
+
+    @Autowired
+    PosService posService;
 
     @RequestMapping("/unitlist")
     public ModelAndView index() {
@@ -62,7 +66,7 @@ public class UnitController extends GenericController {
         if(RedisUtil.get(getCurrentShopId()+"unit") != null){
             RedisUtil.remove(getCurrentShopId()+"unit");
         }
-
+        posService.shopMsgChange(getCurrentShopId());
         return new Result(true);
     }
 
@@ -79,6 +83,7 @@ public class UnitController extends GenericController {
         if(RedisUtil.get(getCurrentShopId()+"unit") != null){
             RedisUtil.remove(getCurrentShopId()+"unit");
         }
+        posService.shopMsgChange(getCurrentShopId());
         return new Result(true);
     }
 
@@ -90,6 +95,7 @@ public class UnitController extends GenericController {
         if(RedisUtil.get(getCurrentShopId()+"unit") != null){
             RedisUtil.remove(getCurrentShopId()+"unit");
         }
+        posService.shopMsgChange(getCurrentShopId());
         return Result.getSuccess();
     }
 

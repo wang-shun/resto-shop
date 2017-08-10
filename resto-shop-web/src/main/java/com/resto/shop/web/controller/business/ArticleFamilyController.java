@@ -7,7 +7,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.resto.brand.core.util.MemcachedUtils;
+import com.resto.shop.web.service.PosService;
 import com.resto.shop.web.util.RedisUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,6 +31,9 @@ public class ArticleFamilyController extends GenericController{
 	ArticleFamilyService articlefamilyService;
 	@Resource
 	DistributionModeService distributionModeService;
+
+	@Autowired
+	PosService posService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -53,6 +58,7 @@ public class ArticleFamilyController extends GenericController{
 		articleFamily.setShopDetailId(request.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID).toString());
 		articleFamily.setId(ApplicationUtils.randomUUID());
 		articlefamilyService.insert(articleFamily);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
@@ -60,6 +66,7 @@ public class ArticleFamilyController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid ArticleFamily articleFamily){
 		articlefamilyService.update(articleFamily);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
@@ -67,6 +74,7 @@ public class ArticleFamilyController extends GenericController{
 	@ResponseBody
 	public Result delete(String id){
 		articlefamilyService.delete(id);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
