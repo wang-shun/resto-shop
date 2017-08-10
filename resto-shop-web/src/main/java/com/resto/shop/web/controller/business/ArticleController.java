@@ -59,6 +59,9 @@ public class ArticleController extends GenericController {
     private ArticleRecommendService articleRecommendService;
 
     @Autowired
+    private PosService posService;
+
+    @Autowired
     private PlatformService platformService;
 
     @RequestMapping("/list")
@@ -143,6 +146,7 @@ public class ArticleController extends GenericController {
             unitService.updateArticleRelation(id, article.getUnits());
         }
         articleService.initStock();
+        posService.shopMsgChange(getCurrentShopId());
         Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
         LogTemplateUtils.articleEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
@@ -171,6 +175,7 @@ public class ArticleController extends GenericController {
         articleService.delete(id);
         //联动删除在推荐餐品包中的id
         articleRecommendService.deleteRecommendByArticleId(id);
+        posService.shopMsgChange(getCurrentShopId());
         Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
         LogTemplateUtils.articleEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());

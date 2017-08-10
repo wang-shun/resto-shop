@@ -295,6 +295,14 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+
+	public static void sendShopChangeMessage(String shopId) {
+		JSONObject object=  new JSONObject();
+		object.put("shopId", shopId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SHOP_CHANGE,object.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
     public static void sendModelFivePaySuccess(Order order) {
         JSONObject obj=  new JSONObject();
         obj.put("brandId", order.getBrandId());

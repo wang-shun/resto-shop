@@ -43,4 +43,9 @@ public class PosServiceImpl implements PosService {
         result.put("articleList",articleStockDtoList);
         return new JSONObject(result).toString();
     }
+
+    @Override
+    public String shopMsgChange(String shopId) {
+        return shopId;
+    }
 }
