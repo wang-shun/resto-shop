@@ -45,7 +45,7 @@ public class PayMode {
             case ALI_PAY:
                 return "支付宝支付";
             case ARTICLE_BACK_PAY:
-                return "退菜返还金额";
+                return "退菜返还余额";
             case CRASH_PAY:
                 return "现金支付";
             case APPRAISE_RED_PAY:
