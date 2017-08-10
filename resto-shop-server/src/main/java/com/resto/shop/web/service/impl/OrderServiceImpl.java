@@ -3951,6 +3951,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderState() != OrderState.PAYMENT) {
             return null;
         }
+        if (order.getParentOrderId() != null) {
+            return null;
+        }
         if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
             return null;
         }
@@ -3992,6 +3995,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order confirmWaiMaiOrder(Order order) {
         order = selectById(order.getId());
+        if (order.getParentOrderId() != null) {
+            return null;
+        }
         if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
             return null;
         }
@@ -4034,6 +4040,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order confirmBossOrder(Order order) {
         order = selectById(order.getId());
         if (order.getOrderState() != OrderState.PAYMENT) {
+            return null;
+        }
+        if (order.getParentOrderId() != null) {
             return null;
         }
         if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
