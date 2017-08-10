@@ -749,6 +749,9 @@ public class OrderAspect {
             if (customer == null) {
                 return;
             }
+            if (order.getOrderState() != OrderState.CONFIRM) {
+                return;
+            }
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
             Brand brand = brandService.selectById(customer.getBrandId());
