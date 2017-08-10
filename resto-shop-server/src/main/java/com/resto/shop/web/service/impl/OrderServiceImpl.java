@@ -2786,6 +2786,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         logMap.put("fileName", shopDetail.getName());
         logMap.put("type", "posAction");
         logMap.put("content", "订单:" + order.getId() + "被商家手动打印总单，请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url,logMap);
         List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         if (selectPrinterId == null) {
             if (printer.size() > 0) {
@@ -3642,10 +3643,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if(!MemcachedUtils.add(orderId,1)){
                 return printTask;
             }
-        }else{
             if(order.getProductionStatus() >= ProductionStatus.PRINTED){
                 return printTask;
             }
+        }else{
             if(!MemcachedUtils.add(orderId+"print",1)){
                 return printTask;
             }
@@ -4577,6 +4578,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         logMap.put("fileName", shop.getName());
         logMap.put("type", "posAction");
         logMap.put("content", "订单:" + order.getId() + "被商家手动打印厨打，请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url,logMap);
         return printTask;
     }
 
