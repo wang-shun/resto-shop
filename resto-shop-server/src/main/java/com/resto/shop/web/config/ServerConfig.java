@@ -3,6 +3,7 @@ package com.resto.shop.web.config;
 import javax.annotation.Resource;
 
 import com.resto.brand.web.service.*;
+import com.resto.shop.web.model.DayAppraiseMessage;
 import com.resto.shop.web.service.LogBaseService;
 import com.resto.shop.web.service.ThirdService;
 import org.springframework.beans.factory.annotation.Configurable;
@@ -111,4 +112,7 @@ public class ServerConfig {
 
     @Bean
     public ElemeTokenService elemeTokenService(){ return  proxy.create(ElemeTokenService.class); }
+
+
+
 }

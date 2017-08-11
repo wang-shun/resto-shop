@@ -160,6 +160,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private OrderRefundRemarkMapper orderRefundRemarkMapper;
 
+
+
     @Override
     public GenericDao<Order, String> getDao() {
         return orderMapper;
