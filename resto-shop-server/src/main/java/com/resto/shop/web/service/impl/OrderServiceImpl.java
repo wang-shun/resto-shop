@@ -28,6 +28,7 @@ import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.AccountService;
+import com.resto.shop.web.util.BrandAccountSendUtil;
 import com.resto.shop.web.util.JdbcSmsUtils;
 import com.resto.shop.web.service.OrderRemarkService;
 import com.resto.shop.web.util.LogTemplateUtils;
@@ -221,6 +222,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
 	private BrandAccountService brandAccountService;
+
+    @Resource
+	private AccountNoticeService accountNoticeService;
 
 
 
@@ -1902,6 +1906,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			brandAccount.setAccountBalance(remain);
 			brandAccount.setAmountUsed(amountUsed.add(money));
 			brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+
+			/*
+		     判断是否要发短信
+			**/
+			Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
+
+			List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
+
+			Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+			if(result.isSuccess()){
+				Long accountSettingId = accountSetting.getId();
+				AccountSetting as = new AccountSetting();
+				as.setId(accountSettingId);
+				as.setType(1);
+				accountSettingService.update(as);
+			}
+
 		}
 	}
 
@@ -10004,9 +10025,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 	@Override
 	public Summarry selctSummaryShopData(String beginDate, String endDate, String shopId) {
+
+		Summarry s = new Summarry();
 		//定义时间
 		Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginDate));
 		Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
+
+		BigDecimal offLineOrderMoney = BigDecimal.ZERO;
+
+		List<OffLineOrder> offLineOrderList = offLineOrderMapper.selectByShopIdAndTime(shopId,begin,end);
+		if(!offLineOrderList.isEmpty()){
+			for(OffLineOrder offLineOrder:offLineOrderList){
+				offLineOrderMoney = offLineOrderMoney.add(offLineOrder.getEnterTotal());
+			}
+		}
+		s.setLineOffOrderMoney(offLineOrderMoney);//线下消费金额
 
 		//查询该段时间内的新增用户订单
 		List<Order> newCustomerOrders = orderMapper.selectNewCustomerOrderByShopIdAndTime(shopId,begin,end);
@@ -10017,19 +10050,31 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//分享用户的订单总数
 		int newShareCustomerOrderNum = 0;
 
+		//新增用户的订单金额
+		BigDecimal newCustomerOrderMoney = BigDecimal.ZERO;
+
+		//分享用户的订单金额
+		BigDecimal newShareCustomerOrderMoney = BigDecimal.ZERO;
+
+
 		if(!newCustomerOrders.isEmpty()){
 			for(Order o:newCustomerOrders){
 				newCustomerOrderNum++;
+				newCustomerOrderMoney = newCustomerOrderMoney.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				if(o.getCustomer()!=null&& StringUtil.isNotEmpty(o.getCustomer().getShareCustomer())){
 					//说明是分享用户
 					newShareCustomerOrderNum++;
+					newShareCustomerOrderMoney = newShareCustomerOrderMoney.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				}
 			}
 		}
 		//获取到 新用户消费笔数 + 分享用户消费笔数
-		Summarry s = new Summarry();
-		s.setNewCustomerOrder(newCustomerOrderNum);
-		s.setShareCustomerOrder(newShareCustomerOrderNum);
+
+		s.setNewCustomerOrderNum(newCustomerOrderNum);
+		s.setNewShareCustomerOrderNum(newShareCustomerOrderNum);
+		s.setNewCustomerOrderMoney(newCustomerOrderMoney);
+		s.setNewShareCustomerMoney(newShareCustomerOrderMoney);
+
 
 		//查询回头用户
 		List<BackCustomerDto> backCustomerDtos = orderMapper.selectBackCustomerByShopIdAndTime(shopId, begin, end);
@@ -10043,16 +10088,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 		//定义回头用户消费笔数
 		int backCustomerOrderNum = 0;
+		//回头用户消费金额
+		BigDecimal backCustomerOrderMoney = BigDecimal.ZERO;
+
+
 		List<Order> orders = orderMapper.selectCompleteByShopIdAndTime(shopId,begin,end);
 		if(!orders.isEmpty()){
 			for(Order o:orders){
 				if(backCustomerId.contains(o.getCustomerId())){
 					backCustomerOrderNum++;
+					backCustomerOrderMoney = backCustomerOrderMoney.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				}
 			}
 		}
+		s.setBackCustomerMoney(backCustomerOrderMoney);
+
+		s.setBackCustomerOrder(backCustomerOrderNum);
 		//用户消费笔数= 新用户消费笔数+回头用户消费笔数
-		s.setCustomerOrder(newCustomerOrderNum+backCustomerOrderNum);
+
+		s.setCustomerOrderNum(backCustomerOrderNum+newCustomerOrderNum);
+
+		s.setCustomerOrderMoney(backCustomerOrderMoney.add(newCustomerOrderMoney));
+
 
 		//折扣比率
 		String discountRatio = "";
@@ -10067,8 +10124,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		BigDecimal chargeReturn = BigDecimal.ZERO;
 		//折扣合计
 		BigDecimal discountTotal = BigDecimal.ZERO;
-
-
 
 		List<Order> orderList = orderMapper.selectListsmsByShopId(begin, end, shopId);
 		if(!orderList.isEmpty()){
@@ -10092,6 +10147,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 			}
 		}
+
+		s.setRestoTotalMoney(restoTotal);
 
 		s.setStatisfaction(discountRatio);
 
@@ -10204,8 +10261,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			}
 			//获取到 新用户消费笔数 + 分享用户消费笔数
 			Summarry s = new Summarry();
-			s.setNewCustomerOrder(newCustomerOrderNum);
-			s.setShareCustomerOrder(newShareCustomerOrderNum);
+
 
 			//查询回头用户
 			List<BackCustomerDto> backCustomerDtos = orderMapper.selectBackCustomerByBrandIdAndTime(brandId, begin, end);
@@ -10228,7 +10284,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				}
 			}
 			//用户消费笔数= 新用户消费笔数+回头用户消费笔数
-			s.setCustomerOrder(newCustomerOrderNum+backCustomerOrderNum);
+
 
 			//折扣比率
 			String discountRatio = "";

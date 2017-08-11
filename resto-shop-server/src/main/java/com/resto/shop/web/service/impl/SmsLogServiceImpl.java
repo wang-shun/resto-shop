@@ -7,10 +7,14 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.alibaba.rocketmq.client.producer.MQProducer;
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.enums.BehaviorType;
 import com.resto.brand.core.enums.DetailType;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
+import com.resto.shop.web.producer.MQMessageProducer;
+import com.resto.shop.web.util.BrandAccountSendUtil;
 import org.json.JSONObject;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -54,6 +58,9 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 
     @Resource
 	BrandAccountService brandAccountService;
+
+    @Resource
+	AccountNoticeService accountNoticeService;
     
     
     @Override
@@ -128,6 +135,21 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 						brandAccount.setAccountBalance(remain);
 						//记录品牌账户的更新日志 + 更新账户
 						brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+
+						List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
+
+						//判断是否需要发短信通知欠费
+						Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+						if(result.isSuccess()){
+							Long id = accountSetting.getId();
+							AccountSetting as = new AccountSetting();
+							as.setId(id);
+							as.setType(1);
+							accountSettingService.update(as);
+							//发送延时消息 24小时
+							MQMessageProducer.sendBrandAccountSms(brandId,1000*2);
+						}
+
 					}else {
 						log.info("该品牌未开启品牌账户 -- ");
 						insert(smsLog);
