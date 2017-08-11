@@ -147,7 +147,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 							as.setType(1);
 							accountSettingService.update(as);
 							//发送延时消息 24小时
-							MQMessageProducer.sendBrandAccountSms(brandId,1000*2);
+							MQMessageProducer.sendBrandAccountSms(brandId,1000*60*60*24);
 						}
 
 					}else {

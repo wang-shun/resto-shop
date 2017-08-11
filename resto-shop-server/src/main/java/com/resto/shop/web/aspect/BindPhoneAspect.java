@@ -170,7 +170,7 @@ public class BindPhoneAspect {
 					as.setType(1);
 					accountSettingService.update(as);//设置为不可以发短信
 					log.info(brand.getBrandName()+"品牌账户余额欠费生产者开始生产欠费消息");
-					MQMessageProducer.sendBrandAccountSms(brand.getId(),1000*1*60);
+					MQMessageProducer.sendBrandAccountSms(brand.getId(),1000*60*60*24);
 				}
 			}
 			log.info("首次绑定手机，执行指定动作");
