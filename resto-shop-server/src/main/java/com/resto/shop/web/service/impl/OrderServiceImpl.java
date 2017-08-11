@@ -1330,6 +1330,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
+        if (MemcachedUtils.get(order.getCustomerId()+"createOrder") != null) {
+            MemcachedUtils.delete(order.getCustomerId() + "createOrder");
+        }
         if (order.getOrderState() != OrderState.SUBMIT) {
             return new Result(false);
         }
@@ -1383,9 +1386,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 //            orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         }
-        if (!MemcachedUtils.add(order.getCustomerId() + "createOrder", 1, 30)) {
-            MemcachedUtils.delete(order.getCustomerId() + "createOrder");
-        }
+
         return result;
     }
 
