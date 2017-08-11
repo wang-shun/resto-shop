@@ -433,6 +433,12 @@ public class SpringContextConfig {
     @Bean
     public ShopTvConfigService shopTvConfigService() {return  proxy.create(ShopTvConfigService.class);}
 
+    @Bean
+	public WetherService wetherService(){
+    	return proxy.create(WetherService.class);
+	}
+
+
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
     }
