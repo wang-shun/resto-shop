@@ -8665,10 +8665,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void fixErrorOrder() {
         orderMapper.fixAllowContinueOrder(new Date());
-        List<Order> orders = orderMapper.getAllowAppraise();
-        for (Order order : orders) {
-            confirmOrder(order);
-        }
+//        List<Order> orders = orderMapper.getAllowAppraise();
+//        for (Order order : orders) {
+//            confirmOrder(order);
+//        }
     }
 
     @Override
