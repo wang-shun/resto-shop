@@ -1383,6 +1383,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 //            orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         }
+        if (!MemcachedUtils.add(order.getCustomerId() + "createOrder", 1, 30)) {
+            MemcachedUtils.delete(order.getCustomerId() + "createOrder");
+        }
         return result;
     }
 
@@ -1529,6 +1532,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "orderAction");
         map.put("content", "订单:" + order.getId() + "已取消,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
+        if (!MemcachedUtils.add(order.getCustomerId() + "createOrder", 1, 30)) {
+            MemcachedUtils.delete(order.getCustomerId() + "createOrder");
+        }
     }
 
     @Override
