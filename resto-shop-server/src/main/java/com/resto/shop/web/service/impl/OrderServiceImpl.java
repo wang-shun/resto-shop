@@ -1117,28 +1117,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//3发短信推送/微信推送
 		pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
 		//3判断是否需要发送旬短信
-		int temp = DateUtil.getEarlyMidLate();
-		switch (temp){
-			case  1:
-				//第一版旬结短信
-				Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail);
-				pushMessageByFirstEdtion(xunMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
-				break;
-
-			case 2:
-				Map<String, String> xunMapByFirstEdtion2 = querryXunDataByFirstEditon(shopDetail);
-				pushMessageByFirstEdtion(xunMapByFirstEdtion2, shopDetail, wechatConfig, brand.getBrandName());
-				break;
-
-			case 3:
-				Map<String, String> xunMapByFirstEdtion3 = querryXunDataByFirstEditon(shopDetail);
-				pushMessageByFirstEdtion(xunMapByFirstEdtion3, shopDetail, wechatConfig, brand.getBrandName());
-
-				Map<String, String> monthMapByFirstEdtion = querryMonthDataByFirstEditon(shopDetail, offLineOrder);
-				pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
-				break;
-
-		}
+//		int temp = DateUtil.getEarlyMidLate();
+//		switch (temp){
+//			case  1:
+//				//第一版旬结短信
+//				Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail);
+//				pushMessageByFirstEdtion(xunMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
+//				break;
+//
+//			case 2:
+//				Map<String, String> xunMapByFirstEdtion2 = querryXunDataByFirstEditon(shopDetail);
+//				pushMessageByFirstEdtion(xunMapByFirstEdtion2, shopDetail, wechatConfig, brand.getBrandName());
+//				break;
+//
+//			case 3:
+//				Map<String, String> xunMapByFirstEdtion3 = querryXunDataByFirstEditon(shopDetail);
+//				pushMessageByFirstEdtion(xunMapByFirstEdtion3, shopDetail, wechatConfig, brand.getBrandName());
+//
+//				Map<String, String> monthMapByFirstEdtion = querryMonthDataByFirstEditon(shopDetail, offLineOrder);
+//				pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
+//				break;
+//
+//		}
 
 		//第二版短信内容由于模板原因无法发送短信 因此保留第一版短信 第二版数据存到大数据库数据库中
 		insertDateData(shopDetail,offLineOrder,wether,brand);
