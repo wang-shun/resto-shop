@@ -5706,11 +5706,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         refundShopDetailOrder(shopDetail);
         Map<String, String> dayMap = querryDateData(shopDetail, offLineOrder, 1);
         //2.查询数据
-        if (temp == 1 || temp == 2 || temp == 3) { //测试先放开--
-            //查询旬相关的内容
-            Map<String, String> xunMap = querryXunData(shopDetail, offLineOrder, temp);
-            pushMessage(xunMap, shopDetail, wechatConfig, brandName);
-        }
+
+		// yz 2017/08/11 询短信 不开启
+//        if (temp == 1 || temp == 2 || temp == 3) { //测试先放开--
+//            //查询旬相关的内容
+//            Map<String, String> xunMap = querryXunData(shopDetail, offLineOrder, temp);
+//            pushMessage(xunMap, shopDetail, wechatConfig, brandName);
+//        }
 
         //3发短信推送/微信推送
         pushMessage(dayMap, shopDetail, wechatConfig, brandName);
