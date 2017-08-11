@@ -161,6 +161,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     private OrderRefundRemarkMapper orderRefundRemarkMapper;
 
 
+    @Resource
+	private  DayAppraiseMessageService dayAppraiseMessageService;
+
+
+    @Resource
+	private  DayDataMessageService dayDataMessageService;
+
+
 
     @Override
     public GenericDao<Order, String> getDao() {
