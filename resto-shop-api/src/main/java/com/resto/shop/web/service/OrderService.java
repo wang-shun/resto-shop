@@ -636,11 +636,6 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	void changeOrderMode(String orderId);
 
-    /**
-     * 每日短信fix查看
-     * @param s
-     */
-    void cleanShopOrderFix(ShopDetail s,WechatConfig wechatConfig,String telephone);
 
     Order posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue);
 
