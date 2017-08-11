@@ -1101,6 +1101,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     public Order payOrderSuccess(Order order) {
+
+
         if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.PAYMENT);
             order.setIsPay(OrderPayState.PAYED);
