@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public interface PosService {
     /**
-     * 同步店铺菜品库存
+     * 同步店铺菜品库存 (服务器->pos)
      * @param shopId 店铺id
      * @return
      */
@@ -17,10 +17,24 @@ public interface PosService {
 
 
     /**
-     * 当门店后台数据发生变更时通知pos
+     * 当门店后台数据发生变更时通知pos （服务器->pos）
      * @param shopId 发生信息变更的门店
      * @return 发生信息变更的门店
      */
     String shopMsgChange(String shopId);
+
+    /**
+     * 同步订单创建时的订单信息 （服务器->pos）
+     * @param orderId
+     * @return
+     */
+    String syncOrderCreated(String orderId);
+
+    /**
+     * 同步订单支付时的信息 （服务器 ->pos）
+     * @param orderId
+     * @return
+     */
+    String syncOrderPay(String orderId);
 
 }

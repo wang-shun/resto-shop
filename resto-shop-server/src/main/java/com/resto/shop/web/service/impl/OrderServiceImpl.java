@@ -353,16 +353,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-    /**
-     * @Author: KONATA
-     * @Description
-     * @Date: 15:42 2017/3/30
-     */
     public JSONResult createOrder(Order order) throws AppException {
         JSONResult jsonResult = new JSONResult();
         String orderId = ApplicationUtils.randomUUID();
         order.setId(orderId);
         Customer customer = customerService.selectById(order.getCustomerId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        Boolean loginFlag = (Boolean) RedisUtil.get(order.getShopDetailId()+"loginStatus");
+        if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+            if(loginFlag == null || loginFlag == false ){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("当前店铺暂未开启在线点餐，请联系服务员详询，谢谢");
+                return jsonResult;
+            }
+        }
+
 
         if (customer == null && "wechat".equals(order.getCreateOrderByAddress())) {
             throw new AppException(AppException.CUSTOMER_NOT_EXISTS);
@@ -384,7 +389,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         Brand brand = brandService.selectById(order.getBrandId());
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
 
         if (brandSetting.getIsUseServicePrice() == Common.YES && shopDetail.getIsUseServicePrice() == Common.YES
@@ -1191,6 +1196,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setAllowContinueOrder(false);
             order.setOrderState(OrderState.CANCEL);
             update(order);
+            MQMessageProducer.sendCancelOrder(order);
             refundOrder(order);
             log.info("取消订单成功:" + order.getId());
 
@@ -1271,6 +1277,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOrderState(OrderState.CANCEL);
             update(order);
             refundOrder(order);
+            MQMessageProducer.sendCancelOrder(order);
             log.info("自动退款成功:" + order.getId());
             return true;
         } else {

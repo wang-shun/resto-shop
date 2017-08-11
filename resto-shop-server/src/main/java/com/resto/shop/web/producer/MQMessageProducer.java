@@ -274,6 +274,17 @@ public class MQMessageProducer {
 		
 	}
 
+	public static void sendCreateOrderMessage(Order order){
+		JSONObject obj  = new JSONObject();
+		obj.put("id", order.getId());
+		obj.put("brandId", order.getBrandId());
+		obj.put("shopDetailId", order.getShopDetailId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_ORDER_CREATED,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+
+	}
+
+
 
 	public static void sendNoticeShareMessage(Customer customer){
 		JSONObject obj  = new JSONObject();
@@ -284,6 +295,14 @@ public class MQMessageProducer {
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOTICE_SHARE_CUSTOMER,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 
+	}
+
+	public static void main(String[] args) {
+		Order order = new Order();
+		order.setId("00b8a27437cf460c93910bdc2489d061");
+		order.setBrandId("31946c940e194311b117e3fff5327215");
+		order.setShopDetailId("31164cebcc4b422685e8d9a32db12ab8");
+		sendCancelOrder(order);
 	}
 
 	public static void sendNotAllowContinueMessage(Order order, long delay) {
@@ -325,6 +344,25 @@ public class MQMessageProducer {
 		JSONObject obj  = new JSONObject();
 		obj.put("shopId",shopId);
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_PRINT_SUCCESS,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
+	public static void sendOrderPay(Order order) {
+		JSONObject obj  = new JSONObject();
+		obj.put("id", order.getId());
+		obj.put("brandId", order.getBrandId());
+		obj.put("payMode", order.getPayMode());
+		obj.put("shopDetailId", order.getShopDetailId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_ORDER_PAY,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
+	public static void sendCancelOrder(Order order) {
+		JSONObject obj  = new JSONObject();
+		obj.put("id", order.getId());
+		obj.put("brandId", order.getBrandId());
+		obj.put("shopDetailId", order.getShopDetailId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_ORDER_CANCEL,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
 }

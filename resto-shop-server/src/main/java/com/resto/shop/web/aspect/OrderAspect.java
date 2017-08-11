@@ -134,6 +134,11 @@ public class OrderAspect {
             if (!updateStockSuccess) {
                 log.info("库存变更失败:" + order.getId());
             }
+
+            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+            if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+                MQMessageProducer.sendCreateOrderMessage(order);
+            }
         }
     }
 
@@ -325,6 +330,9 @@ public class OrderAspect {
             RedisUtil.set(shopId + "shopOrderTotal", orderTotal);
             MQMessageProducer.sendPrintSuccess(shopId);
         }
+        if(order.getPayMode() != OrderPayMode.WX_PAY || order.getPayMode() != OrderPayMode.ALI_PAY){
+            MQMessageProducer.sendOrderPay(order);
+        }
     }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.posPayOrder(..))")
@@ -382,6 +390,9 @@ public class OrderAspect {
             RedisUtil.set(order.getShopDetailId() + "shopOrderTotal", o.getOrderTotal());
             MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
 //            orderService.confirmOrder(order);
+        }
+        if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+            MQMessageProducer.sendOrderPay(order);
         }
     }
 
