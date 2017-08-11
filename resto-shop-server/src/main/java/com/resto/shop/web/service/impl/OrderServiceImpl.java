@@ -1571,7 +1571,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				.append("---------------------").append("\n")
 				.append("今日外卖金额:").append(todayOrderBooks).append("\n")
 				.append("今日总营业额:").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("\n")
-				.append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal).add(monthOrderBooks)).append("\n");
+				.append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("\n");
 
 		Map<String, String> map = new HashMap<>();
 		map.put("sms", todayContent.toString());
