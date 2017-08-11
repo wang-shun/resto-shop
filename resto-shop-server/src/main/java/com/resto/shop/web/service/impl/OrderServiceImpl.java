@@ -23,6 +23,7 @@ import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.OrderRemarkService;
+import com.resto.shop.web.util.JdbcSmsUtils;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -1132,6 +1133,32 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 		//第二版短信内容由于模板原因无法发送短信 因此保留第一版短信 第二版数据存到大数据库数据库中
 		insertDateData(shopDetail,offLineOrder,wether,brand);
+	}
+
+
+
+	private void refundShopDetailOrder(ShopDetail shopDetail) {
+		String[] orderStates = new String[]{OrderState.SUBMIT + "", OrderState.PAYMENT + ""};//未付款和未全部付款和已付款
+		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER + ""};//已付款未下单
+		List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopDetail.getId(), orderStates, productionStates);
+		for (Order order : orderList) {
+			if (!order.getClosed()) {//判断订单是否已被关闭，只对未被关闭的订单做退单处理
+				sendWxRefundMsg(order);
+			}
+		}
+		// 查询已付款且有支付项但是生产状态没有改变的订单
+		List<Order> orderstates = orderMapper.selectHasPayNoChangeStatus(shopDetail.getId(), DateUtil.getDateBegin(new Date()), DateUtil.getDateEnd(new Date()));
+		if (!orderstates.isEmpty()) {
+			for (Order o : orderstates) {
+				if (o.getOrderMode() == ShopMode.CALL_NUMBER) {
+					o.setProductionStatus(ProductionStatus.HAS_CALL);
+				} else {
+					o.setProductionStatus(ProductionStatus.PRINTED);
+				}
+				orderMapper.updateByPrimaryKeySelective(o);
+			}
+		}
+
 	}
 
 
