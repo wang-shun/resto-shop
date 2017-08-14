@@ -2,11 +2,7 @@ package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
 import com.resto.shop.web.constant.Common;
-import com.resto.shop.web.dao.PosMapper;
-import com.resto.shop.web.model.Article;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderItem;
-import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.posDto.ArticleStockDto;
 import com.resto.shop.web.posDto.OrderDto;
 import com.resto.shop.web.service.*;
@@ -37,22 +33,31 @@ public class PosServiceImpl implements PosService {
     @Autowired
     private OrderPaymentItemService orderPaymentItemService;
 
+    @Autowired
+    private PlatformOrderService platformOrderService;
+
+    @Autowired
+    private PlatformOrderDetailService platformOrderDetailService;
+
+    @Autowired
+    private PlatformOrderExtraService platformOrderExtraService;
+
     @Override
     public String syncArticleStock(String shopId) {
-        Map<String,Object> result = new HashMap<>();
-        result.put("dataType","article");
+        Map<String, Object> result = new HashMap<>();
+        result.put("dataType", "article");
 
         List<Article> articleList = articleService.selectList(shopId);
         List<ArticleStockDto> articleStockDtoList = new ArrayList<>();
-        for(Article article : articleList){
+        for (Article article : articleList) {
             Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
             if (count != null) {
                 article.setCurrentWorkingStock(count);
             }
-            ArticleStockDto articleStockDto = new ArticleStockDto(article.getId(),article.getCurrentWorkingStock());
+            ArticleStockDto articleStockDto = new ArticleStockDto(article.getId(), article.getCurrentWorkingStock());
             articleStockDtoList.add(articleStockDto);
         }
-        result.put("articleList",articleStockDtoList);
+        result.put("articleList", articleStockDtoList);
         return new JSONObject(result).toString();
     }
 
@@ -66,11 +71,11 @@ public class PosServiceImpl implements PosService {
         Order order = orderService.selectById(orderId);
         OrderDto orderDto = new OrderDto(order);
         JSONObject jsonObject = new JSONObject(orderDto);
-        jsonObject.put("dataType","orderCreated");
+        jsonObject.put("dataType", "orderCreated");
         List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
-        jsonObject.put("orderItem",orderItems);
+        jsonObject.put("orderItem", orderItems);
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
-        jsonObject.put("orderPayment",payItemsList);
+        jsonObject.put("orderPayment", payItemsList);
         return jsonObject.toString();
     }
 
@@ -78,10 +83,23 @@ public class PosServiceImpl implements PosService {
     public String syncOrderPay(String orderId) {
         Order order = orderService.selectById(orderId);
         JSONObject jsonObject = new JSONObject();
-        jsonObject.put("dataType","orderPay");
-        jsonObject.put("payMode",order.getPayMode());
+        jsonObject.put("dataType", "orderPay");
+        jsonObject.put("payMode", order.getPayMode());
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
-        jsonObject.put("orderPayment",payItemsList);
+        jsonObject.put("orderPayment", payItemsList);
         return jsonObject.toString();
+    }
+
+    @Override
+    public String syncPlatform(String orderId) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("dataType", "platform");
+        PlatformOrder platformOrder = platformOrderService.selectByPlatformOrderId(orderId, null);
+        List<PlatformOrderDetail> platformOrderDetails = platformOrderDetailService.selectByPlatformOrderId(orderId);
+        List<PlatformOrderExtra> platformOrderExtras = platformOrderExtraService.selectByPlatformOrderId(orderId);
+        result.put("order", platformOrder);
+        result.put("orderDetail", platformOrderDetails);
+        result.put("orderExtra", platformOrderExtras);
+        return new JSONObject(result).toString();
     }
 }

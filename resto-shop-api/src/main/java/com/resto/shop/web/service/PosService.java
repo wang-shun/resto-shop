@@ -37,4 +37,10 @@ public interface PosService {
      */
     String syncOrderPay(String orderId);
 
+    /**
+     * 同步第三方外卖数据（服务器->pos）
+     * @param orderId 第三方外卖id
+     */
+    String syncPlatform(String orderId);
+
 }
