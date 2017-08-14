@@ -10463,4 +10463,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, String>> selectCustomerOrderCount(List<String> customerIds) {
         return orderMapper.selectCustomerOrderCount(customerIds);
     }
+
+    @Override
+    public Order afterPayShareBenefits(String orderId) {
+        return orderMapper.selectByPrimaryKey(orderId);
+    }
 }

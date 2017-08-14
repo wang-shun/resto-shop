@@ -741,7 +741,11 @@ public class OrderAspect {
 //
 //    }
 
-    @AfterReturning(value = "confirmOrder()||confirmBossOrder()||confirmWaiMaiOrder()", returning = "order")
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.afterPayShareBenefits(..))")
+    public void afterPayShareBenefits() {
+    }
+
+    @AfterReturning(value = "confirmOrder()||confirmBossOrder()||confirmWaiMaiOrder()||afterPayShareBenefits()", returning = "order")
     public void confirmOrderAfter(Order order) {
         if (order != null) {
             log.info("确认订单成功后回调:" + order.getId());

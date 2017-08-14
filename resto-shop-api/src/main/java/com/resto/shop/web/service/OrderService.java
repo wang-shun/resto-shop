@@ -716,4 +716,6 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	Summarry selctSummaryBrandData(String beginDate, String endDate, String currentBrandId);
 
 	List<Map<String, String>> selectCustomerOrderCount(List<String> customerIds);
+
+	Order afterPayShareBenefits(String orderId);
 }
