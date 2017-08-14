@@ -219,11 +219,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
 	private BrandAccountService brandAccountService;
 
-//    @Resource
-//    private OrderService orderService;
-
-
-
     Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -9672,9 +9667,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         orderMapper.confirmOrderPos(orderId);
-//        if (order.getPayType() == PayType.NOPAY) {
-//            confirmOrder(order);
-//        }
+        if (order.getPayType() == PayType.NOPAY) {
+            confirmOrder(order);
+        }
         if (order.getPayType() == PayType.PAY && (order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
                 || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY)) {
             payOrderSuccess(order);
