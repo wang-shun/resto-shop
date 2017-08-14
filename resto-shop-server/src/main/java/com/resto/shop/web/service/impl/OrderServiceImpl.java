@@ -2057,19 +2057,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			blog.setAccountId(brandAccount.getId());
 			blog.setRemain(remain);
 			blog.setOrderMoney(o.getOrderMoney());
-//			if(flag){
-//				if(order.getParentOrderId()!=null){//说明是主订单
-//					blog.setDetail(DetailType.BACK_CUSTOMER_SELL);
-//				}else {
-//					blog.setDetail(DetailType.BACK_CUSTOMER_SELL_PART);
-//				}
-//			}else {
-//				if(order.getParentOrderId()!=null){
-//					blog.setDetail(DetailType.NEW_CUSTOMER_SELL);
-//				}else {
-//					blog.setDetail(DetailType.NEW_CUSTOMER_SELL_PART);
-//				}
-//			}
 			if(o.getParentOrderId()!=null){
 				blog.setIsParent(true);
 			}
@@ -2089,9 +2076,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			brandAccount.setId(id);
 			brandAccount.setUpdateTime(new Date());
 			brandAccount.setAccountBalance(remain);
-			brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+			brandAccountLogService.insert(blog);
+			brandAccountService.update(brandAccount);
+			//yz TODO//判断品牌账户是否需要发送通知(账户不足通知)---
+			Brand brand = brandService.selectByPrimaryKey(o.getBrandId());
 
-		}
+			List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
+
+			Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+			if(result.isSuccess()){
+				Long accountSettingId = accountSetting.getId();
+				AccountSetting as = new AccountSetting();
+				as.setId(accountSettingId);
+				as.setType(1);
+				accountSettingService.update(as);
+				//发送消息队列通知 消费者24小时后再次查询账户余额情况 如果不符合要求则更改发短信为可以发状态
+				log.info("有resto+外卖订单产生计费并且该品牌账户已经欠费---");
+				log.info("开始发送延时消息队列--");
+				MQMessageProducer.sendBrandAccountSms(brand.getId(), MQSetting.DELAY_TIME);
+			}
+
+		 }
 			return count;
 		}
 
