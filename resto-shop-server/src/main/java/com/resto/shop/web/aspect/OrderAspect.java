@@ -353,7 +353,7 @@ public class OrderAspect {
 //        }
 
         //R+外卖走消息队列  (订单不为空 支付模式不为空  支付为微信或者支付宝支付  已支付  已下单 外卖模式)
-        if (order != null && order.getPayMode() != null && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY) &&
+        if (order != null && order.getPayMode() != null &&
                 order.getOrderState().equals(OrderState.PAYMENT) && !order.getProductionStatus().equals(ProductionStatus.PRINTED) && order.getDistributionModeId() == 2) {
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             MQMessageProducer.sendPlatformOrderMessage(order.getId(), PlatformType.R_VERSION, order.getBrandId(), order.getShopDetailId());
@@ -399,7 +399,7 @@ public class OrderAspect {
         }
 
         //稍后支付  大Boss模式  支付宝或微信支付
-        if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY)) {
+        if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
             /*if(order.getDistributionModeId()==2&&order.getOrderState()==OrderState.PAYMENT){
                 MQMessageProducer.sendPlatformOrderMessage(order.getId(), 4, order.getBrandId(), order.getShopDetailId());
             }else{*/
