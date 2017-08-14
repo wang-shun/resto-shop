@@ -759,7 +759,6 @@ public class OrderAspect {
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
             Brand brand = brandService.selectById(customer.getBrandId());
-            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
             if (order.getAllowAppraise()) {
                 StringBuffer msg = new StringBuffer();
