@@ -6371,13 +6371,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!newCustomerOrders.isEmpty()) {
             for (Order o : newCustomerOrders) {
                 newCustomerOrderNum++;
-                newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
                     newShareCustomerOrderNum++;
-                    newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 } else {
                     newNormalCustomerOrderNum++; //是新增用户
-                    newNormalCustomerOrderTotal = newNormalCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    newNormalCustomerOrderTotal = newNormalCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 }
             }
         }
@@ -6418,14 +6418,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (o.getCreateTime().compareTo(todayBegin) > 0 && o.getCreateTime().compareTo(todayEnd) < 0) {//今日内订单
                     if (backCustomerId.contains(o.getCustomerId())) {
                         backCustomerOrderNum++;
-                        backCustomerOrderTotal = backCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                        backCustomerOrderTotal = backCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                     }
                     if (backTwoCustomerId.contains(o.getCustomerId())) {
                         backTwoCustomerOrderNum++;
-                        backTwoCustomerOrderTotal = backTwoCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                        backTwoCustomerOrderTotal = backTwoCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                     }
                     if (backTwoMoreCustomerId.contains(o.getCustomerId())) {
-                        backTwoMoreCustomerOrderTotal = backTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                        backTwoMoreCustomerOrderTotal = backTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                         backTwoMoreCustomerOderNum++;
                     }
                 }
@@ -6472,7 +6472,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                 if (o.getCreateTime().compareTo(todayBegin) > 0 && o.getCreateTime().compareTo(todayEnd) < 0) {//今日内订单
                     //1.resto订单总额
-                    todayRestoTotal = todayRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    todayRestoTotal = todayRestoTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 
                     //11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
                     if (!o.getOrderPaymentItems().isEmpty()) {
@@ -6495,7 +6495,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //本日end----------
                 //本月开始------
                 //订单总额
-                monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 //本月结束
             }
         }
@@ -6816,13 +6816,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!todayNewCustomerOrders.isEmpty()) {
             for (Order o : todayNewCustomerOrders) {
                 todayNewCustomerOrderNum++;
-                todayNewCustomerOrderTotal = todayNewCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                todayNewCustomerOrderTotal = todayNewCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
                     todayNewShareCustomerOrderNum++;
-                    todayNewShareCustomerOrderTotal = todayNewShareCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    todayNewShareCustomerOrderTotal = todayNewShareCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 } else {
                     todayNewNormalCustomerOrderNum++; //是新增用户
-                    todayNewNormalCustomerOrderTotal = todayNewNormalCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    todayNewNormalCustomerOrderTotal = todayNewNormalCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 }
             }
         }
@@ -6864,14 +6864,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             for (Order o : orders) {
                 if (todayBackCustomerId.contains(o.getCustomerId())) {
                     todayBackCustomerOrderNum++;
-                    todayBackCustomerOrderTotal = todayBackCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    todayBackCustomerOrderTotal = todayBackCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 }
                 if (todayBackTwoCustomerId.contains(o.getCustomerId())) {
                     todayBackTwoCustomerOrderNum++;
-                    todayBackTwoCustomerOrderTotal = todayBackTwoCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    todayBackTwoCustomerOrderTotal = todayBackTwoCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 }
                 if (todayBackTwoMoreCustomerId.contains(o.getCustomerId())) {
-                    todayBackTwoMoreCustomerOrderTotal = todayBackTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    todayBackTwoMoreCustomerOrderTotal = todayBackTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                     todayBackTwoMoreCustomerOderNum++;
                 }
             }
@@ -6918,7 +6918,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 List<Integer> getTime = DateUtil.getDayByToday(o.getCreateTime());
                 if (getTime.contains(2)) {//今日内订单
                     //1.resto订单总额
-                    todayRestoTotal = todayRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    todayRestoTotal = todayRestoTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                     //11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
                     if (!o.getOrderPaymentItems().isEmpty()) {
                         //订单支付项
@@ -6940,7 +6940,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //本日end----------
                 //本月开始------
                 //订单总额
-                monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 //本月结束
             }
         }
@@ -7345,13 +7345,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!newCustomerOrders.isEmpty()) {
             for (Order o : newCustomerOrders) {
                 newCustomerOrderNum++;
-                newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
                     newShareCustomerOrderNum++;
-                    newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 } else {
                     newNormalCustomerOrderNum++; //是新增用户
-                    newNormalCustomerOrderTotal = newNormalCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    newNormalCustomerOrderTotal = newNormalCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 }
             }
         }
@@ -7390,14 +7390,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             for (Order o : orders) {
                 if (backCustomerId.contains(o.getCustomerId())) {
                     backCustomerOrderNum++;
-                    backCustomerOrderTotal = backCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    backCustomerOrderTotal = backCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 }
                 if (backTwoCustomerId.contains(o.getCustomerId())) {
                     backTwoCustomerOrderNum++;
-                    backTwoCustomerOrderTotal = backTwoCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    backTwoCustomerOrderTotal = backTwoCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 }
                 if (backTwoMoreCustomerId.contains(o.getCustomerId())) {
-                    backTwoMoreCustomerOrderTotal = backTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    backTwoMoreCustomerOrderTotal = backTwoMoreCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                     backTwoMoreCustomerOderNum++;
                 }
             }
@@ -7439,7 +7439,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                  *
                  */
                 //1.resto订单总额
-                xunRestoTotal = xunRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                xunRestoTotal = xunRestoTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 //11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
                 if (!o.getOrderPaymentItems().isEmpty()) {
                     //订单支付项
@@ -7650,13 +7650,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!newCustomerOrders.isEmpty()) {
             for (Order o : newCustomerOrders) {
                 newCustomerOrderNum++;
-                newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
                     newShareCustomerOrderNum++;
-                    newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 } else {
                     newNormalCustomerOrderNum++; //是新增用户
-                    newNormalCustomerOrderTotal = newNormalCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    newNormalCustomerOrderTotal = newNormalCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 }
             }
         }
@@ -7695,14 +7695,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             for (Order o : orders) {
                 if (backCustomerId.contains(o.getCustomerId())) {
                     backCustomerOrderNum++;
-                    backCustomerOrderTotal = backCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    backCustomerOrderTotal = backCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 }
                 if (backTwoCustomerId.contains(o.getCustomerId())) {
                     backTwoCustomerOrderNum++;
-                    backTwoCustomerOrderTotal = backTwoCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    backTwoCustomerOrderTotal = backTwoCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 }
                 if (backTwoMoreCustomerId.contains(o.getCustomerId())) {
-                    backTwoMoreCustomerOrderTotal = backTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                    backTwoMoreCustomerOrderTotal = backTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                     backTwoMoreCustomerOderNum++;
                 }
             }
@@ -7744,7 +7744,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                  *
                  */
                 //1.resto订单总额
-                monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+                monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
                 //11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
                 if (!o.getOrderPaymentItems().isEmpty()) {
                     //订单支付项
@@ -10060,11 +10060,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		if(!newCustomerOrders.isEmpty()){
 			for(Order o:newCustomerOrders){
 				newCustomerOrderNum++;
-				newCustomerOrderMoney = newCustomerOrderMoney.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+				newCustomerOrderMoney = newCustomerOrderMoney.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				if(o.getCustomer()!=null&& StringUtil.isNotEmpty(o.getCustomer().getShareCustomer())){
 					//说明是分享用户
 					newShareCustomerOrderNum++;
-					newShareCustomerOrderMoney = newShareCustomerOrderMoney.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+					newShareCustomerOrderMoney = newShareCustomerOrderMoney.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				}
 			}
 		}
@@ -10091,13 +10091,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//回头用户消费金额
 		BigDecimal backCustomerOrderMoney = BigDecimal.ZERO;
 
-
+		//查询 出 所有的订单 根据该订单是否是回头用户来判断 回头用户订单
 		List<Order> orders = orderMapper.selectCompleteByShopIdAndTime(shopId,begin,end);
 		if(!orders.isEmpty()){
 			for(Order o:orders){
 				if(backCustomerId.contains(o.getCustomerId())){
 					backCustomerOrderNum++;
-					backCustomerOrderMoney = backCustomerOrderMoney.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+					backCustomerOrderMoney = backCustomerOrderMoney.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				}
 			}
 		}
@@ -10125,22 +10125,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//折扣合计
 		BigDecimal discountTotal = BigDecimal.ZERO;
 
-		List<Order> orderList = orderMapper.selectListsmsByShopId(begin, end, shopId);
-		if(!orderList.isEmpty()){
-			for(Order o:orderList){
+
+		if(!orders.isEmpty()){
+			for(Order o:orders){
 				//resto订单总额
-				restoTotal = restoTotal.add(getOrderMoney(o.getOrderMode(),o.getPayType(),o.getOrderMoney(),o.getAmountWithChildren()));
+				restoTotal = restoTotal.add(getOrderMoney(o.getPayType(),o.getOrderMoney(),o.getAmountWithChildren()));
 				if(!o.getOrderPaymentItems().isEmpty()){
 					//订单支付项
 					for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
-						if (oi.getPaymentModeId() == PayMode.ACCOUNT_PAY) {
-							redPackTotal = redPackTotal.add(oi.getPayValue());
-						} else if (oi.getPaymentModeId() == PayMode.COUPON_PAY) {
-							couponTotal = couponTotal.add(oi.getPayValue());
-						} else if (oi.getPaymentModeId() == PayMode.REWARD_PAY) {
-							chargeReturn = chargeReturn.add(oi.getPayValue());
+						switch (oi.getPaymentModeId()){
+							case PayMode.ACCOUNT_PAY:
+								redPackTotal = redPackTotal.add(oi.getPayValue());
+								break;
+							case PayMode.COUPON_PAY:
+								couponTotal = couponTotal.add(oi.getPayValue());
+								break;
+							case PayMode.REWARD_PAY:
+								chargeReturn = chargeReturn.add(oi.getPayValue());
+								break;
+							default:
+								break;
 						}
+
 					}
+
 				}
 				discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
 				discountRatio = discountTotal.divide(restoTotal.add(discountTotal),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
@@ -10306,7 +10314,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			if(!orderList.isEmpty()){
 				for(Order o:orderList){
 					//resto订单总额
-					restoTotal = restoTotal.add(getOrderMoney(o.getOrderMode(),o.getPayType(),o.getOrderMoney(),o.getAmountWithChildren()));
+					restoTotal = restoTotal.add(getOrderMoney(o.getPayType(),o.getOrderMoney(),o.getAmountWithChildren()));
 					if(!o.getOrderPaymentItems().isEmpty()){
 						//订单支付项
 						for (OrderPaymentItem oi : o.getOrderPaymentItems()) {

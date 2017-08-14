@@ -124,6 +124,7 @@
         <result column="customer_id" property="customerId"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <result column="payment_mode_id" property="paymentModeId"/>
+			<result column="pay_value" property="payValue"/>
         </collection>
 
     </resultMap>
@@ -2843,7 +2844,8 @@ GROUP BY oi.article_name
         o.create_time,
         o.amount_with_children,
         oi.id orderPaymentItem_id,
-        oi.payment_mode_id
+        oi.payment_mode_id,
+        oi.pay_value
         FROM tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
