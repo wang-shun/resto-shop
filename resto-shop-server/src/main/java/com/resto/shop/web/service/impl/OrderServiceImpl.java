@@ -1921,6 +1921,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				as.setId(accountSettingId);
 				as.setType(1);
 				accountSettingService.update(as);
+				//发送消息队列通知 消费者24小时后再次查询账户余额情况 如果不符合要求则更改发短信为可以发状态
+				log.info("有订单产生计费并且该品牌账户已经欠费---");
+				log.info("开始发送延时消息队列--");
+				MQMessageProducer.sendBrandAccountSms(brand.getId(),MQSetting.DELAY_TIME);
 			}
 
 		}
@@ -6650,7 +6654,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //总营业额
                 .append("totalOrderMoney:").append("'").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("'").append(",")
                 //本月总额
-                .append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal).add(monthOrderBooks)).append("'")
+                .append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("'")
                 .append("}");
 
         //封装微信推送文本
@@ -6690,7 +6694,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 .append("---------------------").append("\n")
                 .append("今日外卖金额:").append(todayOrderBooks).append("\n")
                 .append("今日总营业额:").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("\n")
-                .append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal).add(monthOrderBooks)).append("\n");
+                .append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("\n");
 
         Map<String, String> map = new HashMap<>();
         map.put("sms", todayContent.toString());
