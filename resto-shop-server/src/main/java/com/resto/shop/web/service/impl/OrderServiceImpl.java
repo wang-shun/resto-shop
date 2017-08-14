@@ -1325,7 +1325,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
-        if(!MemcachedUtils.add(order.getId() + "WxPay", 1, 600)){
+        if(MemcachedUtils.get(order.getId() + "WxPay") != null){
             MemcachedUtils.delete(order.getId() + "WxPay");
         }
         if (MemcachedUtils.get(order.getCustomerId()+"createOrder") != null) {
