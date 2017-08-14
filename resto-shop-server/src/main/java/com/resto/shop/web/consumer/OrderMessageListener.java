@@ -126,7 +126,7 @@ public class OrderMessageListener implements MessageListener {
 
 	private Action excuteBrandAccountMsg(Message message) {
 
-    	log.info("消费者开始消费品牌账户欠费消息");
+    	log.info("消费者开始消费品牌账户欠费消息。。");
 		try {
 			String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
 			JSONObject json = JSONObject.parseObject(msg);
@@ -141,6 +141,7 @@ public class OrderMessageListener implements MessageListener {
 					if(brandAccount.getAccountBalance().compareTo(accountNotice.getNoticePrice())<0){// 账户只要小于设置就代表商户没充或者没有冲够钱 更改账户设置为 未发送短信
 						flag = false;
 						//更新设置
+						log.info("账户没有充值或者充值--把账户设置已发送欠费短信改为未发送欠费短信");
 						BrandSetting brandSetting = brandSettingService.selectByBrandId(json.getString("brandId"));
 						AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
 						Long id = accountSetting.getId();
@@ -150,14 +151,8 @@ public class OrderMessageListener implements MessageListener {
 						accountSettingService.update(ast);
 						break;
 					}
-
 				}
-
 			}
-
-
-
-
 		}catch (Exception e){
 			e.printStackTrace();
 			return Action.ReconsumeLater;

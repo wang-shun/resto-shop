@@ -1816,7 +1816,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 	/**
-	 * yz 2017 07/31 计费系统
+	 * yz 2017 07/31 计费系统 下单成功后发送短信--
 	 * 下单成功后 根据计费系统的设置 更新账户余额 和记录账户流水日志
 	 * @param order
 	 * @param openBrandAccount

@@ -11,6 +11,7 @@ import com.alibaba.rocketmq.client.producer.MQProducer;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.enums.BehaviorType;
 import com.resto.brand.core.enums.DetailType;
+import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.producer.MQMessageProducer;
@@ -147,7 +148,8 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 							as.setType(1);
 							accountSettingService.update(as);
 							//发送延时消息 24小时
-							MQMessageProducer.sendBrandAccountSms(brandId,1000*60*60*24);
+							log.info("发送欠费消息后把账户设置改为已发送状态,并发送消息队列。。。");
+							MQMessageProducer.sendBrandAccountSms(brandId, MQSetting.DELAY_TIME);
 						}
 
 					}else {
