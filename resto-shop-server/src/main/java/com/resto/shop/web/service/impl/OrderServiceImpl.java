@@ -199,9 +199,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     ArticleTopService articleTopService;
 
-    @Resource
-    OrderRemarkService orderRemarkService;
-
     @Autowired
     private TableQrcodeService tableQrcodeService;
 
@@ -9674,12 +9671,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer originState = order.getOrderState();
         Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-        Customer customer = customerService.selectById(order.getCustomerId());
         orderMapper.confirmOrderPos(orderId);
-        if (order.getPayType() == PayType.NOPAY) {
-            confirmOrder(order);
-//            orderService.confirmOrder(order);
-        }
+//        if (order.getPayType() == PayType.NOPAY) {
+//            confirmOrder(order);
+//        }
         if (order.getPayType() == PayType.PAY && (order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
                 || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY)) {
             payOrderSuccess(order);
