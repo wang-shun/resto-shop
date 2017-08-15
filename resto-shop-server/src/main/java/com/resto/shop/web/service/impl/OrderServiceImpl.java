@@ -30,6 +30,7 @@ import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.util.JdbcSmsUtils;
 import com.resto.shop.web.service.OrderRemarkService;
+import com.resto.shop.web.util.JdbcSmsUtils;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -460,12 +461,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 jsonResult.setMessage("下单失败，订单金额变动，请重新下单！");
                 return jsonResult;
             }
-            if((farOrder.getIsPay() == OrderPayState.PAYING || farOrder.getIsPay() == OrderPayState.NOT_PAY) && farOrder.getPayMode() == OrderPayMode.WX_PAY
-                    && farOrder.getOrderState() == OrderState.SUBMIT && farOrder.getPayType() == PayType.NOPAY){
-                jsonResult.setSuccess(false);
-                jsonResult.setMessage("正在微信付款中，请稍微加菜！");
-                return jsonResult;
-            }
+//            if((farOrder.getIsPay() == OrderPayState.PAYING || farOrder.getIsPay() == OrderPayState.NOT_PAY) && farOrder.getPayMode() == OrderPayMode.WX_PAY
+//                    && farOrder.getOrderState() == OrderState.SUBMIT && farOrder.getPayType() == PayType.NOPAY){
+//                jsonResult.setSuccess(false);
+//                jsonResult.setMessage("正在微信付款中，请勿加菜！");
+//                return jsonResult;
+//            }
         }
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
         List<Article> articles = articleService.selectList(order.getShopDetailId());
@@ -1141,6 +1142,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     public Order payOrderSuccess(Order order) {
+
+
         if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.PAYMENT);
             order.setIsPay(OrderPayState.PAYED);
@@ -1325,9 +1328,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
-        if(!MemcachedUtils.add(order.getId() + "WxPay", 1, 600)){
-            MemcachedUtils.delete(order.getId() + "WxPay");
-        }
+        MemcachedUtils.delete(orderId + "WxPay");
         if (MemcachedUtils.get(order.getCustomerId()+"createOrder") != null) {
             MemcachedUtils.delete(order.getCustomerId() + "createOrder");
         }
@@ -6277,28 +6278,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //3发短信推送/微信推送
         pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
         //3判断是否需要发送旬短信
-        int temp = DateUtil.getEarlyMidLate();
-        switch (temp){
-            case  1:
-                //第一版旬结短信
-                Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail);
-                pushMessageByFirstEdtion(xunMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
-                break;
-
-            case 2:
-                Map<String, String> xunMapByFirstEdtion2 = querryXunDataByFirstEditon(shopDetail);
-                pushMessageByFirstEdtion(xunMapByFirstEdtion2, shopDetail, wechatConfig, brand.getBrandName());
-                break;
-
-            case 3:
-               Map<String, String> xunMapByFirstEdtion3 = querryXunDataByFirstEditon(shopDetail);
-               pushMessageByFirstEdtion(xunMapByFirstEdtion3, shopDetail, wechatConfig, brand.getBrandName());
-
-               Map<String, String> monthMapByFirstEdtion = querryMonthDataByFirstEditon(shopDetail, offLineOrder);
-               pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
-               break;
-
-        }
+//        int temp = DateUtil.getEarlyMidLate();
+//        switch (temp){
+//            case  1:
+//                //第一版旬结短信
+//                Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail);
+//                pushMessageByFirstEdtion(xunMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
+//                break;
+//
+//            case 2:
+//                Map<String, String> xunMapByFirstEdtion2 = querryXunDataByFirstEditon(shopDetail);
+//                pushMessageByFirstEdtion(xunMapByFirstEdtion2, shopDetail, wechatConfig, brand.getBrandName());
+//                break;
+//
+//            case 3:
+//               Map<String, String> xunMapByFirstEdtion3 = querryXunDataByFirstEditon(shopDetail);
+//               pushMessageByFirstEdtion(xunMapByFirstEdtion3, shopDetail, wechatConfig, brand.getBrandName());
+//
+//               Map<String, String> monthMapByFirstEdtion = querryMonthDataByFirstEditon(shopDetail, offLineOrder);
+//               pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
+//               break;
+//
+//        }
 
         //第二版短信内容由于模板原因无法发送短信 因此保留第一版短信 第二版数据存到大数据库数据库中
         insertDateData(shopDetail,offLineOrder,wether,brand);
@@ -9853,6 +9854,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
+
     @Override
     public Order posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue) {
         Order order = selectById(orderId);
@@ -10011,10 +10013,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void fixErrorOrder() {
         orderMapper.fixAllowContinueOrder(new Date());
-        List<Order> orders = orderMapper.getAllowAppraise();
-        for (Order order : orders) {
-            confirmOrder(order);
-        }
+//        List<Order> orders = orderMapper.getAllowAppraise();
+//        for (Order order : orders) {
+//            confirmOrder(order);
+//        }
     }
 
     @Override
