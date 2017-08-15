@@ -14,7 +14,7 @@
 				<div class="panel-body">
 					<h1 style="color: #ffc459">￥{{accountBalance}}</h1>
 					<div style="text-align: right">
-						<button class="btn btn-success" type="button">账户充值</button>
+						<button type="button" class="btn btn-success" data-toggle="modal" data-target="#chargeModal"> 账户充值 </button>
 					</div>
 				</div>
 			</div>
@@ -89,6 +89,68 @@
 			</div>
 		</div>
 	</div>
+
+	<!-- 充值 Modal -->
+	<div class="modal fade" id="chargeModal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+					<h4 class="modal-title" id="myModalLabel">账号充值</h4>
+				</div>
+				<div class="modal-body">
+					<form role="form" class="form-horizontal"
+						  action="accountchargeorder/charge" method="post" target="_blank" @submit="showChargeModal('createChargeOrder')">
+						<div class="form-body">
+
+							<div class="form-group">
+								<label class="col-sm-3 control-label">充值金额：</label>
+								<div class="col-sm-4">
+									<div class="input-group">
+										<input type="number" class="form-control" name="chargeMoney"  v-model="changeMoney" min="1">
+										<div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
+									</div>
+								</div>
+								<div class="col-sm-5 text-center">
+									<a class="btn btn-info" @click="changeMoney = 500">500</a>&nbsp;
+									<a class="btn btn-info" @click="changeMoney = 1000">1000</a>&nbsp;
+									<a class="btn btn-info" @click="changeMoney = 2000">2000</a>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label class="col-sm-3 control-label">支付方式：</label>
+								<div class="col-sm-8">
+									<div class="md-radio-list">
+										<div class="md-radio">
+											<input type="radio" id="alipay" name="payType"
+												   checked="checked" class="md-radiobtn" value="1"> <label
+												for="alipay"> <span></span> <span class="check"></span>
+											<span class="box"></span>&nbsp;<img alt="支付宝支付"
+																				src="assets/pages/img/alipay.png" width="23px" height="23px">&nbsp;支付宝支付
+										</label>
+										</div>
+										<div class="md-radio">
+											<input type="radio" id="wxpay" name="payType"
+												   class="md-radiobtn" value="2"> <label for="wxpay">
+											<span></span> <span class="check"></span> <span class="box"></span>&nbsp;<img
+												alt="微信支付" src="assets/pages/img/wxpay.png" width="23px"
+												height="23px">&nbsp;微信支付
+										</label>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="text-center">
+							<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+							<input class="btn green" type="submit" value="充值"/>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 
@@ -113,7 +175,8 @@
 					smsOrder:0, //短信支出
 					orderMoney:0, //订单支出
 					chargeMoney:0 //账户充值
-				}
+				},
+				changeMoney : 100
 			},
 			methods:{
                 todayInfo:function(count){
@@ -236,7 +299,6 @@
                         }
                     });
                 }
-
 			},
 			created:function () {
                 var that = this;

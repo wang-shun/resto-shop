@@ -1,19 +1,39 @@
 package com.resto.shop.web.dto;
 
+import java.math.BigDecimal;
+
 /**
  * 店铺 获取汇总数据
  * 本次给 鲁肉范 --- 田林路店用
  */
 public class Summarry {
 
+	private BigDecimal lineOffOrderMoney;//线下输入出订单
 
-	private Integer customerOrder;//用户消费笔数
+	private Integer customerOrderNum;//用户消费笔数
+	private BigDecimal CustomerOrderMoney;//用户消费金额
 
-	private Integer newCustomerOrder;//新用户消费笔数
 
-	private Integer shareCustomerOrder;//分享用户消费笔数
+	private Integer newCustomerOrderNum;//新用户消费笔数
+	private BigDecimal newCustomerOrderMoney;//新用户消费金额
+
+	private BigDecimal RestoTotalMoney;
+
+	public BigDecimal getRestoTotalMoney() {
+		return RestoTotalMoney;
+	}
+
+	public void setRestoTotalMoney(BigDecimal restoTotalMoney) {
+		RestoTotalMoney = restoTotalMoney;
+	}
+
+	private Integer newShareCustomerOrderNum;//分享用户消费笔数
+
+	private BigDecimal newShareCustomerMoney;//分享新用消费金额
 
 	private Integer backCustomerOrder;//回头用户消费笔数
+
+	private BigDecimal backCustomerMoney;//回头用户消费金额
 
 	private String statisfaction;//折扣比率
 
@@ -25,29 +45,68 @@ public class Summarry {
 
 	private String shopName;//店铺名字
 
-
-	public Integer getCustomerOrder() {
-		return customerOrder;
+	public BigDecimal getLineOffOrderMoney() {
+		return lineOffOrderMoney;
 	}
 
-	public void setCustomerOrder(Integer customerOrder) {
-		this.customerOrder = customerOrder;
+	public void setLineOffOrderMoney(BigDecimal lineOffOrderMoney) {
+		this.lineOffOrderMoney = lineOffOrderMoney;
 	}
 
-	public Integer getNewCustomerOrder() {
-		return newCustomerOrder;
+	public Integer getCustomerOrderNum() {
+		return customerOrderNum;
 	}
 
-	public void setNewCustomerOrder(Integer newCustomerOrder) {
-		this.newCustomerOrder = newCustomerOrder;
+	public void setCustomerOrderNum(Integer customerOrderNum) {
+		this.customerOrderNum = customerOrderNum;
 	}
 
-	public Integer getShareCustomerOrder() {
-		return shareCustomerOrder;
+	public BigDecimal getCustomerOrderMoney() {
+		return CustomerOrderMoney;
 	}
 
-	public void setShareCustomerOrder(Integer shareCustomerOrder) {
-		this.shareCustomerOrder = shareCustomerOrder;
+	public void setCustomerOrderMoney(BigDecimal customerOrderMoney) {
+		CustomerOrderMoney = customerOrderMoney;
+	}
+
+	public Integer getNewCustomerOrderNum() {
+		return newCustomerOrderNum;
+	}
+
+	public void setNewCustomerOrderNum(Integer newCustomerOrderNum) {
+		this.newCustomerOrderNum = newCustomerOrderNum;
+	}
+
+	public BigDecimal getNewCustomerOrderMoney() {
+		return newCustomerOrderMoney;
+	}
+
+	public void setNewCustomerOrderMoney(BigDecimal newCustomerOrderMoney) {
+		this.newCustomerOrderMoney = newCustomerOrderMoney;
+	}
+
+	public Integer getNewShareCustomerOrderNum() {
+		return newShareCustomerOrderNum;
+	}
+
+	public void setNewShareCustomerOrderNum(Integer newShareCustomerOrderNum) {
+		this.newShareCustomerOrderNum = newShareCustomerOrderNum;
+	}
+
+	public BigDecimal getNewShareCustomerMoney() {
+		return newShareCustomerMoney;
+	}
+
+	public void setNewShareCustomerMoney(BigDecimal newShareCustomerMoney) {
+		this.newShareCustomerMoney = newShareCustomerMoney;
+	}
+
+	public BigDecimal getBackCustomerMoney() {
+		return backCustomerMoney;
+	}
+
+	public void setBackCustomerMoney(BigDecimal backCustomerMoney) {
+		this.backCustomerMoney = backCustomerMoney;
 	}
 
 	public String getStatisfaction() {

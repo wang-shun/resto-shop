@@ -124,6 +124,7 @@
         <result column="customer_id" property="customerId"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <result column="payment_mode_id" property="paymentModeId"/>
+			<result column="pay_value" property="payValue"/>
         </collection>
 
     </resultMap>
@@ -1109,6 +1110,7 @@
         order_money,
         order_mode,
         amount_with_children,
+        closed,
         ifnull(count_with_child,article_count) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
@@ -1143,6 +1145,7 @@
         amount_with_children,
         print_fail_flag,
         print_kitchen_flag,
+        closed,
         ifnull(count_with_child,article_count) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
         FROM
@@ -2845,7 +2848,8 @@ GROUP BY oi.article_name
         o.create_time,
         o.amount_with_children,
         oi.id orderPaymentItem_id,
-        oi.payment_mode_id
+        oi.payment_mode_id,
+        oi.pay_value
         FROM tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
