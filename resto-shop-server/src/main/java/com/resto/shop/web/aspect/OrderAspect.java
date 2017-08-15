@@ -395,7 +395,13 @@ public class OrderAspect {
         //订单不为空  已支付  电视叫号模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
                 && order.getOrderMode() == ShopMode.CALL_NUMBER) {
-            MQMessageProducer.sendPlaceOrderMessage(order);
+            if(order.getDistributionModeId() == 2){
+                BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+                MQMessageProducer.sendPlatformOrderMessage(order.getId(), PlatformType.R_VERSION, order.getBrandId(), order.getShopDetailId());
+                MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
+            }else{
+                MQMessageProducer.sendPlaceOrderMessage(order);
+            }
         }
 
         //稍后支付  大Boss模式  支付宝或微信支付
