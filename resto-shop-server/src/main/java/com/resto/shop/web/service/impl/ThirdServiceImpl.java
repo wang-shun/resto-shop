@@ -1002,6 +1002,7 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("ITEMS", items);
                     data.put("CUSTOMER_SATISFACTION", "暂无信息");
                     data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+                    data.put("MEMO", "备注：" + order.getRemark());
                     data.put("CUSTOMER_PROPERTY", "");
                     print.put("DATA", data);
                     print.put("STATUS", "0");
@@ -1140,6 +1141,7 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("CUSTOMER_SATISFACTION", "暂无信息");
                     data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
                     data.put("CUSTOMER_PROPERTY", "");
+                    data.put("MEMO", "备注：" + order.getRemark());
                     print.put("DATA", data);
                     print.put("STATUS", "0");
                     print.put("TICKET_TYPE", TicketTypeNew.TICKET);
