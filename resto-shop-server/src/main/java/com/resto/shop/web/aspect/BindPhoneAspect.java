@@ -2,6 +2,7 @@ package com.resto.shop.web.aspect;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.enums.BehaviorType;
 import com.resto.brand.core.enums.DetailType;
 import com.resto.brand.core.util.DateUtil;
@@ -10,10 +11,10 @@ import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
-import com.resto.shop.web.consumer.OrderMessageListener;
 import com.resto.shop.web.model.Coupon;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CouponService;
-import org.aspectj.lang.JoinPoint;
+import com.resto.shop.web.util.BrandAccountSendUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.util.StringUtils;
 import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.NewCustomCouponService;
 import com.resto.shop.web.service.SmsLogService;
@@ -67,6 +67,9 @@ public class BindPhoneAspect {
 
 	@Resource
 	AccountSettingService accountSettingService;
+
+	@Resource
+	AccountNoticeService accountNoticeService;
 
 
 	@Pointcut("execution(* com.resto.shop.web.service.CustomerService.bindPhone(..))")
@@ -158,7 +161,17 @@ public class BindPhoneAspect {
 				brandAccount.setAccountBalance(remain);
 				brandAccount.setUpdateTime(new Date());
 				brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
-
+				List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccountId);
+			    Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+			    if(result.isSuccess()){
+					Long id = accountSetting.getId();
+					AccountSetting as = new AccountSetting();
+					as.setId(id);
+					as.setType(1);
+					accountSettingService.update(as);//设置为不可以发短信
+					log.info(brand.getBrandName()+"品牌账户余额欠费生产者开始生产欠费消息");
+					MQMessageProducer.sendBrandAccountSms(brand.getId(),MQSetting.DELAY_TIME);
+				}
 			}
 			log.info("首次绑定手机，执行指定动作");
 
