@@ -347,7 +347,7 @@ public class NewCustomCouponController extends GenericController{
                 if (!shopDetailList.isEmpty()) {
                     for (int i = 1; i < shopDetailList.size(); i++) {
                         for (int j = 0; j < shopDetailList.size() - 1; j++) {
-                            if (shopDetailList.get(i).getShopDetailIndex() < shopDetailList.get(j + 1).getShopDetailIndex()) {
+                            if (shopDetailList.get(i).getShopDetailIndex() > shopDetailList.get(j + 1).getShopDetailIndex()) {
                                 shopDetail = shopDetailList.get(j);
                                 shopDetailList.set(j, shopDetailList.get(j + 1));
                                 shopDetailList.set(j + 1, shopDetail);
