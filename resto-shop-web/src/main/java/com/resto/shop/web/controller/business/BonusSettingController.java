@@ -5,7 +5,9 @@ import javax.validation.Valid;
 
 import com.alibaba.fastjson.JSONArray;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.model.ChargeSetting;
 import com.resto.shop.web.service.ChargeSettingService;
@@ -34,9 +36,18 @@ public class BonusSettingController extends GenericController{
     @Resource
     ChargeSettingService chargeSettingService;
 
-	@RequestMapping("/list")
-    public void list(){
-    }
+     @Resource
+     BrandSettingService brandSettingService;
+
+     @RequestMapping("/list")
+     public String list(){
+         BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+         if (brandSetting.getOpenBonus().equals(Common.YES)){
+             return "bonusSetting/list";
+         }else {
+             return "notOpen";
+         }
+     }
 
 	@RequestMapping("/list_all")
 	@ResponseBody

@@ -10,14 +10,9 @@ import javax.annotation.Resource;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.util.WeChatPayUtils;
-import com.resto.brand.web.model.NewEmployee;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.model.WechatConfig;
-import com.resto.brand.web.model.WxServerConfig;
-import com.resto.brand.web.service.NewEmployeeService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.brand.web.service.WechatConfigService;
-import com.resto.brand.web.service.WxServerConfigService;
+import com.resto.brand.web.model.*;
+import com.resto.brand.web.service.*;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
@@ -58,10 +53,19 @@ public class BonusLogController extends GenericController{
 
     @Resource
     OrderPaymentItemService orderPaymentItemService;
-	
-	@RequestMapping("/list")
-    public void list(){
-    }
+
+     @Resource
+     BrandSettingService brandSettingService;
+
+     @RequestMapping("/list")
+     public String list(){
+         BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+         if (brandSetting.getOpenBonus().equals(Common.YES)){
+             return "bonusLog/list";
+         }else {
+             return "notOpen";
+         }
+     }
 
 	@RequestMapping("/list_all")
 	@ResponseBody
