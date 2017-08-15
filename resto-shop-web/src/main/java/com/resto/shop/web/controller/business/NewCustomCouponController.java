@@ -370,7 +370,7 @@ public class NewCustomCouponController extends GenericController{
                 //如果是品牌优惠卷则进入到用户最后一次下单的店铺，如无订单则进入到当前品牌中排最后的品牌
                 if (newCustomCoupon.getIsBrand().equals(Common.YES)){
                     valueMap = new HashMap<>();
-                    valueMap.put("lastShopId", customer.getLastOrderShop() == null ? shopDetail.getId() : shopDetail.getId());
+                    valueMap.put("lastShopId", customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop());
                     substitutor = new StrSubstitutor(valueMap);
                     text = substitutor.replace(text);
                 }
