@@ -466,8 +466,6 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
     void updateOrderChild(String orderId);
 
-	void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand);
-
 	public boolean cancelExceptionOrder(String orderId);
 
     /**
@@ -716,4 +714,33 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	Summarry selctSummaryBrandData(String beginDate, String endDate, String currentBrandId);
 
 	List<Map<String, String>> selectCustomerOrderCount(List<String> customerIds);
+
+	List<Order> selectHasPayNoChangeStatus(String shopId, Date dateBegin, Date dateEnd);
+
+	/**
+	 * yz 2017-08-15 范围内新增用户的订单
+	 * @param shopId
+	 * @param todayBegin
+	 * @param todayEnd
+	 * @return
+	 */
+	List<Order> selectNewCustomerOrderByShopIdAndTime(String shopId, Date todayBegin, Date todayEnd);
+
+	/**
+	 * yz 2017-08-15 范围内查询 回头用户的消费次数
+	 * @param shopId
+	 * @param todayBegin
+	 * @param todayEnd
+	 * @return
+	 */
+	List<BackCustomerDto> selectBackCustomerByShopIdAndTime(String shopId, Date todayBegin, Date todayEnd);
+
+	/**
+	 * yz 2017-08-15 查询店铺已完成订单
+	 * @param shopId
+	 * @param todayBegin
+	 * @param todayEnd
+	 * @return
+	 */
+	List<Order> selectCompleteByShopIdAndTime(String shopId, Date todayBegin, Date todayEnd);
 }

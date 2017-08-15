@@ -22,4 +22,6 @@ public interface OffLineOrderService extends GenericService<OffLineOrder, String
      * @return
      */
     OffLineOrder selectSumByTimeSourceAndShopId(int offlinePos, String id, Date todayBegin, Date todayEnd);
+
+	OffLineOrder selectByTimeSourceAndShopId(int offlinePos, String id, Date dateBegin, Date dateEnd);
 }
