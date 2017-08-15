@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.ArticleTopDto;
@@ -18,6 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -26,7 +28,8 @@ import java.util.*;
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.OrderCountUtils.formatDouble;
 import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
-
+@RpcService
+@Component
 public class CloseShopServieImpl implements CloseShopService{
 
 
@@ -124,11 +127,14 @@ public class CloseShopServieImpl implements CloseShopService{
 		String[] orderStates = new String[]{OrderState.SUBMIT + "", OrderState.PAYMENT + ""};//未付款和未全部付款和已付款
 		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER + ""};//已付款未下单
 		List<Order> orderList = orderService.selectByOrderSatesAndProductionStates(shopDetail.getId(), orderStates, productionStates);
-		for (Order order : orderList) {
-			if (!order.getClosed()) {//判断订单是否已被关闭，只对未被关闭的订单做退单处理
-				sendWxRefundMsg(order);
+		if(!orderList.isEmpty()){
+			for (Order order : orderList) {
+				if (!order.getClosed()) {//判断订单是否已被关闭，只对未被关闭的订单做退单处理
+					sendWxRefundMsg(order);
+				}
 			}
 		}
+
 		// 查询已付款且有支付项但是生产状态没有改变的订单
 		List<Order> orderstates = orderService.selectHasPayNoChangeStatus(shopDetail.getId(), DateUtil.getDateBegin(new Date()), DateUtil.getDateEnd(new Date()));
 		if (!orderstates.isEmpty()) {
