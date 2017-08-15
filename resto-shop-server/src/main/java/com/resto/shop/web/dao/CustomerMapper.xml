@@ -637,10 +637,10 @@ and wechat_id != '0'
                 and tc.sex = #{sex}
             </if>
             <if test="registerBeginDate != null">
-                and tc.bind_phone_time &gt;= #{registerBeginDate}
+                and tc.bind_phone_time &gt;= CONCAT(#{registerBeginDate},' 00:00:00')
             </if>
             <if test="registerEndDate != null">
-                and tc.bind_phone_time &lt;= #{registerEndDate}
+                and tc.bind_phone_time &lt;= CONCAT(#{registerEndDate},' 23:59:59')
             </if>
             <if test="customerIds != null and customerIds.length >= 0">
                 and id in
