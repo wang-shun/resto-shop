@@ -56,22 +56,22 @@
 		</div>
 	</div>
 
-	<div>
+	<div class="col-md-8 col-md-offset-2">
 
         <form role="form" class="form-horizontal"
               action="accountchargeorder/charge" method="post" target="_blank" @submit="showChargeModal('createChargeOrder')">
             <div class="form-body">
 
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">充值金额：</label>
-                    <div class="col-sm-4">
+                    <label class="col-md-3 control-label">充值金额：</label>
+                    <div class="col-md-4">
                         <div class="input-group">
                             <input type="text" class="form-control"
                                    placeholder="请输入要充值的金额"  name="chargeMoney"  v-model="chargeMoney">
                             <div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
                         </div>
                     </div>
-                    <div class="col-sm-5 text-center">
+                    <div class="col-md-5 text-center">
                         <a class="btn btn-info" @click="changeMoney(500)">500</a>&nbsp;
                         <a class="btn btn-info" @click="changeMoney(1000)">1000</a>&nbsp;
                         <a class="btn btn-info" @click="changeMoney(2000)">2000</a>
@@ -79,8 +79,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label class="col-sm-3 control-label">支付方式：</label>
-                    <div class="col-sm-8">
+                    <label class="col-md-3 control-label">支付方式：</label>
+                    <div class="col-md-8">
                         <div class="md-radio-list">
                             <div class="md-radio">
                                 <input type="radio" id="alipay" name="payType"
