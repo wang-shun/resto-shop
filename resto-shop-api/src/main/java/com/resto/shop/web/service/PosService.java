@@ -43,4 +43,31 @@ public interface PosService {
      */
     String syncPlatform(String orderId);
 
+    /**
+     * 菜品上架、下架
+     * @param articleId 菜品id
+     * @param actived 0 下架  1 上架
+     * @return
+     */
+    void articleActived(String articleId,Integer actived);
+
+    /**
+     * 菜品沽清
+     * @param articleId 菜品id
+     */
+    void articleEmpty(String articleId);
+
+    /**
+     * 编辑菜品库存
+     * @param articleId 菜品id
+     * @param count 数量
+     */
+    void articleEdit(String articleId,Integer count);
+
+    /**
+     * 打印成功
+     * @param orderId 订单
+     */
+    void printSuccess(String orderId);
+
 }

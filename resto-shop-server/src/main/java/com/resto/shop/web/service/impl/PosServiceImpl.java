@@ -2,6 +2,7 @@ package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
 import com.resto.shop.web.constant.Common;
+import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.posDto.ArticleStockDto;
 import com.resto.shop.web.posDto.OrderDto;
@@ -101,5 +102,31 @@ public class PosServiceImpl implements PosService {
         result.put("orderDetail", platformOrderDetails);
         result.put("orderExtra", platformOrderExtras);
         return new JSONObject(result).toString();
+    }
+
+    @Override
+    public void articleActived(String articleId, Integer actived) {
+        articleService.setActivated(articleId,actived);
+    }
+
+    @Override
+    public void articleEmpty(String articleId) {
+        Article article = articleService.selectById(articleId);
+        articleService.clearStock(articleId,article.getShopDetailId());
+    }
+
+    @Override
+    public void articleEdit(String articleId, Integer count) {
+        Article article = articleService.selectById(articleId);
+        articleService.editStock(articleId,count,article.getShopDetailId());
+    }
+
+    @Override
+    public void printSuccess(String orderId) {
+        try {
+            orderService.printSuccess(orderId);
+        } catch (AppException e) {
+            e.printStackTrace();
+        }
     }
 }

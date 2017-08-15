@@ -298,7 +298,11 @@ public class MQMessageProducer {
 	}
 
 	public static void main(String[] args) {
-		sendPlatformOrderMessage("3009457759299910768",1,"974b0b1e31dc4b3fb0c3d9a0970d22e4","f3910fceb055442ab6b3abc6642eb70a");
+		Order order = new Order();
+		order.setId("00b8a27437cf460c93910bdc2489d061");
+		order.setBrandId("31946c940e194311b117e3fff5327215");
+		order.setShopDetailId("31164cebcc4b422685e8d9a32db12ab8");
+		sendCreateOrderMessage(order);
 	}
 
 	public static void sendNotAllowContinueMessage(Order order, long delay) {
