@@ -3495,7 +3495,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         if (order.getPayType() == PayType.NOPAY && (order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM)) {
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
-        } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getOrderState() == OrderState.SUBMIT) {
+        } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getPayMode() != OrderPayMode.WX_PAY
+                && order.getPayMode() != OrderPayMode.ALI_PAY && order.getOrderState() == OrderState.SUBMIT) {
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY) {
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
@@ -3799,7 +3800,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         if (order.getPayType() == PayType.NOPAY && (order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM)) {
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
-        } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getOrderState() == OrderState.SUBMIT) {
+        } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getPayMode() != OrderPayMode.WX_PAY &&
+                order.getPayMode() != OrderPayMode.ALI_PAY  && order.getOrderState() == OrderState.SUBMIT) {
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY) {
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
