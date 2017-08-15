@@ -95,28 +95,28 @@ public class CloseShopServieImpl implements CloseShopService{
 		//3发短信推送/微信推送
 		pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
 		//3判断是否需要发送旬短信
-		int temp = DateUtil.getEarlyMidLate();
-		switch (temp){
-			case  1:
-				//第一版旬结短信
-				Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail);
-				pushMessageByFirstEdtion(xunMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
-				break;
-
-			case 2:
-				Map<String, String> xunMapByFirstEdtion2 = querryXunDataByFirstEditon(shopDetail);
-				pushMessageByFirstEdtion(xunMapByFirstEdtion2, shopDetail, wechatConfig, brand.getBrandName());
-				break;
-
-			case 3:
-				Map<String, String> xunMapByFirstEdtion3 = querryXunDataByFirstEditon(shopDetail);
-				pushMessageByFirstEdtion(xunMapByFirstEdtion3, shopDetail, wechatConfig, brand.getBrandName());
-
-				Map<String, String> monthMapByFirstEdtion = querryMonthDataByFirstEditon(shopDetail, offLineOrder);
-				pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
-				break;
-
-		}
+//		int temp = DateUtil.getEarlyMidLate();
+//		switch (temp){
+//			case  1:
+//				//第一版旬结短信
+//				Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail);
+//				pushMessageByFirstEdtion(xunMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
+//				break;
+//
+//			case 2:
+//				Map<String, String> xunMapByFirstEdtion2 = querryXunDataByFirstEditon(shopDetail);
+//				pushMessageByFirstEdtion(xunMapByFirstEdtion2, shopDetail, wechatConfig, brand.getBrandName());
+//				break;
+//
+//			case 3:
+//				Map<String, String> xunMapByFirstEdtion3 = querryXunDataByFirstEditon(shopDetail);
+//				pushMessageByFirstEdtion(xunMapByFirstEdtion3, shopDetail, wechatConfig, brand.getBrandName());
+//
+//				Map<String, String> monthMapByFirstEdtion = querryMonthDataByFirstEditon(shopDetail, offLineOrder);
+//				pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
+//				break;
+//
+//		}
 
 		//第二版短信内容由于模板原因无法发送短信 因此保留第一版短信 第二版数据存到大数据库数据库中
 		insertDateData(shopDetail,offLineOrder,wether,brand);
@@ -503,7 +503,7 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		todayContent.append("{")
 				.append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
-				.append("datetime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd")).append("'").append(",")
+				.append("datetime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss")).append("'").append(",")
 				//到店总笔数(r+线下)-----
 				.append("arriveCount:").append("'").append(todayEnterCount + todayRestoCount).append("'").append(",")
 				//到店消费总额 我们的总额+线下的总额，不包含外卖金额
@@ -611,8 +611,7 @@ public class CloseShopServieImpl implements CloseShopService{
 			//截取电话号码
 			String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
 			String[] tels = telephones.split(",");
-			String s = "13317182430";
-			//for (String s : tels) {
+			for (String s : tels) {
 				JSONObject smsResult = SMSUtils.sendMessage(s, JSONObject.parseObject(querryMap.get("sms")), "餐加", "SMS_46725122", null);//推送本日信息
 
 				System.err.println("短信返回内容："+smsResult);
@@ -625,7 +624,7 @@ public class CloseShopServieImpl implements CloseShopService{
 				if (null != c) {
 					WeChatUtils.sendDayCustomerMsgASync(querryMap.get("wechat"), c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), s, brandName, shopDetail.getName());
 				}
-			//}
+			}
 
 		}
 	}
