@@ -64,6 +64,8 @@ public class Order implements Serializable{
 
     private String customerId;
 
+    private String customerAddressId;
+
     private Date distributionDate;
 
     private Integer distributionTimeId;
@@ -236,6 +238,8 @@ public class Order implements Serializable{
      * 退菜原因补充
      */
     private String remarkSupply;
+
+    private Integer type;
 
     public Integer getTag() {
         return tag;
@@ -668,6 +672,14 @@ public class Order implements Serializable{
         this.customerId = customerId;
     }
 
+    final public String getCustomerAddressId() {
+        return customerAddressId;
+    }
+
+    final public void setCustomerAddressId(String customerAddressId) {
+        this.customerAddressId = customerAddressId;
+    }
+
     final public Date getDistributionDate() {
         return distributionDate;
     }
@@ -956,6 +968,14 @@ public class Order implements Serializable{
 
     public void setRemarkSupply(String remarkSupply) {
         this.remarkSupply = remarkSupply;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     @Override

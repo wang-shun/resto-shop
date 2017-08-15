@@ -1,5 +1,6 @@
 package com.resto.shop.web.controller.common;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -9,8 +10,10 @@ import javax.validation.Valid;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.model.Wether;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.shiro.SecurityUtils;
@@ -29,9 +32,6 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.service.BrandUserService;
-import com.resto.brand.web.service.RoleService;
-import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 
 
@@ -53,6 +53,9 @@ public class BrandUserController extends GenericController{
 
     @Resource
     private RoleService roleService;
+
+    @Resource
+    private WetherService wetherService;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -92,6 +95,8 @@ public class BrandUserController extends GenericController{
             session.setAttribute(SessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());
             List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
             session.setAttribute(SessionKey.CURRENT_SHOP_NAMES,shopDetailList);
+            Wether wether = wetherService.selectDateAndShopId(authUserInfo.getShopDetailId(), DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+            session.setAttribute(SessionKey.WETHERINFO,wether);
 
 //            HttpSession session = request.getSession();
 //            session.setAttribute(RedisSessionKey.USER_INFO, JsonUtils.objectToJson(authUserInfo));//存用户的信息

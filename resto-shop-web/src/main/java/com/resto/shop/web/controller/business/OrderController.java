@@ -9,8 +9,10 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.AppendToExcelUtil;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.web.dto.BrandOrderReportDto;
 import com.resto.brand.web.dto.OrderDetailDto;
 import com.resto.brand.web.dto.OrderPayDto;
+import com.resto.brand.web.dto.ShopOrderReportDto;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
@@ -84,7 +86,7 @@ public class OrderController extends GenericController{
 	@SuppressWarnings("unchecked")
 	@RequestMapping("create_brand_excel")
 	@ResponseBody
-	public Result create_brand_excel(String beginDate,String endDate,OrderPayDto orderPayDto,HttpServletRequest request){
+	public Result create_brand_excel(String beginDate, String endDate, ShopOrderReportDto shopOrderReportDto, HttpServletRequest request){
 
 		List<ShopDetail> shopDetailList = getCurrentShopDetails();
 		if(shopDetailList==null){
@@ -95,17 +97,32 @@ public class OrderController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"name","number","orderMoney","average","marketPrize"};
+		String[]columns={"shopName","shop_orderCount","shop_orderPrice","shop_orderCount","shop_peopleCount","shop_orderCount","shop_tangshiCount","shop_tangshiPrice","shop_waidaiCount","shop_waidaiPrice","shop_waimaiCount","shop_waimaiPrice"};
 		//定义数据
-		List<OrderPayDto>  result = new ArrayList<>();
+		//List<OrderPayDto>  result = new ArrayList<>();
+		List<ShopOrderReportDto>  result = new ArrayList<>();
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
         filter.getExcludes().add("brandOrderDto");
         filter.getExcludes().add("shopOrderDtos");
-        String json = JSON.toJSONString(orderPayDto.getBrandOrderDto(), filter);
-        OrderPayDto brandOrderDto = JSON.parseObject(json, OrderPayDto.class);
-        result.add(brandOrderDto);
-        json = JSON.toJSONString(orderPayDto.getShopOrderDtos(), filter);
-        List<OrderPayDto> shopOrderDtos = JSON.parseObject(json, new TypeReference<List<OrderPayDto>>(){});
+        String json = JSON.toJSONString(shopOrderReportDto.getBrandOrderDto(), filter);
+        //OrderPayDto brandOrderDto = JSON.parseObject(json, OrderPayDto.class);
+		BrandOrderReportDto bandOrderReportDto=JSON.parseObject(json, BrandOrderReportDto.class);
+		ShopOrderReportDto b_shopOrderReportDto=new ShopOrderReportDto();
+		b_shopOrderReportDto.setShopName(bandOrderReportDto.getBrandName());
+		b_shopOrderReportDto.setShop_orderCount(bandOrderReportDto.getOrderCount());
+		b_shopOrderReportDto.setShop_orderPrice(bandOrderReportDto.getOrderPrice());
+		b_shopOrderReportDto.setShop_singlePrice(bandOrderReportDto.getSinglePrice());
+		b_shopOrderReportDto.setShop_peopleCount(bandOrderReportDto.getPeopleCount());
+		b_shopOrderReportDto.setShop_perPersonPrice(bandOrderReportDto.getPerPersonPrice());
+		b_shopOrderReportDto.setShop_tangshiCount(bandOrderReportDto.getTangshiCount());
+		b_shopOrderReportDto.setShop_tangshiPrice(bandOrderReportDto.getTangshiPrice());
+		b_shopOrderReportDto.setShop_waidaiCount(bandOrderReportDto.getWaidaiCount());
+		b_shopOrderReportDto.setShop_waidaiPrice(bandOrderReportDto.getWaidaiPrice());
+		b_shopOrderReportDto.setShop_waimaiCount(bandOrderReportDto.getWaimaiCount());
+		b_shopOrderReportDto.setShop_waimaiPrice(bandOrderReportDto.getWaimaiPrice());
+        result.add(b_shopOrderReportDto);
+        json = JSON.toJSONString(shopOrderReportDto.getShopOrderDtos(), filter);
+        List<ShopOrderReportDto> shopOrderDtos = JSON.parseObject(json, new TypeReference<List<ShopOrderReportDto>>(){});
         result.addAll(shopOrderDtos);
 		String shopName="";
 		for (ShopDetail shopDetail : shopDetailList) {
@@ -122,9 +139,9 @@ public class OrderController extends GenericController{
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = {{"品牌名称/店铺名称","25"},{"订单总数(份)","25"},{"订单金额(元)","25"},{"订单平均金额(元)","25"},{"营销撬动率","25"}};
+		String[][] headers = {{"品牌/店铺","25"},{"订单总数","25"},{"订单总额","25"},{"单均","25"},{"就餐人数","25"},{"人均","25"},{"堂吃订单数","25"},{"堂吃订单额","25"},{"外带订单数","25"},{"外带订单额","25"},{"R+外卖订单数","25"},{"R+外卖订单额","25"}};
 		//定义excel工具类对象
-		ExcelUtil<OrderPayDto> excelUtil=new ExcelUtil<OrderPayDto>();
+		ExcelUtil<ShopOrderReportDto> excelUtil=new ExcelUtil<ShopOrderReportDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
@@ -278,6 +295,7 @@ public class OrderController extends GenericController{
 			//订单金额
 			ot.setOrderMoney(o.getOrderMoney());
 			ot.setMoneyPay(ot.getMoneyPay().subtract(ot.getGiveChangePayment()));
+			ot.setDistributionModeId(o.getDistributionModeId());
 			listDto.add(ot);
 		}
 		return listDto;
@@ -344,7 +362,7 @@ public class OrderController extends GenericController{
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
 		String[]columns={"shopName","createTime","telephone","orderState","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay",
-                "aliPayment","moneyPay","backCartPay","shanhuiPay","integralPay","articleBackPay","incomePrize"};
+                "aliPayment","moneyPay","backCartPay","shanhuiPay","integralPay","articleBackPay"};
 		//定义数据
 		List<OrderDetailDto> result = new ArrayList<>();
 		//获取店铺名称
@@ -360,11 +378,23 @@ public class OrderController extends GenericController{
             shopName = shopName.substring(0,shopName.length() - 1);
         }
         if (orderDetailDto.getShopOrderList() != null){
-            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-            filter.getExcludes().add("shopOrderList");
-            String json = JSON.toJSONString(orderDetailDto.getShopOrderList(), filter);
-            result = JSON.parseObject(json, new TypeReference<List<OrderDetailDto>>(){});
-        }
+			SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+			filter.getExcludes().add("shopOrderList");
+			String json = JSON.toJSONString(orderDetailDto.getShopOrderList(), filter);
+			List<OrderDetailDto> list = JSON.parseObject(json, new TypeReference<List<OrderDetailDto>>(){});
+			for(OrderDetailDto orderDetailDto_:list){
+				if(orderDetailDto_.getDistributionModeId()==1){
+					orderDetailDto_.setShopName("堂吃");
+				}else if(orderDetailDto_.getDistributionModeId()==2){
+					orderDetailDto_.setShopName("外卖");
+				}else if(orderDetailDto_.getDistributionModeId()==3){
+					orderDetailDto_.setShopName("外带");
+				}else{
+					orderDetailDto_.setShopName("未知");
+				}
+				result.add(orderDetailDto_);
+			}
+		}
 		Map<String,String> map = new HashMap<>();
 		map.put("brandName", getBrandName());
 		map.put("shops", shopName);
@@ -375,10 +405,9 @@ public class OrderController extends GenericController{
 		map.put("reportTitle", ""+ (shopId == null || shopId == "" ? "会员" : "店铺") +"订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单状态","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},
+		String[][] headers = {{"订单类型","25"},{"下单时间","25"},{"手机号","25"},{"订单状态","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},
                 {"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付(元)","25"},{"支付宝支付(元)","25"},
-                {"现金实收(元)","25"},{"银联支付(元)","25"},{"闪惠支付(元)","25"},{"会员支付(元)","25"},{"退菜返还红包(元)","25"}
-                ,{"营销撬动率","25"}};
+                {"现金实收(元)","25"},{"银联支付(元)","25"},{"闪惠支付(元)","25"},{"会员支付(元)","25"},{"退菜返还红包(元)","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderDetailDto> excelUtil=new ExcelUtil<OrderDetailDto>();
 		try{

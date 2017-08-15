@@ -148,6 +148,18 @@ public class Article implements Serializable{
 
     private  Integer count;
 
+    private String recommendCategoryId;
+
+    private Integer monthlySales;          //菜品月销售量
+
+    public Integer getMonthlySales() {
+        return monthlySales;
+    }
+
+    public void setMonthlySales(Integer monthlySales) {
+        this.monthlySales = monthlySales;
+    }
+
     public Integer getCount() {
         return count;
     }
@@ -603,5 +615,13 @@ public class Article implements Serializable{
 
     public void setDiscount(int discount) {
         this.discount = discount;
+    }
+
+    public String getRecommendCategoryId() {
+        return recommendCategoryId;
+    }
+
+    public void setRecommendCategoryId(String recommendCategoryId) {
+        this.recommendCategoryId = recommendCategoryId;
     }
 }

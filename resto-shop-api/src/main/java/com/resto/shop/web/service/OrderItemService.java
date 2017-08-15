@@ -50,4 +50,6 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	List<OrderItem> getListByRecommendId(String recommendId,String orderId);
 
 	List<OrderItem> selectRefundArticleItem(String orderId);
+
+	List<OrderItem> selectByArticleIds(String[] articleIds);
 }

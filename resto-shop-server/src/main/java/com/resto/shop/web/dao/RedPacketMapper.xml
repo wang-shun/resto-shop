@@ -12,10 +12,11 @@
       <result column="shop_detail_id" property="shopDetailId"/>
       <result column="red_remainder_money" property="redRemainderMoney"/>
       <result column="red_type" property="redType"/>
+      <result column="order_id" property="orderId"/>
   </resultMap>
 
   <sql id="Base_Column_List">
-        id, red_money, create_time, finish_time, customer_id, brand_id, shop_detail_id, red_remainder_money, red_type
+        id, red_money, create_time, finish_time, customer_id, brand_id, shop_detail_id, red_remainder_money, red_type, order_id
   </sql>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
@@ -40,6 +41,7 @@
             <if test="shopDetailId != null">shop_detail_id,</if>
             <if test="redRemainderMoney != null">red_remainder_money,</if>
             <if test="redType != null">red_type,</if>
+            <if test="orderId != null">order_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=VARCHAR},</if>
@@ -51,6 +53,7 @@
             <if test="shopDetailId != null">#{shopDetailId,jdbcType=VARCHAR},</if>
             <if test="redRemainderMoney != null">#{redRemainderMoney,jdbcType=DECIMAL},</if>
             <if test="redType != null">#{redType,jdbcType=INTEGER},</if>
+            <if test="orderId != null">#{orderId},</if>
         </trim>
   </insert>
 
@@ -65,6 +68,7 @@
             <if test="shopDetailId != null">shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},</if>
             <if test="redRemainderMoney != null">red_remainder_money = #{redRemainderMoney,jdbcType=DECIMAL},</if>
             <if test="redType != null">red_type = #{redType,jdbcType=INTEGER},</if>
+            <if test="orderId != null">order_id = #{orderId},</if>
         </set>
       where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -210,5 +214,17 @@
           </if>
         )
         GROUP BY td.id) r),0))) useOrder;
+    </select>
+
+    <select id="selectShareMoneyList" resultType="com.resto.shop.web.dto.ShareMoneyDto">
+        select trp.id id, trp.customer_id cid, trp.order_id orderId, trp.red_money `value`,
+        trp.create_time createTime, o.customer_id customerId, c.nickname nickName, c.head_photo headPhoto, d.`name` shopName
+        from tb_red_packet trp
+        LEFT JOIN tb_order o ON  trp.order_id = o.id
+        LEFT JOIN tb_customer c ON  o.customer_id = c.id
+        LEFT JOIN resto_brand.shop_detail d ON d.id = o.shop_detail_id
+        where trp.customer_id = #{customerId}
+        and trp.order_id is not null and trp.red_type = 1
+        order by trp.create_time desc  LIMIT #{currentPage},#{showCount}
     </select>
 </mapper>

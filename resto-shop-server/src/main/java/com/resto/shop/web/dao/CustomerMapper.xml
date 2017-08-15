@@ -34,6 +34,8 @@
         <result column="share_coupon_ids" property="shareCouponIds"/>
         <result column="serial_number" property="serialNumber"/>
         <result column="share_link" property="shareLink"/>
+        <result column="useOrder" property="useOrder"/>
+        <result column="chargeOrder" property="chargeOrder"/>
         <association property="customerDetail" javaType="com.resto.shop.web.model.CustomerDetail">
             <id column="id" property="id"/>
             <result column="birth_date" property="birthDate"/>
@@ -584,5 +586,71 @@
 
     <select id="getCustomerLimitOne" resultType="Customer">
         select * from tb_customer limit 1
+    </select>
+
+    <select id="selectByTelePhones" resultType="com.resto.shop.web.model.Customer">
+        SELECT * FROM  tb_customer
+        WHERE telephone in
+        <foreach collection="list" item="telephone" open="(" separator="," close=")">
+            #{telephone}
+        </foreach>
+    </select>
+
+
+    <select id="getCommentCustomer" resultType="Customer">
+
+select t.id,wechat_id,telephone,t2.id as orderId,t2.shop_detail_id as shopDetailId from tb_customer t
+left join tb_order t2 on t2.customer_id = t.id
+where order_state in (2,10) and production_status in (2,3) and allow_appraise = 1
+
+and (UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(t2.create_time))/(60*60*24) > #{time}
+and t2.create_time >= CONCAT(#{startTime},'00:00:00')
+and wechat_id != '0'
+<if test="type == 0">
+    GROUP BY wechat_id
+</if>
+
+
+    </select>
+
+    <select id="selectShareCustomerList" resultType="Customer">
+        select * from tb_customer where share_customer = #{customerId}
+        order by bind_phone_time desc LIMIT #{currentPage},#{showCount}
+    </select>
+
+    <select id="selectBySelectMap" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select *
+        <if test="customerIds == null">
+            ,IF((select COUNT(1) from tb_order where customer_id = tc.id and order_state IN (2, 10, 11, 12) and production_status IN (2, 3)) > 0, TRUE, FALSE) useOrder
+            ,IF((select COUNT(1) from tb_charge_order where customer_id = tc.id and order_state = 1) > 0, TRUE, FALSE) chargeOrder
+        </if>
+        from tb_customer tc
+        <if test="customerIds == null">
+            inner join tb_customer_detail tcd
+            on tc.customer_detail_id = tcd.id
+        </if>
+        <where>
+            <if test="register != null and register != '2' and register != 2">
+                and tc.is_bind_phone = #{register}
+            </if>
+            <if test="sex != null and sex != '3' and sex != 3">
+                and tc.sex = #{sex}
+            </if>
+            <if test="registerBeginDate != null">
+                and tc.bind_phone_time &gt;= #{registerBeginDate}
+            </if>
+            <if test="registerEndDate != null">
+                and tc.bind_phone_time &lt;= #{registerEndDate}
+            </if>
+            <if test="customerIds != null and customerIds.length >= 0">
+                and id in
+                <foreach collection="customerIds" item="customerId" open="(" separator="," close=")">
+                    #{customerId}
+                </foreach>
+            </if>
+            <if test="text != null">
+                and tc.nickname like CONCAT('%',#{text},'%') or tc.telephone like CONCAT('%',#{text},'%')
+            </if>
+        </where>
     </select>
 </mapper>

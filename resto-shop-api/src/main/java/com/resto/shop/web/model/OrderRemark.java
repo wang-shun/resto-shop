@@ -5,9 +5,7 @@ import java.util.Date;
 public class OrderRemark {
 
     private String id;
-    private String remarkName;
-    private Integer sort;
-    private Integer state;
+    private String boOrderRemarkId;
     private Date createTime;
     private String shopDetailId;
     private String brandId;
@@ -20,28 +18,12 @@ public class OrderRemark {
         this.id = id;
     }
 
-    public String getRemarkName() {
-        return remarkName;
+    public String getBoOrderRemarkId() {
+        return boOrderRemarkId;
     }
 
-    public void setRemarkName(String remarkName) {
-        this.remarkName = remarkName;
-    }
-
-    public Integer getSort() {
-        return sort;
-    }
-
-    public void setSort(Integer sort) {
-        this.sort = sort;
-    }
-
-    public Integer getState() {
-        return state;
-    }
-
-    public void setState(Integer state) {
-        this.state = state;
+    public void setBoOrderRemarkId(String boOrderRemarkId) {
+        this.boOrderRemarkId = boOrderRemarkId;
     }
 
     public Date getCreateTime() {
@@ -71,11 +53,9 @@ public class OrderRemark {
     public OrderRemark() {
     }
 
-    public OrderRemark(String id, String remarkName, Integer sort, Integer state, Date createTime, String shopDetailId, String brandId) {
+    public OrderRemark(String id, String boOrderRemarkId, Date createTime, String shopDetailId, String brandId) {
         this.id = id;
-        this.remarkName = remarkName;
-        this.sort = sort;
-        this.state = state;
+        this.boOrderRemarkId = boOrderRemarkId;
         this.createTime = createTime;
         this.shopDetailId = shopDetailId;
         this.brandId = brandId;

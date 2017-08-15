@@ -38,7 +38,7 @@ public class PayNotifyController {
 	
 	@RequestMapping("alipay_notify")
 	public void alipayNotify(HttpServletRequest request,HttpServletResponse response){
-		log.info("支付宝---->  异步    发来贺电");
+		log.info("支付宝短信充值---->  异步    发来贺电");
 		//获取支付宝返回的所有参数
 		Map<String, String> resultMap = AlipayNotify.getNotifyParams(request, response);
 		//返回值

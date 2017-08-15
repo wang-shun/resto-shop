@@ -4,6 +4,7 @@ import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.shop.web.dto.ShareMoneyDto;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.RedPacket;
 
@@ -27,4 +28,6 @@ public interface RedPacketService extends GenericService<RedPacket, String> {
     Map<String, Object> selectUseRedOrder(Map<String, Object> selectMap);
 
     void refundRedPacket(BigDecimal payValue, String Id);
+
+    List<ShareMoneyDto> selectShareMoneyList(String customerId, Integer currentPage, Integer showCount);
 }

@@ -98,6 +98,14 @@
                             data:'levelName'
                         },
                         {
+                            title:'区域',
+                            data:'areaname'
+                        },
+                        {
+                            title:'桌号',
+                            data:'tablenumber'
+                        },
+                        {
                             title : "评论对象",
                             data : "feedBack",
                             orderable : false

@@ -36,8 +36,27 @@ public class ChargePaymentServiceImpl extends GenericServiceImpl<ChargePayment, 
         return chargepaymentMapper.selectPayList(begin,end);
     }
 
+	@Override
+	public RechargeLogDto selectRechargeLog(String beginDate, String endDate, String brandId) {
+		// TODO Auto-generated method stub
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return chargepaymentMapper.selectRechargeLog(begin,end,brandId);
+	}
 
-    
-    
+	@Override
+	public RechargeLogDto selectShopRechargeLog(String beginDate, String endDate, String shopId) {
+		// TODO Auto-generated method stub
+		Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return chargepaymentMapper.selectShopRechargeLog(begin,end,shopId);
+	}
 
+
+
+
+    @Override
+    public ChargePayment selectPayData(String shopId) {
+        return chargepaymentMapper.selectPayData(shopId);
+    }
 }

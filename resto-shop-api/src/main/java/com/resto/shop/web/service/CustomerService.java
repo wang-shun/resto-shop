@@ -48,6 +48,8 @@ public interface CustomerService extends GenericService<Customer, String> {
 
 	BigDecimal rewareShareCustomer(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer);
 
+	BigDecimal rewareShareCustomerAgain(ShareSetting shareSetting, Order order, Customer shareCustomer, Customer customer);
+
 	Boolean checkRegistered(String id);
 
 	Customer selectByOpenIdInfo(String openId);
@@ -94,4 +96,13 @@ public interface CustomerService extends GenericService<Customer, String> {
     Customer selectByTelePhone(String s);
 
 	Customer selectBySerialNumber(String number);
+
+
+    List<Customer> selectByTelePhones(List<String> telePhones);
+
+    List<Customer> getCommentCustomer(String startTime,Integer time,Integer type);
+
+	List<Customer> selectShareCustomerList(String customerId, Integer currentPage, Integer showCount);
+
+	List<Customer> selectBySelectMap(Map<String, Object> selectMap);
 }

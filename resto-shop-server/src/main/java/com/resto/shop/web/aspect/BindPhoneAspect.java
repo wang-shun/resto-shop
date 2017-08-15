@@ -2,21 +2,19 @@ package com.resto.shop.web.aspect;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.enums.BehaviorType;
+import com.resto.brand.core.enums.DetailType;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.LogUtils;
 import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.WeChatUtils;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.ShareSetting;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.model.WechatConfig;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.ShareSettingService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.brand.web.service.WechatConfigService;
-import com.resto.shop.web.consumer.OrderMessageListener;
+import com.resto.brand.web.model.*;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.model.Coupon;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CouponService;
-import org.aspectj.lang.JoinPoint;
+import com.resto.shop.web.util.BrandAccountSendUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
 import org.slf4j.Logger;
@@ -25,16 +23,12 @@ import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.util.StringUtils;
 import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.NewCustomCouponService;
 import com.resto.shop.web.service.SmsLogService;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
@@ -60,6 +54,24 @@ public class BindPhoneAspect {
 	@Resource
 	WechatConfigService wechatConfigService;
 
+
+	@Resource
+	BrandSettingService brandSettingService;
+
+	@Resource
+	BrandAccountService brandAccountService;
+
+	@Resource
+	BrandAccountLogService brandAccountLogService;
+
+
+	@Resource
+	AccountSettingService accountSettingService;
+
+	@Resource
+	AccountNoticeService accountNoticeService;
+
+
 	@Pointcut("execution(* com.resto.shop.web.service.CustomerService.bindPhone(..))")
 	public void bindPhone(){};
 
@@ -75,6 +87,7 @@ public class BindPhoneAspect {
 		Customer cus = customerService.selectById(customerId);
 		boolean isFirstBind = !cus.getIsBindPhone();
 		Object obj = pj.proceed();
+		Brand brand = brandService.selectById(cus.getBrandId());
 		if(isFirstBind){
 			newCustomerCouponService.giftCoupon(cus,couponType,shopId);
 			//如果有分享者，那么给分享者发消息
@@ -109,13 +122,56 @@ public class BindPhoneAspect {
 				WechatConfig config = wechatConfigService.selectByBrandId(cus.getBrandId());
 				log.info("异步发送分享注册微信通知ID:" + shareCustomer + " 内容:" + msg);
 				WeChatUtils.sendCustomerMsg(msg.toString(), sc.getWechatId(), config.getAppid(), config.getAppsecret());
-                Brand brand = brandService.selectById(sc.getBrandId());
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
                 map.put("fileName", sc.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+sc.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);
+			}
+			//yz 2017/07/28 计费系统 注册收费
+			BrandSetting brandSetting = brandSettingService.selectByBrandId(cus.getBrandId());
+			if(brandSetting.getOpenBrandAccount()==1){//开启了品牌账户信息
+				BrandAccount brandAccount = brandAccountService.selectByBrandId(brand.getId());
+				//获取品牌账户设置
+				AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+				BigDecimal money = BigDecimal.ZERO;
+				if(accountSetting.getOpenNewCustomerRegister()==1){
+					money = accountSetting.getNewCustomerValue();
+				}
+
+				//品牌剩余的money
+				BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
+				//更新日志
+				BrandAccountLog blog = new BrandAccountLog();
+				blog.setCreateTime(new Date());
+				blog.setGroupName(brand.getBrandName());
+				blog.setBehavior(BehaviorType.REGISTER);
+				blog.setFoundChange(money.negate());
+				blog.setRemain(remain);
+				blog.setDetail(DetailType.NEW_CUSTOMER_REGISTER);
+				blog.setAccountId(brandAccount.getId());
+				blog.setShopId(shopId);
+				blog.setBrandId(brand.getId());
+				blog.setSerialNumber(DateUtil.getRandomSerialNumber());
+				//记录 品牌账户更新日志 + 更新账户
+				Integer brandAccountId = brandAccount.getId();
+				brandAccount = new BrandAccount();
+				brandAccount.setId(brandAccountId);
+				brandAccount.setAccountBalance(remain);
+				brandAccount.setUpdateTime(new Date());
+				brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+				List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccountId);
+			    Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+			    if(result.isSuccess()){
+					Long id = accountSetting.getId();
+					AccountSetting as = new AccountSetting();
+					as.setId(id);
+					as.setType(1);
+					accountSettingService.update(as);//设置为不可以发短信
+					log.info(brand.getBrandName()+"品牌账户余额欠费生产者开始生产欠费消息");
+					MQMessageProducer.sendBrandAccountSms(brand.getId(),MQSetting.DELAY_TIME);
+				}
 			}
 			log.info("首次绑定手机，执行指定动作");
 

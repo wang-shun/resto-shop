@@ -1,27 +1,27 @@
 package com.resto.shop.web.service.impl;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
-import com.resto.shop.web.model.Customer;
+import com.alibaba.rocketmq.client.producer.MQProducer;
+import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.enums.BehaviorType;
+import com.resto.brand.core.enums.DetailType;
+import com.resto.brand.core.util.MQSetting;
+import com.resto.brand.web.model.*;
+import com.resto.brand.web.service.*;
+import com.resto.shop.web.producer.MQMessageProducer;
+import com.resto.shop.web.util.BrandAccountSendUtil;
 import org.json.JSONObject;
 
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.BrandSetting;
-import com.resto.brand.web.model.BrandUser;
-import com.resto.brand.web.model.SmsAcount;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.BrandSettingService;
-import com.resto.brand.web.service.BrandUserService;
-import com.resto.brand.web.service.SmsAcountService;
 import com.resto.shop.web.constant.SmsLogType;
 import com.resto.shop.web.dao.SmsLogMapper;
 import com.resto.shop.web.model.SmsLog;
@@ -49,8 +49,20 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     
     @Resource
     SmsAcountService smsAcountService;
-    
-    
+
+
+    @Resource
+	BrandAccountLogService brandAccountLogService;
+
+    @Resource
+	AccountSettingService accountSettingService;
+
+    @Resource
+	BrandAccountService brandAccountService;
+
+    @Resource
+	AccountNoticeService accountNoticeService;
+
     
     @Override
     public GenericDao<SmsLog, Long> getDao() {
@@ -60,53 +72,109 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     
     
 	@Override
-	public String sendCode(String phone, String code, String brandId, String shopId, int smsLogType,Map<String,String> logMap) {
-		Brand b = brandService.selectById(brandId);
-		BrandSetting brandSetting = brandSettingService.selectByBrandId(b.getId());
-		//查询
-		//BrandUser brandUser = brandUserService.selectById(b.getBrandUserId());
-        BrandUser brandUser = brandUserService.selectOneByBrandId(b.getId());
-
-		//发送短信返回
-		String string = null;
+	public com.alibaba.fastjson.JSONObject sendCode(String phone, String code, String brandId, String shopId, int smsLogType, Map<String,String> logMap,Boolean openBrandAccount,AccountSetting accountSetting) {
+        BrandUser brandUser = brandUserService.selectOneByBrandId(brandId);
+		Brand brand = brandService.selectByPrimaryKey(brandId);
+		//发送阿里短信返回 默认使用阿里发送短信
+		com.alibaba.fastjson.JSONObject aliResult = new com.alibaba.fastjson.JSONObject();
 		if(smsLogType == SmsLogType.AUTO_CODE){
-			string = sendMsg(brandSetting.getSmsSign(), b.getBrandName(), code, phone,brandUser,logMap);
+			aliResult = sendMsg(code, phone,brandUser,logMap);
 		}
-
 		SmsLog smsLog = new SmsLog();
 		smsLog.setBrandId(brandId);
 		smsLog.setShopDetailId(shopId);
 		smsLog.setContent(code);
-		smsLog.setSmsType(SmsLog.CODE);
+		smsLog.setSmsType(SmsLogType.AUTO_CODE);
 		smsLog.setCreateTime(new Date());
 		smsLog.setPhone(phone);
-		smsLog.setSmsResult(string);
-		JSONObject obj = new JSONObject(string);
-		try{
-			insert(smsLog);
-			//更新短信账户的信息
-			smsAcountService.updateByBrandId(brandId);
-			//判断是否要提醒商家充值短信账户
-			sendNotice(b,brandUser,logMap);
-		}catch(Exception e){
-			log.error("发送短信失败:"+e.getMessage());
+		smsLog.setSmsResult(com.alibaba.fastjson.JSONObject.toJSONString(aliResult));
+
+		BrandSetting brandSetting = brandSettingService.selectByBrandId(brandId);
+		Boolean flag = false;
+		if(openBrandAccount!=null&&openBrandAccount){
+			flag = true;
+		}else {
+			flag = brandSetting.getOpenBrandAccount()==1;
 		}
-//		//返回值中有"success":"false"时说明商家无法发短信或者该条短信发送失败,此时不更新短信账户
-//		if(obj.optBoolean("success", true)){
-//			//
-//			if(obj.getBoolean("success")){
-//
-//			}else{
-//				//短信发送失败不更新短信账户
-//				insert(smsLog);
-//			}
-//		}
-//		log.info("短信发送结果:"+string);
-		return string;
+
+		//返回值中有"success":"false"时说明商家无法发短信或者该条短信发送失败,此时不更新短信账户
+			if(aliResult.getBoolean("success")){ //返回成功
+				try{
+					/**
+					 * yz 2017/07/28 计费系统 (验证码短信发送需要扣除账户信息 记录)
+
+					 */
+					if(flag){
+						log.info("该品牌开启了品牌账户信息--------");
+						//获取品牌账户设置
+						if(accountSetting==null){
+							 accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+						}
+						//定义每条短信的单价
+						BigDecimal sms_unit = BigDecimal.ZERO;
+						if(accountSetting.getOpenSendSms()==1){
+							sms_unit = accountSetting.getSendSmsValue();
+						}
+						BrandAccount brandAccount = brandAccountService.selectByBrandId(brandId);
+						//剩余账户余额
+						BigDecimal remain = brandAccount.getAccountBalance().subtract(sms_unit);
+
+						BrandAccountLog blog = new BrandAccountLog();
+						blog.setCreateTime(new Date());
+						blog.setGroupName(brand.getBrandName());
+						blog.setBehavior(BehaviorType.SMS);
+						blog.setFoundChange(sms_unit.negate());//负数
+						blog.setRemain(remain);//剩余账户余额
+						blog.setDetail(DetailType.SMS_CODE);
+						blog.setAccountId(brandAccount.getId());
+						blog.setBrandId(brandId);
+						blog.setShopId(shopId);
+						blog.setSerialNumber(DateUtil.getRandomSerialNumber());//这个流水号目前使用当前时间搓+4位随机字符串
+						Integer accountId = brandAccount.getId();
+						brandAccount = new BrandAccount();
+						brandAccount.setId(accountId);
+						brandAccount.setAccountBalance(remain);
+						//记录品牌账户的更新日志 + 更新账户
+						brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+
+						List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
+
+						//判断是否需要发短信通知欠费
+						Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+						if(result.isSuccess()){
+							Long id = accountSetting.getId();
+							AccountSetting as = new AccountSetting();
+							as.setId(id);
+							as.setType(1);
+							accountSettingService.update(as);
+							//发送延时消息 24小时
+							log.info("发送欠费消息后把账户设置改为已发送状态,并发送消息队列。。。");
+							MQMessageProducer.sendBrandAccountSms(brandId, MQSetting.DELAY_TIME);
+						}
+
+					}else {
+						log.info("该品牌未开启品牌账户 -- ");
+						insert(smsLog);
+						//更新短信账户的信息
+						smsAcountService.updateByBrandId(brandId);
+						//判断是否要提醒商家充值短信账户
+						sendNotice(brandUser,logMap);
+					}
+
+				}catch(Exception e){
+					log.error("发送短信失败:"+e.getMessage());
+				}
+			}else {
+				//短信发送失败不更新短信账户
+				insert(smsLog);
+			}
+
+		log.info("短信发送结果:"+ com.alibaba.fastjson.JSONObject.toJSONString(aliResult));
+		return aliResult;
 	}
 
-	private void sendNotice(Brand b,BrandUser brandUser,Map<String,String>logMap) {
-		SmsAcount smsAcount = smsAcountService.selectByBrandId(b.getId());
+	private void sendNotice(BrandUser brandUser,Map<String,String>logMap) {
+		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
 		//获取短信账户短信提醒
 		String str = smsAcount.getSmsRemind();
 		String[] arrs = str.split(",");
@@ -115,13 +183,12 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		//判断是否需要提醒
 		if(this.isHave(arrs, remindNum+"")){
 			//提醒商家充值
-            //String brandName, int num, String phone, Map<String, String> logMap
-			SMSUtils.sendNoticeToBrand(b.getBrandName(),remindNum, brandUser.getPhone(),logMap);
+			SMSUtils.sendNoticeToBrand(brandUser.getBrandName(),remindNum, brandUser.getPhone(),logMap);
 		}
 	}
 
 	
-	public String sendMsg(String sign,String serviceName,String code,String phone,BrandUser brandUser,Map<String,String> logMap){
+	public com.alibaba.fastjson.JSONObject sendMsg(String code, String phone, BrandUser brandUser, Map<String,String> logMap){
 		//判断该品牌账户的余额是否充足
 		SmsAcount smsAcount = smsAcountService.selectByBrandId(brandUser.getBrandId());
 		//获取剩余短信条数
@@ -133,17 +200,20 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			//我们提醒商家充值
             String content = sb.append(logMap.get("content")).append("商家剩余条数不足").toString();
             logMap.put("content",content);
-			SMSUtils.sendNoticeToBrand(serviceName,smsAcount.getRemainderNum(), brandUser.getPhone(),logMap);
+			SMSUtils.sendNoticeToBrand(brandUser.getBrandName(),smsAcount.getRemainderNum(), brandUser.getPhone(),logMap);
 			log.info("剩余短信为"+remindNum+"条无法发短信");
 			//返回false标记让商家无法发短信
-			return "{'msg':'当前品牌已超欠费可用额度，请充值后使用短信功能','success':'false'}";
+			com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
+			jsonObject.put("msg","当前品牌已超欠费可用额度，请充值后使用短信功能");
+			jsonObject.put("success","false");
+			return jsonObject;
 		}else{
 			//剩余短信在设置的范围内
 			if(this.isHave(arrs, remindNum+"")){
                 String content = sb.append(logMap.get("content")).append("在固定条数短信时发短信给商家").toString();
                 logMap.put("content",content);
 				//发短信提醒商家
-				SMSUtils.sendNoticeToBrand(serviceName, remindNum, brandUser.getPhone(),logMap);
+				SMSUtils.sendNoticeToBrand(brandUser.getBrandName(), remindNum, brandUser.getPhone(),logMap);
 			}
 		}
 		//商家给客户发短信
@@ -152,7 +222,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 			logMap.put("content",content);
 		}
 
-		return SMSUtils.sendCode( serviceName, code, phone,logMap);
+		return SMSUtils.sendCode(brandUser.getBrandName(), code, phone,logMap);
 	}
 
 	@Override
@@ -228,6 +298,9 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		  }
 		  return false;//没找到返回false
 		 }
-	
-	
+
+    @Override
+    public SmsLog selectByMap(Map<String, Object> selectMap) {
+        return smslogMapper.selectByMap(selectMap);
+    }
 }

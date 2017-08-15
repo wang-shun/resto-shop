@@ -204,6 +204,13 @@ public class ArticleController extends GenericController {
         return result;
     }
 
+    @RequestMapping("singo_article_all")
+    @ResponseBody
+    public List<Article> getSingoListAll() {
+        List<Article> result = articleService.getSingoArticleAll(getCurrentShopId());
+        return result;
+    }
+
     @RequestMapping("/selectsingleItem")
     @ResponseBody
     public Result selectsingleItem() {

@@ -27,6 +27,14 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	List<Article> selectListByShopIdAndDistributionId(String currentShopId, Integer distributionModeId);
 
+	/**
+	 * 根据店铺id，推荐类型id查询所有推荐菜品
+	 * @param currentShopId
+	 * @param recommendCcategoryId
+	 * @return
+	 */
+	List<Article> selectListByShopIdRecommendCategory(String currentShopId, String recommendCcategoryId);
+
 	List<Article> selectBySupportTimeId(@Param("times") List<Integer> supportTimes,@Param("shopId") String currentShopId);
 	
 	/**
@@ -80,6 +88,8 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	int setActivate(@Param("articleId")String articleId,@Param("activated")Integer activated);
 
 	List<Article> getSingoArticle(String shopId);
+
+	List<Article> getSingoArticleAll(String shopId);
 
 	int deleteRecommendId(String recommendId);
 
@@ -172,4 +182,11 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	List<Article> getStockBySuit(String shopId);
 
+	/**
+	 * 菜品月销售量
+	 * @param articleId
+	 * @param time
+     * @return
+     */
+	Integer selectSumByMonthlySales(@Param("articleId") String articleId, @Param("time") String time);
 }

@@ -12,6 +12,7 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.dao.RedPacketMapper;
+import com.resto.shop.web.dto.ShareMoneyDto;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.model.RedPacket;
@@ -132,5 +133,10 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
     @Override
     public void refundRedPacket(BigDecimal payValue, String Id) {
         redPacketMapper.refundRedPacket(payValue,Id);
+    }
+
+    @Override
+    public List<ShareMoneyDto> selectShareMoneyList(String customerId, Integer currentPage, Integer showCount) {
+        return redPacketMapper.selectShareMoneyList(customerId, currentPage, showCount);
     }
 }

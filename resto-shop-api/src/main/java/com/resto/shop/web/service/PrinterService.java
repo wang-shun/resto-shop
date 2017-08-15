@@ -26,4 +26,5 @@ public interface PrinterService extends GenericService<Printer, Integer> {
 
 	List<Printer> selectListNotSame(String shopId);
 
+	List<Printer> selectPrintByType(String shopId, Integer type);
 }

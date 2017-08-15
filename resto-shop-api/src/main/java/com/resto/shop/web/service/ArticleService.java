@@ -26,6 +26,15 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * @return
 	 */
 	List<Article> selectListFull(String currentShopId, Integer distributionModeId,String show);
+
+	/**
+	 * 根据店铺id,推荐类型id查询所有推荐菜品
+	 * @param currentShopId
+	 * @param recommendCcategoryId
+	 * @param show
+	 * @return
+	 */
+	List<Article> selectListByShopIdRecommendCategory(String currentShopId, String recommendCcategoryId, String show);
 	
 	/**
 	 * 根据 是否 谷清 查询菜品信息
@@ -58,6 +67,8 @@ public interface ArticleService extends GenericService<Article, String> {
 	Boolean setActivated(String articleId,Integer activated);
 
 	List<Article> getSingoArticle(String shopId);
+
+	List<Article> getSingoArticleAll(String shopId);
 
 	void deleteRecommendId(String recommendId);
 
