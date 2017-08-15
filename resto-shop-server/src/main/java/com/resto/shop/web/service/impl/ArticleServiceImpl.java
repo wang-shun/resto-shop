@@ -85,6 +85,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Autowired
     private ShopDetailService shopDetailService;
 
+    @Resource
+    private RecommendCategoryService recommendCategoryService;
+
 
     @Override
     public GenericDao<Article, String> getDao() {
@@ -181,6 +184,21 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             article.setRecommendCategoryId(recommendCcategoryId);
         }
         getArticleDiscount(currentShopId, articleList, show);
+        RecommendCategory recommendCategory=recommendCategoryService.selectById(recommendCcategoryId);
+        if(recommendCategory!=null){
+            if(recommendCategory.getType()==0){
+                Collections.sort(articleList, new Comparator<Article>() {
+                    public int compare(Article o1, Article o2) {
+                        Integer a = o1.getMonthlySales();
+                        Integer b = o2.getMonthlySales();
+                        // 升序
+                        //return a.compareTo(b);
+                        // 降序
+                         return b.compareTo(a);
+                    }
+                });
+            }
+        }
         return articleList;
     }
 

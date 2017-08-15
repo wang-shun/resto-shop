@@ -62,7 +62,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 
     @Resource
 	AccountNoticeService accountNoticeService;
-    
+
     
     @Override
     public GenericDao<SmsLog, Long> getDao() {

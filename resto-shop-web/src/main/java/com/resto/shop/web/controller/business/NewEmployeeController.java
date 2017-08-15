@@ -9,9 +9,12 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.NewEmployee;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.NewEmployeeService;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.CustomerService;
 import org.springframework.stereotype.Controller;
@@ -30,9 +33,18 @@ public class NewEmployeeController extends GenericController{
 
     @Resource
     CustomerService customerService;
-	
+
+    @Resource
+    BrandSettingService brandSettingService;
+
 	@RequestMapping("/list")
-    public void list(){
+    public String list(){
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+        if (brandSetting.getOpenBonus().equals(Common.YES)){
+            return "newEmployee/list";
+        }else {
+            return "notopen";
+        }
     }
 
 	@RequestMapping("/list_all")

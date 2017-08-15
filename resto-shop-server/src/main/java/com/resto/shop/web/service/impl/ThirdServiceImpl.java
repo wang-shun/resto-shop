@@ -508,7 +508,7 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("ALREADY_PAYED", "已在线支付");
         data.put("DELIVERY_SOURCE", "R+外卖");
         CustomerAddress customerAddress=customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
-        data.put("DELIVERY_ADDRESS", customerAddress.getAddressReality() + "\n\n【备注】：");
+        data.put("DELIVERY_ADDRESS", customerAddress.getAddress()+customerAddress.getAddressReality() + "\n\n【备注】："+order.getRemark());
 
         String phone = customerAddress.getMobileNo().replace("\"", "").replace("[", "").replace("]", "");
 
@@ -631,7 +631,7 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("ALREADY_PAYED", "已在线支付");
         data.put("DELIVERY_SOURCE", "R+外卖");
         CustomerAddress customerAddress=customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
-        data.put("DELIVERY_ADDRESS", customerAddress.getAddressReality() + "\n\n【备注】：");
+        data.put("DELIVERY_ADDRESS", customerAddress.getAddress()+customerAddress.getAddressReality()+ "\n\n【备注】："+order.getRemark());
 
         String phone = customerAddress.getMobileNo().replace("\"", "").replace("[", "").replace("]", "");
         String sex="";
@@ -947,7 +947,8 @@ public class ThirdServiceImpl implements ThirdService {
         if (orderDetailList != null) {
             for (OrderItem detail : orderDetailList) {
                 //得到当前菜品 所关联的厨房信息
-                Article article = articleMapper.selectByPrimaryKey(detail.getArticleId());
+                String[] aId=detail.getArticleId().split("@");
+                Article article = articleMapper.selectByPrimaryKey(aId[0]);
                 if (article == null) {
                     continue;
                 }
@@ -1818,7 +1819,7 @@ public class ThirdServiceImpl implements ThirdService {
         if(o!=null){
             CustomerAddress customerAddress = customerAddressService.selectByPrimaryKey(o.getCustomerAddressId());
             hungerOrder.setId(o.getId());
-            hungerOrder.setAddress(customerAddress.getAddressReality());
+            hungerOrder.setAddress(customerAddress.getAddress()+customerAddress.getAddressReality());
             hungerOrder.setConsignee(customerAddress.getName());
             hungerOrder.setCreatedAt(o.getCreateTime());
             hungerOrder.setDescription(o.getRemark());

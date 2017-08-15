@@ -307,10 +307,10 @@ public class OrderAspect {
         RedisUtil.set(order.getShopDetailId() + "shopOrderCount", o.getOrderCount());
         RedisUtil.set(order.getShopDetailId() + "shopOrderTotal", o.getOrderTotal());
         MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
-
-        if (order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY) {
-            orderService.pushOrder(order.getId());
-        }
+        //在pos端确认的情况下无需再去修改订单了
+//        if (order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY) {
+//            orderService.pushOrder(order.getId());
+//        }
     }
 
     @AfterReturning(value = "afterPay()", returning = "order")
@@ -395,7 +395,7 @@ public class OrderAspect {
         //订单不为空  已支付  电视叫号模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
                 && order.getOrderMode() == ShopMode.CALL_NUMBER) {
-            MQMessageProducer.sendPlaceOrderMessage(order);
+                MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
         //稍后支付  大Boss模式  支付宝或微信支付
@@ -741,7 +741,11 @@ public class OrderAspect {
 //
 //    }
 
-    @AfterReturning(value = "confirmOrder()||confirmBossOrder()||confirmWaiMaiOrder()", returning = "order")
+    @Pointcut("execution(* com.resto.shop.web.service.OrderService.afterPayShareBenefits(..))")
+    public void afterPayShareBenefits() {
+    }
+
+    @AfterReturning(value = "confirmOrder()||confirmBossOrder()||confirmWaiMaiOrder()||afterPayShareBenefits()", returning = "order")
     public void confirmOrderAfter(Order order) {
         if (order != null) {
             log.info("确认订单成功后回调:" + order.getId());
@@ -749,10 +753,12 @@ public class OrderAspect {
             if (customer == null) {
                 return;
             }
+            if (order.getOrderState() != OrderState.CONFIRM) {
+                return;
+            }
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
             Brand brand = brandService.selectById(customer.getBrandId());
-            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
             if (order.getAllowAppraise()) {
                 StringBuffer msg = new StringBuffer();

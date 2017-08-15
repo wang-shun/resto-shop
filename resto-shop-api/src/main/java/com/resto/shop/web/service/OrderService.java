@@ -715,6 +715,8 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	List<Map<String, String>> selectCustomerOrderCount(List<String> customerIds);
 
+	Order afterPayShareBenefits(String orderId);
+
 	List<Order> selectHasPayNoChangeStatus(String shopId, Date dateBegin, Date dateEnd);
 
 	/**
