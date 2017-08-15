@@ -43,7 +43,7 @@ public class NewEmployeeController extends GenericController{
         if (brandSetting.getOpenBonus().equals(Common.YES)){
             return "newEmployee/list";
         }else {
-            return "notOpen";
+            return "notopen";
         }
     }
 

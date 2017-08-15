@@ -45,7 +45,7 @@ public class BonusSettingController extends GenericController{
          if (brandSetting.getOpenBonus().equals(Common.YES)){
              return "bonusSetting/list";
          }else {
-             return "notOpen";
+             return "notopen";
          }
      }
 

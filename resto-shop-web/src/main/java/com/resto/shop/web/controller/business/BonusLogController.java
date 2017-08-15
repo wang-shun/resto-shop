@@ -63,7 +63,7 @@ public class BonusLogController extends GenericController{
          if (brandSetting.getOpenBonus().equals(Common.YES)){
              return "bonusLog/list";
          }else {
-             return "notOpen";
+             return "notopen";
          }
      }
 
