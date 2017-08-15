@@ -282,6 +282,7 @@
         <result column="parent_order_id" property="parentOrderId"/>
         <result column="service_price" property="servicePrice"/>
         <result column="order_mode" property="orderMode"/>
+        <result column="distribution_mode_id" property="distributionModeId"/>
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customer_id" property="id"/>
@@ -3053,6 +3054,34 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <select id="callProcDayAllOrderItem" resultType="com.resto.brand.web.dto.ShopIncomeDto">
         CALL <if test="shopId == null">proc_day_all_order_item(#{beginDate},#{endDate},#{pageNo})</if>
         <if test="shopId != null">proc_day_all_order_item_by_shop(#{beginDate},#{endDate},#{shopId},#{pageNo})</if>
+    </select>
+    <resultMap id="shopMap" type="com.resto.brand.web.dto.ShopOrderReportDto">
+        <result column="orderCount" property="shop_orderCount" jdbcType="INTEGER"/>
+        <result column="orderPrice" property="shop_orderPrice" jdbcType="DECIMAL"/>
+        <result column="peopleCount" property="shop_peopleCount" jdbcType="INTEGER"/>
+        <result column="tangshiCount" property="shop_tangshiCount" jdbcType="INTEGER"/>
+        <result column="tangshiPrice" property="shop_tangshiPrice" jdbcType="DECIMAL"/>
+        <result column="waidaiCount" property="shop_waidaiCount" jdbcType="INTEGER"/>
+        <result column="waidaiPrice" property="shop_waidaiPrice" jdbcType="DECIMAL"/>
+        <result column="waimaiCount" property="shop_waimaiCount" jdbcType="INTEGER"/>
+        <result column="waimaiPrice" property="shop_waimaiPrice" jdbcType="DECIMAL"/>
+    </resultMap>
+    <select id="procDayAllOrderItemShop" resultMap="shopMap">
+       call proc_day_all_order_item_shop(#{0},#{1},#{2})
+    </select>
+    <resultMap id="brandMap" type="com.resto.brand.web.dto.BrandOrderReportDto">
+        <result column="orderCount" property="orderCount" jdbcType="INTEGER"/>
+        <result column="orderPrice" property="orderPrice" jdbcType="DECIMAL"/>
+        <result column="peopleCount" property="peopleCount" jdbcType="INTEGER"/>
+        <result column="tangshiCount" property="tangshiCount" jdbcType="INTEGER"/>
+        <result column="tangshiPrice" property="tangshiPrice" jdbcType="DECIMAL"/>
+        <result column="waidaiCount" property="waidaiCount" jdbcType="INTEGER"/>
+        <result column="waidaiPrice" property="waidaiPrice" jdbcType="DECIMAL"/>
+        <result column="waimaiCount" property="waimaiCount" jdbcType="INTEGER"/>
+        <result column="waimaiPrice" property="waimaiPrice" jdbcType="DECIMAL"/>
+    </resultMap>
+    <select id="procDayAllOrderItemBrand" resultMap="brandMap">
+        call proc_day_all_order_item_brand(#{beginDate},#{endDate},#{brandId})
     </select>
 
     <select id="callProcDayAllOrderPayMent" resultType="com.resto.brand.web.dto.ShopIncomeDto">

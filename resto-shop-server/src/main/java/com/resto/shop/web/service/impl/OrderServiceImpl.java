@@ -222,6 +222,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     Logger log = LoggerFactory.getLogger(getClass());
 
+
     @Override
     public List<Order> listOrder(Integer start, Integer datalength, String shopId, String customerId, String ORDER_STATE) {
         String[] states = null;
@@ -4784,95 +4785,86 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Map<String, Object> callMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
         //封装品牌的数据
-        OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
+        BrandOrderReportDto brandOrderReportDto;
+        Map<String, Object> selectBrandMap = new HashMap<>();
+        selectBrandMap.put("beginDate", beginDate);
+        selectBrandMap.put("endDate", endDate);
+        selectBrandMap.put("brandId", brandId);
+        brandOrderReportDto=orderMapper.procDayAllOrderItemBrand(selectBrandMap);
+        brandOrderReportDto.setBrandName(brandName);
+        if(brandOrderReportDto.getOrderCount()!=0&&brandOrderReportDto.getOrderPrice()!=null){
+            BigDecimal singlePrice = new BigDecimal(brandOrderReportDto.getOrderPrice().doubleValue()/brandOrderReportDto.getOrderCount());
+            brandOrderReportDto.setSinglePrice(new BigDecimal(singlePrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+        }else{
+            brandOrderReportDto.setSinglePrice(new BigDecimal("0.00"));
+        }
+        if(brandOrderReportDto.getPeopleCount()!=null&&brandOrderReportDto.getPeopleCount()!=0&&brandOrderReportDto.getOrderPrice()!=null){
+            BigDecimal perPersonPrice = new BigDecimal(brandOrderReportDto.getOrderPrice().doubleValue()/brandOrderReportDto.getPeopleCount());
+            brandOrderReportDto.setPerPersonPrice(new BigDecimal(perPersonPrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+        }else{
+            brandOrderReportDto.setPerPersonPrice(new BigDecimal("0.00"));
+        }
+        if(brandOrderReportDto.getPeopleCount()==null){
+            brandOrderReportDto.setPeopleCount(0);
+        }
+        BigDecimal initial=new BigDecimal("0.00");
+        if(brandOrderReportDto.getOrderPrice()==null){
+            brandOrderReportDto.setOrderPrice(initial);
+        }
+        if(brandOrderReportDto.getTangshiPrice()==null){
+            brandOrderReportDto.setTangshiPrice(initial);
+        }
+        if(brandOrderReportDto.getWaidaiPrice()==null){
+            brandOrderReportDto.setWaidaiPrice(initial);
+        }
+        if(brandOrderReportDto.getWaimaiPrice()==null){
+            brandOrderReportDto.setWaimaiPrice(initial);
+        }
         //封装店铺的数据
-        List<OrderPayDto> shopPayDto = new ArrayList<>();
-        for (ShopDetail shopDetail : shopDetailList) {
-            OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
-            shopPayDto.add(ot);
-        }
-        //用来接收分段查询出来的订单金额信息
-        List<ShopIncomeDto> shopIncomeDtosItem = new ArrayList<>();
-        shopIncomeDtosItem.add(new ShopIncomeDto());
-        //用来累加分段查询出来的订单金额信息
-        List<ShopIncomeDto> shopIncomeDtosItems = new ArrayList<>();
-        //用来接收分段查询出来的订单支付项信息
-        List<ShopIncomeDto> shopIncomeDtosPayMent = new ArrayList<>();
-        shopIncomeDtosPayMent.add(new ShopIncomeDto());
-        //用来累加分段查询出来的订单支付项信息
-        List<ShopIncomeDto> shopIncomeDtosPayMents = new ArrayList<>();
-        Map<String, Object> selectMap = new HashMap<>();
-        selectMap.put("beginDate", beginDate);
-        selectMap.put("endDate", endDate);
-        for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
-                || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
-            selectMap.put("pageNo", pageNo * 1000);
-            shopIncomeDtosItem = orderMapper.callProcDayAllOrderItem(selectMap);
-            shopIncomeDtosPayMent = orderMapper.callProcDayAllOrderPayMent(selectMap);
-            shopIncomeDtosItems.addAll(shopIncomeDtosItem);
-            shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
-        }
-        BigDecimal brandActualPayment = BigDecimal.ZERO;
-        BigDecimal brandVirtualPayment = BigDecimal.ZERO;
-        BigDecimal shopActualPayment = BigDecimal.ZERO;
-        BigDecimal shopVirtualPayment = BigDecimal.ZERO;
-        for (OrderPayDto shopOrderPayDto : shopPayDto){
-            //循环累加店铺订单总额、订单数
-            for (ShopIncomeDto shopIncomeDtoItem : shopIncomeDtosItems){
-                if (shopOrderPayDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoItem.getShopDetailId())){
-                    shopOrderPayDto.setOrderMoney(shopOrderPayDto.getOrderMoney().add(shopIncomeDtoItem.getTotalIncome()));
-                    if (StringUtils.isBlank(shopIncomeDtoItem.getParentOrderId())){
-                        shopOrderPayDto.setNumber(shopOrderPayDto.getNumber() + 1);
-                    }
-                }
+        List<ShopOrderReportDto> shopOrderReportDtoLists = new ArrayList<ShopOrderReportDto>();
+        for(int i = 0; i < shopDetailList.size(); i++){
+            ShopDetail shopDetail=shopDetailList.get(i);
+            ShopOrderReportDto shopOrderReportDto= new ShopOrderReportDto();
+            Date begin = DateUtil.getformatBeginDate(beginDate);
+            Date end = DateUtil.getformatEndDate(endDate);
+            shopOrderReportDto=orderMapper.procDayAllOrderItemShop(begin,end,shopDetail.getId());
+            BigDecimal initial_=new BigDecimal("0.00");
+            if(shopOrderReportDto.getShop_orderCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
+                BigDecimal ssinglePrice= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_orderCount());
+                shopOrderReportDto.setShop_singlePrice(new BigDecimal(ssinglePrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+            }else{
+                shopOrderReportDto.setShop_singlePrice(initial_);
             }
-            //循环累加得到店铺的实际支付、虚拟支付的值
-            for (ShopIncomeDto shopIncomeDtoPayMent : shopIncomeDtosPayMents){
-                if (shopOrderPayDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoPayMent.getShopDetailId())){
-                    shopActualPayment = shopActualPayment.add(shopIncomeDtoPayMent.getWechatIncome()).add(shopIncomeDtoPayMent.getAliPayment())
-                            .add(shopIncomeDtoPayMent.getChargeAccountIncome()).add(shopIncomeDtoPayMent.getBackCartPay()).add(shopIncomeDtoPayMent.getMoneyPay());
-                    shopVirtualPayment = shopVirtualPayment.add(shopIncomeDtoPayMent.getRedIncome()).add(shopIncomeDtoPayMent.getCouponIncome()).add(shopIncomeDtoPayMent.getChargeGifAccountIncome())
-                            .add(shopIncomeDtoPayMent.getWaitNumberIncome());
-                }
+
+            if(shopOrderReportDto.getShop_peopleCount()!=null&&shopOrderReportDto.getShop_peopleCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
+                BigDecimal speopleCount= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_peopleCount());
+                shopOrderReportDto.setShop_perPersonPrice(new BigDecimal(speopleCount.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+            }else{
+                shopOrderReportDto.setShop_perPersonPrice(initial_);
             }
-            //计算店铺订单平均金额
-            if (shopOrderPayDto.getNumber().equals(0)){
-                shopOrderPayDto.setAverage(shopOrderPayDto.getOrderMoney());
-            }else {
-                shopOrderPayDto.setAverage(shopOrderPayDto.getOrderMoney().divide(new BigDecimal(shopOrderPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
+            if(shopOrderReportDto.getShop_peopleCount()==null){
+                shopOrderReportDto.setShop_peopleCount(0);
             }
-            //计算店铺营销撬动率
-            if (shopVirtualPayment.equals(BigDecimal.ZERO) || shopVirtualPayment.intValue() == 0){
-                shopOrderPayDto.setMarketPrize("0");
-            }else {
-                shopOrderPayDto.setMarketPrize((shopActualPayment.divide(shopVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
+            if(shopOrderReportDto.getShop_orderPrice()==null){
+                shopOrderReportDto.setShop_orderPrice(initial_);
             }
-            //累加得到品牌实际支付的值
-            brandActualPayment = brandActualPayment.add(shopActualPayment);
-            //累加得到品牌虚拟支付的值
-            brandVirtualPayment = brandVirtualPayment.add(shopVirtualPayment);
-            //店铺虚拟、实际支付的值归零
-            shopActualPayment = BigDecimal.ZERO;
-            shopVirtualPayment = BigDecimal.ZERO;
-            brandPayDto.setOrderMoney(brandPayDto.getOrderMoney().add(shopOrderPayDto.getOrderMoney()));
-            brandPayDto.setNumber(brandPayDto.getNumber() + shopOrderPayDto.getNumber());
-        }
-        //计算品牌订单平均金额
-        if (brandPayDto.getNumber().equals(0)){
-            brandPayDto.setAverage(brandPayDto.getOrderMoney());
-        }else {
-            brandPayDto.setAverage(brandPayDto.getOrderMoney().divide(new BigDecimal(brandPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
-        }
-        //计算品牌营销撬动率
-        if (brandVirtualPayment.equals(BigDecimal.ZERO) || brandVirtualPayment.intValue() == 0){
-            brandPayDto.setMarketPrize("0");
-        }else {
-            brandPayDto.setMarketPrize((brandActualPayment.divide(brandVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
+            if(shopOrderReportDto.getShop_tangshiPrice()==null){
+                shopOrderReportDto.setShop_tangshiPrice(initial_);
+            }
+            if(shopOrderReportDto.getShop_waidaiPrice()==null){
+                shopOrderReportDto.setShop_waidaiPrice(initial_);
+            }
+            if(shopOrderReportDto.getShop_waimaiPrice()==null){
+                shopOrderReportDto.setShop_waimaiPrice(initial_);
+            }
+            shopOrderReportDto.setShopDetailId(shopDetail.getId());
+            shopOrderReportDto.setShopName(shopDetail.getName());
+            shopOrderReportDtoLists.add(shopOrderReportDto);
         }
         //封装返回Map集
         Map<String, Object> map = new HashMap<>();
-        map.put("shopId", shopPayDto);
-        map.put("brandId", brandPayDto);
+        map.put("shopId", shopOrderReportDtoLists);
+        map.put("brandId", brandOrderReportDto);
         return map;
     }
 
