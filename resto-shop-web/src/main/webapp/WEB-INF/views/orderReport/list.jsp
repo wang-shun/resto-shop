@@ -40,29 +40,43 @@
                     <table id="brandOrderTable" class="table table-striped table-bordered table-hover" width="100%">
                         <thead>
                         <tr><th>品牌</th>
-                            <th>订单总额(元)</th>
-                            <th>订单总数(份)</th>
-                            <th>订单平均金额(元)</th>
-                            <th>营销撬动率</th>
+                            <th>订单总数</th>
+                            <th>订单总额</th>
+                            <th>单均</th>
+                            <th>就餐人数</th>
+                            <th>人均</th>
+                            <th>堂吃订单数</th>
+                            <th>堂吃订单额</th>
+                            <th>外带订单数</th>
+                            <th>外带订单额</th>
+                            <th>R+外卖订单数</th>
+                            <th>R+外卖订单额</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <template v-if="brandOrder.name != null">
+                        <%--<template v-if="brandOrder.brandName != null">--%>
                             <tr>
-                                <td><strong>{{brandOrder.name}}</strong></td>
-                                <td>{{brandOrder.orderMoney}}</td>
-                                <td>{{brandOrder.number}}</td>
-                                <td>{{brandOrder.average}}</td>
-                                <td>{{brandOrder.marketPrize}}</td>
+                                <td><strong>{{brandOrder.brandName}}</strong></td>
+                                <td>{{brandOrder.orderCount}}</td>
+                                <td>{{brandOrder.orderPrice}}</td>
+                                <td>{{brandOrder.singlePrice}}</td>
+                                <td>{{brandOrder.peopleCount}}</td>
+                                <td>{{brandOrder.perPersonPrice}}</td>
+                                <td>{{brandOrder.tangshiCount}}</td>
+                                <td>{{brandOrder.tangshiPrice}}</td>
+                                <td>{{brandOrder.waidaiCount}}</td>
+                                <td>{{brandOrder.waidaiPrice}}</td>
+                                <td>{{brandOrder.waimaiCount}}</td>
+                                <td>{{brandOrder.waimaiPrice}}</td>
                             </tr>
-                        </template>
+                       <%-- </template>
                         <template v-else>
                             <tr>
                                 <td align="center" colspan="5">
                                     暂时没有数据...
                                 </td>
                             </tr>
-                        </template>
+                        </template>--%>
                         </tbody>
                     </table>
                 </div>
@@ -126,32 +140,60 @@
                     order: [[ 1, "desc" ]],
                     columns : [
                         {
-                            title : "店铺名称",
-                            data : "name",
+                            title : "店铺",
+                            data : "shopName",
                             orderable : false
                         },
                         {
-                            title : "订单总额(元)",
-                            data : "orderMoney"
+                            title : "订单总数",
+                            data : "shop_orderCount"
                         },
                         {
-                            title : "订单总数(份)",
-                            data : "number"
+                            title : "订单总额",
+                            data : "shop_orderPrice"
                         },
                         {
-                            title : "订单平均金额(元)",
-                            data : "average"
+                            title : "单均",
+                            data : "shop_orderCount"
                         },
                         {
-                            title : "营销撬动率",
-                            data : "marketPrize"
+                            title : "就餐人数",
+                            data : "shop_peopleCount"
+                        },
+                        {
+                            title : "人均",
+                            data : "shop_orderCount"
+                        },
+                        {
+                            title : "堂吃订单数",
+                            data : "shop_tangshiCount"
+                        },
+                        {
+                            title : "堂吃订单额",
+                            data : "shop_tangshiPrice"
+                        },
+                        {
+                            title : "外带订单数",
+                            data : "shop_waidaiCount"
+                        },
+                        {
+                            title : "外带订单额",
+                            data : "shop_waidaiPrice"
+                        },
+                        {
+                            title : "R+外卖订单数",
+                            data : "shop_waimaiCount"
+                        },
+                        {
+                            title : "R+外卖订单额",
+                            data : "shop_waimaiPrice"
                         },
                         {
                             title: "操作",
                             data: "shopDetailId",
                             orderable : false,
                             createdCell: function (td, tdData, rowData) {
-                                var shopName = rowData.name;
+                                var shopName = rowData.shopName;
                                 var button = $("<a href='orderReport/show/shopReport?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopId="+tdData+"&&shopName="+shopName+"' class='btn green ajaxify '>查看详情</a>");
                                 $(td).html(button);
                             }

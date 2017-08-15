@@ -395,7 +395,7 @@ public class OrderAspect {
         //订单不为空  已支付  电视叫号模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
                 && order.getOrderMode() == ShopMode.CALL_NUMBER) {
-            MQMessageProducer.sendPlaceOrderMessage(order);
+                MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
         //稍后支付  大Boss模式  支付宝或微信支付
