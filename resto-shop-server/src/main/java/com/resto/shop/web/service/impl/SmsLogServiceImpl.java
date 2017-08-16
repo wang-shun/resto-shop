@@ -154,7 +154,6 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 					//判断是否要提醒商家充值短信账户
 					sendNotice(brandUser,logMap);
 				}
-
 			}catch(Exception e){
 				log.error("发送短信失败:"+e.getMessage());
 			}
