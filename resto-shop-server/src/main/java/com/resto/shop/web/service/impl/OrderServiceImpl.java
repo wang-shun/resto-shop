@@ -7511,12 +7511,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
-            o.setCountWithChild(o.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getTag() + "ItemCount").toString()));
+            o.setCountWithChild(o.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
         }
         if (o.getParentOrderId() != null) {
             Order parent = selectById(o.getParentOrderId());
             parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
-            parent.setCountWithChild(parent.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getTag() + "ItemCount").toString()));
+            parent.setCountWithChild(parent.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
             update(parent);
             Map map = new HashMap(4);
             map.put("brandName", brandSetting.getBrandName());
