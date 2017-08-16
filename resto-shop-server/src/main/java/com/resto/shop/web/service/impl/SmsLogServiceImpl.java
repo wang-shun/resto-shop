@@ -98,77 +98,68 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		}
 
 		//返回值中有"success":"false"时说明商家无法发短信或者该条短信发送失败,此时不更新短信账户
-			if(aliResult.getBoolean("success")){ //返回成功
-				try{
-					/**
-					 * yz 2017/07/28 计费系统 (验证码短信发送需要扣除账户信息 记录)
-
-					 */
-					if(flag){
-						log.info("该品牌开启了品牌账户信息--------");
-						//获取品牌账户设置
-						if(accountSetting==null){
-							 accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-						}
-						//定义每条短信的单价
-						BigDecimal sms_unit = BigDecimal.ZERO;
-						if(accountSetting.getOpenSendSms()==1){
-							sms_unit = accountSetting.getSendSmsValue();
-						}
-						BrandAccount brandAccount = brandAccountService.selectByBrandId(brandId);
-						//剩余账户余额
-						BigDecimal remain = brandAccount.getAccountBalance().subtract(sms_unit);
-
-						BrandAccountLog blog = new BrandAccountLog();
-						blog.setCreateTime(new Date());
-						blog.setGroupName(brand.getBrandName());
-						blog.setBehavior(BehaviorType.SMS);
-						blog.setFoundChange(sms_unit.negate());//负数
-						blog.setRemain(remain);//剩余账户余额
-						blog.setDetail(DetailType.SMS_CODE);
-						blog.setAccountId(brandAccount.getId());
-						blog.setBrandId(brandId);
-						blog.setShopId(shopId);
-						blog.setSerialNumber(DateUtil.getRandomSerialNumber());//这个流水号目前使用当前时间搓+4位随机字符串
-						Integer accountId = brandAccount.getId();
-						brandAccount = new BrandAccount();
-						brandAccount.setId(accountId);
-						brandAccount.setAccountBalance(remain);
-						//记录品牌账户的更新日志 + 更新账户
-						brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
-
-						List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
-
-						//判断是否需要发短信通知欠费
-						Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
-						if(result.isSuccess()){
-							Long id = accountSetting.getId();
-							AccountSetting as = new AccountSetting();
-							as.setId(id);
-							as.setType(1);
-							accountSettingService.update(as);
-							//发送延时消息 24小时
-							log.info("发送欠费消息后把账户设置改为已发送状态,并发送消息队列。。。");
-							MQMessageProducer.sendBrandAccountSms(brandId, MQSetting.DELAY_TIME);
-						}
-
-					}else {
-						log.info("该品牌未开启品牌账户 -- ");
-						insert(smsLog);
-						//更新短信账户的信息
-						smsAcountService.updateByBrandId(brandId);
-						//判断是否要提醒商家充值短信账户
-						sendNotice(brandUser,logMap);
+		if(aliResult.getBoolean("success")){ //返回成功
+			try{
+				/**
+				 * yz 2017/07/28 计费系统 (验证码短信发送需要扣除账户信息 记录)
+				 */
+				if(flag){
+					log.info("该品牌开启了品牌账户信息--------");
+					//获取品牌账户设置
+					if(accountSetting==null){
+						 accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
 					}
-
-				}catch(Exception e){
-					log.error("发送短信失败:"+e.getMessage());
+					//定义每条短信的单价
+					BigDecimal sms_unit = BigDecimal.ZERO;
+					if(accountSetting.getOpenSendSms()==1){
+						sms_unit = accountSetting.getSendSmsValue();
+					}
+					BrandAccount brandAccount = brandAccountService.selectByBrandId(brandId);
+					//剩余账户余额
+					BigDecimal remain = brandAccount.getAccountBalance().subtract(sms_unit);
+					BrandAccountLog blog = new BrandAccountLog();
+					blog.setCreateTime(new Date());
+					blog.setGroupName(brand.getBrandName());
+					blog.setBehavior(BehaviorType.SMS);
+					blog.setFoundChange(sms_unit.negate());//负数
+					blog.setRemain(remain);//剩余账户余额
+					blog.setDetail(DetailType.SMS_CODE);
+					blog.setAccountId(brandAccount.getId());
+					blog.setBrandId(brandId);
+					blog.setShopId(shopId);
+					blog.setSerialNumber(DateUtil.getRandomSerialNumber());//这个流水号目前使用当前时间搓+4位随机字符串
+					Integer accountId = brandAccount.getId();
+					brandAccount = new BrandAccount();
+					brandAccount.setId(accountId);
+					brandAccount.setAccountBalance(remain);
+					//记录品牌账户的更新日志 + 更新账户
+					brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+					List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
+					//判断是否需要发短信通知欠费
+					Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+					if(result.isSuccess()){
+						Long id = accountSetting.getId();
+						AccountSetting as = new AccountSetting();
+						as.setId(id);
+						as.setType(1);
+						accountSettingService.update(as);
+						//发送延时消息 24小时
+						log.info("发送欠费消息后把账户设置改为已发送状态,并发送消息队列。。。");
+						MQMessageProducer.sendBrandAccountSms(brandId, MQSetting.DELAY_TIME);
+					}
+				}else {
+					log.info("该品牌未开启品牌账户 -- ");
+					//更新短信账户的信息
+					smsAcountService.updateByBrandId(brandId);
+					//判断是否要提醒商家充值短信账户
+					sendNotice(brandUser,logMap);
 				}
-			}else {
-				//短信发送失败不更新短信账户
-				insert(smsLog);
-			}
 
+			}catch(Exception e){
+				log.error("发送短信失败:"+e.getMessage());
+			}
+		}
+		insert(smsLog);
 		log.info("短信发送结果:"+ com.alibaba.fastjson.JSONObject.toJSONString(aliResult));
 		return aliResult;
 	}
