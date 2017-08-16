@@ -103,6 +103,7 @@ public class ShopInfoController extends GenericController{
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
         }
 //        shopDetailService.updateWithDatong(shopDetail,getCurrentBrandId(),getBrandName());
+        shopDetailService.update(shopDetail);
         ShopDetail shopDetail1 =(ShopDetail) RedisUtil.get(getCurrentShopId()+"info");
         if(shopDetail != null){
             RedisUtil.remove(getCurrentShopId()+"info");
