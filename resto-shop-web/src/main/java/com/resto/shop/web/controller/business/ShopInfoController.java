@@ -102,16 +102,16 @@ public class ShopInfoController extends GenericController{
         }else  if(shopDetail.getIsOpenSms()==1){
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
         }
-        System.out.println("12222222");
+        log.info("12222222");
         shopDetailService.updateWithDatong(shopDetail,getCurrentBrandId(),getBrandName());
         ShopDetail shopDetail1 =(ShopDetail) RedisUtil.get(getCurrentShopId()+"info");
         if(shopDetail != null){
             RedisUtil.remove(getCurrentShopId()+"info");
         }
-        System.out.println("12222222333333333");
+        log.info("12222222333333333");
         Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
         shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
-        System.out.println("33312222222");
+        log.info("33312222222");
         LogTemplateUtils.shopDeatilEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
         return Result.getSuccess();
     }
