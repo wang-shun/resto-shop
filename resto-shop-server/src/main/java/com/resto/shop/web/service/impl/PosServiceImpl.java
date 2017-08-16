@@ -1,11 +1,18 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.resto.brand.web.model.AccountSetting;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.service.AccountSettingService;
+import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.posDto.ArticleStockDto;
 import com.resto.shop.web.posDto.OrderDto;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
 import org.json.JSONObject;
@@ -42,6 +49,15 @@ public class PosServiceImpl implements PosService {
 
     @Autowired
     private PlatformOrderExtraService platformOrderExtraService;
+
+    @Autowired
+    private BrandService brandService;
+
+    @Autowired
+    private BrandSettingService brandSettingService;
+
+    @Autowired
+    private AccountSettingService accountSettingService;
 
     @Override
     public String syncArticleStock(String shopId) {
@@ -123,10 +139,16 @@ public class PosServiceImpl implements PosService {
 
     @Override
     public void printSuccess(String orderId) {
+        Order order = orderService.selectById(orderId);
+        Brand brand = brandService.selectById(order.getBrandId());
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
+        AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
         try {
-            orderService.printSuccess(orderId);
+            orderService.printSuccess(orderId,brandSetting.getOpenBrandAccount() == 1,accountSetting);
         } catch (AppException e) {
             e.printStackTrace();
         }
     }
+
+
 }
