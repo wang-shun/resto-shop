@@ -7268,9 +7268,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
             if (orders.containsKey(orderItem.getOrderId())) {
                 orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
-                MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", Integer.parseInt(MemcachedUtils.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getRefundCount());
+                MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", Integer.parseInt(MemcachedUtils.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
             } else {
-                MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", orderItem.getRefundCount());
+                MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", orderItem.getCount());
                 orders.put(orderItem.getOrderId(), itemValue);
             }
         }
