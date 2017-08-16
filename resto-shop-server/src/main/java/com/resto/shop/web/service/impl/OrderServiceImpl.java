@@ -1793,15 +1793,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
         //yz 2017/07/29计费系统
         Boolean flag = false;
-        if(openBrandAccount!=null&&openBrandAccount){
-        	flag = true;
-        	if(accountSetting==null){
-        		accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-			}
-		}else {
-        	flag = brandSetting.getOpenBrandAccount()==1;
+        if (openBrandAccount!=null) {
+            if (openBrandAccount) {
+                flag = true;
+                if (accountSetting == null) {
+                    accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+                }
+            } else {
+                flag = brandSetting.getOpenBrandAccount() == 1;
 
-		}
+            }
+        }
 		update(order);
         updateBrandAccount(order,flag,accountSetting);
 //        Map map = new HashMap(4);
