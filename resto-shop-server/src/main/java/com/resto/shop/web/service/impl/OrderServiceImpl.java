@@ -7477,6 +7477,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
         int base = 0;
         int sum = 0;
+        int count = 0;
         BigDecimal mealPrice = BigDecimal.valueOf(0);
         int mealCount = 0;
         BigDecimal mealTotalPrice = BigDecimal.valueOf(0);
@@ -7496,6 +7497,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (item.getType() != OrderItemType.MEALS_CHILDREN) {
                 base += item.getOrginCount();
             }
+            count += item.getCount();
         }
 
         if (o.getServicePrice() == null) {
@@ -7503,18 +7505,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
-        o.setArticleCount(base - sum);
+        o.setArticleCount(count);
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
-            o.setCountWithChild(o.getCountWithChild() - sum);
+            o.setCountWithChild(count);
         }
         if (o.getParentOrderId() != null) {
             Order parent = selectById(o.getParentOrderId());
             parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
-            parent.setCountWithChild(parent.getCountWithChild() - sum);
+            parent.setCountWithChild(count);
             update(parent);
             Map map = new HashMap(4);
             map.put("brandName", brandSetting.getBrandName());
