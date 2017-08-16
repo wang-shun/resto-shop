@@ -70,4 +70,24 @@ public interface PosService {
      */
     void printSuccess(String orderId);
 
+    /**
+     * 同步pos端创建的订单
+     * @param data json数据
+     */
+    void syncPosOrder(String data);
+
+
+    /**
+     * 同步pos端订单支付信息
+     * @param data json数据
+     */
+    void syncPosOrderPay(String data);
+
+    /**
+     * 同步pos端退菜信息
+     * @param data json数据
+     */
+    void syncPosRefundOrder(String data);
+
+    void test();
 }

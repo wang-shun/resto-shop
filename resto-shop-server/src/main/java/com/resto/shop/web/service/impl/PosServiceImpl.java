@@ -1,6 +1,7 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.alibaba.fastjson.JSON;
 import com.resto.brand.web.model.AccountSetting;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
@@ -59,6 +60,9 @@ public class PosServiceImpl implements PosService {
     @Autowired
     private AccountSettingService accountSettingService;
 
+    @Autowired
+    private CustomerAddressService customerAddressService;
+
     @Override
     public String syncArticleStock(String shopId) {
         Map<String, Object> result = new HashMap<>();
@@ -93,6 +97,13 @@ public class PosServiceImpl implements PosService {
         jsonObject.put("orderItem", orderItems);
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         jsonObject.put("orderPayment", payItemsList);
+        CustomerAddress customerAddress = customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
+        if(customerAddress == null){
+            jsonObject.put("customerAddress","");
+        }else{
+            jsonObject.put("customerAddress",new JSONObject(customerAddress));
+        }
+
         return jsonObject.toString();
     }
 
@@ -150,5 +161,34 @@ public class PosServiceImpl implements PosService {
         }
     }
 
+    @Override
+    public void syncPosOrder(String data) {
+        JSONObject json = new JSONObject(data);
+        if(json.get("type") != "orderCreated"){
+            return;
+        }
+        OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
+        Order order = new Order(orderDto);
+
+    }
+
+    @Override
+    public void syncPosOrderPay(String data) {
+
+    }
+
+    @Override
+    public void syncPosRefundOrder(String data) {
+
+    }
+
+    @Override
+    public void test() {
+        Order order = new Order();
+        order.setId("00b8a27437cf460c93910bdc2489d061");
+        order.setBrandId("31946c940e194311b117e3fff5327215");
+        order.setShopDetailId("31164cebcc4b422685e8d9a32db12ab8");
+        MQMessageProducer.sendCreateOrderMessage(order);
+    }
 
 }

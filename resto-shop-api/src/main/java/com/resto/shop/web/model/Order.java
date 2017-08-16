@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.web.model.RefundRemark;
+import com.resto.shop.web.posDto.OrderDto;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -1075,4 +1076,28 @@ public class Order implements Serializable{
     public void setDiscountMoney(BigDecimal discountMoney) {
         this.discountMoney = discountMoney;
     }
+
+    public Order(){}
+    public Order(OrderDto dto){
+        this.id = dto.getId();
+        this.tableNumber = dto.getTableNumber();
+        this.customerCount = dto.getCustomerCount();
+        this.accountingTime = dto.getAccountingTime();
+        this.orderState = dto.getOrderState();
+        this.productionStatus = dto.getProductionStatus();
+        this.originalAmount = dto.getOriginalAmount();
+        this.reductionAmount = new BigDecimal(0);
+        this.paymentAmount = dto.getPaymentAmount();
+        this.orderMoney = dto.getOrderMoney();
+        this.articleCount = dto.getArticleCount();
+        this.serialNumber = dto.getSerialNumber();
+        this.allowCancel = dto.getAllowCancel();
+        this.closed = dto.getClosed();
+        this.remark = dto.getRemark();
+        this.createTime = dto.getCreateTime();
+        this.operatorId = "pos";
+        this.customerId = dto.getCustomerId();
+
+    }
+
 }

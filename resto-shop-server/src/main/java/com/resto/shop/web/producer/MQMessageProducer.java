@@ -300,9 +300,9 @@ public class MQMessageProducer {
 
 	public static void main(String[] args) {
 		Order order = new Order();
-		order.setId("00b8a27437cf460c93910bdc2489d061");
-		order.setBrandId("31946c940e194311b117e3fff5327215");
-		order.setShopDetailId("31164cebcc4b422685e8d9a32db12ab8");
+		order.setId("01119722fb6c41de9c59a507e7efa55c");
+		order.setBrandId("2f83afee7a0e4822a6729145dd53af33");
+		order.setShopDetailId("8565844c69b94b0dbde38b0861df62c8");
 		sendCreateOrderMessage(order);
 	}
 

@@ -5,6 +5,7 @@ import com.resto.shop.web.model.Order;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by KONATA on 2017/8/11.
@@ -16,7 +17,7 @@ public class OrderDto implements Serializable{
     }
 
     public OrderDto(Order order) {
-        this.id = order.getId();
+        this.id = order.getId() == null ?;
         this.tableNumber = order.getTableNumber();
         this.customerCount = order.getCustomerCount();
         this.accountingTime = order.getAccountingTime();
@@ -96,6 +97,26 @@ public class OrderDto implements Serializable{
     private BigDecimal paymentAmount;
     //用户id
     private String customerId;
+
+    private List<OrderItemDto> orderItem;
+
+    private List<OrderPaymentDto> orderPayment;
+
+    public List<OrderPaymentDto> getOrderPayment() {
+        return orderPayment;
+    }
+
+    public void setOrderPayment(List<OrderPaymentDto> orderPayment) {
+        this.orderPayment = orderPayment;
+    }
+
+    public List<OrderItemDto> getOrderItem() {
+        return orderItem;
+    }
+
+    public void setOrderItem(List<OrderItemDto> orderItem) {
+        this.orderItem = orderItem;
+    }
 
     public String getId() {
         return id;
