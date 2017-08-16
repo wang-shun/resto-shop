@@ -7502,18 +7502,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
-//        o.setArticleCount(base - sum);
+        o.setArticleCount(base - sum);
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
-//            o.setCountWithChild(o.getCountWithChild() - o.getOrderItems().size());
+            o.setCountWithChild(o.getCountWithChild() - o.getOrderItems().size());
         }
         if (o.getParentOrderId() != null) {
             Order parent = selectById(o.getParentOrderId());
             parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
-//            parent.setCountWithChild(parent.getCountWithChild() - o.getOrderItems().size());
+            parent.setCountWithChild(parent.getCountWithChild() - o.getOrderItems().size());
             update(parent);
             Map map = new HashMap(4);
             map.put("brandName", brandSetting.getBrandName());
