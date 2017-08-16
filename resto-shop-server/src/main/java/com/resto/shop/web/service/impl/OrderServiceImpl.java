@@ -7509,12 +7509,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
-            o.setCountWithChild(o.getCountWithChild() - order.getOrderItems().size());
+            o.setCountWithChild(o.getCountWithChild() - sum);
         }
         if (o.getParentOrderId() != null) {
             Order parent = selectById(o.getParentOrderId());
             parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
-            parent.setCountWithChild(parent.getCountWithChild() - order.getOrderItems().size());
+            parent.setCountWithChild(parent.getCountWithChild() - sum);
             update(parent);
             Map map = new HashMap(4);
             map.put("brandName", brandSetting.getBrandName());
