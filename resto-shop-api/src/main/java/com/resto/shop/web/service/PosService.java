@@ -89,5 +89,12 @@ public interface PosService {
      */
     void syncPosRefundOrder(String data);
 
+
+    /**
+     * pos确认订单
+     * @param orderId 订单id
+     */
+    void syncPosConfirmOrder(String orderId);
+
     void test();
 }

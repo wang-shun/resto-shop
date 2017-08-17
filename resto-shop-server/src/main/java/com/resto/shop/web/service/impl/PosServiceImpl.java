@@ -74,6 +74,9 @@ public class PosServiceImpl implements PosService {
     @Autowired
     private ShopDetailService shopDetailService;
 
+    @Autowired
+    private CustomerService customerService;
+
     @Override
     public String syncArticleStock(String shopId) {
         Map<String, Object> result = new HashMap<>();
@@ -110,6 +113,8 @@ public class PosServiceImpl implements PosService {
             OrderItemDto orderItemDto = new OrderItemDto(orderItem);
             orderItemDtos.add(orderItemDto);
         }
+        Customer customer = customerService.selectById(order.getCustomerId());
+        jsonObject.put("customer", new CustomerDto(customer));
         jsonObject.put("orderItem", orderItemDtos);
         if(order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
                 || order.getPayMode() == OrderPayMode.YL_PAY){
@@ -288,6 +293,14 @@ public class PosServiceImpl implements PosService {
     @Override
     public void syncPosRefundOrder(String data) {
 
+    }
+
+    @Override
+    public void syncPosConfirmOrder(String orderId) {
+        Order order = orderService.selectById(orderId);
+        if(order != null && order.getOrderState() == OrderState.SUBMIT && order.getIsConfirm() == Common.NO){
+            orderService.confirmOrderPos(orderId);
+        }
     }
 
     @Override
