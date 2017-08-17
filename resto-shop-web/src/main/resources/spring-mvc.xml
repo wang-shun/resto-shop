@@ -56,8 +56,7 @@
 		</mvc:interceptor>
 
 		<mvc:interceptor>
-			<mvc:mapping path="/**"/>
-			<mvc:exclude-mapping path="/*/login" />
+			<mvc:mapping path="/**/*list"/>
 			<bean class="com.resto.shop.web.BrandAccountInterceptors.OpenBrandAccountInterceptor"></bean>
 		</mvc:interceptor>
 

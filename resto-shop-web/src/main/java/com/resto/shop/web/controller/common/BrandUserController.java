@@ -1,5 +1,6 @@
 package com.resto.shop.web.controller.common;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -111,10 +112,14 @@ public class BrandUserController extends GenericController{
 				if(brandAccount!=null){
 					List<AccountNotice> accountNotices = accountNoticeService.selectByAccountId(brandAccount.getId());
 					if(accountNotices!=null&&!accountNotices.isEmpty()){
-						for(AccountNotice accountNotice:accountNotices){
-							if(brandAccount.getAccountBalance().compareTo(accountNotice.getNoticePrice())<0){//如果品牌账户小于设置值
-								flag = false;
+						BigDecimal min = accountNotices.get(0).getNoticePrice();//默认第一个最小
+						for(int i=0;i<accountNotices.size();i++){
+							if(accountNotices.get(i).getNoticePrice().compareTo(min)<0){
+								min = accountNotices.get(i).getNoticePrice();
 							}
+						}
+						if(brandAccount.getAccountBalance().compareTo(min)<0){//如果品牌账户小于设置值
+							flag = false;
 						}
 					}
 				}
