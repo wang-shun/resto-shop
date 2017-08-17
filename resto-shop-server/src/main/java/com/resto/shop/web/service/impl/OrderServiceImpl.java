@@ -7505,7 +7505,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
-        o.setArticleCount(base - sum);
+        o.setArticleCount(o.getArticleCount() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
