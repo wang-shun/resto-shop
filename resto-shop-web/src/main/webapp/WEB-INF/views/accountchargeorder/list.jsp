@@ -66,7 +66,7 @@
                     <label class="col-md-3 control-label">充值金额：</label>
                     <div class="col-md-4">
                         <div class="input-group">
-                            <input type="text" class="form-control"
+                            <input type="number" class="form-control"
                                    placeholder="请输入要充值的金额"  name="chargeMoney"  v-model="chargeMoney">
                             <div class="input-group-addon"><span class="glyphicon glyphicon-yen"></span></div>
                         </div>
@@ -187,7 +187,7 @@
 		var vueObj = new Vue({
 			el:"#control",
 			data:{
-				chargeMoney:0,
+				chargeMoney:100,
 				payType:''
 			},
 			mixins:[C.formVueMix],
