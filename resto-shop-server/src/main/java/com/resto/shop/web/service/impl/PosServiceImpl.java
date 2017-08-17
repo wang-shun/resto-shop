@@ -5,24 +5,32 @@ import com.alibaba.fastjson.JSON;
 import com.resto.brand.web.model.AccountSetting;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.AccountSettingService;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.Common;
+import com.resto.shop.web.constant.OrderPayMode;
+import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
-import com.resto.shop.web.posDto.ArticleStockDto;
-import com.resto.shop.web.posDto.OrderDto;
+import com.resto.shop.web.posDto.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.resto.shop.web.service.impl.OrderServiceImpl.generateString;
 
 /**
  * Created by KONATA on 2017/8/9.
@@ -63,6 +71,9 @@ public class PosServiceImpl implements PosService {
     @Autowired
     private CustomerAddressService customerAddressService;
 
+    @Autowired
+    private ShopDetailService shopDetailService;
+
     @Override
     public String syncArticleStock(String shopId) {
         Map<String, Object> result = new HashMap<>();
@@ -94,16 +105,32 @@ public class PosServiceImpl implements PosService {
         JSONObject jsonObject = new JSONObject(orderDto);
         jsonObject.put("dataType", "orderCreated");
         List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
-        jsonObject.put("orderItem", orderItems);
-        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
-        jsonObject.put("orderPayment", payItemsList);
-        CustomerAddress customerAddress = customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
-        if(customerAddress == null){
-            jsonObject.put("customerAddress","");
-        }else{
-            jsonObject.put("customerAddress",new JSONObject(customerAddress));
+        List<OrderItemDto> orderItemDtos = new ArrayList<>();
+        for(OrderItem orderItem : orderItems){
+            OrderItemDto orderItemDto = new OrderItemDto(orderItem);
+            orderItemDtos.add(orderItemDto);
+        }
+        jsonObject.put("orderItem", orderItemDtos);
+        if(order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
+                || order.getPayMode() == OrderPayMode.YL_PAY){
+            List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+            if(!CollectionUtils.isEmpty(payItemsList)){
+                List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
+                for(OrderPaymentItem orderPaymentItem : payItemsList){
+                    OrderPaymentDto orderPaymentDto = new OrderPaymentDto(orderPaymentItem);
+                    orderPaymentDtos.add(orderPaymentDto);
+                }
+                jsonObject.put("orderPayment", orderPaymentDtos);
+            }
         }
 
+
+        CustomerAddress customerAddress = customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
+
+        if(customerAddress != null){
+            CustomerAddressDto customerAddressDto = new CustomerAddressDto(customerAddress);
+            jsonObject.put("customerAddress",new JSONObject(customerAddressDto));
+        }
         return jsonObject.toString();
     }
 
@@ -112,9 +139,15 @@ public class PosServiceImpl implements PosService {
         Order order = orderService.selectById(orderId);
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("dataType", "orderPay");
+        jsonObject.put("orderId",order.getId());
         jsonObject.put("payMode", order.getPayMode());
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
-        jsonObject.put("orderPayment", payItemsList);
+        List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
+        for(OrderPaymentItem  paymentItem: payItemsList){
+            OrderPaymentDto orderPaymentDto = new OrderPaymentDto(paymentItem);
+            orderPaymentDtos.add(orderPaymentDto);
+        }
+        jsonObject.put("orderPayment", orderPaymentDtos);
         return jsonObject.toString();
     }
 
@@ -124,10 +157,20 @@ public class PosServiceImpl implements PosService {
         result.put("dataType", "platform");
         PlatformOrder platformOrder = platformOrderService.selectByPlatformOrderId(orderId, null);
         List<PlatformOrderDetail> platformOrderDetails = platformOrderDetailService.selectByPlatformOrderId(orderId);
+        List<PlatformOrderDetailDto> platformOrderDetailDtos = new ArrayList<>();
+        for(PlatformOrderDetail platformOrderDetail : platformOrderDetails){
+            PlatformOrderDetailDto detailDto = new PlatformOrderDetailDto(platformOrderDetail);
+            platformOrderDetailDtos.add(detailDto);
+        }
         List<PlatformOrderExtra> platformOrderExtras = platformOrderExtraService.selectByPlatformOrderId(orderId);
-        result.put("order", platformOrder);
-        result.put("orderDetail", platformOrderDetails);
-        result.put("orderExtra", platformOrderExtras);
+        List<PlatformOrderExtraDto> extraDtos = new ArrayList<>();
+        for(PlatformOrderExtra platformOrderExtra : platformOrderExtras){
+            PlatformOrderExtraDto extraDto = new PlatformOrderExtraDto(platformOrderExtra);
+            extraDtos.add(extraDto);
+        }
+        result.put("order", new PlatformOrderDto(platformOrder));
+        result.put("orderDetail", platformOrderDetailDtos);
+        result.put("orderExtra", extraDtos);
         return new JSONObject(result).toString();
     }
 
@@ -164,16 +207,81 @@ public class PosServiceImpl implements PosService {
     @Override
     public void syncPosOrder(String data) {
         JSONObject json = new JSONObject(data);
-        if(json.get("type") != "orderCreated"){
-            return;
-        }
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
         Order order = new Order(orderDto);
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        order.setOrderMode(shopDetail.getShopMode());
+        order.setReductionAmount(BigDecimal.valueOf(0));
+        order.setBrandId(json.getString("brandId"));
+        List<OrderItemDto> orderItemDtos =  orderDto.getOrderItem();
+        List<OrderItem> orderItems = new ArrayList<>();
+        for(OrderItemDto orderItemDto : orderItemDtos){
+            OrderItem orderItem = new OrderItem(orderItemDto);
+            orderItems.add(orderItem);
+        }
+        if(!StringUtils.isEmpty(orderDto.getParentOrderId())){
+            //子订单
+            Order parent = orderService.selectById(order.getParentOrderId());
+            order.setVerCode(parent.getVerCode());
+            orderService.insert(order);
+            orderItemService.insertItems(orderItems);
+            updateParent(order);
 
+        }else{
+            //主订单
+            if(StringUtils.isEmpty(order.getVerCode())){
+                order.setVerCode(generateString(5));
+            }
+            orderService.insert(order);
+            orderItemService.insertItems(orderItems);
+        }
     }
 
     @Override
     public void syncPosOrderPay(String data) {
+        JSONObject json = new JSONObject(data);
+        Order order = orderService.selectById(json.getString("orderId"));
+        if(order != null && order.getOrderState() == OrderState.SUBMIT){
+            List<OrderPaymentDto> orderPaymentDtos = JSON.parseArray(json.get("orderPayment").toString(), OrderPaymentDto.class);
+            for(OrderPaymentDto orderPaymentDto : orderPaymentDtos){
+                OrderPaymentItem orderPaymentItem = new OrderPaymentItem(orderPaymentDto);
+                orderPaymentItemService.insert(orderPaymentItem);
+            }
+            order.setOrderState(OrderState.PAYMENT);
+            order.setPaymentAmount(BigDecimal.valueOf(0));
+            order.setAllowCancel(false);
+            order.setAllowContinueOrder(false);
+            orderService.update(order);
+            if(!StringUtils.isEmpty(order.getParentOrderId())){
+                updateParent(order);
+            }
+            updateChild(order);
+
+
+        }
+    }
+
+    private void updateParent(Order order){
+        Order parent = orderService.selectById(order.getParentOrderId());
+        parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
+        parent.setCountWithChild(parent.getCountWithChild() - order.getOrderItems().size());
+        orderService.update(parent);
+    }
+
+
+    private void updateChild(Order order) {
+        List<Order> orders = orderService.selectByParentId(order.getId(), order.getPayType());
+        if(!CollectionUtils.isEmpty(orders)){
+            for (Order child : orders) {
+                if (child.getOrderState() < OrderState.PAYMENT) {
+                    child.setOrderState(OrderState.PAYMENT);
+                    child.setPaymentAmount(BigDecimal.valueOf(0));
+                    child.setAllowCancel(false);
+                    child.setAllowContinueOrder(false);
+                    orderService.update(child);
+                }
+            }
+        }
 
     }
 

@@ -1,10 +1,25 @@
 package com.resto.shop.web.model;
 
+import com.resto.shop.web.posDto.OrderPaymentDto;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class OrderPaymentItem implements Serializable {
+
+    public OrderPaymentItem(OrderPaymentDto orderPaymentItem){
+        this.id = orderPaymentItem.getId() == null ? "" : orderPaymentItem.getId();
+        this.payValue = orderPaymentItem.getPayValue() == null ? BigDecimal.valueOf(0) : orderPaymentItem.getPayValue();
+        this.remark = orderPaymentItem.getRemark() == null ? "" : orderPaymentItem.getRemark();
+        this.payTime = new Date(orderPaymentItem.getPayTime()) ;
+        this.orderId = orderPaymentItem.getOrderId() == null ? "" : orderPaymentItem.getOrderId();
+        this.paymentModeId = orderPaymentItem.getPaymentModeId() == null ? 0 : orderPaymentItem.getPaymentModeId();
+        this.resultData = orderPaymentItem.getResultData() == null ? "" : orderPaymentItem.getResultData();
+    }
+
+
+
     private String id;
 
     private Date payTime;
