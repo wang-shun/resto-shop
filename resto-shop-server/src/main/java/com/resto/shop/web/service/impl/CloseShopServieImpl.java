@@ -97,7 +97,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		//短信第一版用来发日结短信
 		Map<String, String> dayMapByFirstEdtion = querryDateDataByFirstEdtion(shopDetail, offLineOrder);
 		//3发短信推送/微信推送
-		pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
+		pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand);
 		//3判断是否需要发送旬短信
 //		int temp = DateUtil.getEarlyMidLate();
 //		switch (temp){
@@ -610,23 +610,25 @@ public class CloseShopServieImpl implements CloseShopService{
 	}
 
 
-	private void pushMessageByFirstEdtion(Map<String, String> querryMap, ShopDetail shopDetail, WechatConfig wechatConfig, String brandName) {
+	private void pushMessageByFirstEdtion(Map<String, String> querryMap, ShopDetail shopDetail, WechatConfig wechatConfig, Brand brand) {
 		if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
 			//截取电话号码
 			String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
-			String[] tels = telephones.split(",");
+			//String[] tels = telephones.split(",");
+			List<String> tels = new ArrayList<>();
+			tels.add("13317182430");
 			for (String telephone : tels) {
-				JSONObject smsResult = smsLogService.sendMessage(telephone,JSONObject.parseObject(querryMap.get("sms")), "餐加", SMSUtils.DAY_SMS_SEND);
+				//String brandId, String shopId,int smsType, String sign, String code_temp,String phone,JSONObject jsonObject
+
+				JSONObject smsResult = smsLogService.sendMessage(brand.getId(),shopDetail.getId(),SmsLogType.DAYMESSGAGE,SMSUtils.SIGN,SMSUtils.DAY_SMS_SEND,telephone,JSONObject.parseObject(querryMap.get("sms")));
 				//JSONObject smsResult = SMSUtils.sendMessage(s, JSONObject.parseObject(querryMap.get("sms")), "餐加", "SMS_46725122", null);//推送本日信息
 				log.info("短信返回内容："+smsResult);
-				//记录日志
-				LogTemplateUtils.dayMessageSms(brandName, shopDetail.getName(), telephone, smsResult.toJSONString());
 				Customer c = customerService.selectByTelePhone(telephone);
 				/**
 				 发送客服消息
 				 */
 				if (null != c) {
-					WeChatUtils.sendDayCustomerMsgASync(querryMap.get("wechat"), c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), telephone, brandName, shopDetail.getName());
+					WeChatUtils.sendDayCustomerMsgASync(querryMap.get("wechat"), c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), telephone, brand.getBrandName(), shopDetail.getName());
 				}
 			}
 

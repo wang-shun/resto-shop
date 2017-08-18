@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import com.alibaba.fastjson.JSONObject;
-import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 
 import com.resto.brand.core.generic.GenericDao;
@@ -61,20 +60,6 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
         return smslogMapper;
     }
 
-    
-    
-	@Override
-	public JSONObject sendCode(String phone, String code, String brandId, String shopId, int smsLogType) {
-		BrandUser brandUser = brandUserService.selectOneByBrandId(brandId);
-		JSONObject aliResult = sendMsg(code,phone,brandUser);
-		return aliResult;
-
-	}
-
-	
-	public JSONObject sendMsg(String code, String phone, BrandUser brandUser){
-		return SMSUtils.sendCode(brandUser.getBrandName(), code, phone);
-	}
 
 	@Override
 	public List<SmsLog> selectListByShopId(String shopId) {
@@ -118,9 +103,6 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
 		return list;
 	}
 	
-	
-
-	
 
 
     @Override
@@ -129,7 +111,12 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     }
 
 	@Override
-	public JSONObject sendMessage(String telephone, JSONObject sms, String sign, String code_temp, Object o) {
-		return null;
+	public JSONObject sendMessage(String brandId, String shopId, int smsType, String sign, String code_temp,String phone ,JSONObject jsonObject) {
+		return SMSUtils.sendMessage(phone,jsonObject,sign,code_temp);
 	}
+
+//	@Override
+//	public JSONObject sendMessage(String telephone, JSONObject sms, String sign, String code_temp,String brandId) {
+//		return SMSUtils.sendMessage(telephone,sms,sign,code_temp);
+//	}
 }
