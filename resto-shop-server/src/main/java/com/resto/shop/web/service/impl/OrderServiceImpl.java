@@ -7505,7 +7505,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
-        o.setArticleCount(base - sum);
+        o.setArticleCount(o.getArticleCount() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
@@ -7811,7 +7811,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMoney = orderMoney.add(article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())));
             if (article.getType() != OrderItemType.MEALS_CHILDREN && order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
                 refundItem = new HashMap<>();
-                Article a = articleService.selectById(article.getArticleId());
+                String aid = article.getArticleId();
+                if (aid.indexOf("@") > -1) {
+                    aid = aid.substring(0, aid.indexOf("@"));
+                }
+                Article a = articleService.selectById(aid);
                 refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(
                         new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(a.getMealFeeNumber()))).doubleValue());
                 refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
