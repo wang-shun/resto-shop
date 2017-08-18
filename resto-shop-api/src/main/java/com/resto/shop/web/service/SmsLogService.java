@@ -11,7 +11,17 @@ import com.resto.shop.web.model.SmsLog;
 
 public interface SmsLogService extends GenericService<SmsLog, Long> {
 
-	JSONObject sendCode(String phone, String code, String brandId, String shopId, int smsLogType, Map<String,String> logMap, Boolean openBrandAccount, AccountSetting accountSetting);
+	/**
+	 * 发送注册验证码
+	 * 这个里面只做法短信验证码功能 把发短信之前做什么 和之后做什么功能抽出来做成 切面
+ 	 * @param phone
+	 * @param code
+	 * @param brandId
+	 * @param shopId
+	 * @param smsLogType
+	 * @return
+	 */
+	JSONObject sendCode(String phone, String code, String brandId, String shopId, int smsLogType);
 
     /**
      * 根据店铺ID查询短信记录
@@ -45,4 +55,6 @@ public interface SmsLogService extends GenericService<SmsLog, Long> {
 
 
     SmsLog selectByMap(Map<String, Object> selectMap);
+
+	JSONObject sendMessage(String telephone, JSONObject sms, String sign, String code_temp);
 }

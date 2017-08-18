@@ -1,7 +1,6 @@
 package com.resto.shop.web.BrandAccountInterceptors;
 
 import com.resto.shop.web.config.SessionKey;
-import com.resto.shop.web.controller.GenericController;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 

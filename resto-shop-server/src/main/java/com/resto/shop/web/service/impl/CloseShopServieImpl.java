@@ -74,6 +74,10 @@ public class CloseShopServieImpl implements CloseShopService{
 	@Resource
 	private DayAppraiseMessageService dayAppraiseMessageService;
 
+
+	@Resource
+	private SmsLogService smsLogService;
+
 	Logger log = LoggerFactory.getLogger(getClass());
 
 	@Override
@@ -611,18 +615,18 @@ public class CloseShopServieImpl implements CloseShopService{
 			//截取电话号码
 			String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
 			String[] tels = telephones.split(",");
-			for (String s : tels) {
-				JSONObject smsResult = SMSUtils.sendMessage(s, JSONObject.parseObject(querryMap.get("sms")), "餐加", "SMS_46725122", null);//推送本日信息
-
-				System.err.println("短信返回内容："+smsResult);
+			for (String telephone : tels) {
+				JSONObject smsResult = smsLogService.sendMessage(telephone,JSONObject.parseObject(querryMap.get("sms")), "餐加", SMSUtils.DAY_SMS_SEND);
+				//JSONObject smsResult = SMSUtils.sendMessage(s, JSONObject.parseObject(querryMap.get("sms")), "餐加", "SMS_46725122", null);//推送本日信息
+				log.info("短信返回内容："+smsResult);
 				//记录日志
-				LogTemplateUtils.dayMessageSms(brandName, shopDetail.getName(), s, smsResult.toJSONString());
-				Customer c = customerService.selectByTelePhone(s);
+				LogTemplateUtils.dayMessageSms(brandName, shopDetail.getName(), telephone, smsResult.toJSONString());
+				Customer c = customerService.selectByTelePhone(telephone);
 				/**
 				 发送客服消息
 				 */
 				if (null != c) {
-					WeChatUtils.sendDayCustomerMsgASync(querryMap.get("wechat"), c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), s, brandName, shopDetail.getName());
+					WeChatUtils.sendDayCustomerMsgASync(querryMap.get("wechat"), c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), telephone, brandName, shopDetail.getName());
 				}
 			}
 

@@ -22,8 +22,7 @@ public class SmsLogType {
     public static final int MONTHMESSAGE=7;//月结短信通知(阿里)
 
 
-   public static final int TX_AUTO_CODE =100;//腾讯校验码
-	
+
 	public static String getSmsLogTypeName(int state){
 	    switch (state) {
             case AUTO_CODE:
