@@ -216,7 +216,13 @@ public class SendMessageAspect {
 				blog.setBehavior(BehaviorType.SMS);
 				blog.setFoundChange(sms_unit.negate());//负数
 				blog.setRemain(remain);//剩余账户余额
-				blog.setDetail(DetailType.SMS_CODE);
+				int detailType = 0;
+				if(smsType== SmsLogType.AUTO_CODE){//如果是验证码
+					detailType = DetailType.SMS_CODE;
+				}else if(smsType==SmsLogType.DAYMESSGAGE){
+					detailType = DetailType.SMS_DAY_MESSAGE;
+				}
+				blog.setDetail(detailType);
 				blog.setAccountId(brandAccount.getId());
 				blog.setBrandId(brandId);
 				blog.setShopId(shopId);

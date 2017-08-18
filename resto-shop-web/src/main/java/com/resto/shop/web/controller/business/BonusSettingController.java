@@ -3,7 +3,6 @@
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import com.alibaba.fastjson.JSONArray;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -11,7 +10,6 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.model.ChargeSetting;
 import com.resto.shop.web.service.ChargeSettingService;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,9 +20,7 @@ import com.resto.shop.web.model.BonusSetting;
 import com.resto.shop.web.service.BonusSettingService;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
  @Controller
 @RequestMapping("bonusSetting")
