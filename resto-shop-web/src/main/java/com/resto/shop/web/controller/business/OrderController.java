@@ -292,6 +292,11 @@ public class OrderController extends GenericController{
 			if(temp.compareTo(BigDecimal.ZERO)>0){
                 ot.setIncomePrize(real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"");
 			}
+			if(o.getTableNumber()!=null){
+				ot.setTableNumber(o.getTableNumber());
+			}else {
+				ot.setTableNumber("--");
+			}
 			//订单金额
 			ot.setOrderMoney(o.getOrderMoney());
 			ot.setMoneyPay(ot.getMoneyPay().subtract(ot.getGiveChangePayment()));

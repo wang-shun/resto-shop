@@ -284,6 +284,7 @@
         <result column="service_price" property="servicePrice"/>
         <result column="order_mode" property="orderMode"/>
         <result column="distribution_mode_id" property="distributionModeId"/>
+        <result column="table_number" property="tableNumber"/>
 
         <association property="customer" javaType="com.resto.shop.web.model.Customer">
             <id column="customer_id" property="id"/>
