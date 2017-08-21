@@ -152,6 +152,10 @@ public class Article implements Serializable{
 
     private Integer monthlySales;          //菜品月销售量
 
+    private Integer photoType;             //菜品图片显示   1大图  2小图  3无图
+
+    private String photoLittle;            //菜品类型2  小图存放地址
+
     public Integer getMonthlySales() {
         return monthlySales;
     }
@@ -623,5 +627,21 @@ public class Article implements Serializable{
 
     public void setRecommendCategoryId(String recommendCategoryId) {
         this.recommendCategoryId = recommendCategoryId;
+    }
+
+    public Integer getPhotoType() {
+        return photoType;
+    }
+
+    public void setPhotoType(Integer photoType) {
+        this.photoType = photoType;
+    }
+
+    public String getPhotoLittle() {
+        return photoLittle;
+    }
+
+    public void setPhotoLittle(String photoLittle) {
+        this.photoLittle = photoLittle;
     }
 }
