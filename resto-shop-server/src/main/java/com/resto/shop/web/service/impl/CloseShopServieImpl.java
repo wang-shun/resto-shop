@@ -614,9 +614,9 @@ public class CloseShopServieImpl implements CloseShopService{
 		if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
 			//截取电话号码
 			String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
-			//String[] tels = telephones.split(",");
-			List<String> tels = new ArrayList<>();
-			tels.add("13317182430");
+			String[] tels = telephones.split(",");
+			//List<String> tels = new ArrayList<>();
+			//tels.add("13317182430");
 			for (String telephone : tels) {
 				//String brandId, String shopId,int smsType, String sign, String code_temp,String phone,JSONObject jsonObject
 
