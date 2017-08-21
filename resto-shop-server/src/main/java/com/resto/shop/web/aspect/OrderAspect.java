@@ -109,6 +109,12 @@ public class OrderAspect {
             }
 
 
+            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+            log.info("tttttttttttttt----------");
+            if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+                MQMessageProducer.sendCreateOrderMessage(order);
+            }
+
             if (order.getPayMode() != PayMode.WEIXIN_PAY) {
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
@@ -140,11 +146,6 @@ public class OrderAspect {
                 log.info("库存变更失败:" + order.getId());
             }
 
-            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-            log.info("tttttttttttttt----------");
-            if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
-                MQMessageProducer.sendCreateOrderMessage(order);
-            }
         }
     }
 
