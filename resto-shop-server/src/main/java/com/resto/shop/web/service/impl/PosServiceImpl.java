@@ -77,6 +77,9 @@ public class PosServiceImpl implements PosService {
     @Autowired
     private CustomerService customerService;
 
+    @Autowired
+    private ArticlePriceService articlePriceService;
+
     @Override
     public String syncArticleStock(String shopId) {
         Map<String, Object> result = new HashMap<>();
@@ -187,13 +190,54 @@ public class PosServiceImpl implements PosService {
     @Override
     public void articleEmpty(String articleId) {
         Article article = articleService.selectById(articleId);
-        articleService.clearStock(articleId,article.getShopDetailId());
+        if (articleId.indexOf("@") > -1) { //老规格下的子品
+            RedisUtil.set(articleId + Common.KUCUN, 0);
+            String aid = articleId.substring(0, articleId.indexOf("@"));
+            //得到这个老规格下的所有属性
+            List<ArticlePrice> articlePrices = articlePriceService.selectByArticleId(aid);
+            int sum = 0;
+            if (!CollectionUtils.isEmpty(articlePrices)) {
+                for (ArticlePrice articlePrice : articlePrices) {
+                    Integer ck = (Integer) RedisUtil.get(articlePrice.getId() + Common.KUCUN);
+                    if (ck != null) {
+                        sum += ck;
+                    } else {
+                        sum += articlePrice.getCurrentWorkingStock();
+                    }
+                }
+                RedisUtil.set(aid + Common.KUCUN, sum);
+                if (sum == 0) {
+                    articleService.setEmpty(aid);
+                } else {
+                    articleService.setEmptyFail(aid);
+                }
+            }
+        }else{
+            articleService.setEmpty(articleId);
+            List<ArticlePrice> articlePrices = articlePriceService.selectByArticleId(articleId);
+            if (!CollectionUtils.isEmpty(articlePrices)) {
+                for (ArticlePrice articlePrice : articlePrices) {
+                    RedisUtil.set(articlePrice.getId() + Common.KUCUN, 0);
+                }
+            }
+        }
+
+
     }
 
     @Override
     public void articleEdit(String articleId, Integer count) {
-        Article article = articleService.selectById(articleId);
-        articleService.editStock(articleId,count,article.getShopDetailId());
+        String shopId;
+        if (articleId.indexOf("@") > -1) { //老规格下的子品
+            String aid = articleId.substring(0, articleId.indexOf("@"));
+            Article article = articleService.selectById(aid);
+            shopId = article.getShopDetailId();
+        }else{
+            Article article = articleService.selectById(articleId);
+            shopId = article.getShopDetailId();
+        }
+
+        articleService.editStock(articleId,count,shopId);
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.resto.brand.web.model.RefundRemark;
 import com.resto.shop.web.posDto.OrderDto;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -35,7 +36,7 @@ public class Order implements Serializable {
         this.remark = orderDto.getRemark() == null ? "" : orderDto.getRemark();
         this.distributionModeId = orderDto.getDistributionModeId() == null ? 0 : orderDto.getDistributionModeId();
         this.amountWithChildren = orderDto.getAmountWithChildren() == null ? BigDecimal.valueOf(0) : orderDto.getAmountWithChildren();
-        this.parentOrderId = orderDto.getParentOrderId() == null ? "" : orderDto.getParentOrderId();
+        this.parentOrderId = StringUtils.isEmpty(orderDto.getParentOrderId())  ? null : orderDto.getParentOrderId();
         this.servicePrice = orderDto.getServicePrice() == null ? BigDecimal.valueOf(0) : orderDto.getServicePrice();
         this.shopDetailId = orderDto.getShopDetailId() == null ? "" : orderDto.getShopDetailId();
         this.payType = orderDto.getPayType() == null ? 0 : orderDto.getPayType();
@@ -43,7 +44,7 @@ public class Order implements Serializable {
         this.allowContinueOrder = orderDto.getAllowContinueOrder() == null ? false : orderDto.getAllowContinueOrder() > 0;
         this.paymentAmount = orderDto.getPaymentAmount() == null ? BigDecimal.valueOf(0) : orderDto.getPaymentAmount();
         this.customerId = orderDto.getCustomerId() == null ? "0" : orderDto.getCustomerId();
-        this.customerAddressId = orderDto.getCustomerAddressId() == null ? "" : orderDto.getCustomerAddressId();
+        this.customerAddressId = StringUtils.isEmpty(orderDto.getCustomerAddressId()) ? null : orderDto.getCustomerAddressId();
     }
 
 

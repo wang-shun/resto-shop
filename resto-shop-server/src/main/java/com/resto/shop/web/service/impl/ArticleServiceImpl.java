@@ -421,7 +421,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = count <= 0 ? "【手动沽清】" : null;
 //        RedisUtil.set(articleId + Common.KUCUN, count);
-        RedisUtil.set(articleId + Common.KUCUN, count);
+            RedisUtil.set(articleId + Common.KUCUN, count);
         if (article.getIsEmpty()) {
             if (moreType && count > 0) {
                 articlePriceServer.setArticlePriceEmptyFail(baseArticleId);
