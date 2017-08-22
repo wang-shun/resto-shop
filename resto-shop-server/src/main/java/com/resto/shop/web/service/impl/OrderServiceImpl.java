@@ -51,6 +51,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.resto.brand.core.util.HttpClient.doPost;
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
 import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
@@ -1386,6 +1387,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         }
 
+        //用户取消微信支付记录UserAction日志
+        Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
+        Map customerMap = new HashMap(4);
+        customerMap.put("brandName", brand.getBrandName());
+        customerMap.put("fileName", order.getCustomerId());
+        customerMap.put("type", "UserAction");
+        customerMap.put("content", "用户:"+order.getCustomerId()+"取消微信支付，订单Id:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, customerMap);
         return result;
     }
 
