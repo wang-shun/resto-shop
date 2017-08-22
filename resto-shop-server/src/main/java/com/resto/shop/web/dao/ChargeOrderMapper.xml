@@ -540,7 +540,7 @@ AND u.id =#{customerId}
         IF (
         number_day_now > 0,
         SUM(
-        reward_money - (number_day_now - 1) * arrival_amount + end_amount
+        reward_money - (((number_day_now - 1) * arrival_amount) + end_amount + reward_balance)
         ),
         SUM(
         reward_money - reward_balance

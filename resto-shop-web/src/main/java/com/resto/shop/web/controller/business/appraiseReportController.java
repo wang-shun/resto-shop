@@ -16,6 +16,7 @@
  import com.resto.brand.web.service.BrandService;
  import com.resto.brand.web.service.ShopDetailService;
  import com.resto.brand.web.service.TableQrcodeService;
+ import com.resto.shop.web.constant.Common;
  import com.resto.shop.web.controller.GenericController;
  import com.resto.shop.web.model.Order;
  import com.resto.shop.web.service.AppraiseService;
@@ -33,6 +34,7 @@
  import java.io.OutputStream;
  import java.math.BigDecimal;
  import java.text.NumberFormat;
+ import java.text.SimpleDateFormat;
  import java.util.*;
 
 @Controller
@@ -428,4 +430,76 @@ public class appraiseReportController extends GenericController{
             e.printStackTrace();
         }
     }
+
+	@RequestMapping("/createMonthDto")
+	@ResponseBody
+	public Result createMonthDto(String year, String month, Integer type, HttpServletRequest request){
+		//得到传入的某年某月一共有多少天
+		Integer monthDay = getMonthDay(year, month);
+		// 导出文件名
+		String typeName = type.equals(Common.YES) ? "店铺评论报表月报表" : "品牌评论报表月报表" ;
+		String str = typeName + year.concat("-").concat(month).concat("-01") + "至"
+				+ year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)) + ".xls";
+		//得到文件存储路径
+		String path = request.getSession().getServletContext().getRealPath(str);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			List<ShopDetail> shopDetails = getCurrentShopDetails();
+			String[] shopNames = new String[1];
+			AppraiseDto[][] result = new AppraiseDto[1][monthDay];
+			if (type.equals(Common.YES)) {
+				shopNames = new String[shopDetails.size()];
+			}else {
+				String shopName = "";
+			}
+			Map<String, Object> map = new HashMap<>();
+			map.put("brandName", getBrandName());
+			map.put("beginDate", year.concat("-").concat(month).concat("-01"));
+			map.put("reportType", typeName);// 表的头，第一行内容
+			map.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
+			map.put("num", "15");// 显示的位置
+			map.put("timeType", "yyyy-MM-dd");
+			map.put("reportTitle", shopNames);// 表的名字
+			String[][] headers = {{"评价单数","25"},{"评价率","25"},{"评论红包总额","25"},{"订单总额(元)","25"},{"五星评价","25"},{"四星评价","25"},{"三星评价","25"},{"二星评价","25"},{"一星评价","25"}};
+			String[] columns = {"appraiseNum","appraiseRatio","redMoney","totalMoney","fivestar","fourstar","threestar","twostar","onestar"};
+			ExcelUtil<AppraiseDto> excelUtil = new ExcelUtil<>();
+			OutputStream out = new FileOutputStream(path);
+			excelUtil.createMonthDtoExcel(headers, columns, result, out, map);
+			out.close();
+		}catch (Exception e){
+			e.printStackTrace();
+			log.error("生成月营业报表出错！");
+			return new Result(false);
+		}
+		return getSuccessResult(path);
+	}
+
+	public Integer getMonthDay(String year, String month){
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.YEAR, Integer.parseInt(year));
+		calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+		return calendar.getActualMaximum(Calendar.DATE);
+	}
+
+	public Date getBeginDay(String year, String month, Integer day){
+		Calendar beginDate = Calendar.getInstance();
+		beginDate.set(Calendar.YEAR, Integer.parseInt(year));
+		beginDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+		beginDate.set(Calendar.DATE, day + 1);
+		beginDate.set(Calendar.HOUR_OF_DAY, 0);
+		beginDate.set(Calendar.MINUTE, 0);
+		beginDate.set(Calendar.SECOND,1);
+		return beginDate.getTime();
+	}
+
+	public Date getEndDay(String year, String month, Integer day){
+		Calendar endDate = Calendar.getInstance();
+		endDate.set(Calendar.YEAR, Integer.parseInt(year));
+		endDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+		endDate.set(Calendar.DATE, day + 1);
+		endDate.set(Calendar.HOUR_OF_DAY, 23);
+		endDate.set(Calendar.MINUTE, 59);
+		endDate.set(Calendar.SECOND,59);
+		return endDate.getTime();
+	}
 }
