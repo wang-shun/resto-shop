@@ -30,8 +30,8 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">推荐类型:</label>
                                 <div class="col-sm-8">
-                                    <input type="radio" style="cursor:pointer" class="form-control"  name="type" required v-model="m.type" value="0">热销
-                                    <input type="radio" style="cursor:pointer" class="form-control"  name="type" required v-model="m.type" value="1">新品
+                                    <label><input type="radio" style="cursor:pointer"  name="type" required v-model="m.type" value="0">热销</label>
+                                    <label><input type="radio" style="cursor:pointer"  name="type" required v-model="m.type" value="1">新品</label>
                                 </div>
                             </div>
                             <div class="form-group">
