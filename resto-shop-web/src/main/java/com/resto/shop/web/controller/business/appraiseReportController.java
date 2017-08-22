@@ -234,21 +234,18 @@ public class appraiseReportController extends GenericController{
 	@RequestMapping("create_brand_excel")
 	@ResponseBody
 	public Result report_brandExcel (String beginDate,String endDate,AppraiseDto appraiseDto,HttpServletRequest request, HttpServletResponse response){
-		
 		//导出文件名
         String fileName = "品牌评论报表"+beginDate+"至"+endDate+".xls";
         //定义读取文件的路径
         String path = request.getSession().getServletContext().getRealPath(fileName);
         //定义列
         String[]columns={"name","appraiseNum","appraiseRatio","redMoney","totalMoney","fivestar","fourstar","threestar","twostar","onestar"};
-        //定义数据
-
         //定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
         Map<String,String> map = new HashMap<>();
         Brand brand = brandService.selectById(getCurrentBrandId());
         //获取店铺名称
         List<ShopDetail> shops = shopDetailService.selectByBrandId(getCurrentBrandId());
-        String shopName="";
+        String shopName = "";
         for (ShopDetail shopDetail : shops) {
             shopName += shopDetail.getName()+",";
         }
@@ -290,6 +287,7 @@ public class appraiseReportController extends GenericController{
                 try {
                     out.close();
                 } catch (IOException io) {
+                	io.printStackTrace();
                 }
             }
         }
