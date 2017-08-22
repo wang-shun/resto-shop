@@ -505,7 +505,7 @@ public class appraiseReportController extends GenericController{
 								}
 							}
 							appraiseDto.setAppraiseNum(appraiseCount);
-							appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : ((float)(appraiseCount/orderCount) * 100) + "%");
+							appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : new BigDecimal(appraiseCount).divide(new BigDecimal(orderCount), 2, BigDecimal.ROUND_HALF_UP) + "%");
 						}
 						appraiseDto.setRedRatio(format.format(beginDate));
 						result[i][j] = appraiseDto;
@@ -566,7 +566,7 @@ public class appraiseReportController extends GenericController{
 							}
 						}
 						appraiseDto.setAppraiseNum(appraiseCount);
-						appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : ((float)(appraiseCount/orderCount) * 100) + "%");
+						appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : new BigDecimal(appraiseCount).divide(new BigDecimal(orderCount), 2, BigDecimal.ROUND_HALF_UP) + "%");
 					}
 					appraiseDto.setRedRatio(format.format(beginDate));
 					result[0][j] = appraiseDto;
