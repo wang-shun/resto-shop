@@ -98,11 +98,11 @@
                   }
 				},
                 {
-                    title : "主题V",
-                    data : "groupName"
+                    title : "主题",
+                    data : "groupName",
                 },
                 {
-                    title : "行为V",
+                    title : "行为",
                     data : "behavior",
 					createdCell:function (td,tdData) {
 						$(td).html(vueObj.BehaviorName(tdData))
@@ -113,7 +113,7 @@
                     data : "serialNumber"
                 },
                 {
-                    title : "详情V",
+                    title : "详情",
                     data : "detail",
 					createdCell:function (td,tdData) {
 						$(td).html(vueObj.DetailName(tdData))
@@ -151,6 +151,128 @@
                     <%--}--%>
                 <%--}--%>
                 ],
+
+            //给每一列添加下拉框搜索
+            initComplete: function () {
+                var api = this.api();
+                api.columns().indexes().flatten().each( function ( i ) {
+                    switch (i){
+						case 1: /*如果是第二列*/
+                            var column = api.column( i );
+                            var select = $('<select><option value="">主题</option></select>')
+                                .appendTo( $(column.header()).empty() )
+                                .on( 'change', function () {
+                                    var val = $.fn.dataTable.util.escapeRegex(
+                                        $(this).val()
+                                    );
+                                    column
+                                        .search( val ? '^'+val+'$' : '', true, false )
+                                        .draw();
+                                } );
+                            column.data().unique().sort().each( function ( d, j ) {
+                                select.append( '<option value="'+d+'">'+d+'</option>' )
+                            } );
+                        	break;
+
+						case 2:	/*如果是第三列*/
+                            var column = api.column( i );
+                            var select = $('<select><option value="">行为</option></select>')
+                                .appendTo( $(column.header()).empty() )
+                                .on( 'change', function () {
+                                    var val = $.fn.dataTable.util.escapeRegex(
+                                        $(this).val()
+                                    );
+                                    column
+                                        .search( val ? '^'+val+'$' : '', true, false )
+                                        .draw();
+                                } );
+                            column.data().unique().sort().each( function ( d, j ) {
+                                var temp = "未知";
+                                switch (d){
+                                    case 10:
+                                        temp = "注册";
+                                        break;
+                                    case 20:
+                                        temp = "消费";
+                                        break;
+                                    case 30:
+                                        temp = "短信";
+                                        break;
+                                    case 40:
+                                        temp = "充值";
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                select.append( '<option value="'+d+'">'+temp+'</option>' )
+                            } );
+                            break;
+                        case 4:	/*如果是第五列*/
+                            var column = api.column( i );
+                            var select = $('<select><option value="">详情</option></select>')
+                                .appendTo( $(column.header()).empty() )
+                                .on( 'change', function () {
+                                    var val = $.fn.dataTable.util.escapeRegex(
+                                        $(this).val()
+                                    );
+                                    column
+                                        .search( val ? '^'+val+'$' : '', true, false )
+                                        .draw();
+                                } );
+                            column.data().unique().sort().each( function ( d, j ) {
+                                var temp = "未知";
+                                switch (d){
+                                    case 10:
+                                        temp = "新用户注册";
+                                        break;
+                                    case 20:
+                                        temp = "消费订单抽成";
+                                        break;
+                                    case 21:
+                                        temp = "消费订单实付抽成";
+                                        break;
+                                    case 22:
+                                        temp = "回头用户消费订单抽成";
+                                        break;
+                                    case 23:
+                                        temp = "回头用户消费实付订单抽成";
+                                        break;
+                                    case 24:
+                                        temp = "R+外卖订单抽成";
+                                        break;
+                                    case 25:
+                                        temp = "R+外卖实付抽成";
+                                        break;
+                                    case 26:
+                                        temp = "第三方外卖订单抽成";
+                                        break;
+                                    case 27:
+                                        temp = "第三方外卖订单实付抽成";
+                                        break;
+
+                                    case 30:
+                                        temp = "注册验证码";
+                                        break;
+                                    case 31:
+                                        temp = "结店短信";
+                                        break;
+                                    case 40:
+                                        temp = "账户充值";
+                                        break;
+                                    default:
+                                        break;
+                                }
+                                select.append( '<option value="'+d+'">'+temp+'</option>' )
+                            } );
+                            break;
+						default:
+						    break;
+					}
+
+
+
+                } );
+            }
         });
 
         var C = new Controller(null,tb);
