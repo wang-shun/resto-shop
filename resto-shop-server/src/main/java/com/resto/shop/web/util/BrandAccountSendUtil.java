@@ -32,30 +32,6 @@ public class BrandAccountSendUtil {
 		Result r = new Result();
 		r.setSuccess(false);
 		r.setMessage("");
-
-
-
-		//需要发短信的情况
-		// 余额小于设置项 并且没发短信 就开始发短信
-//		if((account.compareTo(little)<0||account.compareTo(middle)<0||account.compareTo(hign)<0)&&accountSetting.getType()==0){
-//			JSONObject json = new JSONObject();
-//			json.put("name",brandName);
-//			json.put("price",brandAccount.getAccountBalance()+"");
-//			JSONObject aliResult = SMSUtils.sendMessage(accountSetting.getTelephone(),json,SMSUtils.SIGN,SMSUtils.BRAND_ACCOUNT_SMS,null);
-//			if(aliResult.getBoolean("success")){//如果发送短信成功
-//				r.setSuccess(true);
-//				if(account.compareTo(little)<0&&account.compareTo(middle)>0){
-//					r.setMessage(brandName+"第一次账户余额欠费提醒");
-//					r.setOpenId("one");
-//				}else if(account.compareTo(middle)<0&&account.compareTo(hign)>0){
-//					r.setOpenId("two");
-//					r.setMessage(brandName+"第二次账户余额欠费提醒");
-//				}else if(account.compareTo(hign)<0){
-//					r.setOpenId("three");
-//					r.setMessage(brandName+"第三次账户余额欠费提醒");
-//				}
-//			}
-//		}
 		if(accountSetting.getType()==0){//说明未发送
 			if(!noticeList.isEmpty()){
 			for(int i =0 ;i<noticeList.size();i++){
@@ -65,9 +41,9 @@ public class BrandAccountSendUtil {
 					json.put("price",brandAccount.getAccountBalance().toString());
 					JSONObject aliResult = new JSONObject();
 					if(noticeList.get(i).getType()== BrandAccountNoticeType.NOT_ENOUGH){
-						aliResult = SMSUtils.sendMessage(accountSetting.getTelephone(),json,SMSUtils.SIGN,SMSUtils.ACCOUNT_NOT_ENOUGH,null);
+						aliResult = SMSUtils.sendMessage(accountSetting.getTelephone(),json,SMSUtils.SIGN,SMSUtils.ACCOUNT_NOT_ENOUGH);
 					}else if(noticeList.get(i).getType()==BrandAccountNoticeType.ARREARS){
-						aliResult = SMSUtils.sendMessage(accountSetting.getTelephone(),json,SMSUtils.SIGN,SMSUtils.ACCOUNT_NOT_USED,null);
+						aliResult = SMSUtils.sendMessage(accountSetting.getTelephone(),json,SMSUtils.SIGN,SMSUtils.ACCOUNT_NOT_USED);
 					}
 					if(aliResult.getBoolean("success")){
 						r.setSuccess(true);

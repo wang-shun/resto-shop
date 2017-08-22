@@ -337,7 +337,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         param.put("price", price);
         param.put("name", name);
         param.put("day", day);
-        SMSUtils.sendMessage(customer.getTelephone(), new com.alibaba.fastjson.JSONObject(param), "餐加", "SMS_43790004", logMap);
+        SMSUtils.sendMessage(customer.getTelephone(), new com.alibaba.fastjson.JSONObject(param), "餐加", "SMS_43790004");
     }
 
     @Override

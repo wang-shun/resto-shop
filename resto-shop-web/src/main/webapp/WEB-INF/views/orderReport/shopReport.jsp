@@ -225,7 +225,12 @@
                             data : "orderState",
                             s_filter: true,
                             orderable : false
-                        }, {
+                        },
+                        {
+                            title : "桌号",
+                            data : "tableNumber",
+                        },
+                        {
                             title : "订单金额",
                             data : "orderMoney"
                         }, {

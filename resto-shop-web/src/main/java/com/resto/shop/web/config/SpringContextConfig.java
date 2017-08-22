@@ -520,6 +520,12 @@ public class SpringContextConfig {
 		return proxy.create(AccountSettingService.class);
 	}
 
+
+	@Bean
+	public AccountNoticeService accountNoticeService(){
+		return proxy.create(AccountNoticeService.class);
+	}
+
 	//-----------------------
 
 

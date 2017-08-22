@@ -154,7 +154,7 @@
                         },
                         {
                             title : "单均",
-                            data : "shop_orderCount"
+                            data : "shop_singlePrice"
                         },
                         {
                             title : "就餐人数",
@@ -162,7 +162,7 @@
                         },
                         {
                             title : "人均",
-                            data : "shop_orderCount"
+                            data : "shop_perPersonPrice"
                         },
                         {
                             title : "堂吃订单数",

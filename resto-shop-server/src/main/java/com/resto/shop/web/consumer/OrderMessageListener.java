@@ -194,6 +194,13 @@ public class OrderMessageListener implements MessageListener {
     
     
     //优惠券过期提前推送消息队列
+
+	/**
+	 * 方法已过期 wtl
+	 * @param message
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
     private Action executeRecommendMsg(Message message) throws UnsupportedEncodingException {
         try {
             String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
@@ -219,7 +226,7 @@ public class OrderMessageListener implements MessageListener {
             doPostAnsc(LogUtils.url, map);
             map.put("content","用户:"+customer.getNickname()+"优惠券过期发短信提醒"+"请求地址:"+MQSetting.getLocalIP());
             if(setting.getIsSendCouponMsg() == Common.YES){
-                sendNote(shopName,pr,name,pushDay,customer.getId(),map);
+                sendNote(shopName,pr,name,pushDay,customer.getId());
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -231,14 +238,16 @@ public class OrderMessageListener implements MessageListener {
     }
     
   //发送短信
-    private void sendNote(String shop,String price,String name,String pushDay,String customerId,Map<String,String>logMap){
+    private void sendNote(String shop,String price,String name,String pushDay,String customerId){
         Customer customer=customerService.selectById(customerId);
     	Map param = new HashMap();
         param.put("shop", shop);
 		param.put("price", price);
 		param.put("name", name);
 		param.put("day", pushDay);
-        SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param), "餐加", "SMS_43790004",logMap);
+        JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param), "餐加", "SMS_43790004");
+
+
     }
 
     //

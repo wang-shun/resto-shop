@@ -126,16 +126,5 @@ public class SmsLogoInfoController extends GenericController{
 		return smsAcountService.selectSmsUnitPriceByBrandId(getCurrentBrandId()).toString();
 	}
 	
-	/**
-	 * shop端
-	 * 测试发短信功能
-	 * @return
-	 */
-	@RequestMapping("/sendCode")
-	public JSONObject sendCode(@RequestParam("phone")String phone, @RequestParam("code")String code, @RequestParam("brandId")String brandId, @RequestParam("shopId")String shopId, @RequestParam("smsLogType")int smsLogType){
 
-//		return smsLogService.sendCode(phone, code, brandId, shopId);
-		return smsLogService.sendCode(phone, code, brandId, shopId, smsLogType,null,false,null);
-	}
-	
 }

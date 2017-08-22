@@ -218,7 +218,10 @@
                             break;
 
                         case 30:
-                            temp = "注册验证吗";
+                            temp = "注册验证码";
+                            break;
+                        case 31:
+                            temp = "结店短信";
                             break;
                         case 40:
                             temp = "账户充值";

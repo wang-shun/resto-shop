@@ -29,7 +29,6 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.util.BrandAccountSendUtil;
-import com.resto.shop.web.service.OrderRemarkService;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -1801,15 +1800,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
         //yz 2017/07/29计费系统
         Boolean flag = false;
-        if(openBrandAccount!=null&&openBrandAccount){
-        	flag = true;
-        	if(accountSetting==null){
-        		accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-			}
-		}else {
-        	flag = brandSetting.getOpenBrandAccount()==1;
+        if (openBrandAccount!=null) {
+            if (openBrandAccount) {
+                flag = true;
+                if (accountSetting == null) {
+                    accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+                }
+            } else {
+                flag = brandSetting.getOpenBrandAccount() == 1;
 
-		}
+            }
+        }
 		update(order);
         updateBrandAccount(order,flag,accountSetting);
 //        Map map = new HashMap(4);
@@ -2033,87 +2034,94 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		o.setProductionStatus(ProductionStatus.GET_IT);
 		int count = orderMapper.updateByPrimaryKeySelective(o);
 		//yz 2017/08/03 计费系统 添加账户设置(简单版) ---resto+外卖订单
-		BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
-		if (brandSetting.getOpenBrandAccount() == 1) {//说明开启了品牌账户
-			//查询品牌账户设置
-			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-			//定义抽成的金额
-			BigDecimal money = BigDecimal.ZERO;
 
-			if (accountSetting.getOpenOutFoodOrder() == 1) {//开启resto外卖订单 并且按订单总额抽成
-				//计算resto外卖 的 抽成金额 (外卖都是先付所以就直接计算)
-				money = o.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? o.getAmountWithChildren() : o.getOrderMoney();
-			} else if (accountSetting.getOpenOutFoodOrder() == 2) {//开启resto外卖订单 并且按实际支付 抽成
-				List<OrderPaymentItem> orderPaymentItemList = orderPaymentItemService.selectByOrderId(o.getId());
+		try{
+			BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
+			if (brandSetting.getOpenBrandAccount() == 1) {//说明开启了品牌账户
+				//查询品牌账户设置
+				AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+				//定义抽成的金额
+				BigDecimal money = BigDecimal.ZERO;
 
-				if(!orderPaymentItemList.isEmpty()){
-					for (OrderPaymentItem oi : orderPaymentItemList) {
-						//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
-						if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
-								oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
-								oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
-								oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
-								){
-							money = money.add(oi.getPayValue());
+				if (accountSetting.getOpenOutFoodOrder() == 1) {//开启resto外卖订单 并且按订单总额抽成
+					//计算resto外卖 的 抽成金额 (外卖都是先付所以就直接计算)
+					money = o.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? o.getAmountWithChildren() : o.getOrderMoney();
+				} else if (accountSetting.getOpenOutFoodOrder() == 2) {//开启resto外卖订单 并且按实际支付 抽成
+					List<OrderPaymentItem> orderPaymentItemList = orderPaymentItemService.selectByOrderId(o.getId());
+
+					if(!orderPaymentItemList.isEmpty()){
+						for (OrderPaymentItem oi : orderPaymentItemList) {
+							//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
+							if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+									oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
+									oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+									oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
+									){
+								money = money.add(oi.getPayValue());
+							}
 						}
 					}
 				}
+				//记录日志 和更新账户
+				BrandAccount brandAccount = brandAccountService.selectByBrandId(o.getBrandId());
+				ShopDetail s = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
+
+				BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
+				BrandAccountLog blog = new BrandAccountLog();
+				blog.setSerialNumber(o.getSerialNumber());
+				blog.setCreateTime(new Date());
+				blog.setBrandId(o.getBrandId());
+				blog.setShopId(o.getShopDetailId());
+				blog.setFoundChange(money.negate());
+				blog.setGroupName(s.getName());
+				blog.setAccountId(brandAccount.getId());
+				blog.setRemain(remain);
+				blog.setOrderMoney(o.getOrderMoney());
+				if(o.getParentOrderId()!=null){
+					blog.setIsParent(true);
+				}
+
+				if(accountSetting.getOpenOutFoodOrder()==1){//Resto+外卖订单抽成
+					blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_SELL);
+				}
+				if(accountSetting.getOpenOutFoodOrder()==2){ //Resto+外卖订单实付抽成
+					blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_REAL_SELL);
+				}
+
+				blog.setBehavior(BehaviorType.SELL);
+
+				// 创建账户日志流水 和更新账户
+				Integer id = brandAccount.getId();
+				brandAccount = new BrandAccount();
+				brandAccount.setId(id);
+				brandAccount.setUpdateTime(new Date());
+				brandAccount.setAccountBalance(remain);
+				brandAccountLogService.insert(blog);
+				brandAccountService.update(brandAccount);
+				//yz TODO//判断品牌账户是否需要发送通知(账户不足通知)---
+				Brand brand = brandService.selectByPrimaryKey(o.getBrandId());
+
+				List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
+
+				Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+				if(result.isSuccess()){
+					Long accountSettingId = accountSetting.getId();
+					AccountSetting as = new AccountSetting();
+					as.setId(accountSettingId);
+					as.setType(1);
+					accountSettingService.update(as);
+					//发送消息队列通知 消费者24小时后再次查询账户余额情况 如果不符合要求则更改发短信为可以发状态
+					log.info("有resto+外卖订单产生计费并且该品牌账户已经欠费---");
+					log.info("开始发送延时消息队列--");
+					MQMessageProducer.sendBrandAccountSms(brand.getId(), MQSetting.DELAY_TIME);
+				}
+
 			}
-			//记录日志 和更新账户
-			BrandAccount brandAccount = brandAccountService.selectByBrandId(o.getBrandId());
-			ShopDetail s = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
+		}catch (Exception e){
+			log.info("resto外卖订单抽成出错 "+e.getMessage());
+			e.printStackTrace();
+		}
 
-			BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
-			BrandAccountLog blog = new BrandAccountLog();
-			blog.setSerialNumber(o.getSerialNumber());
-			blog.setCreateTime(new Date());
-			blog.setBrandId(o.getBrandId());
-			blog.setShopId(o.getShopDetailId());
-			blog.setFoundChange(money.negate());
-			blog.setGroupName(s.getName());
-			blog.setAccountId(brandAccount.getId());
-			blog.setRemain(remain);
-			blog.setOrderMoney(o.getOrderMoney());
-			if(o.getParentOrderId()!=null){
-				blog.setIsParent(true);
-			}
-
-			if(accountSetting.getOpenOutFoodOrder()==1){//Resto+外卖订单抽成
-				blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_SELL);
-			}
-			if(accountSetting.getOpenOutFoodOrder()==2){ //Resto+外卖订单实付抽成
-				blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_REAL_SELL);
-			}
-
-			blog.setBehavior(BehaviorType.SELL);
-
-			// 创建账户日志流水 和更新账户
-			Integer id = brandAccount.getId();
-			brandAccount = new BrandAccount();
-			brandAccount.setId(id);
-			brandAccount.setUpdateTime(new Date());
-			brandAccount.setAccountBalance(remain);
-			brandAccountLogService.insert(blog);
-			brandAccountService.update(brandAccount);
-			//yz TODO//判断品牌账户是否需要发送通知(账户不足通知)---
-			Brand brand = brandService.selectByPrimaryKey(o.getBrandId());
-
-			List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
-
-			Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
-			if(result.isSuccess()){
-				Long accountSettingId = accountSetting.getId();
-				AccountSetting as = new AccountSetting();
-				as.setId(accountSettingId);
-				as.setType(1);
-				accountSettingService.update(as);
-				//发送消息队列通知 消费者24小时后再次查询账户余额情况 如果不符合要求则更改发短信为可以发状态
-				log.info("有resto+外卖订单产生计费并且该品牌账户已经欠费---");
-				log.info("开始发送延时消息队列--");
-				MQMessageProducer.sendBrandAccountSms(brand.getId(), MQSetting.DELAY_TIME);
-			}
-
-		 }
 			return count;
 		}
 
@@ -7267,7 +7275,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
             if (orders.containsKey(orderItem.getOrderId())) {
                 orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
+                MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", Integer.parseInt(MemcachedUtils.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
             } else {
+                MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", orderItem.getCount());
                 orders.put(orderItem.getOrderId(), itemValue);
             }
         }
@@ -7490,7 +7500,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             if (item.getRefundCount() > 0 && item.getType() != OrderItemType.MEALS_CHILDREN) {
                 sum += item.getRefundCount();
-
+                sum += item.getRefundCount();
             }
             if (item.getType() != OrderItemType.MEALS_CHILDREN) {
                 base += item.getOrginCount();
@@ -7502,18 +7512,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
-        o.setArticleCount(base - sum);
+        o.setArticleCount(o.getArticleCount() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
-            o.setCountWithChild(o.getCountWithChild() - order.getOrderItems().size());
+            o.setCountWithChild(o.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
         }
         if (o.getParentOrderId() != null) {
             Order parent = selectById(o.getParentOrderId());
             parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
-            parent.setCountWithChild(parent.getCountWithChild() - order.getOrderItems().size());
+            parent.setCountWithChild(parent.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
             update(parent);
             Map map = new HashMap(4);
             map.put("brandName", brandSetting.getBrandName());
@@ -7808,7 +7818,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMoney = orderMoney.add(article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())));
             if (article.getType() != OrderItemType.MEALS_CHILDREN && order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
                 refundItem = new HashMap<>();
-                Article a = articleService.selectById(article.getArticleId());
+                String aid = article.getArticleId();
+                if (aid.indexOf("@") > -1) {
+                    aid = aid.substring(0, aid.indexOf("@"));
+                }
+                Article a = articleService.selectById(aid);
                 refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(
                         new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(a.getMealFeeNumber()))).doubleValue());
                 refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
