@@ -342,7 +342,7 @@ public class PosServiceImpl implements PosService {
     @Override
     public void syncPosConfirmOrder(String orderId) {
         Order order = orderService.selectById(orderId);
-        if(order != null && order.getOrderState() == OrderState.SUBMIT && order.getIsConfirm() == Common.NO){
+        if(order != null && order.getOrderState() == OrderState.SUBMIT ){
             orderService.confirmOrderPos(orderId);
         }
     }
