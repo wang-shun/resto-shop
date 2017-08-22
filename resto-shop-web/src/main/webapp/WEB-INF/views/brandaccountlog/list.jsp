@@ -19,7 +19,7 @@
 				<button type="button" class="btn btn-primary" @click="week">本周</button>
 				<button type="button" class="btn btn-primary" @click="month">本月</button>
 				<button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-				<button type="button" class="btn btn-primary" @click="createOrderExcel">下载报表</button><br/>
+				<%--<button type="button" class="btn btn-primary" @click="createOrderExcel">下载报表</button><br/>--%>
 			</form>
 
 		</div>
