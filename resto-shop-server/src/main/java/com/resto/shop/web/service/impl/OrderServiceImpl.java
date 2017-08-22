@@ -1965,7 +1965,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					jifeiMoney = order.getOrderMoney();
 				}
 			}
-			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
+			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
 		}else if(accountSetting.getOpenAllOrder()==BrandAccountPayType.ALL_ORDER_MONEY) {//说明是 所有订单/实际支付金额抽成
 			List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
 			if(!orderPaymentItems.isEmpty()){
@@ -1980,7 +1980,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					}
 				}
 			}
-			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
+			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue())).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
 		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.ALL_ORDER_MONEY){//回头用户订单  /订单总额抽成
 			if(flag){//是回头用户才会计算金额
 				if(order.getPayType()==0){//如果是先付
@@ -1992,7 +1992,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 						jifeiMoney = order.getOrderMoney();
 					}
 				}
-				money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
+				money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
 			}
 
 		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.REAL_ORDER_MONEY){//回头用户 /实际支付总额抽成
@@ -2010,7 +2010,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 						}
 					}
 				}
-				money = jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue())).divide(new BigDecimal(100),2,BigDecimal.ROUND_HALF_UP);
+				money = jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue())).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
 
 			}
 		}
