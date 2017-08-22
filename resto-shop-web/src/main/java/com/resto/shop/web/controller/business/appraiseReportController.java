@@ -21,6 +21,7 @@
  import com.resto.shop.web.model.Order;
  import com.resto.shop.web.service.AppraiseService;
  import com.resto.shop.web.service.OrderService;
+ import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
@@ -444,24 +445,146 @@ public class appraiseReportController extends GenericController{
 		String path = request.getSession().getServletContext().getRealPath(str);
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
 		try {
+			//得到该品牌所有店铺
 			List<ShopDetail> shopDetails = getCurrentShopDetails();
+			//初始化店铺名称集合
 			String[] shopNames = new String[1];
+			//初始化数据集合
 			AppraiseDto[][] result = new AppraiseDto[1][monthDay];
+			//查询本月订单
+			List<Order> orderList = orderService.selectListBybrandId(year.concat("-").concat(month).concat("-01"), year.concat("-").concat(month).concat("-" + String.valueOf(monthDay))
+					, getCurrentBrandId());
+			//声明迭代器
+			Iterator<Order> orderIterator = orderList.iterator();
+			//初始化评论报表实体
+			AppraiseDto appraiseDto = new AppraiseDto("","", 0, "0.00%", BigDecimal.ZERO, BigDecimal.ZERO, "", 0, 0, 0, 0, 0);
 			if (type.equals(Common.YES)) {
 				shopNames = new String[shopDetails.size()];
+				//重新new一个二位数组，行是店铺数、列是天数
+				result = new AppraiseDto[shopDetails.size()][monthDay];
+				//初始化i用来记录当前所在店铺
+				int i = 0;
+				//初始化j用来记录当前所在天数
+				int j = 0;
+				//循环每个店铺，每个店铺相当于一个sheet
+				for (ShopDetail shopDetail : shopDetails){
+					//循环每一天，封装每个sheet的数据
+					for (int day = 0; day < monthDay; day++){
+						Date beginDate = getBeginDay(year, month, day);
+						Date endDate = getEndDay(year, month, day);
+						int orderCount = 0;
+						int appraiseCount = 0;
+						//判断当天是否又产生订单，有则进入逻辑判断
+						if (!orderList.isEmpty()) {
+							while (orderIterator.hasNext()) {
+								//得到当前订单
+								Order order = orderIterator.next();
+								//循环订单找到某店铺某一天的数据
+								if (order.getShopDetailId().equalsIgnoreCase(shopDetail.getId()) && order.getCreateTime().getTime() >= beginDate.getTime() && order.getCreateTime().getTime() <= endDate.getTime()) {
+									//如果该笔订单产生评论
+									if (order.getAppraise() != null) {
+										//评论数递增
+										appraiseCount++;
+										//红包金额累加
+										appraiseDto.setRedMoney(appraiseDto.getRedMoney().add(order.getAppraise().getRedMoney()));
+										if (order.getAppraise().getLevel() == 1) {
+											appraiseDto.setOnestar(appraiseDto.getOnestar() + 1);
+										} else if (order.getAppraise().getLevel() == 2) {
+											appraiseDto.setTwostar(appraiseDto.getTwostar() + 1);
+										} else if (order.getAppraise().getLevel() == 3) {
+											appraiseDto.setThreestar(appraiseDto.getThreestar() + 1);
+										} else if (order.getAppraise().getLevel() == 4) {
+											appraiseDto.setFourstar(appraiseDto.getFourstar() + 1);
+										} else if (order.getAppraise().getLevel() == 5) {
+											appraiseDto.setFivestar(appraiseDto.getFivestar() + 1);
+										}
+									}
+									appraiseDto.setTotalMoney(appraiseDto.getTotalMoney().add(order.getOrderMoney()));
+									orderCount++;
+									orderIterator.remove();
+								}
+							}
+							appraiseDto.setAppraiseNum(appraiseCount);
+							appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00" : ((appraiseCount / orderCount) * 100) + "%");
+						}
+						appraiseDto.setRedRatio(format.format(beginDate));
+						result[i][j] = appraiseDto;
+						j++;
+						appraiseDto = new AppraiseDto("","", 0, "0.00%", BigDecimal.ZERO, BigDecimal.ZERO, "", 0, 0, 0, 0, 0);
+					}
+					shopNames[i] = shopDetail.getName();
+					//所在店铺下标累加
+					i++;
+					//将所在天数恢复初始值
+					j = 0;
+				}
 			}else {
-				String shopName = "";
+				//得到所有店铺名称
+				StringBuilder builder = new StringBuilder();
+				for (ShopDetail shopDetail : shopDetails){
+					builder.append(shopDetail.getName()).append(",");
+				}
+				String shopName = builder.toString();
+				shopName = shopName.substring(0, shopName.length() - 1);
+				shopNames[0] = shopName;
+				//初始化j用来记录当前所在天数
+				int j = 0;
+				//循环每一天，封装每个sheet的数据
+				for (int day = 0; day < monthDay; day++){
+					Date beginDate = getBeginDay(year, month, day);
+					Date endDate = getEndDay(year, month, day);
+					int orderCount = 0;
+					int appraiseCount = 0;
+					//判断当天是否又产生订单，有则进入逻辑判断
+					if (!orderList.isEmpty()) {
+						while (orderIterator.hasNext()) {
+							//得到当前订单
+							Order order = orderIterator.next();
+							//循环订单找到某店铺某一天的数据
+							if (order.getCreateTime().getTime() >= beginDate.getTime() && order.getCreateTime().getTime() <= endDate.getTime()) {
+								//如果该笔订单产生评论
+								if (order.getAppraise() != null) {
+									//评论数递增
+									appraiseCount++;
+									//红包金额累加
+									appraiseDto.setRedMoney(appraiseDto.getRedMoney().add(order.getAppraise().getRedMoney()));
+									if (order.getAppraise().getLevel() == 1) {
+										appraiseDto.setOnestar(appraiseDto.getOnestar() + 1);
+									} else if (order.getAppraise().getLevel() == 2) {
+										appraiseDto.setTwostar(appraiseDto.getTwostar() + 1);
+									} else if (order.getAppraise().getLevel() == 3) {
+										appraiseDto.setThreestar(appraiseDto.getThreestar() + 1);
+									} else if (order.getAppraise().getLevel() == 4) {
+										appraiseDto.setFourstar(appraiseDto.getFourstar() + 1);
+									} else if (order.getAppraise().getLevel() == 5) {
+										appraiseDto.setFivestar(appraiseDto.getFivestar() + 1);
+									}
+								}
+								appraiseDto.setTotalMoney(appraiseDto.getTotalMoney().add(order.getOrderMoney()));
+								orderCount++;
+								orderIterator.remove();
+							}
+						}
+						appraiseDto.setAppraiseNum(appraiseCount);
+						appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00" : ((appraiseCount / orderCount) * 100) + "%");
+					}
+					appraiseDto.setRedRatio(format.format(beginDate));
+					result[0][j] = appraiseDto;
+					j++;
+					appraiseDto = new AppraiseDto("","", 0, "0.00%", BigDecimal.ZERO, BigDecimal.ZERO, "", 0, 0, 0, 0, 0);
+				}
 			}
+			//封装excel基本信息
 			Map<String, Object> map = new HashMap<>();
 			map.put("brandName", getBrandName());
 			map.put("beginDate", year.concat("-").concat(month).concat("-01"));
 			map.put("reportType", typeName);// 表的头，第一行内容
 			map.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
-			map.put("num", "15");// 显示的位置
+			map.put("num", "9");// 显示的位置
 			map.put("timeType", "yyyy-MM-dd");
 			map.put("reportTitle", shopNames);// 表的名字
-			String[][] headers = {{"评价单数","25"},{"评价率","25"},{"评论红包总额","25"},{"订单总额(元)","25"},{"五星评价","25"},{"四星评价","25"},{"三星评价","25"},{"二星评价","25"},{"一星评价","25"}};
-			String[] columns = {"appraiseNum","appraiseRatio","redMoney","totalMoney","fivestar","fourstar","threestar","twostar","onestar"};
+			String[][] headers = {{"日期","25"},{"评价单数","25"},{"评价率","25"},{"评论红包总额","25"},{"订单总额(元)","25"},{"五星评价","25"},{"四星评价","25"},{"三星评价","25"},{"二星评价","25"},{"一星评价","25"}};
+			String[] columns = {"redRatio","appraiseNum","appraiseRatio","redMoney","totalMoney","fivestar","fourstar","threestar","twostar","onestar"};
 			ExcelUtil<AppraiseDto> excelUtil = new ExcelUtil<>();
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.createMonthDtoExcel(headers, columns, result, out, map);
