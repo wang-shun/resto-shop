@@ -280,7 +280,6 @@
                 this.searchInfo();
             },
             yesterDay : function(){
-
                 this.searchDate.beginDate = GetDateStr(-1);
                 this.searchDate.endDate  = GetDateStr(-1);
                 this.searchInfo();

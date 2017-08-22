@@ -6,6 +6,7 @@
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.RequestParam;
  import org.springframework.web.bind.annotation.ResponseBody;
 
  import javax.annotation.Resource;
@@ -25,8 +26,11 @@
 
 	 @RequestMapping("/list_all")
 	 @ResponseBody
-	 public List<BrandAccountLog> listData(){
-		 return brandaccountlogService.selectListByBrandId(getCurrentBrandId());
+	 public Result listData(@RequestParam("beginDate")String beginDate,@RequestParam("endDate")String endDate){
+	 	 List<BrandAccountLog> list = brandaccountlogService.selectListByBrandIdAndTime(beginDate,endDate,getCurrentBrandId());
+
+	 	 return getSuccessResult(list);
+
 	 }
 
 	 @RequestMapping("list_one")
