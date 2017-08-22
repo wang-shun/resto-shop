@@ -325,13 +325,12 @@
         <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
-
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
             <id column="appraise_id" property="id"/>
             <result column="level" property="level"/>
             <result column="red_money" property="redMoney"/>
         </association>
-
     </resultMap>
 
 
@@ -2006,7 +2005,7 @@
 
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
         SELECT
-        o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money from tb_order o
+        o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.create_time from tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         LEFT JOIN  tb_appraise a
