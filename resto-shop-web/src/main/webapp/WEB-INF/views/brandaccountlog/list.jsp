@@ -2,66 +2,28 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <div id="control">
-	<div class="row form-div" v-if="showform">
-		<div class="col-md-offset-3 col-md-6" >
-			<div class="portlet light bordered">
-				<div class="portlet-title">
-					<div class="caption">
-						<span class="caption-subject bold font-blue-hoki"> 表单</span>
-					</div>
+	<h2 class="text-center"><strong>账户流水</strong></h2><br/>
+	<div class="row" id="searchTools">
+		<div class="col-md-12">
+			<form class="form-inline">
+				<div class="form-group" style="margin-right: 50px;">
+					<label for="beginDate">开始时间：</label>
+					<input type="text" class="form-control form_datetime" id="beginDate" v-model="searchDate.beginDate"   readonly="readonly">
 				</div>
-				<div class="portlet-body">
-					<form role="form" action="{{m.id?'brandaccountlog/modify':'brandaccountlog/create'}}" @submit.prevent="save">
-						<div class="form-body">
-							<div class="form-group">
-								<label>money</label>
-								<input type="text" class="form-control" name="money" v-model="m.money">
-							</div>
-							<div class="form-group">
-								<label>groupName</label>
-								<input type="text" class="form-control" name="groupName" v-model="m.groupName">
-							</div>
-							<div class="form-group">
-								<label>behavior</label>
-								<input type="text" class="form-control" name="behavior" v-model="m.behavior">
-							</div>
-							<div class="form-group">
-								<label>foundChange</label>
-								<input type="text" class="form-control" name="foundChange" v-model="m.foundChange">
-							</div>
-							<div class="form-group">
-								<label>remain</label>
-								<input type="text" class="form-control" name="remain" v-model="m.remain">
-							</div>
-							<div class="form-group">
-								<label>detail</label>
-								<input type="text" class="form-control" name="detail" v-model="m.detail">
-							</div>
-							<div class="form-group">
-								<label>accountId</label>
-								<input type="text" class="form-control" name="accountId" v-model="m.accountId">
-							</div>
-							<div class="form-group">
-								<label>brandId</label>
-								<input type="text" class="form-control" name="brandId" v-model="m.brandId">
-							</div>
-							<div class="form-group">
-								<label>shopId</label>
-								<input type="text" class="form-control" name="shopId" v-model="m.shopId">
-							</div>
-							<div class="form-group">
-								<label>serialNumber</label>
-								<input type="text" class="form-control" name="serialNumber" v-model="m.serialNumber">
-							</div>
+				<div class="form-group" style="margin-right: 50px;">
+					<label for="endDate">结束时间：</label>
+					<input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly="readonly">
+				</div>
+				<button type="button" class="btn btn-primary" @click="today"> 今日</button>
+				<button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
+				<button type="button" class="btn btn-primary" @click="week">本周</button>
+				<button type="button" class="btn btn-primary" @click="month">本月</button>
+				<button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
+				<button type="button" class="btn btn-primary" @click="createOrderExcel">下载报表</button><br/>
+			</form>
 
-						</div>
-						<input type="hidden" name="id" v-model="m.id" />
-						<input class="btn green"  type="submit"  value="保存"/>
-						<a class="btn default" @click="cancel" >取消</a>
-					</form>
-				</div>
-			</div>
 		</div>
+	</div>
 	</div>
 
 	<div class="table-div">
@@ -78,88 +40,216 @@
 	</div>
 </div>
 
+<script src="assets/customer/date.js" type="text/javascript"></script>
 
 <script>
+
+    //时间插件
+    $('.form_datetime').datetimepicker({
+        endDate:new Date(),
+        minView:"month",
+        maxView:"month",
+        autoclose:true,//选择后自动关闭时间选择器
+        todayBtn:true,//在底部显示 当天日期
+        todayHighlight:true,//高亮当前日期
+        format:"yyyy-mm-dd",
+        startView:"month",
+        language:"zh-CN"
+    });
+
     (function(){
-        var cid="#control";
-        var $table = $(".table-body>table");
-        var tb = $table.DataTable({
-            ajax : {
-                url : "brandaccountlog/list_all",
-                dataSrc : ""
-            },
-			"order":[[0,"desc"]],
-            columns : [
-				{
-				  title:"时间",
-				  data:"createTime",
-				  createdCell:function (td,tdData) {
-					  $(td).html(vueObj.formatDate(tdData))
-                  }
-				},
-                {
-                    title : "主题V",
-                    data : "groupName"
-                },
-                {
-                    title : "行为V",
-                    data : "behavior",
-					createdCell:function (td,tdData) {
-						$(td).html(vueObj.BehaviorName(tdData))
-                    }
-                },
-                {
-                    title : "流水号",
-                    data : "serialNumber"
-                },
-                {
-                    title : "详情V",
-                    data : "detail",
-					createdCell:function (td,tdData) {
-						$(td).html(vueObj.DetailName(tdData))
-                    }
-                },
-
-                {
-                    title : "资金变动",
-                    data : "foundChange",
-					createdCell:function (td,tdData) {
-                        var temp = tdData;
-						if(tdData>0){
-						    temp = "+"+tdData;
-						}
-						$(td).html(temp);
-                    }
-                },
-                {
-                    title : "余额(￥)",
-                    data : "remain",
-                }
-                <%--{--%>
-                    <%--title : "操作",--%>
-                    <%--data : "id",--%>
-                    <%--createdCell:function(td,tdData,rowData,row){--%>
-                        <%--var operator=[--%>
-                            <%--<s:hasPermission name="brandaccountlog/delete">--%>
-                            <%--C.createDelBtn(tdData,"brandaccountlog/delete"),--%>
-                            <%--</s:hasPermission>--%>
-                            <%--<s:hasPermission name="brandaccountlog/modify">--%>
-                            <%--C.createEditBtn(rowData),--%>
-                            <%--</s:hasPermission>--%>
-                        <%--];--%>
-                        <%--$(td).html(operator);--%>
-                    <%--}--%>
-                <%--}--%>
-                ],
-        });
-
-        var C = new Controller(null,tb);
         var vueObj = new Vue({
             el:"#control",
-            mixins:[C.formVueMix],
+            data:{
+                searchDate : {
+                    beginDate : '',
+                    endDate : ''
+                },
+				brandAccountLogTable:{}
+            },
+            created : function() {
+                var date = new Date().format("yyyy-MM-dd");
+                this.searchDate.beginDate = date;
+                this.searchDate.endDate = date;
+                this.createdDataTable();//初始化创建dataTable
+				this.searchInfo()
+            },
+
 			methods:{
+                createdDataTable:function () {
+                    //that代表 vue对象
+                    var that = this;
+                    //datatable对象
+                    that.brandAccountLogTable=$(".table-body>table").DataTable({
+                        lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
+                        order: [[ 0, "desc" ]],
+                        columns: [
+                            {
+                                title: "时间",
+                                data: "createTime",
+                                createdCell: function (td, tdData) {
+                                    $(td).html(vueObj.formatDate(tdData))
+                                }
+                            },
+                            {
+                                title: "主题",
+                                data: "groupName",
+                            },
+                            {
+                                title: "行为",
+                                data: "behavior",
+                                createdCell: function (td, tdData) {
+                                    $(td).html(vueObj.BehaviorName(tdData))
+                                }
+                            },
+                            {
+                                title: "流水号",
+                                data: "serialNumber"
+                            },
+                            {
+                                title: "详情",
+                                data: "detail",
+                                createdCell: function (td, tdData) {
+                                    $(td).html(vueObj.DetailName(tdData))
+                                }
+                            },
+
+                            {
+                                title: "资金变动",
+                                data: "foundChange",
+                                createdCell: function (td, tdData) {
+                                    var temp = tdData;
+                                    if (tdData > 0) {
+                                        temp = "+" + tdData;
+                                    }
+                                    $(td).html(temp);
+                                }
+                            },
+                            {
+                                title: "余额(￥)",
+                                data: "remain"
+                            }
+                        ],
+                        //给每一列添加下拉框搜索
+                        initComplete: function () {
+                            var api = this.api();
+                            api.columns().indexes().flatten().each(function (i) {
+                                switch (i) {
+                                    case 1: /*如果是第二列*/
+                                        var column = api.column(i);
+                                        var select = $('<select><option value="">主题</option></select>')
+                                            .appendTo($(column.header()).empty())
+                                            .on('change', function () {
+                                                var val = $.fn.dataTable.util.escapeRegex(
+                                                    $(this).val()
+                                                );
+                                                column
+                                                    .search(val ? '^' + val + '$' : '', true, false)
+                                                    .draw();
+                                            });
+                                        column.data().unique().sort().each(function (d, j) {
+                                            select.append('<option value="' + d + '">' + d + '</option>')
+                                        });
+                                        break;
+
+                                    case 2:    /*如果是第三列*/
+                                        var column = api.column(i);
+                                        var select = $('<select><option value="">行为</option></select>')
+                                            .appendTo($(column.header()).empty())
+                                            .on('change', function () {
+                                                var val = $.fn.dataTable.util.escapeRegex(
+                                                    $(this).val()
+                                                );
+                                                column
+                                                    .search(val ? '^' + val + '$' : '', true, false)
+                                                    .draw();
+                                            });
+                                        column.data().unique().sort().each(function (d, j) {
+                                            select.append('<option value="' + d + '">' + vueObj.BehaviorName(d) + '</option>')
+                                        });
+                                        break;
+                                    case 4:    /*如果是第五列*/
+                                        var column = api.column(i);
+                                        var select = $('<select><option value="">详情</option></select>')
+                                            .appendTo($(column.header()).empty())
+                                            .on('change', function () {
+                                                var val = $.fn.dataTable.util.escapeRegex(
+                                                    $(this).val()
+                                                );
+                                                column
+                                                    .search(val ? '^' + val + '$' : '', true, false)
+                                                    .draw();
+                                            });
+                                        column.data().unique().sort().each(function (d, j) {
+                                            select.append('<option value="' + d + '">' + vueObj.DetailName(d) + '</option>')
+                                        });
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            });
+                        }
+                    })
+                },
+				searchInfo:function () {
+                    var that = this;
+                    var timeCha = new Date(that.searchDate.endDate).getTime() - new Date(that.searchDate.beginDate).getTime();
+                    if(timeCha < 0) {
+                        toastr.clear();
+                        toastr.error("开始时间应该少于结束时间！");
+                        return false;
+                    }
+                    toastr.clear();
+                    toastr.success("查询中...");
+                    try {
+                        $.post("brandaccountlog/list_all", this.getDate(), function (result) {
+                            console.log(result)
+                            if(result.success) {
+                                that.brandAccountLogTable.clear();
+                                that.brandAccountLogTable.rows.add(result.data).draw();
+                                toastr.clear();
+                                toastr.success("查询成功");
+                            }else{
+                                toastr.clear();
+                                toastr.error("查询出错");
+                            }
+                        });
+                    }catch (e){
+                        toastr.clear();
+                        toastr.error("系统异常，请刷新重试");
+                    }
+                },
+                getDate : function(){
+                    var data = {
+                        beginDate : this.searchDate.beginDate,
+                        endDate : this.searchDate.endDate
+                    };
+                    return data;
+                },
+                today : function(){
+                    var date = new Date().format("yyyy-MM-dd");
+                    this.searchDate.beginDate = date;
+                    this.searchDate.endDate = date;
+                    this.searchInfo();
+                },
+                yesterDay : function(){
+                    this.searchDate.beginDate = GetDateStr(-1);
+                    this.searchDate.endDate  = GetDateStr(-1);
+                    this.searchInfo();
+                },
+                week : function(){
+                    this.searchDate.beginDate  = getWeekStartDate();
+                    this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
+                    this.searchInfo();
+                },
+                month : function(){
+                    this.searchDate.beginDate  = getMonthStartDate();
+                    this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
+                    this.searchInfo();
+                },
+
                 formatDate:function (date) {
-                    var temp = "";
+                    var temp = '';
                     if (date != null && date != "") {
                         temp = new Date(date);
                         temp = temp.format("yyyy-MM-dd hh:mm:ss");
@@ -236,7 +326,6 @@
 
 			}
         });
-        C.vue=vueObj;
     }());
 
 
