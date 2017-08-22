@@ -45,6 +45,7 @@ public class OrderDto implements Serializable {
         this.customerId = order.getCustomerId() == null ? "0" : order.getCustomerId();
         this.customerAddressId = order.getCustomerAddressId() == null ? "" : order.getCustomerAddressId();
         this.verCode = order.getVerCode() == null ? "" : order.getVerCode();
+        this.payMode = order.getPayMode();
     }
 
     //订单id
@@ -107,6 +108,16 @@ public class OrderDto implements Serializable {
     private List<OrderPaymentDto> orderPayment;
 
     private String verCode;
+
+    private Integer payMode;
+
+    public Integer getPayMode() {
+        return payMode;
+    }
+
+    public void setPayMode(Integer payMode) {
+        this.payMode = payMode;
+    }
 
     public String getVerCode() {
         return verCode;
