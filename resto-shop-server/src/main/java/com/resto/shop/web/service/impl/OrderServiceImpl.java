@@ -8279,6 +8279,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return printTask;
     }
 
+    @Override
+    public void uploadLocalPosOrderList(List<Map<String, Object>> orderList) {
+            for(Map orderMap : orderList){
+                Order order = JSON.parseObject(new JSONObject(orderMap).toString(),Order.class);
+                order.setOperatorId("localPosOrder");
+                order.setCustomerId("localPosOrder");
+                order.setVerCode("1111");
+                order.setAllowAppraise(true);
+                order.setOrderMode(1);
+                order.setBrandId("-------------");
+                order.setAllowContinueOrder(true);
+                orderMapper.insertSelective(order);
+            }
+    }
+
     List<OrderItem> getOrderItemsWithChild(List<OrderItem> orderItems) {
         log.debug("这里查看套餐子项: ");
         Map<String, OrderItem> idItems = ApplicationUtils.convertCollectionToMap(String.class, orderItems);

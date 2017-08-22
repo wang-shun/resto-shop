@@ -3,6 +3,7 @@ package com.resto.shop.web.service;
 import java.util.List;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.shop.web.model.ArticleKitchen;
 import com.resto.shop.web.model.Kitchen;
 import com.resto.shop.web.model.OrderItem;
 
@@ -43,4 +44,5 @@ public interface KitchenService extends GenericService<Kitchen, Integer> {
 
 	Kitchen getItemKitchenId(OrderItem orderItem);
 
+	List<ArticleKitchen>  selectArticleKitchenByShopId(String shopId);
 }

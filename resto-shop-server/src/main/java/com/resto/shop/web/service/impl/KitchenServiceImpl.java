@@ -7,6 +7,7 @@ import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.KitchenMapper;
+import com.resto.shop.web.model.ArticleKitchen;
 import com.resto.shop.web.model.Kitchen;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.service.KitchenService;
@@ -74,5 +75,10 @@ public class KitchenServiceImpl extends GenericServiceImpl<Kitchen, Integer> imp
 	@Override
 	public Kitchen getItemKitchenId(OrderItem orderItem) {
 		return kitchenMapper.getItemKitchenId(orderItem);
+	}
+
+	@Override
+	public List<ArticleKitchen> selectArticleKitchenByShopId(String shopId) {
+		return kitchenMapper.selectArticleKitchenByShopId(shopId);
 	}
 }

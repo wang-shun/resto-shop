@@ -1044,4 +1044,8 @@ GROUP BY article_id
         select COALESCE(sum(count),0) from tb_order_item
         where article_id like CONCAT(#{articleId},'%') and create_time like CONCAT('%',#{time},'%')
     </select>
+    <select id="selectArticleByShopId" resultType="Article">
+        SELECT * from tb_article where shop_detail_id = #{shopId}
+    </select>
+
 </mapper>

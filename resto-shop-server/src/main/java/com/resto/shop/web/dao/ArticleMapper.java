@@ -189,4 +189,12 @@ public interface ArticleMapper extends GenericDao<Article, String>{
      * @return
      */
 	Integer selectSumByMonthlySales(@Param("articleId") String articleId, @Param("time") String time);
+
+	/**
+	 * 根据 店铺ID 查询店铺下的所有菜品数据
+	 * Pos2.0 数据拉取接口			By___lmx
+	 * @param shopId
+	 * @return
+	 */
+	List<Article> selectArticleByShopId(@Param("shopId") String shopId);
 }

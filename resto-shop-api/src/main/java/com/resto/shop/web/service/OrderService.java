@@ -745,4 +745,12 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	 * @return
 	 */
 	List<Order> selectCompleteByShopIdAndTime(String shopId, Date todayBegin, Date todayEnd);
+
+    /**
+     * 	【Pos 2.0】
+     * 	本地 Pos 订单上传接口
+     * 	lmx			2017年6月20日 19:56:21
+     * @param orderList
+     */
+    void uploadLocalPosOrderList(List<Map<String, Object>> orderList);
 }

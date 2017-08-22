@@ -762,4 +762,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public Boolean setEmptyFail(String articleId) {
         return articleMapper.setEmptyFail(articleId);
     }
+    @Override
+    public List<Article> selectArticleByShopId(String shopId) {
+        return articleMapper.selectArticleByShopId(shopId);
+    }
+
 }
