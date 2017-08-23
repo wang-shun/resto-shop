@@ -257,17 +257,17 @@
                                     否
                                 </label>
                             </div>
-                            <div class="form-group">
-                                <div class="control-label">优惠券提醒方式：</div>
-                                <label>
-                                    <input type="checkbox" name="wechatPushGiftCoupons" v-model="m.wechatPushGiftCoupons" value="1">
-                                    微信推送
-                                </label>
-                                <label>
-                                    <input type="checkbox" name="smsPushGiftCoupons" v-model="m.smsPushGiftCoupons" value="1">
-                                    短信推送
-                                </label>
-                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="control-label">优惠券提醒方式：</div>
+                            <label>
+                                <input type="checkbox" name="wechatPushGiftCoupons" v-model="m.wechatPushGiftCoupons" value="1">
+                                微信推送
+                            </label>
+                            <label>
+                                <input type="checkbox" name="smsPushGiftCoupons" v-model="m.smsPushGiftCoupons" value="1">
+                                短信推送
+                            </label>
                         </div>
                     </div>
                     <input type="hidden" name="id" v-model="m.id"/>
