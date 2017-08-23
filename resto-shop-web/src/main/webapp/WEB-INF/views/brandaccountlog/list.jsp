@@ -82,7 +82,7 @@
                     //datatable对象
                     that.brandAccountLogTable=$(".table-body>table").DataTable({
                         lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
-                        order: [[ 0, "desc" ]],
+                        order: [[ 0, "desc" ],[6,"asc"]],
                         columns: [
                             {
                                 title: "时间",
