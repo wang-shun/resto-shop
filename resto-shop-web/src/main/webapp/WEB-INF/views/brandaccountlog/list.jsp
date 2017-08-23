@@ -8,18 +8,18 @@
 			<form class="form-inline">
 				<div class="form-group" style="margin-right: 50px;">
 					<label for="beginDate">开始时间：</label>
-					<input type="text" class="form-control form_datetime" id="beginDate" v-model="searchDate.beginDate"   readonly="readonly">
+					<input type="text" class="form-control form_datetime" id="beginDate" v-model="searchDate.beginDate"   readonly>
 				</div>
 				<div class="form-group" style="margin-right: 50px;">
 					<label for="endDate">结束时间：</label>
-					<input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly="readonly">
+					<input type="text" class="form-control form_datetime" id="endDate" v-model="searchDate.endDate"   readonly>
 				</div>
 				<button type="button" class="btn btn-primary" @click="today"> 今日</button>
 				<button type="button" class="btn btn-primary" @click="yesterDay">昨日</button>
 				<button type="button" class="btn btn-primary" @click="week">本周</button>
 				<button type="button" class="btn btn-primary" @click="month">本月</button>
 				<button type="button" class="btn btn-primary" @click="searchInfo">查询报表</button>&nbsp;
-				<button type="button" class="btn btn-primary" @click="createOrderExcel">下载报表</button><br/>
+				<button type="button" class="btn btn-primary" @click="createAccountLogExcel">下载报表</button><br/>
 			</form>
 
 		</div>
@@ -137,6 +137,27 @@
                         }
                     })
                 },
+                createAccountLogExcel:function () {
+                    var data = {
+                        beginDate : this.searchDate.beginDate,
+                        endDate : this.searchDate.endDate
+                    };
+                    try {
+                        $.post("brandaccountlog/create_accountLog_excel",data,function (result) {
+                            if(result.success){
+                                window.location.href = "brandaccountlog/downloadAccountLogExcel?path="+result.data+"";
+                            }else{
+                                toastr.clear();
+                                toastr.error("生成报表出错");
+                            }
+                        });
+                    }catch (e){
+                        toastr.clear();
+                        toastr.error("系统异常，请刷新重试");
+                    }
+
+                },
+
 				selectTable:function () {
                     var api = brandAccountApi;
                     api.columns().indexes().flatten().each(function (i) {
@@ -187,7 +208,6 @@
                                             .draw();
                                     });
                                 column.data().unique().sort().each(function (d, j) {
-
                                     select.append('<option value="' + d + '">' + vueObj.DetailName(d) + '</option>')
                                 });
                                 break;
