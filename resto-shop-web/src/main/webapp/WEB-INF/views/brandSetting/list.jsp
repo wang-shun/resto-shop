@@ -236,7 +236,6 @@
                                 <input type="radio" name="openCommentRecommend" v-model="m.openCommentRecommend" value="0">
                                 否
                             </label>
-
                         </div>
                         <div v-if="m.openCommentRecommend==1">
 
@@ -256,6 +255,17 @@
                                 <label>
                                     <input type="radio" name="isPushSms" v-model="m.isPushSms" value="0">
                                     否
+                                </label>
+                            </div>
+                            <div class="form-group">
+                                <div class="control-label">优惠券提醒方式：</div>
+                                <label>
+                                    <input type="checkbox" name="wechatPushGiftCoupons" v-model="m.wechatPushGiftCoupons" value="1">
+                                    微信推送
+                                </label>
+                                <label>
+                                    <input type="checkbox" name="smsPushGiftCoupons" v-model="m.smsPushGiftCoupons" value="1">
+                                    短信推送
                                 </label>
                             </div>
                         </div>
