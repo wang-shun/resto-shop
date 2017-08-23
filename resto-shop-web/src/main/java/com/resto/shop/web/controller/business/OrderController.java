@@ -662,8 +662,6 @@ public class OrderController extends GenericController{
 							Order order = orderIterator.next();
 							//循环订单找到某店铺某一天的数据
 							if (order.getCreateTime().getTime() >= beginDate.getTime() && order.getCreateTime().getTime() <= endDate.getTime()) {
-								//当日订单数累加
-								orderReportDto.setOrderCount(orderReportDto.getOrderCount() + 1);
 								//当时订单金额累加
 								orderReportDto.setOrderPrice(orderReportDto.getOrderPrice().add(order.getOrderMoney()));
 								//判断是否为父订单
