@@ -325,6 +325,8 @@
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="customer_count" property="customerCount"/>
+        <result column="distribution_mode_id" property="distributionModeId"/>
         <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
             <id column="appraise_id" property="id"/>
             <result column="level" property="level"/>
