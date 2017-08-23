@@ -2004,8 +2004,10 @@
 
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
         SELECT
-        o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.create_time from tb_order o
-        INNER JOIN tb_order_payment_item oi
+        o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.create_time,o.customer_count,
+        o.distribution_mode_id
+        from tb_order o
+        LEFT JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         LEFT JOIN  tb_appraise a
         on o.id = a.order_id

@@ -591,38 +591,9 @@ public class appraiseReportController extends GenericController{
 			out.close();
 		}catch (Exception e){
 			e.printStackTrace();
-			log.error("生成月营业报表出错！");
+			log.error("生成月评论报表出错！");
 			return new Result(false);
 		}
 		return getSuccessResult(path);
-	}
-
-	public Integer getMonthDay(String year, String month){
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.YEAR, Integer.parseInt(year));
-		calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1);
-		return calendar.getActualMaximum(Calendar.DATE);
-	}
-
-	public Date getBeginDay(String year, String month, Integer day){
-		Calendar beginDate = Calendar.getInstance();
-		beginDate.set(Calendar.YEAR, Integer.parseInt(year));
-		beginDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
-		beginDate.set(Calendar.DATE, day + 1);
-		beginDate.set(Calendar.HOUR_OF_DAY, 0);
-		beginDate.set(Calendar.MINUTE, 0);
-		beginDate.set(Calendar.SECOND,1);
-		return beginDate.getTime();
-	}
-
-	public Date getEndDay(String year, String month, Integer day){
-		Calendar endDate = Calendar.getInstance();
-		endDate.set(Calendar.YEAR, Integer.parseInt(year));
-		endDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
-		endDate.set(Calendar.DATE, day + 1);
-		endDate.set(Calendar.HOUR_OF_DAY, 23);
-		endDate.set(Calendar.MINUTE, 59);
-		endDate.set(Calendar.SECOND,59);
-		return endDate.getTime();
 	}
 }
