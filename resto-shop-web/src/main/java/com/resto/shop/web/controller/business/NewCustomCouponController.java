@@ -385,8 +385,11 @@ public class NewCustomCouponController extends GenericController{
                 }
                 //有手机号则发送短信
                 if (StringUtils.isNotBlank(customer.getTelephone()) && brandSetting.getSmsPushGiftCoupons().equals(Common.YES)) {
+                    JSONObject smsParam = new JSONObject();
+                    smsParam.put("name", valueMap.get("name").toString());
+                    smsParam.put("value", valueMap.get("value").toString());
                     JSONObject jsonObject = smsLogService.sendMessage(getCurrentBrandId(), customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop(),
-                            SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), JSON.parseObject(JSON.toJSONString(valueMap)));
+                            SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsParam);
                     log.info("短信发送结果：" + jsonObject.toJSONString());
                 }
             }
