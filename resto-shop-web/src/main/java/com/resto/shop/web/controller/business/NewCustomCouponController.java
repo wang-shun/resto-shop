@@ -379,9 +379,12 @@ public class NewCustomCouponController extends GenericController{
                     text = substitutor.replace(text);
                 }
                 couponService.addRealTimeCoupon(newCustomCoupons, customer);
-                WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                //判断是否开启微信推送
+                if (brandSetting.getWechatPushGiftCoupons().equals(Common.YES)) {
+                    WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                }
                 //有手机号则发送短信
-                if (StringUtils.isNotBlank(customer.getTelephone())) {
+                if (StringUtils.isNotBlank(customer.getTelephone()) && brandSetting.getSmsPushGiftCoupons().equals(Common.YES)) {
                     JSONObject jsonObject = smsLogService.sendMessage(getCurrentBrandId(), customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop(),
                             SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), JSON.parseObject(JSON.toJSONString(valueMap)));
                     log.info("短信发送结果：" + jsonObject.toJSONString());
