@@ -454,6 +454,8 @@ public class appraiseReportController extends GenericController{
 			//查询本月订单
 			List<Order> orderList = orderService.selectListBybrandId(year.concat("-").concat(month).concat("-01"), year.concat("-").concat(month).concat("-" + String.valueOf(monthDay))
 					, getCurrentBrandId());
+			//用来保存每次循环没有用到的订单
+			List<Order> orders = new ArrayList<>();
 			//声明迭代器
 			Iterator<Order> orderIterator = orderList.iterator();
 			//初始化评论报表实体
@@ -501,11 +503,14 @@ public class appraiseReportController extends GenericController{
 									}
 									appraiseDto.setTotalMoney(appraiseDto.getTotalMoney().add(order.getOrderMoney()));
 									orderCount++;
-									orderIterator.remove();
+								}else {
+									orders.add(order);
 								}
 							}
 							appraiseDto.setAppraiseNum(appraiseCount);
 							appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : new BigDecimal(appraiseCount).divide(new BigDecimal(orderCount), 2, BigDecimal.ROUND_HALF_UP) + "%");
+							orderIterator = orders.iterator();
+							orders = new ArrayList<>();
 						}
 						appraiseDto.setRedRatio(format.format(beginDate));
 						result[i][j] = appraiseDto;
@@ -562,11 +567,14 @@ public class appraiseReportController extends GenericController{
 								}
 								appraiseDto.setTotalMoney(appraiseDto.getTotalMoney().add(order.getOrderMoney()));
 								orderCount++;
-								orderIterator.remove();
+							}else {
+								orders.add(order);
 							}
 						}
 						appraiseDto.setAppraiseNum(appraiseCount);
 						appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : new BigDecimal(appraiseCount).divide(new BigDecimal(orderCount), 2, BigDecimal.ROUND_HALF_UP) + "%");
+						orderIterator = orders.iterator();
+						orders = new ArrayList<>();
 					}
 					appraiseDto.setRedRatio(format.format(beginDate));
 					result[0][j] = appraiseDto;
@@ -591,38 +599,9 @@ public class appraiseReportController extends GenericController{
 			out.close();
 		}catch (Exception e){
 			e.printStackTrace();
-			log.error("生成月营业报表出错！");
+			log.error("生成月评论报表出错！");
 			return new Result(false);
 		}
 		return getSuccessResult(path);
-	}
-
-	public Integer getMonthDay(String year, String month){
-		Calendar calendar = Calendar.getInstance();
-		calendar.set(Calendar.YEAR, Integer.parseInt(year));
-		calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1);
-		return calendar.getActualMaximum(Calendar.DATE);
-	}
-
-	public Date getBeginDay(String year, String month, Integer day){
-		Calendar beginDate = Calendar.getInstance();
-		beginDate.set(Calendar.YEAR, Integer.parseInt(year));
-		beginDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
-		beginDate.set(Calendar.DATE, day + 1);
-		beginDate.set(Calendar.HOUR_OF_DAY, 0);
-		beginDate.set(Calendar.MINUTE, 0);
-		beginDate.set(Calendar.SECOND,1);
-		return beginDate.getTime();
-	}
-
-	public Date getEndDay(String year, String month, Integer day){
-		Calendar endDate = Calendar.getInstance();
-		endDate.set(Calendar.YEAR, Integer.parseInt(year));
-		endDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
-		endDate.set(Calendar.DATE, day + 1);
-		endDate.set(Calendar.HOUR_OF_DAY, 23);
-		endDate.set(Calendar.MINUTE, 59);
-		endDate.set(Calendar.SECOND,59);
-		return endDate.getTime();
 	}
 }

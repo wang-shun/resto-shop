@@ -35,6 +35,7 @@
             <div class="panel panel-info">
                 <div class="panel-heading text-center">
                     <strong style="margin-right:100px;font-size:22px">品牌订单报表</strong>
+                    <button type="button" style="float: right;" @click="openModal(0)" class="btn btn-primary">月报表</button>
                 </div>
                 <div class="panel-body">
                     <table id="brandOrderTable" class="table table-striped table-bordered table-hover" width="100%">
@@ -83,10 +84,38 @@
 
                 <div class="panel-heading text-center">
                     <strong style="margin-right:100px;font-size:22px">店铺订单报表</strong>
+                    <button type="button" style="float: right;" @click="openModal(1)" class="btn btn-primary">月报表</button>
                 </div>
                 <div class="panel-body">
                     <table id="shopOrderTable" class="table table-striped table-bordered table-hover" width="100%">
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 月报表弹窗 -->
+    <div class="modal fade" id="queryCriteriaModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-full">
+            <div class="modal-content" style="width: 30em;margin: 15% auto;">
+                <div class="modal-header" style="border-bottom:initial;">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 align="center"><b>下载月报表</b></h4>
+                </div>
+                <div class="modal-body" align="center">
+                    <select style="padding: 5px 12px;" v-model="selectYear">
+                        <option :value="year" v-for="year in years">{{year}}</option>
+                    </select>
+                    <span style="font-size: 16px;margin-left: 15px;font-weight: bold;">年</span>
+                    <select style="padding: 5px 12px;" v-model="selectMonth">
+                        <option :value="month" v-for="month in months">{{month}}</option>
+                    </select>
+                    <span style="font-size: 16px;margin-left: 15px;font-weight: bold;">月</span>
+                </div>
+                <div class="modal-footer" style="border-top:initial;">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" style="float: left;margin-left: 5em;">取消</button>
+                    <button type="button" class="btn btn-primary" v-if="state == 1" @click="createMonthDto" style="float: right;margin-right: 5em;">生成并下载</button>
+                    <button type="button" class="btn btn-success" v-if="state == 2" disabled="disabled" style="float: right;margin-right: 5em;">生成中...</button>
                 </div>
             </div>
         </div>
@@ -121,7 +150,13 @@
                 beginDate : "",
                 endDate : "",
             },
-            shopOrderTable : {}
+            shopOrderTable : {},
+            years : [],
+            months : ["01","02","03","04","05","06","07","08","09","10","11","12"],
+            selectYear : new Date().format("yyyy"),
+            selectMonth : new Date().format("MM"),
+            type : 0,
+            state : 1
         },
         created : function() {
             var date = new Date().format("yyyy-MM-dd");
@@ -129,8 +164,22 @@
             this.searchDate.endDate = date;
             this.createShopOrderTable();
             this.searchInfo();
+            this.getYears();
         },
         methods:{
+            getYears : function() {
+                var years = new Array();
+                var year = 2016;
+                var nowYear = parseInt(new Date().format("yyyy"));
+                for (var i = 0;true;i++){
+                    years[i] = year;
+                    if (year == nowYear){
+                        break;
+                    }
+                    year++;
+                }
+                this.years = years;
+            },
             createShopOrderTable : function(){
                 //that代表 vue对象
                 var that = this;
@@ -305,6 +354,33 @@
                 var strDateE = new Date(oDate2[0], oDate2[1]-1, oDate2[2]);
                 iDays = parseInt(Math.abs(strDateS - strDateE ) / 1000 / 60 / 60 /24)//把相差的毫秒数转换为天数
                 return iDays ;
+            },
+            openModal : function (type) {
+                $("#queryCriteriaModal").modal();
+                this.type = type;
+            },
+            createMonthDto : function () {
+                toastr.clear();
+                toastr.success("生成中...");
+                var that = this;
+                that.state = 2;
+                try {
+                    $.post("orderReport/createMonthDto",{year : that.selectYear, month : that.selectMonth, type : that.type},function (result) {
+                        if (result.success){
+                            that.state = 1;
+                            window.location.href="orderReport/downloadBrandOrderExcel?path="+result.data+"";
+                        }else{
+                            that.state = 1;
+                            toastr.clear();
+                            toastr.error("生成月报表出错");
+                        }
+                    });
+                }catch (e){
+                    that.state = 1;
+                    toastr.clear();
+                    toastr.error("生成月报表出错");
+                    return;
+                }
             }
         }
     });
