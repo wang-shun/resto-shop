@@ -328,6 +328,7 @@
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="customer_count" property="customerCount"/>
         <result column="distribution_mode_id" property="distributionModeId"/>
+        <result column="parent_order_id" property="parentOrderId"/>
         <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
             <id column="appraise_id" property="id"/>
             <result column="level" property="level"/>
@@ -2008,7 +2009,7 @@
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
         SELECT
         o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.create_time,o.customer_count,
-        o.distribution_mode_id
+        o.distribution_mode_id,o.parent_order_id
         from tb_order o
         LEFT JOIN tb_order_payment_item oi
         on o.id = oi.order_id
