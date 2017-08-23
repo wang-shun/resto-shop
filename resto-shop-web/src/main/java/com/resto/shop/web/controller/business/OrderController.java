@@ -592,7 +592,7 @@ public class OrderController extends GenericController{
 									orderReportDto.setOrderPrice(orderReportDto.getOrderPrice().add(order.getOrderMoney()));
 									//判断是否为父订单，是则就餐人数累加
 									if (StringUtils.isBlank(order.getParentOrderId())){
-										orderReportDto.setPeopleCount(orderReportDto.getPeopleCount() + order.getCustomerCount());
+										orderReportDto.setPeopleCount(orderReportDto.getPeopleCount() + (order.getCustomerCount() == null ? 0 : order.getCustomerCount()));
 									}
 									if (order.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){ //就餐模式为堂食
 										//堂食订单数累加
@@ -656,7 +656,7 @@ public class OrderController extends GenericController{
 								orderReportDto.setOrderPrice(orderReportDto.getOrderPrice().add(order.getOrderMoney()));
 								//判断是否为父订单，是则就餐人数累加
 								if (StringUtils.isBlank(order.getParentOrderId())){
-									orderReportDto.setPeopleCount(orderReportDto.getPeopleCount() + order.getCustomerCount());
+									orderReportDto.setPeopleCount(orderReportDto.getPeopleCount() + (order.getCustomerCount() == null ? 0 : order.getCustomerCount()));
 								}
 								if (order.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){ //就餐模式为堂食
 									//堂食订单数累加
