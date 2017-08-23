@@ -615,9 +615,10 @@ public class OrderController extends GenericController{
 							}
 						}
 						//计算单均：订单总额/订单总数
-						orderReportDto.setSinglePrice(orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getOrderCount()), 2, BigDecimal.ROUND_HALF_UP));
+						orderReportDto.setSinglePrice(orderReportDto.getOrderCount() != 0 ? orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getOrderCount()), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO);
 						//计算人均：订单总额/就餐人数
-						orderReportDto.setPerPersonPrice(orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getPeopleCount()), 2, BigDecimal.ROUND_HALF_UP));
+						orderReportDto.setPerPersonPrice(orderReportDto.getPeopleCount() != 0 ? orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getPeopleCount()), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO);
+						orderReportDto.setBrandName(format.format(beginDate));
 						result[i][j] = orderReportDto;
 						j++;
 						orderReportDto = new BrandOrderReportDto();
@@ -679,9 +680,10 @@ public class OrderController extends GenericController{
 						}
 					}
 					//计算单均：订单总额/订单总数
-					orderReportDto.setSinglePrice(orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getOrderCount()), 2, BigDecimal.ROUND_HALF_UP));
+					orderReportDto.setSinglePrice(orderReportDto.getOrderCount() != 0 ? orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getOrderCount()), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO);
 					//计算人均：订单总额/就餐人数
-					orderReportDto.setPerPersonPrice(orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getPeopleCount()), 2, BigDecimal.ROUND_HALF_UP));
+					orderReportDto.setPerPersonPrice(orderReportDto.getPeopleCount() != 0 ? orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getPeopleCount()), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO);
+					orderReportDto.setBrandName(format.format(beginDate));
 					result[0][j] = orderReportDto;
 					j++;
 					orderReportDto = new BrandOrderReportDto();
@@ -696,8 +698,8 @@ public class OrderController extends GenericController{
 			map.put("num", "10");// 显示的位置
 			map.put("timeType", "yyyy-MM-dd");
 			map.put("reportTitle", shopNames);// 表的名字
-			String[][] headers = {{"订单总数","25"},{"订单总额","25"},{"单均","25"},{"就餐人数","25"},{"人均","25"},{"堂吃订单数","25"},{"堂吃订单额","25"},{"外带订单数","25"},{"外带订单额","25"},{"R+外卖订单数","25"},{"R+外卖订单额","25"}};
-			String[] columns = {"orderCount","orderPrice","singlePrice","peopleCount","perPersonPrice","tangshiCount","tangshiPrice","waidaiCount","waidaiPrice","waimaiCount","waimaiPrice"};
+			String[][] headers = {{"日期","25"},{"订单总数","25"},{"订单总额","25"},{"单均","25"},{"就餐人数","25"},{"人均","25"},{"堂吃订单数","25"},{"堂吃订单额","25"},{"外带订单数","25"},{"外带订单额","25"},{"R+外卖订单数","25"},{"R+外卖订单额","25"}};
+			String[] columns = {"brandName","orderCount","orderPrice","singlePrice","peopleCount","perPersonPrice","tangshiCount","tangshiPrice","waidaiCount","waidaiPrice","waimaiCount","waimaiPrice"};
 			ExcelUtil<BrandOrderReportDto> excelUtil = new ExcelUtil<>();
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.createMonthDtoExcel(headers, columns, result, out, map);
