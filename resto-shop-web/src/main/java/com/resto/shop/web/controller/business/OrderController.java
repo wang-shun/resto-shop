@@ -560,6 +560,8 @@ public class OrderController extends GenericController{
 			//查询本月订单
 			List<Order> orderList = orderService.selectListBybrandId(year.concat("-").concat(month).concat("-01"), year.concat("-").concat(month).concat("-" + String.valueOf(monthDay))
 					, getCurrentBrandId());
+			//用来保存orderList
+			List<Order> orders = new ArrayList<>();
 			//声明迭代器
 			Iterator<Order> orderIterator = orderList.iterator();
 			//初始化订单报表实体
@@ -610,9 +612,12 @@ public class OrderController extends GenericController{
 										//外卖订单额累加
 										orderReportDto.setWaimaiPrice(orderReportDto.getWaimaiPrice().add(order.getOrderMoney()));
 									}
-									orderIterator.remove();
+								}else {
+									orders.add(order);
 								}
 							}
+							orderIterator = orders.iterator();
+							orders = new ArrayList<>();
 						}
 						//计算单均：订单总额/订单总数
 						orderReportDto.setSinglePrice(orderReportDto.getOrderCount() != 0 ? orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getOrderCount()), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO);
@@ -675,9 +680,12 @@ public class OrderController extends GenericController{
 									//外卖订单额累加
 									orderReportDto.setWaimaiPrice(orderReportDto.getWaimaiPrice().add(order.getOrderMoney()));
 								}
-								orderIterator.remove();
+							}else {
+								orders.add(order);
 							}
 						}
+						orderIterator = orders.iterator();
+						orders = new ArrayList<>();
 					}
 					//计算单均：订单总额/订单总数
 					orderReportDto.setSinglePrice(orderReportDto.getOrderCount() != 0 ? orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getOrderCount()), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO);
