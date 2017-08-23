@@ -168,7 +168,7 @@
                             </div>
 
                             <div class="form-group" v-if="m.couponType == 2">
-                                <label >生日优惠卷发放时间：（日）</label>
+                                <label >生日优惠券发放时间：（日）</label>
                                 <div class="input-group">
                                     距用户生日前
                                     <input type="number"

@@ -73,7 +73,7 @@ public class LogTemplateUtils {
       //支付项---优惠券
     public static void getCouponByOrderType(String brandName, String id, BigDecimal payValue) {
         Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
-        map.put("content", "订单:"+id+"订单使用优惠卷支付了：" + payValue +",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "订单:"+id+"订单使用优惠券支付了：" + payValue +",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
     }
 
@@ -240,9 +240,9 @@ public class LogTemplateUtils {
 
     //优惠券支付
     public static void getCouponByUserType(String brandName, String id, String nickname, BigDecimal payValue) {
-        // CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        // CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠券支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
         Map map = getOrderBaseMap(brandName,id,USERTYPE);
-        map.put("content", "用户:"+nickname+"使用优惠卷支付了：" +payValue +"订单Id为:"+id+",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "用户:"+nickname+"使用优惠券支付了：" +payValue +"订单Id为:"+id+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
     }
 

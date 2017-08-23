@@ -182,13 +182,13 @@
     <select id="selectCouponDto" resultType="com.resto.brand.web.dto.CouponDto" parameterType="java.util.Map">
         select
         CASE tc.coupon_type
-        WHEN -1 THEN '通用优惠卷'
-        WHEN 0 THEN '注册优惠卷'
-        WHEN 1 THEN '邀请优惠卷'
-        WHEN 2 THEN '生日优惠卷'
-        WHEN 3 THEN '分享优惠卷'
-        WHEN 4 THEN '实时优惠卷'
-        WHEN 5 THEN '流失唤醒优惠卷'
+        WHEN -1 THEN '通用优惠券'
+        WHEN 0 THEN '注册优惠券'
+        WHEN 1 THEN '邀请优惠券'
+        WHEN 2 THEN '生日优惠券'
+        WHEN 3 THEN '分享优惠券'
+        WHEN 4 THEN '实时优惠券'
+        WHEN 5 THEN '流失唤醒优惠券'
         END couponType,
         IF(tc.brand_id is not null,'品牌','店铺') couponSoure,
         tc.`name` couponName,
