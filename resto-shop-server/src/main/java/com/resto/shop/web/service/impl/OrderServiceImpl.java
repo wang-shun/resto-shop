@@ -8281,14 +8281,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void uploadLocalPosOrderList(List<Map<String, Object>> orderList) {
+        if(CollectionUtils.isEmpty(orderList)){
+            return;
+        }
+        Order o = JSON.parseObject(new JSONObject(orderList.get(0)).toString(),Order.class);
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
             for(Map orderMap : orderList){
                 Order order = JSON.parseObject(new JSONObject(orderMap).toString(),Order.class);
                 order.setOperatorId("localPosOrder");
-                order.setCustomerId("localPosOrder");
-                order.setVerCode("1111");
+                order.setCustomerId("0");
+                order.setVerCode(generateString(5));
                 order.setAllowAppraise(true);
                 order.setOrderMode(1);
-                order.setBrandId("-------------");
+                order.setReductionAmount(BigDecimal.valueOf(0));
+                order.setBrandId(shopDetail.getBrandId());
                 order.setAllowContinueOrder(true);
                 orderMapper.insertSelective(order);
             }
