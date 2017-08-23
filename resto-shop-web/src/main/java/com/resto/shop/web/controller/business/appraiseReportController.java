@@ -454,6 +454,8 @@ public class appraiseReportController extends GenericController{
 			//查询本月订单
 			List<Order> orderList = orderService.selectListBybrandId(year.concat("-").concat(month).concat("-01"), year.concat("-").concat(month).concat("-" + String.valueOf(monthDay))
 					, getCurrentBrandId());
+			//用来保存每次循环没有用到的订单
+			List<Order> orders = new ArrayList<>();
 			//声明迭代器
 			Iterator<Order> orderIterator = orderList.iterator();
 			//初始化评论报表实体
@@ -501,11 +503,14 @@ public class appraiseReportController extends GenericController{
 									}
 									appraiseDto.setTotalMoney(appraiseDto.getTotalMoney().add(order.getOrderMoney()));
 									orderCount++;
-									orderIterator.remove();
+								}else {
+									orders.add(order);
 								}
 							}
 							appraiseDto.setAppraiseNum(appraiseCount);
 							appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : new BigDecimal(appraiseCount).divide(new BigDecimal(orderCount), 2, BigDecimal.ROUND_HALF_UP) + "%");
+							orderIterator = orders.iterator();
+							orders = new ArrayList<>();
 						}
 						appraiseDto.setRedRatio(format.format(beginDate));
 						result[i][j] = appraiseDto;
@@ -562,11 +567,14 @@ public class appraiseReportController extends GenericController{
 								}
 								appraiseDto.setTotalMoney(appraiseDto.getTotalMoney().add(order.getOrderMoney()));
 								orderCount++;
-								orderIterator.remove();
+							}else {
+								orders.add(order);
 							}
 						}
 						appraiseDto.setAppraiseNum(appraiseCount);
 						appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : new BigDecimal(appraiseCount).divide(new BigDecimal(orderCount), 2, BigDecimal.ROUND_HALF_UP) + "%");
+						orderIterator = orders.iterator();
+						orders = new ArrayList<>();
 					}
 					appraiseDto.setRedRatio(format.format(beginDate));
 					result[0][j] = appraiseDto;

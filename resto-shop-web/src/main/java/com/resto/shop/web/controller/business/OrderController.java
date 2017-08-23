@@ -560,7 +560,7 @@ public class OrderController extends GenericController{
 			//查询本月订单
 			List<Order> orderList = orderService.selectListBybrandId(year.concat("-").concat(month).concat("-01"), year.concat("-").concat(month).concat("-" + String.valueOf(monthDay))
 					, getCurrentBrandId());
-			//用来保存orderList
+			//用来保存每次循环没有用到的订单
 			List<Order> orders = new ArrayList<>();
 			//声明迭代器
 			Iterator<Order> orderIterator = orderList.iterator();
