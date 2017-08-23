@@ -8,6 +8,7 @@
  import com.resto.brand.core.entity.Result;
  import com.resto.brand.core.util.AppendToExcelUtil;
  import com.resto.brand.core.util.ExcelUtil;
+ import com.resto.brand.core.util.StringUtils;
  import com.resto.brand.web.dto.AppraiseDto;
  import com.resto.brand.web.dto.AppraiseShopDto;
  import com.resto.brand.web.model.Brand;
@@ -502,7 +503,9 @@ public class appraiseReportController extends GenericController{
 										}
 									}
 									appraiseDto.setTotalMoney(appraiseDto.getTotalMoney().add(order.getOrderMoney()));
-									orderCount++;
+									if (StringUtils.isBlank(order.getParentOrderId())) {
+										orderCount++;
+									}
 								}else {
 									orders.add(order);
 								}
@@ -566,7 +569,9 @@ public class appraiseReportController extends GenericController{
 									}
 								}
 								appraiseDto.setTotalMoney(appraiseDto.getTotalMoney().add(order.getOrderMoney()));
-								orderCount++;
+								if (StringUtils.isBlank(order.getParentOrderId())) {
+									orderCount++;
+								}
 							}else {
 								orders.add(order);
 							}
