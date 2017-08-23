@@ -666,9 +666,12 @@ public class OrderController extends GenericController{
 								orderReportDto.setOrderCount(orderReportDto.getOrderCount() + 1);
 								//当时订单金额累加
 								orderReportDto.setOrderPrice(orderReportDto.getOrderPrice().add(order.getOrderMoney()));
-								//判断是否为父订单，是则就餐人数累加
+								//判断是否为父订单
 								if (StringUtils.isBlank(order.getParentOrderId())){
+									//就餐人数累加
 									orderReportDto.setPeopleCount(orderReportDto.getPeopleCount() + (order.getCustomerCount() == null ? 0 : order.getCustomerCount()));
+									//当日订单数累加
+									orderReportDto.setOrderCount(orderReportDto.getOrderCount() + 1);
 								}
 								if (order.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){ //就餐模式为堂食
 									//堂食订单数累加
