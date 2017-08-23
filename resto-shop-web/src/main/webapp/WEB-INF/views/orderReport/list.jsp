@@ -258,7 +258,7 @@
                     endDate : this.searchDate.endDate,
                     brandOrderDto : this.brandOrder,
                     shopOrderDtos : this.shopOrderList
-                }
+                };
                 try {
                     $.post("orderReport/create_brand_excel",object,function (result) {
                         if(result.success){

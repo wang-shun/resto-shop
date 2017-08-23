@@ -80,7 +80,7 @@
 					registerCustomerMoney = registerCustomerMoney.add(blog.getFoundChange());
 				}
 
-				if(blog.getDetail() == DetailType.SMS_CODE){//发短信
+				if(blog.getDetail() == DetailType.SMS_CODE||blog.getDetail()==DetailType.SMS_DAY_MESSAGE){//发短信
 					smsNum++;
 					smsMoney = smsMoney.add(blog.getFoundChange());
 				}
@@ -142,7 +142,7 @@
 				 if(blog.getDetail()== DetailType.NEW_CUSTOMER_REGISTER){//新用户注册
 					 registerCustomerMoney = registerCustomerMoney.add(blog.getFoundChange());
 				 }
-				 if(blog.getDetail() == DetailType.SMS_CODE){//发短信
+				 if(blog.getDetail() == DetailType.SMS_CODE||blog.getDetail()==DetailType.SMS_DAY_MESSAGE){//发短信
 					 smsMoney = smsMoney.add(blog.getFoundChange());
 				 }
 
