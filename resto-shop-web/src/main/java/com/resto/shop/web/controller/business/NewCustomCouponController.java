@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
@@ -17,6 +18,7 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.Common;
+import com.resto.shop.web.constant.SmsLogType;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
@@ -64,6 +66,9 @@ public class NewCustomCouponController extends GenericController{
 
     @Resource
     WechatConfigService wechatConfigService;
+
+    @Resource
+    SmsLogService smsLogService;
 
     @RequestMapping("/list")
     public void list(){
@@ -366,16 +371,24 @@ public class NewCustomCouponController extends GenericController{
             String text = "好久不见，你最近好吗？${name}给您寄来价值${value}元的“回归礼券”，<a href='${url}'>赶紧来尝尝我们的新品吧！~</a>";
             StrSubstitutor substitutor = new StrSubstitutor(valueMap);
             text = substitutor.replace(text);
+            JSONObject smsObject = new JSONObject();
+            smsObject.put("name", valueMap.get("name"));
+            smsObject.put("value", valueMap.get("value"));
             for (Customer customer : customerList){
                 //如果是品牌优惠卷则进入到用户最后一次下单的店铺，如无订单则进入到当前品牌中排最后的品牌
                 if (newCustomCoupon.getIsBrand().equals(Common.YES)){
-                    valueMap = new HashMap<>();
                     valueMap.put("lastShopId", customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop());
                     substitutor = new StrSubstitutor(valueMap);
                     text = substitutor.replace(text);
                 }
                 couponService.addRealTimeCoupon(newCustomCoupons, customer);
                 WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                //有手机号则发送短信
+                if (StringUtils.isNotBlank(customer.getTelephone())) {
+                    JSONObject jsonObject = smsLogService.sendMessage(getCurrentBrandId(), customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop(),
+                            SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsObject);
+                    log.info("短信发送结果：" + jsonObject.toJSONString());
+                }
             }
             return getSuccessResult();
         }catch (Exception e){
