@@ -68,6 +68,17 @@
 										前台打印机</label>
 								</div>
 							</div>
+							<div class="form-group" v-if="m.range == 1">
+								<div class="col-sm-3 control-label">出单类型：</div>
+								<div class="col-sm-9 radio-list">
+									<label class="radio-inline">
+										<input type="radio">
+										出结账单</label>
+									<label class="radio-inline">
+										<input type="radio">
+										出消费单</label>
+								</div>
+							</div>
 							<div class="form-group">
 								<div class="col-sm-3 control-label">关联钱箱：</div>
 								<div class="col-sm-9 radio-list">
