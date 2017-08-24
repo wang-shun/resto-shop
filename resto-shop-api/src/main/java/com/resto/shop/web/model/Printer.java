@@ -31,6 +31,26 @@ public class Printer implements Serializable {
     //是否关联钱箱 0-否 1-是
     private Integer receiveMoney;
 
+    private Integer billOfAccount;
+
+    private Integer billOfConsumption;
+
+    public Integer getBillOfAccount() {
+        return billOfAccount;
+    }
+
+    public void setBillOfAccount(Integer billOfAccount) {
+        this.billOfAccount = billOfAccount;
+    }
+
+    public Integer getBillOfConsumption() {
+        return billOfConsumption;
+    }
+
+    public void setBillOfConsumption(Integer billOfConsumption) {
+        this.billOfConsumption = billOfConsumption;
+    }
+
     private List<Map<String,Object>> taskList;
 
     public List<Map<String, Object>> getTaskList() {
