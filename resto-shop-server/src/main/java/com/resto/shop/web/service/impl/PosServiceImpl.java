@@ -13,6 +13,7 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.constant.OrderPayMode;
 import com.resto.shop.web.constant.OrderState;
+import com.resto.shop.web.constant.ProductionStatus;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.posDto.*;
@@ -336,7 +337,57 @@ public class PosServiceImpl implements PosService {
 
     @Override
     public void syncPosRefundOrder(String data) {
+        JSONObject json = new JSONObject(data);
+        Order order = JSON.parseObject(json.get("refund").toString(), Order.class);
+        orderService.refundItem(order);
+        orderService.refundArticleMsg(order);
+        //判断是否清空
+        Order refundOrder = orderService.getOrderInfo(order.getId());
+        boolean flag = true;
+        for (OrderItem item : refundOrder.getOrderItems()) {
+            if (item.getCount() > 0) {
+                flag = false;
+            }
+        }
+        if (flag) {
+            if (refundOrder.getParentOrderId() == null) {
+                List<Order> orders = orderService.selectByParentId(refundOrder.getId(), 1); //得到子订单
+                if (orders.size() > 0) {
+                    for (Order child : orders) { //遍历子订单
+                        child = orderService.getOrderInfo(child.getId());
+                        for (OrderItem item : child.getOrderItems()) {
+                            if (item.getCount() > 0) {
+                                flag = false;
+                            }
+                        }
+                    }
+                    if (flag) {
+                        refundOrderArticleNull(refundOrder);
+                    }
+                } else {
+                    refundOrderArticleNull(refundOrder);
+                }
+            } else {
+                refundOrderArticleNull(refundOrder);
+            }
+            //存在退菜之后订单菜品是为负的情况  所以这边添加此校验  若为负则为零
+            if(refundOrder.getArticleCount() != null && refundOrder.getArticleCount() < 0){
+                refundOrder.setArticleCount(0);
+            }else if(refundOrder.getCountWithChild() != null && refundOrder.getCountWithChild() < 0){
+                refundOrder.setCountWithChild(0);
+            }
+            orderService.update(refundOrder);
+        }
 
+    }
+
+    private void refundOrderArticleNull(Order refundOrder) {
+        if (refundOrder.getServicePrice().doubleValue() <= 0) {
+            refundOrder.setAllowAppraise(false);
+            refundOrder.setAllowContinueOrder(false);
+            refundOrder.setIsRefundOrder(true);
+            refundOrder.setProductionStatus(ProductionStatus.REFUND_ARTICLE);
+        }
     }
 
     @Override
@@ -345,6 +396,11 @@ public class PosServiceImpl implements PosService {
         if(order != null && order.getOrderState() == OrderState.SUBMIT ){
             orderService.confirmOrderPos(orderId);
         }
+    }
+
+    @Override
+    public void syncRefundOrder(String data) {
+
     }
 
     @Override

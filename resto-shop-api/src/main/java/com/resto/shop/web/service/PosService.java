@@ -96,5 +96,11 @@ public interface PosService {
      */
     void syncPosConfirmOrder(String orderId);
 
+    /**
+     * 同步退菜信息
+     * @param data
+     */
+    void syncRefundOrder(String data);
+
     void test();
 }
