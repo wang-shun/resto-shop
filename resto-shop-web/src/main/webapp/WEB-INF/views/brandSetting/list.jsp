@@ -259,7 +259,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <div class="control-label">优惠券提醒方式：</div>
+                            <div class="control-label">礼品优惠券提醒方式：</div>
                             <label>
                                 <input type="checkbox" name="wechatPushGiftCoupons" v-model="m.wechatPushGiftCoupons" value="1">
                                 微信推送
