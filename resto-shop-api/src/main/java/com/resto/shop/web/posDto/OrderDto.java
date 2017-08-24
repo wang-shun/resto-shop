@@ -22,7 +22,7 @@ public class OrderDto implements Serializable {
         this.customerCount = order.getCustomerCount() == null ? 0 : order.getCustomerCount();
         this.accountingTime = order.getAccountingTime() == null ? new Date() : order.getAccountingTime();
         this.orderState = order.getOrderState() == null ? 0 : order.getOrderState();
-        this.productionStatus = order.getProductionStatus() == null ? 0 : order.getProductionStatus();
+        this.productionStatus = order.getProductionStatus() == 0 ? 1 : order.getProductionStatus();
         this.originalAmount = order.getOriginalAmount() == null ? BigDecimal.valueOf(0) : order.getOriginalAmount();
         this.orderMoney = order.getOrderMoney() == null ? BigDecimal.valueOf(0) : order.getOrderMoney();
         this.articleCount = order.getArticleCount() == null ? 0 : order.getArticleCount();
