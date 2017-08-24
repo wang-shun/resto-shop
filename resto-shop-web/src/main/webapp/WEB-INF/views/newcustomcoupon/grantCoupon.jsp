@@ -141,7 +141,7 @@
         startView:"month",
         language:"zh-CN"
     });
-    //得到当前流失唤醒优惠卷的Id
+    //得到当前流失唤醒优惠券的Id
     var couponId = ${couponId};
     var groupReleaseTableAPI;
     var personalLoansTableAPI;

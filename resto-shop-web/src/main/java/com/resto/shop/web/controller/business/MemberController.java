@@ -146,7 +146,7 @@ public class MemberController extends GenericController{
             object.put("coupons",list);
             object.put("shopDetails",shopDetails);
         }catch (Exception e){
-            log.error("查看会员优惠卷信息");
+            log.error("查看会员优惠券信息");
             e.printStackTrace();
             return new Result(false);
         }

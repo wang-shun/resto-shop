@@ -8,8 +8,9 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.BrandSetting;
@@ -17,6 +18,7 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.Common;
+import com.resto.shop.web.constant.SmsLogType;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
@@ -64,6 +66,9 @@ public class NewCustomCouponController extends GenericController{
 
     @Resource
     WechatConfigService wechatConfigService;
+
+    @Resource
+    SmsLogService smsLogService;
 
     @RequestMapping("/list")
     public void list(){
@@ -204,7 +209,7 @@ public class NewCustomCouponController extends GenericController{
     }
 
     /**
-     * 根据条件查询发放流失唤醒优惠卷的用户
+     * 根据条件查询发放流失唤醒优惠券的用户
      * @param selectMap
      * @return
      */
@@ -317,7 +322,7 @@ public class NewCustomCouponController extends GenericController{
     }
 
     /**
-     * 向用户发放流失唤醒优惠卷
+     * 向用户发放流失唤醒优惠券
      * @param customerId
      * @param couponId
      * @return
@@ -331,7 +336,7 @@ public class NewCustomCouponController extends GenericController{
             Map<String, Object> objectMap = new HashMap<>();
             objectMap.put("customerIds", customerIds);
             List<Customer> customerList = customerService.selectBySelectMap(objectMap);
-            //得到要发放的优惠卷信息
+            //得到要发放的优惠券信息
             List<NewCustomCoupon> newCustomCoupons = new ArrayList<>();
             NewCustomCoupon newCustomCoupon = newcustomcouponService.selectById(Long.valueOf(couponId));
             newCustomCoupons.add(newCustomCoupon);
@@ -367,15 +372,26 @@ public class NewCustomCouponController extends GenericController{
             StrSubstitutor substitutor = new StrSubstitutor(valueMap);
             text = substitutor.replace(text);
             for (Customer customer : customerList){
-                //如果是品牌优惠卷则进入到用户最后一次下单的店铺，如无订单则进入到当前品牌中排最后的品牌
+                //如果是品牌优惠券则进入到用户最后一次下单的店铺，如无订单则进入到当前品牌中排最后的品牌
                 if (newCustomCoupon.getIsBrand().equals(Common.YES)){
-                    valueMap = new HashMap<>();
                     valueMap.put("lastShopId", customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop());
                     substitutor = new StrSubstitutor(valueMap);
                     text = substitutor.replace(text);
                 }
                 couponService.addRealTimeCoupon(newCustomCoupons, customer);
-                WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                //判断是否开启微信推送
+                if (brandSetting.getWechatPushGiftCoupons().equals(Common.YES)) {
+                    WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                }
+                //有手机号则发送短信
+                if (StringUtils.isNotBlank(customer.getTelephone()) && brandSetting.getSmsPushGiftCoupons().equals(Common.YES)) {
+                    JSONObject smsParam = new JSONObject();
+                    smsParam.put("name", valueMap.get("name").toString());
+                    smsParam.put("value", valueMap.get("value").toString());
+                    JSONObject jsonObject = smsLogService.sendMessage(getCurrentBrandId(), customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop(),
+                            SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsParam);
+                    log.info("短信发送结果：" + jsonObject.toJSONString());
+                }
             }
             return getSuccessResult();
         }catch (Exception e){

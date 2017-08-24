@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <div id="control">
-<h2 class="text-center"><strong>优惠卷报表</strong></h2><br/>
+<h2 class="text-center"><strong>优惠券报表</strong></h2><br/>
 <div class="row" id="searchTools">
 	<div class="col-md-12">
 		<form class="form-inline">
@@ -41,7 +41,7 @@
 				<div class="panel panel-success">
 				  <div class="panel-heading text-center">
 				  	<strong style="margin-right:100px;font-size:22px">
-				  		品牌优惠卷报表
+				  		品牌优惠券报表
 				  	</strong>
 				  </div>
 				  <div class="panel-body">
@@ -53,7 +53,7 @@
 								<th>发放总额</th>
 								<th>使用总数</th>
 		                        <th>使用总额</th>
-		                        <th>优惠卷使用占比</th>
+		                        <th>优惠券使用占比</th>
                                 <th>拉动订单总数</th>
                                 <th>拉动订单总额</th>
                                 <th>拉动注册用户数</th>
@@ -90,7 +90,7 @@
 	    <div role="tabpanel" class="tab-pane active">
 	    	<div class="panel panel-success">
 			  <div class="panel-heading text-center">
-			  	   <strong style="margin-right:100px;font-size:22px">店铺优惠卷报表</strong>
+			  	   <strong style="margin-right:100px;font-size:22px">店铺优惠券报表</strong>
 			  </div>
 			  <div class="panel-body">
 			  	<table id="shopCouponList" class="table table-striped table-bordered table-hover"
@@ -152,12 +152,12 @@
                     lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
                     columns : [
                         {
-                            title : "优惠卷类型",
+                            title : "优惠券类型",
                             data : "couponType",
                             orderable : false
                         },
                         {
-                            title : "优惠卷所属",
+                            title : "优惠券所属",
                             data : "couponSoure",
                             orderable : false
                         },
@@ -167,7 +167,7 @@
                             orderable : false
                         },
                         {
-                            title : "优惠卷名称",
+                            title : "优惠券名称",
                             data : "couponName",
                             orderable : false
                         },
@@ -188,7 +188,7 @@
                             data : "useCouponMoney"
                         },
                         {
-                            title : "优惠卷使用占比",
+                            title : "优惠券使用占比",
                             data : "useCouponCountRatio"
                         },
                         {

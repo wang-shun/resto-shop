@@ -318,7 +318,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setPaymentModeId(PayMode.COUPON_PAY);
                 item.setPayTime(order.getCreateTime());
                 item.setPayValue(coupon.getValue());
-                item.setRemark("优惠卷支付:" + item.getPayValue());
+                item.setRemark("优惠券支付:" + item.getPayValue());
                 item.setResultData(coupon.getId());
                 orderPaymentItemService.insert(item);
                 payment = payment.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -769,22 +769,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPaymentModeId(PayMode.COUPON_PAY);
                     item.setPayTime(order.getCreateTime());
                     item.setPayValue(coupon.getValue());
-                    item.setRemark("优惠卷支付:" + item.getPayValue());
+                    item.setRemark("优惠券支付:" + item.getPayValue());
                     item.setResultData(coupon.getId());
                     orderPaymentItemService.insert(item);
 //                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                        "订单使用优惠卷支付了：" + item.getPayValue());
+//                        "订单使用优惠券支付了：" + item.getPayValue());
 //                    Map couponPaymap = new HashMap(4);
 //                    couponPaymap.put("brandName", brand.getBrandName());
 //                    couponPaymap.put("fileName", order.getId());
 //                    couponPaymap.put("type", "orderAction");
-//                    couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠卷支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//                    couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠券支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
 //                    doPostAnsc(url, couponPaymap);
 //                    Map CustomerCouponPaymap = new HashMap(4);
 //                    CustomerCouponPaymap.put("brandName", brand.getBrandName());
 //                    CustomerCouponPaymap.put("fileName", customer.getId());
 //                    CustomerCouponPaymap.put("type", "UserAction");
-//                    CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//                    CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠券支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
 //                    doPostAnsc(url, CustomerCouponPaymap);
                     LogTemplateUtils.getCouponByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
                     LogTemplateUtils.getCouponByUserType(brand.getBrandName(), customer.getId(), customer.getNickname(), item.getPayValue());
@@ -7321,12 +7321,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPaymentModeId(PayMode.COUPON_PAY);
                     item.setPayTime(new Date());
                     item.setPayValue(coupon.getValue());
-                    item.setRemark("优惠卷支付:" + item.getPayValue());
+                    item.setRemark("优惠券支付:" + item.getPayValue());
                     price = price.subtract(item.getPayValue());
                     item.setResultData(coupon.getId());
                     orderPaymentItemService.insert(item);
                     UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                            "订单使用优惠卷支付了：" + item.getPayValue());
+                            "订单使用优惠券支付了：" + item.getPayValue());
                 } else {
 //                    Coupon coupon = couponService.selectById(couponId);
 //                    pay = pay.subtract(coupon.getValue());
