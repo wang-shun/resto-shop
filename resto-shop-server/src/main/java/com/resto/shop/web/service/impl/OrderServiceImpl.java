@@ -3988,9 +3988,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (article.getRefundCount() != 0) {
                     Map<String, Object> refundItem = new HashMap<>();
                     refundItem.put("SUBTOTAL", -article.getOriginalPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
-                    if (article.getArticleName().contains("加")) {
-                        article.setArticleName(article.getArticleName().substring(0, article.getArticleName().indexOf("(") - 1));
-                    }
+//                    if (article.getArticleName().contains("加")) {
+//                        article.setArticleName(article.getArticleName().substring(0, article.getArticleName().indexOf("(") - 1));
+//                    }
                     refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
                     refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
                     refundItems.add(refundItem);
