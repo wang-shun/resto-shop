@@ -554,7 +554,7 @@
             count(1)
         FROM tb_customer
         WHERE
-            t.share_customer = #{id}
+            share_customer = #{id}
     </select>
 
     <select id="selectBirthUser" resultMap="BaseResultMap">
