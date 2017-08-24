@@ -21,7 +21,7 @@ public class Order implements Serializable {
         this.id = orderDto.getId() == null ? "" : orderDto.getId();
         this.tableNumber = orderDto.getTableNumber() == null ? "" : orderDto.getTableNumber();
         this.customerCount = orderDto.getCustomerCount() == null ? 0 : orderDto.getCustomerCount();
-        this.accountingTime = orderDto.getAccountingTime() == null ? new Date() : new Date(orderDto.getAccountingTime());
+        this.accountingTime = orderDto.getAccountingTime() == null ? new Date() : orderDto.getAccountingTime();
         this.orderState = orderDto.getOrderState() == null ? 0 : orderDto.getOrderState();
         this.productionStatus = orderDto.getProductionStatus() == null ? 0 : orderDto.getProductionStatus();
         this.originalAmount = orderDto.getOriginalAmount() == null ? BigDecimal.valueOf(0) : orderDto.getOriginalAmount();

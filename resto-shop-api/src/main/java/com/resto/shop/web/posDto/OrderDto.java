@@ -20,7 +20,7 @@ public class OrderDto implements Serializable {
         this.id = order.getId() == null ? "" : order.getId();
         this.tableNumber = order.getTableNumber() == null ? "" : order.getTableNumber();
         this.customerCount = order.getCustomerCount() == null ? 0 : order.getCustomerCount();
-        this.accountingTime = order.getAccountingTime() == null ? new Date().getTime() : order.getAccountingTime().getTime();
+        this.accountingTime = order.getAccountingTime() == null ? new Date() : order.getAccountingTime();
         this.orderState = order.getOrderState() == null ? 0 : order.getOrderState();
         this.productionStatus = order.getProductionStatus() == null ? 0 : order.getProductionStatus();
         this.originalAmount = order.getOriginalAmount() == null ? BigDecimal.valueOf(0) : order.getOriginalAmount();
@@ -55,7 +55,7 @@ public class OrderDto implements Serializable {
     //人数
     private Integer customerCount;
     //订单创建日期
-    private Long accountingTime;
+    private Date accountingTime;
     //订单状态
     private Integer orderState;
     //生产状态
@@ -329,11 +329,11 @@ public class OrderDto implements Serializable {
         this.allowContinueOrder = allowContinueOrder;
     }
 
-    public Long getAccountingTime() {
+    public Date getAccountingTime() {
         return accountingTime;
     }
 
-    public void setAccountingTime(Long accountingTime) {
+    public void setAccountingTime(Date accountingTime) {
         this.accountingTime = accountingTime;
     }
 
