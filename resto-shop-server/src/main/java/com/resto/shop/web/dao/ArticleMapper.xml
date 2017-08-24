@@ -359,13 +359,13 @@
                 #{virtualId,jdbcType=INTEGER},
             </if>
             <if test="initials != null">
-                #{initials}
+                #{initials},
             </if>
             <if test="photoType != null">
-                #{photoType}
+                #{photoType},
             </if>
             <if test="photoLittle != null">
-                #{photoLittle}
+                #{photoLittle},
             </if>
         </trim>
     </insert>
