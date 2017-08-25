@@ -1814,6 +1814,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 		update(order);
+        //判断是否已经记录过该订单
+		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
+		if(brandAccountLog!=null){
+			return order;
+		}
+
         updateBrandAccount(order,flag,accountSetting);
 //        Map map = new HashMap(4);
 //        map.put("brandName", brand.getBrandName());
@@ -1843,9 +1849,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	 * @param accountSetting
 	 */
 	private void updateBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting) {
-		if(order.getPayType()==PayType.NOPAY&&order.getOrderState()==1){//后付会走两次paySuccess 所以如果是后付 并且支付状态为1的时候就不记录
-			return;
-		}
+//		if(order.getPayType()==PayType.NOPAY&&order.getOrderState()==1){//后付会走两次paySuccess 所以如果是后付 并且支付状态为1的时候就不记录
+//			return;
+//		}
+		//在外层已经判断过 同一个品牌的同一订单不会记录两次 所以不用考虑后付打印两次的情况
 
     	BigDecimal money = BigDecimal.ZERO;
 		BrandAccountLog blog = new BrandAccountLog();
@@ -1868,7 +1875,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				//就算出应收金额
 			money = getJifeiMoney(order,accountSetting,flag);
 			BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
-			blog.setSerialNumber(order.getSerialNumber());
+			blog.setSerialNumber(order.getId());
 			blog.setCreateTime(new Date());
 			blog.setBrandId(order.getBrandId());
 			blog.setShopId(order.getShopDetailId());
@@ -1877,19 +1884,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			blog.setAccountId(brandAccount.getId());
 			blog.setRemain(remain);
 			blog.setOrderMoney(order.getOrderMoney());
-//			if(flag){
-//				if(order.getParentOrderId()!=null){//说明是主订单
-//					blog.setDetail(DetailType.BACK_CUSTOMER_SELL);
-//				}else {
-//					blog.setDetail(DetailType.BACK_CUSTOMER_SELL_PART);
-//				}
-//			}else {
-//				if(order.getParentOrderId()!=null){
-//					blog.setDetail(DetailType.NEW_CUSTOMER_SELL);
-//				}else {
-//					blog.setDetail(DetailType.NEW_CUSTOMER_SELL_PART);
-//				}
-//			}
+
 			if(order.getParentOrderId()==null){
 				blog.setIsParent(true);
 			}
@@ -1903,15 +1898,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			}
 
 			if(accountSetting.getOpenBackCustomerOrder()==1){ //回头用户订单抽成
-				if(flag){
 					blog.setDetail(DetailType.BACK_CUSTOMER_ORDER_SELL);
-				}
+					//是要计算回头用户订单 如果该订单不是回头用户的订单则直接结束该方法
+					if(!flag){
+						return;
+					}
 			}
 
 			if(accountSetting.getOpenBackCustomerOrder()==2){
-				if(flag){
 					blog.setDetail(DetailType.BACK_CUSTOMER_ORDER_REAL_SELL);//回头用户订单实付抽成
-				}
+				    if(!flag){
+				    	return;
+					}
 			}
 
 			blog.setBehavior(BehaviorType.SELL);
@@ -1965,19 +1963,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		BigDecimal jifeiMoney = BigDecimal.ZERO;
 
 		if(accountSetting.getOpenAllOrder()==BrandAccountPayType.ALL_ORDER_MONEY){//说明是 所有订单是/订单总额 抽成
-			if(order.getPayType()==PayType.PAY){//如果是先付
-				jifeiMoney = order.getOrderMoney();
-			}else if(order.getPayType()==PayType.NOPAY){//如果是后付
-				if(order.getAmountWithChildren().compareTo(BigDecimal.ZERO)>0){
-					jifeiMoney = order.getAmountWithChildren();
-				}else {
-					jifeiMoney = order.getOrderMoney();
-				}
-			}
+//			if(order.getPayType()==PayType.PAY){//如果是先付
+//				jifeiMoney = order.getOrderMoney();
+//			}else if(order.getPayType()==PayType.NOPAY){//如果是后付
+//				if(order.getAmountWithChildren().compareTo(BigDecimal.ZERO)>0){
+//					jifeiMoney = order.getAmountWithChildren();
+//				}else {
+//					jifeiMoney = order.getOrderMoney();
+//				}
+//			}
+			//不用考虑先付还是后付款
+			jifeiMoney = order.getOrderMoney();
 			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
-		}else if(accountSetting.getOpenAllOrder()==BrandAccountPayType.ALL_ORDER_MONEY) {//说明是 所有订单/实际支付金额抽成
+		}else if(accountSetting.getOpenAllOrder()==BrandAccountPayType.REAL_ORDER_MONEY) {//说明是 所有订单/实际支付金额抽成
 			List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
-			if(!orderPaymentItems.isEmpty()){
+			if(orderPaymentItems!=null&&!orderPaymentItems.isEmpty()){
 				//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
 				for(OrderPaymentItem oi:orderPaymentItems){
 					if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
@@ -1989,9 +1989,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					}
 				}
 			}
-			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue())).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
-		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.ALL_ORDER_MONEY){//回头用户订单  /订单总额抽成
-			if(flag){//是回头用户才会计算金额
+			log.info("订单id为："+order.getId()+"jifeimoney为"+jifeiMoney);
+			money =(jifeiMoney.multiply(new BigDecimal(accountSetting.getAllOrderValue()))).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
+
+		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.ALL_ORDER_MONEY &&flag){//回头用户订单  /订单总额抽成
+			//是回头用户才会计算金额
 				if(order.getPayType()==0){//如果是先付
 					jifeiMoney = order.getOrderMoney();
 				}else if(order.getPayType()==1){//如果是后付
@@ -2001,29 +2003,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 						jifeiMoney = order.getOrderMoney();
 					}
 				}
-				money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
-			}
+				money = (jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue()))).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
 
-		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.REAL_ORDER_MONEY){//回头用户 /实际支付总额抽成
-			if(flag){//是回头用户才会计算金额
+		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.REAL_ORDER_MONEY&&flag){//回头用户 /实际支付总额抽成
+			//是回头用户才会计算金额
 				List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
 				if(!orderPaymentItems.isEmpty()){
 					//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
 					for(OrderPaymentItem oi:orderPaymentItems){
-						if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+						if(oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
 								oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
-								oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+								oi.getPaymentModeId()==PayMode.CRASH_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
 								oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
 								){
 							jifeiMoney = jifeiMoney.add(oi.getPayValue());
 						}
 					}
 				}
-				money = jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue())).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
+				money = (jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue()))).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
 
-			}
 		}
-
 		return money;
 	}
 
@@ -2054,9 +2053,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					if(!orderPaymentItemList.isEmpty()){
 						for (OrderPaymentItem oi : orderPaymentItemList) {
 							//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
-							if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+							if(oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
 									oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
-									oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+									oi.getPaymentModeId()==PayMode.CRASH_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
 									oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
 									){
 								money = money.add(oi.getPayValue());
@@ -3538,17 +3537,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         if (order.getPayType() == PayType.NOPAY && (order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM)) {
+            //如果带打印机是区域打印机，判断他是否开启打结账单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getPayMode() != OrderPayMode.WX_PAY
                 && order.getPayMode() != OrderPayMode.ALI_PAY && order.getOrderState() == OrderState.SUBMIT) {
+            //如果带打印机是区域打印机，判断他是否开启打结账单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY) {
+            //如果带打印机是区域打印机，判断他是否开启打消费单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfConsumption().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
         } else {
             if (order.getParentOrderId() != null) {
                 //加菜的话  判断他主订单  如果主订单是后付  则显示(结账单)
                 Order faOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
                 if (faOrder.getPayType() == PayType.NOPAY) {
+                    //如果带打印机是区域打印机，判断他是否开启打结账单
+                    if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                        return null;
+                    }
                     data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
                 } else {
                     data.put("RESTAURANT_NAME", shopDetail.getName());
@@ -3843,17 +3858,31 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         if (order.getPayType() == PayType.NOPAY && (order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM)) {
+            //如果带打印机是区域打印机，判断他是否开启打结账单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getPayMode() != OrderPayMode.WX_PAY &&
                 order.getPayMode() != OrderPayMode.ALI_PAY  && order.getOrderState() == OrderState.SUBMIT) {
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY) {
+            //如果带打印机是区域打印机，判断他是否开启打消费单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfConsumption().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
         } else {
             if (order.getParentOrderId() != null) {
                 //加菜的话  判断他主订单  如果主订单是后付  则显示(结账单)
                 Order faOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
                 if (faOrder.getPayType() == PayType.NOPAY) {
+                    if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                        return null;
+                    }
                     data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
                 } else {
                     data.put("RESTAURANT_NAME", shopDetail.getName());

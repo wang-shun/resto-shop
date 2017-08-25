@@ -14,6 +14,7 @@ public class AccountLog implements Serializable {
 	public static final Integer CHARGE_PAY_REFUND = 6;  //取消订单返回充值的金额
 	public static final Integer REWARD_PAY_REFUND = 7;  //取消订单返回充值赠送的金额
     public static final Integer REFUND_ARTICLE_RED_PACKAGE = 7;  //退菜红包返回余额
+    public static final Integer THIRD_MONEY = 8;  //第三方账户储值余额
 	
     private String id;
 

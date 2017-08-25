@@ -14,6 +14,9 @@ public class RedType {
     //退菜红包
     public static final int REFUND_ARTICLE_RED = 2;
 
+    //第三方账户余额
+    public static final int THIRD_MONEY = 3;
+
     public static final Map<Integer, String> GETREDTYPE = new HashMap<Integer, String>(){
         {
             put(APPRAISE_RED,"评论红包");

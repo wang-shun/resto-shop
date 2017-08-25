@@ -128,7 +128,11 @@
                             {
                                 title: "余额(￥)",
                                 data: "remain"
-                            }
+                            },
+//							{
+//                                title: "订单额",
+//                                data: "orderMoney"
+//							}
                         ],
                         //给每一列添加下拉框搜索
                         initComplete: function () {
