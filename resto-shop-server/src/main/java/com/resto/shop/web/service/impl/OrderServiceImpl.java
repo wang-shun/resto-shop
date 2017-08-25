@@ -7561,7 +7561,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void refundArticleMsg(Order order) {
         Order o = getOrderInfo(order.getId());
-
+        if(o.getCustomerId() == null){
+            return;
+        }
         Customer customer = customerService.selectById(o.getCustomerId());
         Brand brand = brandService.selectById(o.getBrandId());
         WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
