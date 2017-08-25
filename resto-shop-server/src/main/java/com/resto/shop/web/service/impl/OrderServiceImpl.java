@@ -2010,9 +2010,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 				if(!orderPaymentItems.isEmpty()){
 					//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
 					for(OrderPaymentItem oi:orderPaymentItems){
-						if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+						if(oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
 								oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
-								oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+								oi.getPaymentModeId()==PayMode.CRASH_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
 								oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
 								){
 							jifeiMoney = jifeiMoney.add(oi.getPayValue());
@@ -2054,9 +2054,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					if(!orderPaymentItemList.isEmpty()){
 						for (OrderPaymentItem oi : orderPaymentItemList) {
 							//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
-							if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+							if(oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
 									oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
-									oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+									oi.getPaymentModeId()==PayMode.CRASH_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
 									oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
 									){
 								money = money.add(oi.getPayValue());
