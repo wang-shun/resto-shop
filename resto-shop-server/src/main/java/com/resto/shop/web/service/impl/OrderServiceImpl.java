@@ -3538,17 +3538,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         if (order.getPayType() == PayType.NOPAY && (order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM)) {
+            //如果带打印机是区域打印机，判断他是否开启打结账单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getPayMode() != OrderPayMode.WX_PAY
                 && order.getPayMode() != OrderPayMode.ALI_PAY && order.getOrderState() == OrderState.SUBMIT) {
+            //如果带打印机是区域打印机，判断他是否开启打结账单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY) {
+            //如果带打印机是区域打印机，判断他是否开启打消费单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfConsumption().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
         } else {
             if (order.getParentOrderId() != null) {
                 //加菜的话  判断他主订单  如果主订单是后付  则显示(结账单)
                 Order faOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
                 if (faOrder.getPayType() == PayType.NOPAY) {
+                    //如果带打印机是区域打印机，判断他是否开启打结账单
+                    if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                        return null;
+                    }
                     data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
                 } else {
                     data.put("RESTAURANT_NAME", shopDetail.getName());
@@ -3843,17 +3859,31 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         if (order.getPayType() == PayType.NOPAY && (order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM)) {
+            //如果带打印机是区域打印机，判断他是否开启打结账单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getPayMode() != OrderPayMode.WX_PAY &&
                 order.getPayMode() != OrderPayMode.ALI_PAY  && order.getOrderState() == OrderState.SUBMIT) {
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY) {
+            //如果带打印机是区域打印机，判断他是否开启打消费单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfConsumption().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
         } else {
             if (order.getParentOrderId() != null) {
                 //加菜的话  判断他主订单  如果主订单是后付  则显示(结账单)
                 Order faOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
                 if (faOrder.getPayType() == PayType.NOPAY) {
+                    if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                        return null;
+                    }
                     data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
                 } else {
                     data.put("RESTAURANT_NAME", shopDetail.getName());
