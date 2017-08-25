@@ -59,8 +59,13 @@ public class PrinterController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid Printer printer){
+		if (printer.getBillOfAccount() == null){
+			printer.setBillOfAccount(0);
+		}
+		if (printer.getBillOfConsumption() == null){
+			printer.setBillOfConsumption(0);
+		}
 		printerService.update(printer);
-
 		return Result.getSuccess();
 	}
 	
