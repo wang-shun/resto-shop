@@ -118,7 +118,7 @@ public class PosServiceImpl implements PosService {
             orderItemDtos.add(orderItemDto);
         }
         Customer customer = customerService.selectById(order.getCustomerId());
-        jsonObject.put("customer", new CustomerDto(customer));
+        jsonObject.put("customer", new JSONObject(new CustomerDto(customer)));
         jsonObject.put("orderItem", orderItemDtos);
         if(order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
                 || order.getPayMode() == OrderPayMode.YL_PAY){
