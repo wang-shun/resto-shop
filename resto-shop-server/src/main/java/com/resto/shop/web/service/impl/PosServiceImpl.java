@@ -398,10 +398,7 @@ public class PosServiceImpl implements PosService {
         }
     }
 
-    @Override
-    public void syncRefundOrder(String data) {
 
-    }
 
     @Override
     public void test() {
