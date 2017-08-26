@@ -65,18 +65,6 @@ public class BindPhoneAspect {
 	@Resource
 	AccountNoticeService accountNoticeService;
 
-	@Resource
-	ThirdCustomerService thirdCustomerService;
-
-	@Resource
-	RedPacketService redPacketService;
-
-	@Resource
-	AccountService accountService;
-
-	@Resource
-	AccountLogService accountLogService;
-
 	@Pointcut("execution(* com.resto.shop.web.service.CustomerService.bindPhone(..))")
 	public void bindPhone(){};
 
@@ -94,41 +82,6 @@ public class BindPhoneAspect {
 		Object obj = pj.proceed();
 		Brand brand = brandService.selectById(cus.getBrandId());
 
-		//判断该用户是否在第三方储值有余额
-		ThirdCustomer thirdCustomer = thirdCustomerService.selectByTelephone(cus.getTelephone());
-		if(thirdCustomer != null){
-			//插入tb_red_packet
-			RedPacket redPacket = new RedPacket();
-			redPacket.setId(ApplicationUtils.randomUUID());
-			redPacket.setRedMoney(thirdCustomer.getMoney());
-			redPacket.setCreateTime(new Date());
-			redPacket.setCustomerId(cus.getId());
-			redPacket.setBrandId(cus.getBrandId());
-			redPacket.setShopDetailId(cus.getBindPhoneShop());
-			redPacket.setRedRemainderMoney(thirdCustomer.getMoney());
-			redPacket.setRedType(RedType.THIRD_MONEY);
-			redPacket.setOrderId(null);
-			redPacketService.insert(redPacket);
-			//修改余额
-			Account account = accountService.selectById(cus.getAccountId());
-			account.setRemain(account.getRemain().add(thirdCustomer.getMoney()));
-			accountService.update(account);
-			//修改tb_third_customer表
-			thirdCustomer.setType(0);
-			thirdCustomerService.update(thirdCustomer);
-			//添加余额日志表
-			AccountLog acclog = new AccountLog();
-			acclog.setCreateTime(new Date());
-			acclog.setId(ApplicationUtils.randomUUID());
-			acclog.setMoney(thirdCustomer.getMoney());
-			acclog.setRemain(account.getRemain());
-			acclog.setPaymentType(AccountLogType.INCOME);
-			acclog.setRemark("第三方储值余额");
-			acclog.setAccountId(account.getId());
-			acclog.setSource(AccountLog.THIRD_MONEY);
-			acclog.setShopDetailId(cus.getBindPhoneShop());
-			accountLogService.insert(acclog);
-		}
 		if(isFirstBind){
 			newCustomerCouponService.giftCoupon(cus,couponType,shopId);
 			//如果有分享者，那么给分享者发消息
