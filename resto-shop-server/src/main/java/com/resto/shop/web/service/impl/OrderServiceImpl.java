@@ -2433,7 +2433,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "订单:" + order.getId() + "返回打印厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "订单:" + order.getId() + "返回打印换桌模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
         return printTask;
     }
