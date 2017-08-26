@@ -42,8 +42,8 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
 
     @Override
     public void useRedPacketPay(BigDecimal redPay, String customerId, Order order, Brand brand, ShopDetail shopDetail) {
-        //扣除红包，扣除顺序 评论红包-->分享红包-->退菜红包
-        Integer[] redType = {0,1,2};
+        //扣除红包，扣除顺序 评论红包-->分享红包-->退菜红包-->第三方储值余额   --2017-08-23新增红包类型wtl
+        Integer[] redType = {0,1,2,3};
         for(Integer type : redType){
             redPay = useRedPacket(type,redPay,customerId,order,brand,shopDetail);
             //如果已扣完则不再扣除
