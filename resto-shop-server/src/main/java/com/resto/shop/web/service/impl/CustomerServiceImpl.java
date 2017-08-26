@@ -131,6 +131,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 		//判断该用户是否在第三方储值有余额
 		ThirdCustomer thirdCustomer = thirdCustomerService.selectByTelephone(customer.getTelephone());
 		if(thirdCustomer != null){
+			customer = customerMapper.selectByPrimaryKey(customer.getId());
 			//插入tb_red_packet
 			RedPacket redPacket = new RedPacket();
 			redPacket.setId(ApplicationUtils.randomUUID());
@@ -145,12 +146,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 			redPacketService.insert(redPacket);
 			//修改余额
 			Account account = accountService.selectById(customer.getAccountId());
-			log.info("afhkjshlkjsglk " + account.getRemain());
-			if(account.getRemain().doubleValue() > 0){
-				account.setRemain(account.getRemain().add(thirdCustomer.getMoney()));
-			}else{
-				account.setRemain(thirdCustomer.getMoney());
-			}
+			account.setRemain(account.getRemain().add(thirdCustomer.getMoney()));
 			accountService.update(account);
 			//修改tb_third_customer表
 			thirdCustomer.setType(0);
