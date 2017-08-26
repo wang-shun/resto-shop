@@ -13,15 +13,14 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.dto.MemberUserDto;
 import com.resto.brand.web.model.ShareSetting;
+import com.resto.shop.web.constant.AccountLogType;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.dao.CustomerMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
-import com.resto.shop.web.service.AccountService;
-import com.resto.shop.web.service.CustomerService;
+import com.resto.shop.web.service.*;
 
 import cn.restoplus.rpc.server.RpcService;
-import com.resto.shop.web.service.RedPacketService;
 
 /**
  *
@@ -35,6 +34,12 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
     private AccountService accountService;
     @Resource
     private RedPacketService redPacketService;
+
+	@Resource
+	ThirdCustomerService thirdCustomerService;
+
+	@Resource
+	AccountLogService accountLogService;
 
     @Override
     public GenericDao<Customer, String> getDao() {
@@ -122,6 +127,42 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 //		customer.setRegisterShopId(shopId);
 //		update(customer);
 		customerMapper.registerCustomer(customer);
+
+		//判断该用户是否在第三方储值有余额
+		ThirdCustomer thirdCustomer = thirdCustomerService.selectByTelephone(customer.getTelephone());
+		if(thirdCustomer != null){
+			//插入tb_red_packet
+			RedPacket redPacket = new RedPacket();
+			redPacket.setId(ApplicationUtils.randomUUID());
+			redPacket.setRedMoney(thirdCustomer.getMoney());
+			redPacket.setCreateTime(new Date());
+			redPacket.setCustomerId(customer.getId());
+			redPacket.setBrandId(customer.getBrandId());
+			redPacket.setShopDetailId(customer.getBindPhoneShop());
+			redPacket.setRedRemainderMoney(thirdCustomer.getMoney());
+			redPacket.setRedType(RedType.THIRD_MONEY);
+			redPacket.setOrderId(null);
+			redPacketService.insert(redPacket);
+			//修改余额
+			Account account = accountService.selectById(customer.getAccountId());
+			account.setRemain(account.getRemain().add(thirdCustomer.getMoney()));
+			accountService.update(account);
+			//修改tb_third_customer表
+			thirdCustomer.setType(0);
+			thirdCustomerService.update(thirdCustomer);
+			//添加余额日志表
+			AccountLog acclog = new AccountLog();
+			acclog.setCreateTime(new Date());
+			acclog.setId(ApplicationUtils.randomUUID());
+			acclog.setMoney(thirdCustomer.getMoney());
+			acclog.setRemain(account.getRemain());
+			acclog.setPaymentType(AccountLogType.INCOME);
+			acclog.setRemark("第三方储值余额");
+			acclog.setAccountId(account.getId());
+			acclog.setSource(AccountLog.THIRD_MONEY);
+			acclog.setShopDetailId(customer.getBindPhoneShop());
+			accountLogService.insert(acclog);
+		}
 		return customer;
 	}
 
