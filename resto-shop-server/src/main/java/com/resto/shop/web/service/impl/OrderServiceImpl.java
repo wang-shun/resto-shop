@@ -1916,12 +1916,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			blog.setBehavior(BehaviorType.SELL);
 
 			// 创建账户日志流水 和更新账户
-			Integer id = brandAccount.getId();
-			brandAccount = new BrandAccount();
-			brandAccount.setId(id);
-			brandAccount.setUpdateTime(new Date());
+//			Integer id = brandAccount.getId();
+//			brandAccount = new BrandAccount();
+//			brandAccount.setId(id);
+//			brandAccount.setUpdateTime(new Date());
 
 			brandAccountLogService.updateBrandAccountAndLog(blog,brandAccount.getId(),money);
+
+			/**
+			 * 拉取最新的 品牌账户信息
+			 */
+			BrandAccount brandAccount2 = brandAccountService.selectById(brandAccount.getId());
 
 			/*
 		     判断是否要发短信
@@ -1930,7 +1935,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 			List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
 
-			Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+			Result result =  BrandAccountSendUtil.sendSms(brandAccount2,noticeList,brand.getBrandName(),accountSetting);
 			if(result.isSuccess()){
 				Long accountSettingId = accountSetting.getId();
 				AccountSetting as = new AccountSetting();
@@ -2103,7 +2108,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 				List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
 
-				Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+				//拉取最新的brandAccount
+				BrandAccount brandAccount2 = brandAccountService.selectById(brandAccount.getId());
+
+				Result result =  BrandAccountSendUtil.sendSms(brandAccount2,noticeList,brand.getBrandName(),accountSetting);
 				if(result.isSuccess()){
 					Long accountSettingId = accountSetting.getId();
 					AccountSetting as = new AccountSetting();
