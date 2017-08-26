@@ -134,28 +134,28 @@ public class BindPhoneAspect {
 					money = accountSetting.getNewCustomerValue();
 				}
 
-				//品牌剩余的money
-				BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
+				//品牌剩余的money 不计算剩余 在sql中控制
+				//BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
 				//更新日志
 				BrandAccountLog blog = new BrandAccountLog();
 				blog.setCreateTime(new Date());
 				blog.setGroupName(brand.getBrandName());
 				blog.setBehavior(BehaviorType.REGISTER);
 				blog.setFoundChange(money.negate());
-				blog.setRemain(remain);
+				//blog.setRemain(remain);
 				blog.setDetail(DetailType.NEW_CUSTOMER_REGISTER);
 				blog.setAccountId(brandAccount.getId());
 				blog.setShopId(shopId);
 				blog.setBrandId(brand.getId());
 				blog.setSerialNumber(DateUtil.getRandomSerialNumber());
 				//记录 品牌账户更新日志 + 更新账户
-				Integer brandAccountId = brandAccount.getId();
-				brandAccount = new BrandAccount();
-				brandAccount.setId(brandAccountId);
-				brandAccount.setAccountBalance(remain);
+//				Integer brandAccountId = brandAccount.getId();
+//				brandAccount = new BrandAccount();
+//				brandAccount.setId(brandAccountId);
+				//brandAccount.setAccountBalance(remain);
 				brandAccount.setUpdateTime(new Date());
-				brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
-				List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccountId);
+				brandAccountLogService.updateBrandAccountAndLog(blog,brandAccount.getId(),money);
+				List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
 			    Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
 			    if(result.isSuccess()){
 					Long id = accountSetting.getId();
