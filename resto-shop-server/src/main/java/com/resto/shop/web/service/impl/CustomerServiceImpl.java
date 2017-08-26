@@ -145,6 +145,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 			redPacketService.insert(redPacket);
 			//修改余额
 			Account account = accountService.selectById(customer.getAccountId());
+			log.info("afhkjshlkjsglk " + account.getRemain());
 			if(account.getRemain().doubleValue() > 0){
 				account.setRemain(account.getRemain().add(thirdCustomer.getMoney()));
 			}else{
