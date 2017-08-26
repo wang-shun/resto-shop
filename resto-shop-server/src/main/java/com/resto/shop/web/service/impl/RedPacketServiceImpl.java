@@ -111,6 +111,9 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
                 case RedType.REFUND_ARTICLE_RED:
                     item.setPaymentModeId(PayMode.REFUND_ARTICLE_RED_PAY);
                     break;
+                case RedType.THIRD_MONEY:
+                    item.setPaymentModeId(PayMode.THIRD_MONEY_RED_PAY);
+                    break;
             }
             item.setPayTime(new Date());
             item.setPayValue(redPay);
