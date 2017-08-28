@@ -1354,11 +1354,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED) {
 //            refundOrderHoufu(order);
             result.setSuccess(true);
-//            BigDecimal hasPay = orderMapper.getPayHoufu(orderId);
-//            if (hasPay == null) {
-//                hasPay = BigDecimal.valueOf(0);
-//            }
-//            order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
+            BigDecimal hasPay = orderMapper.getPayHoufu(orderId);
+            if (hasPay == null) {
+                hasPay = BigDecimal.valueOf(0);
+            }
+            order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
         } else {
             if (!order.getOperatorId().equals("sb")) {
                 result.setSuccess(autoRefundOrder(orderId));
