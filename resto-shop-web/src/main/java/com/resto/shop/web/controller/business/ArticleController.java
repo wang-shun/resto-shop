@@ -142,7 +142,7 @@ public class ArticleController extends GenericController {
             }
             unitService.updateArticleRelation(id, article.getUnits());
         }
-        articleService.initStock();
+//        articleService.initStock();
         Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
         LogTemplateUtils.articleEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
