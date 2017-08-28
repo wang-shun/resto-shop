@@ -21,6 +21,8 @@ public class SmsLogType {
 
     public static final int MONTHMESSAGE=7;//月结短信通知(阿里)
 
+    public static final int WAKELOSS=8;//流失唤醒短信(阿里)
+
 
 
 	public static String getSmsLogTypeName(int state){

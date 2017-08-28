@@ -100,6 +100,12 @@ public class OrderAspect {
                 String shopId = order.getShopDetailId();
                 Integer orderCount = (Integer) RedisUtil.get(shopId + "shopOrderCount");
                 BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId + "shopOrderTotal");
+                if(orderCount == null){
+                    orderCount = 0;
+                }
+                if(orderTotal == null){
+                    orderTotal = BigDecimal.valueOf(0);
+                }
                 orderCount++;
                 orderTotal = orderTotal.add(order.getOrderMoney());
                 RedisUtil.set(shopId + "shopOrderCount", orderCount);
@@ -329,6 +335,12 @@ public class OrderAspect {
             String shopId = order.getShopDetailId();
             Integer orderCount = (Integer) RedisUtil.get(shopId + "shopOrderCount");
             BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId + "shopOrderTotal");
+            if(orderCount == null){
+                orderCount = 0;
+            }
+            if(orderTotal == null){
+                orderTotal = BigDecimal.valueOf(0);
+            }
             if (order.getParentOrderId() == null) {
                 orderCount++;
             }
@@ -625,6 +637,12 @@ public class OrderAspect {
             if (!MemcachedUtils.add(order.getId(), 1)) {
                 Integer orderCount = (Integer) RedisUtil.get(shopId + "shopOrderCount");
                 BigDecimal orderTotal = (BigDecimal) RedisUtil.get(shopId + "shopOrderTotal");
+                if(orderCount == null){
+                    orderCount = 0;
+                }
+                if(orderTotal == null){
+                    orderTotal = BigDecimal.valueOf(0);
+                }
                 if (order.getParentOrderId() == null) {
                     orderCount++;
                 }

@@ -85,8 +85,8 @@
                             <div class="form-group">
                                 <label class="col-sm-2 control-label">是否启用:</label>
                                 <div class="col-sm-8">
-                                    <input type="radio"  style="cursor:pointer" class="form-control" name="state" required v-model="m.state" value="1">启用
-                                    <input type="radio"  style="cursor:pointer" class="form-control" name="state" required v-model="m.state" value="0">不启用
+                                    <label><input type="radio"  style="cursor:pointer" class="form-control" name="state" required v-model="m.state" value="1">启用</label>
+                                    <label><input type="radio"  style="cursor:pointer" class="form-control" name="state" required v-model="m.state" value="0">不启用</label>
                                 </div>
                             </div>
                             <div class="form-group text-center">

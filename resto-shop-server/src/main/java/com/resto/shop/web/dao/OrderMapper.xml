@@ -326,6 +326,9 @@
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
         <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
         <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="customer_count" property="customerCount"/>
+        <result column="distribution_mode_id" property="distributionModeId"/>
+        <result column="parent_order_id" property="parentOrderId"/>
         <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
             <id column="appraise_id" property="id"/>
             <result column="level" property="level"/>
@@ -2005,12 +2008,14 @@
 
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
         SELECT
-        o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.create_time from tb_order o
-        INNER JOIN tb_order_payment_item oi
+        o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.create_time,o.customer_count,
+        o.distribution_mode_id,o.parent_order_id
+        from tb_order o
+        LEFT JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         LEFT JOIN  tb_appraise a
         on o.id = a.order_id
-        WHERE o.order_state in (10,11,12,2) and o.production_status in (2,3)
+        WHERE o.order_state in (10,11,12,2) and o.production_status in (2,3,4)
         and <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and o.brand_id = #{brandId}
         GROUP BY o.id
@@ -2352,6 +2357,7 @@ GROUP BY r.table_number
             </foreach>
         </if>
         and DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
+        and order_state!=1
         and distribution_mode_id=2
         ORDER BY create_time ASC
     </select>
@@ -2417,7 +2423,7 @@ on o.id = oi.order_id
         from tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
-        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND oi.payment_mode_id not in (13,14,15)
+        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND oi.payment_mode_id not in (13,14,15,20)
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}
         ]]>
     </select>
@@ -2712,7 +2718,7 @@ AND o.brand_id = #{brandId}
 
     <select id="selectPayBefore" resultType="java.math.BigDecimal">
     select sum(pay_value) from tb_order_payment_item
-    where order_id = #{orderId} and payment_mode_id not in (13,14,15)
+    where order_id = #{orderId} and payment_mode_id not in (13,14,15,20)
 </select>
 
     <select id="getPayHoufu" resultType="java.math.BigDecimal">
@@ -2902,7 +2908,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
-opi.payment_mode_id not in (13,14,15) AND
+opi.payment_mode_id not in (13,14,15,20) AND
 o.production_status in(2,3,6)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
@@ -2936,7 +2942,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
-opi.payment_mode_id not in (13,14,15) AND
+opi.payment_mode_id not in (13,14,15,20) AND
 o.production_status in(2,3,6)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}

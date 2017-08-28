@@ -41,9 +41,9 @@
 							    	<label class="radio-inline">
 								    	<input type="radio"  name="printType" v-model="m.printType" value="2">
 								    	前台</label>
-							    	<label class="radio-inline">
-								    	<input type="radio"  name="printType" v-model="m.printType" value="3"> 
-								    	打包</label>
+							    	<%--<label class="radio-inline">--%>
+								    	<%--<input type="radio"  name="printType" v-model="m.printType" value="3"> --%>
+								    	<%--打包</label>--%>
 								</div>
 							</div>
 							<div class="form-group">
@@ -66,6 +66,17 @@
 									<label class="radio-inline">
 										<input type="radio"  name="range" v-model="m.range" value="0">
 										前台打印机</label>
+								</div>
+							</div>
+							<div class="form-group" v-if="m.range == 1 && m.printType == 2">
+								<div class="col-sm-3 control-label">出单类型：</div>
+								<div class="col-sm-9 radio-list">
+									<label class="radio-inline">
+										<input type="checkbox" name="billOfAccount" v-model="m.billOfAccount" value="1">
+										出结账单</label>
+									<label class="radio-inline">
+										<input type="checkbox" name="billOfConsumption" v-model="m.billOfConsumption" value="1">
+										出消费单</label>
 								</div>
 							</div>
 							<div class="form-group">

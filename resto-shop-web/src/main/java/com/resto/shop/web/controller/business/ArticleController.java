@@ -145,7 +145,7 @@ public class ArticleController extends GenericController {
             }
             unitService.updateArticleRelation(id, article.getUnits());
         }
-        articleService.initStock();
+        //articleService.initStock();
         posService.shopMsgChange(getCurrentShopId());
         Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());

@@ -5,15 +5,14 @@ import javax.annotation.Resource;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.enums.BehaviorType;
 import com.resto.brand.core.enums.DetailType;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.LogUtils;
-import com.resto.brand.core.util.MQSetting;
-import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
-import com.resto.shop.web.model.Coupon;
+import com.resto.shop.web.constant.AccountLogType;
+import com.resto.shop.web.constant.RedType;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
-import com.resto.shop.web.service.CouponService;
+import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.BrandAccountSendUtil;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -22,10 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.alibaba.druid.util.StringUtils;
-import com.resto.shop.web.model.Customer;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.NewCustomCouponService;
-import com.resto.shop.web.service.SmsLogService;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -64,13 +59,11 @@ public class BindPhoneAspect {
 	@Resource
 	BrandAccountLogService brandAccountLogService;
 
-
 	@Resource
 	AccountSettingService accountSettingService;
 
 	@Resource
 	AccountNoticeService accountNoticeService;
-
 
 	@Pointcut("execution(* com.resto.shop.web.service.CustomerService.bindPhone(..))")
 	public void bindPhone(){};
@@ -88,6 +81,7 @@ public class BindPhoneAspect {
 		boolean isFirstBind = !cus.getIsBindPhone();
 		Object obj = pj.proceed();
 		Brand brand = brandService.selectById(cus.getBrandId());
+
 		if(isFirstBind){
 			newCustomerCouponService.giftCoupon(cus,couponType,shopId);
 			//如果有分享者，那么给分享者发消息
@@ -140,28 +134,28 @@ public class BindPhoneAspect {
 					money = accountSetting.getNewCustomerValue();
 				}
 
-				//品牌剩余的money
-				BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
+				//品牌剩余的money 不计算剩余 在sql中控制
+				//BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
 				//更新日志
 				BrandAccountLog blog = new BrandAccountLog();
 				blog.setCreateTime(new Date());
 				blog.setGroupName(brand.getBrandName());
 				blog.setBehavior(BehaviorType.REGISTER);
 				blog.setFoundChange(money.negate());
-				blog.setRemain(remain);
+				//blog.setRemain(remain);
 				blog.setDetail(DetailType.NEW_CUSTOMER_REGISTER);
 				blog.setAccountId(brandAccount.getId());
 				blog.setShopId(shopId);
 				blog.setBrandId(brand.getId());
 				blog.setSerialNumber(DateUtil.getRandomSerialNumber());
 				//记录 品牌账户更新日志 + 更新账户
-				Integer brandAccountId = brandAccount.getId();
-				brandAccount = new BrandAccount();
-				brandAccount.setId(brandAccountId);
-				brandAccount.setAccountBalance(remain);
+//				Integer brandAccountId = brandAccount.getId();
+//				brandAccount = new BrandAccount();
+//				brandAccount.setId(brandAccountId);
+				//brandAccount.setAccountBalance(remain);
 				brandAccount.setUpdateTime(new Date());
-				brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
-				List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccountId);
+				brandAccountLogService.updateBrandAccountAndLog(blog,brandAccount.getId(),money);
+				List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
 			    Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
 			    if(result.isSuccess()){
 					Long id = accountSetting.getId();
