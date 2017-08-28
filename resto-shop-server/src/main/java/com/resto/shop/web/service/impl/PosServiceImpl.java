@@ -10,10 +10,7 @@ import com.resto.brand.web.service.AccountSettingService;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
-import com.resto.shop.web.constant.Common;
-import com.resto.shop.web.constant.OrderPayMode;
-import com.resto.shop.web.constant.OrderState;
-import com.resto.shop.web.constant.ProductionStatus;
+import com.resto.shop.web.constant.*;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.posDto.*;
@@ -339,10 +336,20 @@ public class PosServiceImpl implements PosService {
     public void syncPosRefundOrder(String data) {
         JSONObject json = new JSONObject(data);
         Order order = JSON.parseObject(json.get("refund").toString(), Order.class);
-        orderService.refundItem(order);
-        orderService.refundArticleMsg(order);
-        //判断是否清空
         Order refundOrder = orderService.getOrderInfo(order.getId());
+        if(refundOrder.getOrderState() == OrderState.SUBMIT){
+            for(OrderItem orderItem : order.getOrderItems()){
+                OrderItem item = orderItemService.selectById(orderItem.getId());
+                orderService.updateOrderItem(orderItem.getOrderId(),item.getCount() - orderItem.getCount(),orderItem.getId(), 1);
+            }
+
+        }else{
+            orderService.refundItem(order);
+            orderService.refundArticleMsg(order);
+        }
+
+        //判断是否清空
+
         boolean flag = true;
         for (OrderItem item : refundOrder.getOrderItems()) {
             if (item.getCount() > 0) {
