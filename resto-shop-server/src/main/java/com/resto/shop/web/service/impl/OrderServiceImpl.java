@@ -8807,6 +8807,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             star.append("☆☆☆☆☆");
         }
         data.put("CUSTOMER_SATISFACTION", star.toString());
+        //声明对象存储差评用户信息
+        StringBuilder customerInfo = new StringBuilder();
+        //得到该订单用户信息
+        Customer customer = customerService.selectById(order.getCustomerId());
+        //判断用户手机号是否为空
+        if (StringUtils.isNotBlank(customer.getTelephone())){
+            customerInfo.append("["+ customer.getTelephone() +"]");
+        }
+        //判断用户性别
+        if (!customer.getSex().equals(Common.NO)){
+            if (customer.getSex().equals(Common.YES)){
+                customerInfo.append("[先生]");
+            }else {
+                customerInfo.append("[女士]");
+            }
+        }
+        data.put("CUSTOMER_PROPERTY", customerInfo.toString());
         //评价内容
         String[] feedBacks = appraise.getFeedback().split(",");
         StringBuilder builder = new StringBuilder();
