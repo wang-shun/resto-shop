@@ -1352,7 +1352,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                "微信点X取消订单！");
 //      LogTemplateUtils.getRefundWechatByUserType(order,brand,shopDetail.getName());
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED) {
-//            refundOrderHoufu(order);
+            refundOrderHoufu(order);
             result.setSuccess(true);
             BigDecimal hasPay = orderMapper.getPayHoufu(orderId);
             if (hasPay == null) {
@@ -1613,6 +1613,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     private void refundOrderHoufu(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        List<String> chargeList = new ArrayList<>();
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
             switch (item.getPaymentModeId()) {
@@ -1623,21 +1624,48 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderPaymentItemService.insert(item);
                     break;
                 case PayMode.CHARGE_PAY:
-                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+                    if(!chargeList.contains(item.getResultData())){
+                        chargeList.add(item.getResultData());
+                    }
+//                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     item.setId(newPayItemId);
                     orderPaymentItemService.insert(item);
+                    BigDecimal chargeValue = (BigDecimal) RedisUtil.get(item.getResultData()+"chargeValue");
+                    if(chargeValue == null){
+                        chargeValue = item.getPayValue();
+                    }else{
+                        chargeValue = chargeValue.add(item.getPayValue());
+                    }
                     break;
                 case PayMode.REWARD_PAY:
-                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+                    if(!chargeList.contains(item.getResultData())){
+                        chargeList.add(item.getResultData());
+                    }
+//                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     item.setId(newPayItemId);
                     orderPaymentItemService.insert(item);
+                    BigDecimal rewardValue = (BigDecimal) RedisUtil.get(item.getResultData()+"rewardValue");
+                    if(rewardValue == null){
+                        rewardValue = item.getPayValue();
+                    }else{
+                        rewardValue = rewardValue.add(item.getPayValue());
+                    }
                     break;
 
             }
-
         }
+        if(!CollectionUtils.isEmpty(chargeList)){
+            for(String id : chargeList){
+                BigDecimal rewardValue = (BigDecimal) RedisUtil.get(id+"rewardValue");
+                BigDecimal chargeValue = (BigDecimal) RedisUtil.get(id+"chargeValue");
+                chargeOrderService.refundMoney(chargeValue,rewardValue,id,order.getShopDetailId());
+                RedisUtil.remove(id+"rewardValue");
+                RedisUtil.remove(id+"chargeValue");
+            }
+        }
+
         Brand brand = brandService.selectById(order.getBrandId());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
