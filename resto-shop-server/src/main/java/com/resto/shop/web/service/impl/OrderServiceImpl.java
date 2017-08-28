@@ -1352,13 +1352,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                "微信点X取消订单！");
 //      LogTemplateUtils.getRefundWechatByUserType(order,brand,shopDetail.getName());
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getProductionStatus() == ProductionStatus.PRINTED) {
-            refundOrderHoufu(order);
+//            refundOrderHoufu(order);
             result.setSuccess(true);
-            BigDecimal hasPay = orderMapper.getPayHoufu(orderId);
-            if (hasPay == null) {
-                hasPay = BigDecimal.valueOf(0);
-            }
-            order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
+//            BigDecimal hasPay = orderMapper.getPayHoufu(orderId);
+//            if (hasPay == null) {
+//                hasPay = BigDecimal.valueOf(0);
+//            }
+//            order.setPaymentAmount(order.getOrderMoney().subtract(hasPay));
         } else {
             if (!order.getOperatorId().equals("sb")) {
                 result.setSuccess(autoRefundOrder(orderId));
