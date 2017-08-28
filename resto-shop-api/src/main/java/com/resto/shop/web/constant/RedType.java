@@ -22,6 +22,7 @@ public class RedType {
             put(APPRAISE_RED,"评论红包");
             put(SHARE_RED,"分享返利红包");
             put(REFUND_ARTICLE_RED,"退菜红包");
+            put(THIRD_MONEY,"第三方储值余额");
         }
     };
 }

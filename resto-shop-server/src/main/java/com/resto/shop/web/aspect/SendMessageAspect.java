@@ -208,14 +208,14 @@ public class SendMessageAspect {
 				if(accountSetting.getOpenSendSms()==1){
 					sms_unit = accountSetting.getSendSmsValue();
 				}
-				//剩余账户余额
-				BigDecimal remain = brandAccount.getAccountBalance().subtract(sms_unit);
+				//剩余账户余额 在sql中控制 以防在扣费的时候 有其它的已经扣费 导致数据不准
+				//BigDecimal remain = brandAccount.getAccountBalance().subtract(sms_unit);
 				BrandAccountLog blog = new BrandAccountLog();
 				blog.setCreateTime(new Date());
 				blog.setGroupName(brand.getBrandName());
 				blog.setBehavior(BehaviorType.SMS);
 				blog.setFoundChange(sms_unit.negate());//负数
-				blog.setRemain(remain);//剩余账户余额
+				//blog.setRemain(remain);//剩余账户余额
 				int detailType = 0;
 				if(smsType== SmsLogType.AUTO_CODE){//如果是验证码
 					detailType = DetailType.SMS_CODE;
@@ -227,12 +227,12 @@ public class SendMessageAspect {
 				blog.setBrandId(brandId);
 				blog.setShopId(shopId);
 				blog.setSerialNumber(DateUtil.getRandomSerialNumber());//这个流水号目前使用当前时间搓+4位随机字符串
-				Integer accountId = brandAccount.getId();
-				brandAccount = new BrandAccount();
-				brandAccount.setId(accountId);
-				brandAccount.setAccountBalance(remain);
+//				Integer accountId = brandAccount.getId();
+//				brandAccount = new BrandAccount();
+//				brandAccount.setId(accountId);
+//				brandAccount.setAccountBalance(remain);
 				//记录品牌账户的更新日志 + 更新账户
-				brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+				brandAccountLogService.updateBrandAccountAndLog(blog,brandAccount.getId(),sms_unit);
 			}else {
 
 				//判断短信账户的余额是否充足
