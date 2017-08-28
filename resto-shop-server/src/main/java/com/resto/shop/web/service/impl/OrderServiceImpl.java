@@ -2426,7 +2426,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, Object>> printTurnTable(Order order,String oldtableNumber){
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         List<Map<String, Object>> printTask = new ArrayList<>();
-        List<Printer> ticketPrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.RECEPTION);
+        List<Printer> ticketPrinter=new ArrayList<>();
+        if(shopDetail.getTurntablePrintType()==3){
+            ticketPrinter =printerService.selectListByShopId(order.getShopDetailId());
+        }else if(shopDetail.getTurntablePrintType()==1){
+            ticketPrinter =printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.KITCHEN);
+        }else if(shopDetail.getTurntablePrintType()==2){
+            ticketPrinter =printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.RECEPTION);
+        }
         for (Printer printer : ticketPrinter) {
             if (shopDetail.getIsPosNew() == Common.YES) {
                 getTurnTableModelNew(order, printer,shopDetail,printTask,oldtableNumber);
@@ -2440,7 +2447,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "订单:" + order.getId() + "返回打印厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "订单:" + order.getId() + "返回打印换桌模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
         return printTask;
     }
