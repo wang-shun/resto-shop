@@ -2419,7 +2419,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Map<String, Object>> printTurnTable(Order order,String oldtableNumber){
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         List<Map<String, Object>> printTask = new ArrayList<>();
-        List<Printer> ticketPrinter =printerService.selectListByShopId(order.getShopDetailId());
+        List<Printer> ticketPrinter=new ArrayList<>();
+        if(shopDetail.getTurntablePrintType()==3){
+            ticketPrinter =printerService.selectListByShopId(order.getShopDetailId());
+        }else if(shopDetail.getTurntablePrintType()==1){
+            ticketPrinter =printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.KITCHEN);
+        }else if(shopDetail.getTurntablePrintType()==2){
+            ticketPrinter =printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.RECEPTION);
+        }
         for (Printer printer : ticketPrinter) {
             if (shopDetail.getIsPosNew() == Common.YES) {
                 getTurnTableModelNew(order, printer,shopDetail,printTask,oldtableNumber);
