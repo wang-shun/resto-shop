@@ -2456,11 +2456,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter=new ArrayList<>();
         if(shopDetail.getTurntablePrintType()==3){
-            ticketPrinter =printerService.selectListByShopId(order.getShopDetailId());
+            ticketPrinter.addAll(printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.KITCHEN));
+            ticketPrinter.addAll(printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.RECEPTION));
         }else if(shopDetail.getTurntablePrintType()==1){
-            ticketPrinter =printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.KITCHEN);
+            ticketPrinter.addAll(printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.KITCHEN));
         }else if(shopDetail.getTurntablePrintType()==2){
-            ticketPrinter =printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.RECEPTION);
+            ticketPrinter.addAll(printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.RECEPTION));
         }
         for (Printer printer : ticketPrinter) {
             if (shopDetail.getIsPosNew() == Common.YES) {
