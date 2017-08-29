@@ -25,6 +25,7 @@ import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 
 import javax.annotation.Resource;
+import javax.swing.*;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -218,6 +219,17 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			Customer customer = customerService.selectById(chargeOrder.getCustomerId());
 			chargeorderMapper.refundCharge(payValue,id);
 			accountService.addAccount(payValue, customer.getAccountId(), "退还充值金额", AccountLog.CHARGE_PAY_REFUND,shopDetailId);
+		}
+	}
+
+	@Override
+	public void refundMoney(BigDecimal charge, BigDecimal reward, String id, String shopDetailId) {
+		ChargeOrder chargeOrder= selectById(id);
+		if(chargeOrder!=null){
+			Customer customer = customerService.selectById(chargeOrder.getCustomerId());
+			accountService.addAccount(charge, customer.getAccountId(), "退还充值金额", AccountLog.CHARGE_PAY_REFUND,shopDetailId);
+			chargeorderMapper.refundMoney(charge,reward,id);
+			accountService.addAccount(reward, customer.getAccountId(), "退还充值赠送金额", AccountLog.REWARD_PAY_REFUND,shopDetailId);
 		}
 	}
 

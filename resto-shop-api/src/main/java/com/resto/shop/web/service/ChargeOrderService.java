@@ -43,6 +43,8 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 
 	void refundCharge(BigDecimal payValue, String id,String shopDetailId);
 
+	void refundMoney(BigDecimal charge,BigDecimal reward, String id,String shopDetailId);
+
 
 	void refundReward(BigDecimal payValue, String id,String shopDetailId);
 

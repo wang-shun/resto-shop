@@ -1613,6 +1613,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     private void refundOrderHoufu(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        List<String> chargeList = new ArrayList<>();
         for (OrderPaymentItem item : payItemsList) {
             String newPayItemId = ApplicationUtils.randomUUID();
             switch (item.getPaymentModeId()) {
@@ -1623,21 +1624,48 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderPaymentItemService.insert(item);
                     break;
                 case PayMode.CHARGE_PAY:
-                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+                    if(!chargeList.contains(item.getResultData())){
+                        chargeList.add(item.getResultData());
+                    }
+//                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     item.setId(newPayItemId);
                     orderPaymentItemService.insert(item);
+                    BigDecimal chargeValue = (BigDecimal) RedisUtil.get(item.getResultData()+"chargeValue");
+                    if(chargeValue == null){
+                        chargeValue = item.getPayValue();
+                    }else{
+                        chargeValue = chargeValue.add(item.getPayValue());
+                    }
                     break;
                 case PayMode.REWARD_PAY:
-                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+                    if(!chargeList.contains(item.getResultData())){
+                        chargeList.add(item.getResultData());
+                    }
+//                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     item.setId(newPayItemId);
                     orderPaymentItemService.insert(item);
+                    BigDecimal rewardValue = (BigDecimal) RedisUtil.get(item.getResultData()+"rewardValue");
+                    if(rewardValue == null){
+                        rewardValue = item.getPayValue();
+                    }else{
+                        rewardValue = rewardValue.add(item.getPayValue());
+                    }
                     break;
 
             }
-
         }
+        if(!CollectionUtils.isEmpty(chargeList)){
+            for(String id : chargeList){
+                BigDecimal rewardValue = (BigDecimal) RedisUtil.get(id+"rewardValue");
+                BigDecimal chargeValue = (BigDecimal) RedisUtil.get(id+"chargeValue");
+                chargeOrderService.refundMoney(chargeValue,rewardValue,id,order.getShopDetailId());
+                RedisUtil.remove(id+"rewardValue");
+                RedisUtil.remove(id+"chargeValue");
+            }
+        }
+
         Brand brand = brandService.selectById(order.getBrandId());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
@@ -1772,7 +1800,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order printSuccess(String orderId,Boolean openBrandAccount,AccountSetting accountSetting) throws AppException {
         Order order = selectById(orderId);
         Brand brand = brandService.selectById(order.getBrandId());
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         if (StringUtils.isEmpty(order.getParentOrderId())) {
             log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
             LogTemplateUtils.getParentOrderPrintSuccessByOrderType(brand.getBrandName(), order.getId(), order.getProductionStatus());
@@ -1872,9 +1899,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			flag = true;
 		}
     	if(openBrandAccount){//说明开启了品牌账户设置
-				//就算出应收金额
+				//就算出应扣费金额
 			money = getJifeiMoney(order,accountSetting,flag);
-			BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
+			//BigDecimal remain = brandAccount.getAccountBalance().subtract(money);//剩余账户余额 = 账户余额减去-扣除的余额
+			//这里不计算 剩余扣费的金额 因为在扣费的时候可能存在 其它人已经扣费了，这样账户余额就不是此时的账户余额
+
 			blog.setSerialNumber(order.getId());
 			blog.setCreateTime(new Date());
 			blog.setBrandId(order.getBrandId());
@@ -1882,7 +1911,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			blog.setFoundChange(money.negate());
 			blog.setGroupName(shopDetail.getName());
 			blog.setAccountId(brandAccount.getId());
-			blog.setRemain(remain);
+			//blog.setRemain(remain);
 			blog.setOrderMoney(order.getOrderMoney());
 
 			if(order.getParentOrderId()==null){
@@ -1915,15 +1944,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			blog.setBehavior(BehaviorType.SELL);
 
 			// 创建账户日志流水 和更新账户
-			Integer id = brandAccount.getId();
-			BigDecimal amountUsed = brandAccount.getAmountUsed();
+//			Integer id = brandAccount.getId();
+//			brandAccount = new BrandAccount();
+//			brandAccount.setId(id);
+//			brandAccount.setUpdateTime(new Date());
 
-			brandAccount = new BrandAccount();
-			brandAccount.setId(id);
-			brandAccount.setUpdateTime(new Date());
-			brandAccount.setAccountBalance(remain);
-			brandAccount.setAmountUsed(amountUsed.add(money));
-			brandAccountLogService.logBrandAccountAndLog(blog,accountSetting,brandAccount);
+			brandAccountLogService.updateBrandAccountAndLog(blog,brandAccount.getId(),money);
+
+			/**
+			 * 拉取最新的 品牌账户信息
+			 */
+			BrandAccount brandAccount2 = brandAccountService.selectById(brandAccount.getId());
 
 			/*
 		     判断是否要发短信
@@ -1932,7 +1963,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 			List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
 
-			Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+			Result result =  BrandAccountSendUtil.sendSms(brandAccount2,noticeList,brand.getBrandName(),accountSetting);
 			if(result.isSuccess()){
 				Long accountSettingId = accountSetting.getId();
 				AccountSetting as = new AccountSetting();
@@ -1975,6 +2006,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			//不用考虑先付还是后付款
 			jifeiMoney = order.getOrderMoney();
 			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
+			System.err.println("计算出订单总额抽成金额为："+money);
 		}else if(accountSetting.getOpenAllOrder()==BrandAccountPayType.REAL_ORDER_MONEY) {//说明是 所有订单/实际支付金额抽成
 			List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
 			if(orderPaymentItems!=null&&!orderPaymentItems.isEmpty()){
@@ -1991,7 +2023,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			}
 			log.info("订单id为："+order.getId()+"jifeimoney为"+jifeiMoney);
 			money =(jifeiMoney.multiply(new BigDecimal(accountSetting.getAllOrderValue()))).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
-
+			System.err.println("计算出订单实付抽成金额为："+money);
 		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.ALL_ORDER_MONEY &&flag){//回头用户订单  /订单总额抽成
 			//是回头用户才会计算金额
 				if(order.getPayType()==0){//如果是先付
@@ -2004,7 +2036,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					}
 				}
 				money = (jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue()))).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
-
+			System.err.println("回头用户订单总额："+money);
 		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.REAL_ORDER_MONEY&&flag){//回头用户 /实际支付总额抽成
 			//是回头用户才会计算金额
 				List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
@@ -2021,7 +2053,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 					}
 				}
 				money = (jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue()))).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
-
+			System.err.println("回头用户实付订单总额："+money);
 		}
 		return money;
 	}
@@ -2104,7 +2136,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 				List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
 
-				Result result =  BrandAccountSendUtil.sendSms(brandAccount,noticeList,brand.getBrandName(),accountSetting);
+				//拉取最新的brandAccount
+				BrandAccount brandAccount2 = brandAccountService.selectById(brandAccount.getId());
+
+				Result result =  BrandAccountSendUtil.sendSms(brandAccount2,noticeList,brand.getBrandName(),accountSetting);
 				if(result.isSuccess()){
 					Long accountSettingId = accountSetting.getId();
 					AccountSetting as = new AccountSetting();
@@ -8814,6 +8849,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             star.append("☆☆☆☆☆");
         }
         data.put("CUSTOMER_SATISFACTION", star.toString());
+        //声明对象存储差评用户信息
+        StringBuilder customerInfo = new StringBuilder();
+        //得到该订单用户信息
+        Customer customer = customerService.selectById(order.getCustomerId());
+        //判断用户手机号是否为空
+        if (StringUtils.isNotBlank(customer.getTelephone())){
+            customerInfo.append("["+ customer.getTelephone() +"]");
+        }
+        //判断用户性别
+        if (!customer.getSex().equals(Common.NO)){
+            if (customer.getSex().equals(Common.YES)){
+                customerInfo.append("[先生]");
+            }else {
+                customerInfo.append("[女士]");
+            }
+        }
+        data.put("CUSTOMER_PROPERTY", customerInfo.toString());
         //评价内容
         String[] feedBacks = appraise.getFeedback().split(",");
         StringBuilder builder = new StringBuilder();
