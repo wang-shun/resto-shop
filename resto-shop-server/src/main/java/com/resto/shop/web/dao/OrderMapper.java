@@ -770,4 +770,11 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<Order> selectOrderListByCustomerIdAndShopId(@Param("shopId") String shopDetailId, @Param("customerId") String customerId);
 
 	List<Map<String, String>> selectCustomerOrderCount(List<String> customerIds);
+
+	/**
+	 * 用户最近一把有效订单
+	 * @param customerId
+	 * @return
+     */
+	Order selectAfterValidOrderByCustomerId(String customerId);
 }
