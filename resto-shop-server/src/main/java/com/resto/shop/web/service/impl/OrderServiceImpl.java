@@ -8924,6 +8924,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	}
 
     @Override
+    public Order selectAfterValidOrderByCustomerId(String customerId) {
+        return orderMapper.selectAfterValidOrderByCustomerId(customerId);
+    }
+
+    @Override
     public Order afterPayShareBenefits(String orderId) {
         return orderMapper.selectByPrimaryKey(orderId);
     }
