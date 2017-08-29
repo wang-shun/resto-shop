@@ -162,6 +162,9 @@ public class PosServiceImpl implements PosService {
         Map<String, Object> result = new HashMap<>();
         result.put("dataType", "platform");
         PlatformOrder platformOrder = platformOrderService.selectByPlatformOrderId(orderId, null);
+        if(platformOrder == null){
+            return null;
+        }
         List<PlatformOrderDetail> platformOrderDetails = platformOrderDetailService.selectByPlatformOrderId(orderId);
         List<PlatformOrderDetailDto> platformOrderDetailDtos = new ArrayList<>();
         for(PlatformOrderDetail platformOrderDetail : platformOrderDetails){
