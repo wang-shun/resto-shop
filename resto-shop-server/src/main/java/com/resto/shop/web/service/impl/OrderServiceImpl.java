@@ -8312,6 +8312,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		//yz 2017/07/29计费系统
 		//判断是否已经记录过该订单
 		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
+
+		//--
 		if(brandAccountLog!=null){
 			return order;
 		}
