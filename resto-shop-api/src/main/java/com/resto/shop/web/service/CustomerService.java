@@ -105,4 +105,6 @@ public interface CustomerService extends GenericService<Customer, String> {
 	List<Customer> selectShareCustomerList(String customerId, Integer currentPage, Integer showCount);
 
 	List<Customer> selectBySelectMap(Map<String, Object> selectMap);
+
+	 int updateCustomerWechatId(Customer customer);
 }

@@ -342,4 +342,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public List<Customer> selectBySelectMap(Map<String, Object> selectMap) {
 		return customerMapper.selectBySelectMap(selectMap);
 	}
+
+	@Override
+	public int updateCustomerWechatId(Customer customer) {
+		return customerMapper.updateCustomerWechatId(customer);
+	}
 }
