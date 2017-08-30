@@ -11,6 +11,7 @@ import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.*;
+import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.posDto.*;
@@ -77,6 +78,9 @@ public class PosServiceImpl implements PosService {
 
     @Autowired
     private ArticlePriceService articlePriceService;
+
+    @Autowired
+    private OrderMapper orderMapper;
 
     @Override
     public String syncArticleStock(String shopId) {
@@ -257,9 +261,11 @@ public class PosServiceImpl implements PosService {
     @Override
     public void syncPosOrder(String data) {
         JSONObject json = new JSONObject(data);
+
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
+        orderDto.setShopDetailId(json.getString("shopId"));
         Order order = new Order(orderDto);
-        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(json.getString("shopId"));
         order.setOrderMode(shopDetail.getShopMode());
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(json.getString("brandId"));
@@ -269,6 +275,7 @@ public class PosServiceImpl implements PosService {
             OrderItem orderItem = new OrderItem(orderItemDto);
             orderItems.add(orderItem);
         }
+        order.setOrderItems(orderItems);
         if(!StringUtils.isEmpty(orderDto.getParentOrderId())){
             //子订单
             Order parent = orderService.selectById(order.getParentOrderId());
@@ -313,8 +320,12 @@ public class PosServiceImpl implements PosService {
 
     private void updateParent(Order order){
         Order parent = orderService.selectById(order.getParentOrderId());
-        parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
-        parent.setCountWithChild(parent.getCountWithChild() - order.getOrderItems().size());
+        int articleCountWithChildren = 0;
+        Double amountWithChildren = 0.0;
+        articleCountWithChildren = orderMapper.selectArticleCountByIdBossOrder(parent.getId());
+        amountWithChildren = orderMapper.selectParentAmountByBossOrder(parent.getId());
+        parent.setCountWithChild(articleCountWithChildren);
+        parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
         orderService.update(parent);
     }
 
