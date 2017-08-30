@@ -8310,6 +8310,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //yz 计费系统 后付款 pos端 结算时计费
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
 		//yz 2017/07/29计费系统
+		//判断是否已经记录过该订单
+		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
+		if(brandAccountLog!=null){
+			return order;
+		}
+
 		if(brandSetting.getOpenBrandAccount()==1){//说明开启了品牌账户
 			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
 			updateBrandAccount(order,true,accountSetting);
