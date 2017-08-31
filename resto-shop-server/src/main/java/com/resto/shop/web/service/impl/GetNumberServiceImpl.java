@@ -115,13 +115,13 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
     public GetNumber getWaitInfoByCustomerId(String customerId,String shopId) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
 
-        return getNumberMapper.getWaitInfoByCustomerId(customerId,shopId);
+        return getNumberMapper.getWaitInfoByCustomerId(customerId,shopId,shopDetail.getTimeOut());
     }
 
     @Override
     public void refundWaitMoney(Order order) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-        GetNumber getNumber = getNumberMapper.getWaitInfoByCustomerId(order.getCustomerId(),order.getShopDetailId());
+        GetNumber getNumber = getNumberMapper.getWaitInfoByCustomerId(order.getCustomerId(),order.getShopDetailId(),shopDetail.getTimeOut());
         getNumber.setState(WaitModerState.WAIT_MODEL_NUMBER_ONE);
         update(getNumber);
 
