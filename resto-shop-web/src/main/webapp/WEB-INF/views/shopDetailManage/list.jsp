@@ -36,7 +36,7 @@
 						<div class="form-group">
 							<label>等位红包失效时间：</label>
 							<div>
-								<input type="text" class="form-control" name="timeOut" v-model="m.timeOut">小时
+								<input type="text" class="form-control" name="timeOut" v-model="m.timeOut" placeholder="单位为小时">
 							</div>
 						</div>
 						<%--<div  class="form-group">--%>
