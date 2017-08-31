@@ -28,7 +28,7 @@ public interface GetNumberMapper  extends GenericDao<GetNumber,String> {
 
     List<GetNumber> selectCount(@Param("tableType") String tableType,@Param("date") Date date);
 
-    GetNumber getWaitInfoByCustomerId(@Param("customerId") String customerId,@Param("shopId") String shopId,@Param("timeOut") Integer timeOut);
+    GetNumber getWaitInfoByCustomerId(@Param("customerId") String customerId,@Param("shopId") String shopId);
 
     Integer getWaitNumber(GetNumber getNumber);
 
