@@ -8326,6 +8326,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!payMode.equals(PayMode.WEIXIN_PAY) && !payMode.equals(PayMode.ACCOUNT_PAY)) {
             orderMapper.confirmOrderPos(orderId);
         }
+
+        //日志记录
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", order.getCustomerId());
+        map.put("type", "UserAction");
+        StringBuffer msg = new StringBuffer("用户:"+order.getCustomerId()+"订单在pos端被结算，结算方式为:");
+        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+        for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
+            msg.append(orderPaymentItem.getRemark() + "\n");
+        }
+        msg.append("请求服务器地址为:"+MQSetting.getLocalIP());
+        map.put("content", msg.toString());
+        doPost(url, map);
+
         //yz 计费系统 后付款 pos端 结算时计费
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
 		//yz 2017/07/29计费系统
