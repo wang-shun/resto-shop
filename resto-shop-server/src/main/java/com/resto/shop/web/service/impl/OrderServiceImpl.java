@@ -8072,6 +8072,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
+
+        Map map1 = new HashMap(4);
+        map1.put("brandName", brand.getBrandName());
+        map1.put("fileName", order.getCustomerId());
+        map1.put("type", "userAction");
+        map1.put("content", "用户:"+order.getCustomerId()+"的订单："+order.getId()+"在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map1);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
         return order;
     }
