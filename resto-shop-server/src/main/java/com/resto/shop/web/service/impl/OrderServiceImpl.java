@@ -7455,6 +7455,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                                "订单使用银联支付了：" + item.getPayValue());
 //                        updateChild(order);
+                        Map map = new HashMap(4);
+                        map.put("brandName", brand.getBrandName());
+                        map.put("fileName", order.getCustomerId());
+                        map.put("type", "UserAction");
+                        map.put("content", "用户:"+order.getCustomerId()+"发起银联支付："+item.getPayValue()+",订单号为："+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPost(url, map);
                         break;
                     case OrderPayMode.XJ_PAY:
                         order.setPaymentAmount(pay);
@@ -7471,6 +7477,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                                "订单使用现金支付了：" + item.getPayValue());
 //                        updateChild(order);
+                        Map map1 = new HashMap(4);
+                        map1.put("brandName", brand.getBrandName());
+                        map1.put("fileName", order.getCustomerId());
+                        map1.put("type", "UserAction");
+                        map1.put("content", "用户:"+order.getCustomerId()+"发起现金支付："+item.getPayValue()+",订单号为："+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPost(url, map1);
                         break;
                     case OrderPayMode.JF_PAY:
                         order.setPaymentAmount(pay);
@@ -8060,6 +8072,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
+
+        Map map1 = new HashMap(4);
+        map1.put("brandName", brand.getBrandName());
+        map1.put("fileName", order.getCustomerId());
+        map1.put("type", "UserAction");
+        map1.put("content", "用户:"+order.getCustomerId()+"的订单："+order.getId()+"在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map1);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
         return order;
     }
