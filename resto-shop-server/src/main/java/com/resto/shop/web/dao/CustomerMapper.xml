@@ -488,9 +488,9 @@
             <!--<if test="wechatId != null">
                 wechat_id = #{wechatId,jdbcType=VARCHAR},
             </if>-->
-            <if test="wechatId != null">
+            <!--<if test="id != null">
                 id = #{id,jdbcType=VARCHAR},
-            </if>
+            </if>-->
             <if test="nickname != null">
                 nickname = #{nickname,jdbcType=VARCHAR},
             </if>
