@@ -347,7 +347,7 @@ public class PosServiceImpl implements PosService {
     }
 
     @Override
-    public void syncPosRefundOrder(String data) {
+    public String syncPosRefundOrder(String data) {
         JSONObject json = new JSONObject(data);
         Order order = JSON.parseObject(json.get("refund").toString(), Order.class);
         Order refundOrder = orderService.getOrderInfo(order.getId());
@@ -399,7 +399,19 @@ public class PosServiceImpl implements PosService {
             }
             orderService.update(refundOrder);
         }
-
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("dataType","updatePayment");
+        jsonObject.put("orderId",order.getId());
+        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        if(!CollectionUtils.isEmpty(payItemsList)){
+            List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
+            for(OrderPaymentItem orderPaymentItem : payItemsList){
+                OrderPaymentDto orderPaymentDto = new OrderPaymentDto(orderPaymentItem);
+                orderPaymentDtos.add(orderPaymentDto);
+            }
+            jsonObject.put("orderPayment", orderPaymentDtos);
+        }
+        return jsonObject.toString();
     }
 
     private void refundOrderArticleNull(Order refundOrder) {

@@ -87,7 +87,7 @@ public interface PosService {
      * 同步pos端退菜信息
      * @param data json数据
      */
-    void syncPosRefundOrder(String data);
+    String syncPosRefundOrder(String data);
 
 
     /**
