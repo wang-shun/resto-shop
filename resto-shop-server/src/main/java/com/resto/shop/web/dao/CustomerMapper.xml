@@ -585,7 +585,7 @@
                 code = #{code,jdbcType=VARCHAR},
             </if>
         </set>
-        where wechat_id = #{wechatId,jdbcType=VARCHAR},
+        where wechat_id = #{wechatId,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Customer">
     update tb_customer
