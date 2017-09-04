@@ -1625,7 +1625,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
 //                    item.setId(newPayItemId);
 //                    orderPaymentItemService.insert(item);
-                    orderPaymentItemService.delete(item.getId());
                     break;
                 case PayMode.CHARGE_PAY:
                     if(!chargeList.contains(item.getResultData())){
@@ -1641,7 +1640,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }else{
                         chargeValue = chargeValue.add(item.getPayValue());
                     }
-                    orderPaymentItemService.delete(item.getId());
                     break;
                 case PayMode.REWARD_PAY:
                     if(!chargeList.contains(item.getResultData())){
@@ -1657,23 +1655,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }else{
                         rewardValue = rewardValue.add(item.getPayValue());
                     }
-                    orderPaymentItemService.delete(item.getId());
                     break;
                 case PayMode.APPRAISE_RED_PAY:
                     redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
-                    orderPaymentItemService.delete(item.getId());
                     break;
                 case PayMode.SHARE_RED_PAY:
                     redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
-                    orderPaymentItemService.delete(item.getId());
                     break;
                 case PayMode.REFUND_ARTICLE_RED_PAY:
                     redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
-                    orderPaymentItemService.delete(item.getId());
                     break;
                 case PayMode.THIRD_MONEY_RED_PAY:
                     redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
-                    orderPaymentItemService.delete(item.getId());
                     break;
             }
         }
@@ -1686,7 +1679,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 RedisUtil.remove(id+"chargeValue");
             }
         }
-
+        orderPaymentItemService.deleteByOrderId(order.getId());
         Brand brand = brandService.selectById(order.getBrandId());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
