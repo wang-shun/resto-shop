@@ -104,6 +104,27 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	}
 
 	@Override
+	public Customer registerCard(Customer customer) {
+		String customerId = ApplicationUtils.randomUUID();
+		Customer cus = customerMapper.selectByOpenId(customer.getWechatId());
+		if(cus != null){
+			return cus;
+		}
+		customer.setId(customerId);
+		Account account = new Account();
+		account.setId(ApplicationUtils.randomUUID());
+		account.setRemain(BigDecimal.ZERO);
+		accountService.insert(account);
+		customer.setAccountId(account.getId());
+		customer.setLastLoginTime(new Date());
+		customer.setRegiestTime(new Date());
+		customer.setCreateTime(new Date());
+		customer.setAccount(account.getRemain());
+		insert(customer);
+		return customer;
+	}
+
+	@Override
 	public void updateCustomer(Customer customer) {
 		update(customer);
 	}
