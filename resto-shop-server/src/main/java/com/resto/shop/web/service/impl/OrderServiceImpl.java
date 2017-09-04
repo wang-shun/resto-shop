@@ -1675,11 +1675,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             for(String id : chargeList){
                 BigDecimal rewardValue = (BigDecimal) MemcachedUtils.get(id+"rewardValue");
                 BigDecimal chargeValue = (BigDecimal) MemcachedUtils.get(id+"chargeValue");
-                log.info("哈哈哈rewardValue：" + rewardValue);
-                log.info("哈哈哈chargeValue：" + chargeValue);
                 chargeOrderService.refundMoney(chargeValue,rewardValue,id,order.getShopDetailId());
-                RedisUtil.remove(id+"rewardValue");
-                RedisUtil.remove(id+"chargeValue");
+                MemcachedUtils.delete(id+"rewardValue");
+                MemcachedUtils.delete(id+"chargeValue");
             }
         }
         orderPaymentItemService.deleteByOrderId(order.getId());
