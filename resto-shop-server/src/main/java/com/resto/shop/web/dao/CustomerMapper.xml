@@ -36,6 +36,8 @@
         <result column="share_link" property="shareLink"/>
         <result column="useOrder" property="useOrder"/>
         <result column="chargeOrder" property="chargeOrder"/>
+        <result column="card_id" property="cardId" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
         <association property="customerDetail" javaType="com.resto.shop.web.model.CustomerDetail">
             <id column="id" property="id"/>
             <result column="birth_date" property="birthDate"/>
@@ -53,7 +55,7 @@
     regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province,
     city, country, last_order_shop, new_notice_time, share_customer, is_now_register, customer_detail_id,
     bind_phone_time, bind_phone_shop, real_time_coupon_ids, subscribe, last_table_number, birthday_coupon_ids,
-    share_coupon_ids,serial_number,share_link
+    share_coupon_ids,serial_number,share_link,card_id,code
   </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select <include refid="Base_Column_List"/> from tb_customer where id = #{id,jdbcType=VARCHAR}
@@ -70,7 +72,7 @@
       sex, province, city, 
       country, last_order_shop, new_notice_time,
       share_customer,is_now_register, customer_detail_id, bind_phone_time, bind_phone_shop, real_time_coupon_ids,
-      subscribe, last_table_number, birthday_coupon_ids, share_coupon_ids, share_link)
+      subscribe, last_table_number, birthday_coupon_ids, share_coupon_ids, share_link,card_id,code)
     values (#{id,jdbcType=VARCHAR}, #{wechatId,jdbcType=VARCHAR}, #{nickname,jdbcType=VARCHAR}, 
       #{telephone,jdbcType=VARCHAR}, #{headPhoto,jdbcType=VARCHAR}, #{defaultDeliveryPoint,jdbcType=INTEGER}, 
       #{isBindPhone,jdbcType=BIT}, #{regiestTime,jdbcType=TIMESTAMP}, #{firstOrderTime,jdbcType=TIMESTAMP}, 
@@ -78,7 +80,7 @@
       #{sex,jdbcType=INTEGER}, #{province,jdbcType=VARCHAR}, #{city,jdbcType=VARCHAR}, 
       #{country,jdbcType=VARCHAR}, #{lastOrderShop,jdbcType=VARCHAR}, #{newNoticeTime,jdbcType=TIMESTAMP}, 
       #{shareCustomer,jdbcType=VARCHAR},#{isNowRegister},#{customerDetailId},#{bindPhoneTime},#{bindPhoneShop},#{realTimeCouponIds},
-      #{subscribe},#{lastTableNumber},#{birthdayCouponIds},#{shareCouponIds},#{shareLink})
+      #{subscribe},#{lastTableNumber},#{birthdayCouponIds},#{shareCouponIds},#{shareLink},#{cardId,jdbcType=VARCHAR},#{code,jdbcType=VARCHAR})
   </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Customer">
         insert into tb_customer
@@ -176,6 +178,12 @@
             <if test="shareLink != null">
                 share_link,
             </if>
+            <if test="cardId != null">
+                card_id,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -271,6 +279,12 @@
             <if test="shareLink != null">
                 #{shareLink},
             </if>
+            <if test="cardId != null">
+                #{cardId,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Customer">
@@ -356,6 +370,12 @@
             </if>
             <if test="shareLink != null">
                 share_link = #{shareLink},
+            </if>
+            <if test="cardId != null">
+                card_id = #{cardId,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -453,8 +473,119 @@
             <if test="shareLink != null">
                 share_link = #{shareLink},
             </if>
+            <if test="cardId != null">
+                card_id = #{cardId,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateCustomerWechatId" parameterType="com.resto.shop.web.model.Customer">
+        update tb_customer
+        <set>
+            <!--<if test="wechatId != null">
+                wechat_id = #{wechatId,jdbcType=VARCHAR},
+            </if>-->
+            <!--<if test="id != null">
+                id = #{id,jdbcType=VARCHAR},
+            </if>-->
+            <if test="nickname != null">
+                nickname = #{nickname,jdbcType=VARCHAR},
+            </if>
+            <if test="telephone != null">
+                telephone = #{telephone,jdbcType=VARCHAR},
+            </if>
+            <if test="headPhoto != null">
+                head_photo = #{headPhoto,jdbcType=VARCHAR},
+            </if>
+            <if test="defaultDeliveryPoint != null">
+                default_delivery_point = #{defaultDeliveryPoint,jdbcType=INTEGER},
+            </if>
+            <if test="isBindPhone != null">
+                is_bind_phone = #{isBindPhone,jdbcType=BIT},
+            </if>
+            <if test="regiestTime != null">
+                regiest_time = #{regiestTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="registerShopId != null" >
+                register_shop_id = #{registerShopId,jdbcType=VARCHAR},
+            </if>
+            <if test="firstOrderTime != null">
+                first_order_time = #{firstOrderTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="lastLoginTime != null">
+                last_login_time = #{lastLoginTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="accountId != null">
+                account_id = #{accountId,jdbcType=VARCHAR},
+            </if>
+            <if test="brandId != null">
+                brand_id = #{brandId,jdbcType=VARCHAR},
+            </if>
+            <if test="sex != null">
+                sex = #{sex,jdbcType=INTEGER},
+            </if>
+            <if test="province != null">
+                province = #{province,jdbcType=VARCHAR},
+            </if>
+            <if test="city != null">
+                city = #{city,jdbcType=VARCHAR},
+            </if>
+            <if test="country != null">
+                country = #{country,jdbcType=VARCHAR},
+            </if>
+            <if test="lastOrderShop != null">
+                last_order_shop = #{lastOrderShop,jdbcType=VARCHAR},
+            </if>
+            <if test="newNoticeTime != null">
+                new_notice_time = #{newNoticeTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="shareCustomer != null">
+                share_customer = #{shareCustomer,jdbcType=VARCHAR},
+            </if>
+            <if test="isNowRegister != null">
+                is_now_register = #{isNowRegister,jdbcType=VARCHAR},
+            </if>
+            <if test="isShare != null">
+                is_share = #{isShare},
+            </if>
+            <if test="customerDetailId != null">
+                customer_detail_id = #{customerDetailId},
+            </if>
+            <if test="bindPhoneTime != null">
+                bind_phone_time = #{bindPhoneTime},
+            </if>
+            <if test="bindPhoneShop != null">
+                bind_phone_shop = #{bindPhoneShop},
+            </if>
+            <if test="realTimeCouponIds != null">
+                real_time_coupon_ids = #{realTimeCouponIds},
+            </if>
+            <if test="subscribe != null">
+                subscribe = #{subscribe},
+            </if>
+            <if test="lastTableNumber != null">
+                last_table_number = #{lastTableNumber},
+            </if>
+            <if test="birthdayCouponIds != null">
+                birthday_coupon_ids = #{birthdayCouponIds},
+            </if>
+            <if test="shareCouponIds != null">
+                share_coupon_ids = #{shareCouponIds},
+            </if>
+            <if test="shareLink != null">
+                share_link = #{shareLink},
+            </if>
+            <if test="cardId != null">
+                card_id = #{cardId,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where wechat_id = #{wechatId,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Customer">
     update tb_customer
@@ -484,7 +615,9 @@
       subscribe = #{subscribe},
       last_table_number = #{lastTableNumber},
       birthday_coupon_ids = #{birthdayCouponIds},
-      share_coupon_ids = #{shareCouponIds}
+      share_coupon_ids = #{shareCouponIds},
+      card_id = #{cardId,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 

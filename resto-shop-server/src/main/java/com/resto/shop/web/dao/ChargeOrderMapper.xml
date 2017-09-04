@@ -316,6 +316,15 @@
   	total_balance = charge_balance+reward_balance
   	where id=#{1}
   </update>
+
+    <update id="refundMoney">
+        update tb_charge_order
+        set charge_balance = charge_balance+#{0},
+        reward_balance = reward_balance+#{1},
+        total_balance = charge_balance+reward_balance
+        where id=#{2}
+    </update>
+
   <update id="refundReward">
   	update tb_charge_order
   	set reward_balance = reward_balance+#{0},

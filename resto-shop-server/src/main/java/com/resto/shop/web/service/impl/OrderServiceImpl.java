@@ -1329,7 +1329,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
-        MemcachedUtils.delete(orderId + "WxPay");
         if (MemcachedUtils.get(order.getCustomerId()+"createOrder") != null) {
             MemcachedUtils.delete(order.getCustomerId() + "createOrder");
         }
@@ -1456,6 +1455,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.REFUND_ARTICLE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.THIRD_MONEY_RED_PAY:
                     redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
@@ -1613,31 +1616,71 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     private void refundOrderHoufu(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        List<String> chargeList = new ArrayList<>();
         for (OrderPaymentItem item : payItemsList) {
-            String newPayItemId = ApplicationUtils.randomUUID();
+//            String newPayItemId = ApplicationUtils.randomUUID();
             switch (item.getPaymentModeId()) {
                 case PayMode.ACCOUNT_PAY:
                     accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER, order.getShopDetailId());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    item.setId(newPayItemId);
-                    orderPaymentItemService.insert(item);
+//                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+//                    item.setId(newPayItemId);
+//                    orderPaymentItemService.insert(item);
                     break;
                 case PayMode.CHARGE_PAY:
-                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    item.setId(newPayItemId);
-                    orderPaymentItemService.insert(item);
+                    if(!chargeList.contains(item.getResultData())){
+                        chargeList.add(item.getResultData());
+                    }
+//                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+//                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+//                    item.setId(newPayItemId);
+//                    orderPaymentItemService.insert(item);
+//                    BigDecimal chargeValue = (BigDecimal) RedisUtil.get(item.getResultData()+"chargeValue");
+                    if(!MemcachedUtils.add(item.getResultData()+"chargeValue", item.getPayValue(), 600)){
+                        MemcachedUtils.put(item.getResultData()+"chargeValue", item.getPayValue().add((BigDecimal) MemcachedUtils.get(item.getResultData()+"chargeValue")));
+                    }
                     break;
                 case PayMode.REWARD_PAY:
-                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    item.setId(newPayItemId);
-                    orderPaymentItemService.insert(item);
+                    if(!chargeList.contains(item.getResultData())){
+                        chargeList.add(item.getResultData());
+                    }
+//                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+//                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+//                    item.setId(newPayItemId);
+//                    orderPaymentItemService.insert(item);
+//                    BigDecimal rewardValue = (BigDecimal) RedisUtil.get(item.getResultData()+"rewardValue");
+//                    if(rewardValue == null){
+//                        rewardValue = item.getPayValue();
+//                    }else{
+//                        rewardValue = rewardValue.add(item.getPayValue());
+//                    }
+                    if(!MemcachedUtils.add(item.getResultData()+"rewardValue", item.getPayValue(), 600)){
+                        MemcachedUtils.put(item.getResultData()+"rewardValue", item.getPayValue().add((BigDecimal) MemcachedUtils.get(item.getResultData()+"rewardValue")));
+                    }
                     break;
-
+                case PayMode.APPRAISE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    break;
+                case PayMode.SHARE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    break;
+                case PayMode.REFUND_ARTICLE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    break;
+                case PayMode.THIRD_MONEY_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    break;
             }
-
         }
+        if(!CollectionUtils.isEmpty(chargeList)){
+            for(String id : chargeList){
+                BigDecimal rewardValue = (BigDecimal) MemcachedUtils.get(id+"rewardValue");
+                BigDecimal chargeValue = (BigDecimal) MemcachedUtils.get(id+"chargeValue");
+                chargeOrderService.refundMoney(chargeValue,rewardValue,id,order.getShopDetailId());
+                MemcachedUtils.delete(id+"rewardValue");
+                MemcachedUtils.delete(id+"chargeValue");
+            }
+        }
+        orderPaymentItemService.deleteByOrderId(order.getId());
         Brand brand = brandService.selectById(order.getBrandId());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
@@ -2128,9 +2171,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}catch (Exception e){
 			log.info("resto外卖订单抽成出错 "+e.getMessage());
 			e.printStackTrace();
-		}
+		}finally{
+            return count;
+        }
 
-			return count;
 		}
 
     @Override
@@ -2428,11 +2472,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter=new ArrayList<>();
         if(shopDetail.getTurntablePrintType()==3){
-            ticketPrinter =printerService.selectListByShopId(order.getShopDetailId());
+            ticketPrinter.addAll(printerService.selectPrintByType(order.getShopDetailId(),PrinterType.KITCHEN));
+            ticketPrinter.addAll(printerService.selectPrintByType(order.getShopDetailId(),PrinterType.RECEPTION));
         }else if(shopDetail.getTurntablePrintType()==1){
-            ticketPrinter =printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.KITCHEN);
+            ticketPrinter.addAll(printerService.selectPrintByType(order.getShopDetailId(),PrinterType.KITCHEN));
         }else if(shopDetail.getTurntablePrintType()==2){
-            ticketPrinter =printerService.selectByShopAndType(order.getShopDetailId(),PrinterType.RECEPTION);
+            ticketPrinter.addAll(printerService.selectPrintByType(order.getShopDetailId(),PrinterType.RECEPTION));
         }
         for (Printer printer : ticketPrinter) {
             if (shopDetail.getIsPosNew() == Common.YES) {
@@ -7429,6 +7474,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                                "订单使用银联支付了：" + item.getPayValue());
 //                        updateChild(order);
+                        Map map = new HashMap(4);
+                        map.put("brandName", brand.getBrandName());
+                        map.put("fileName", order.getCustomerId());
+                        map.put("type", "UserAction");
+                        map.put("content", "用户:"+order.getCustomerId()+"发起银联支付："+item.getPayValue()+",订单号为："+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPost(url, map);
                         break;
                     case OrderPayMode.XJ_PAY:
                         order.setPaymentAmount(pay);
@@ -7445,6 +7496,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                                "订单使用现金支付了：" + item.getPayValue());
 //                        updateChild(order);
+                        Map map1 = new HashMap(4);
+                        map1.put("brandName", brand.getBrandName());
+                        map1.put("fileName", order.getCustomerId());
+                        map1.put("type", "UserAction");
+                        map1.put("content", "用户:"+order.getCustomerId()+"发起现金支付："+item.getPayValue()+",订单号为："+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPost(url, map1);
                         break;
                     case OrderPayMode.JF_PAY:
                         order.setPaymentAmount(pay);
@@ -8034,6 +8091,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
+
+        Map map1 = new HashMap(4);
+        map1.put("brandName", brand.getBrandName());
+        map1.put("fileName", order.getCustomerId());
+        map1.put("type", "UserAction");
+        map1.put("content", "用户:"+order.getCustomerId()+"的订单："+order.getId()+"在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map1);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
         return order;
     }
@@ -8281,9 +8345,32 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (!payMode.equals(PayMode.WEIXIN_PAY) && !payMode.equals(PayMode.ACCOUNT_PAY)) {
             orderMapper.confirmOrderPos(orderId);
         }
+
+        //日志记录
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", order.getCustomerId());
+        map.put("type", "UserAction");
+        StringBuffer msg = new StringBuffer("用户:"+order.getCustomerId()+"订单在pos端被结算，结算方式为:");
+        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+        for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
+            msg.append(orderPaymentItem.getRemark() + "\n");
+        }
+        msg.append("请求服务器地址为:"+MQSetting.getLocalIP());
+        map.put("content", msg.toString());
+        doPost(url, map);
+
         //yz 计费系统 后付款 pos端 结算时计费
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
 		//yz 2017/07/29计费系统
+		//判断是否已经记录过该订单
+		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
+
+		//--
+		if(brandAccountLog!=null){
+			return order;
+		}
+
 		if(brandSetting.getOpenBrandAccount()==1){//说明开启了品牌账户
 			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
 			updateBrandAccount(order,true,accountSetting);
@@ -8897,6 +8984,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 	public List<Order> selectCompleteByShopIdAndTime(String shopId, Date begin, Date end) {
 		return orderMapper.selectCompleteByShopIdAndTime(shopId,begin,end);
 	}
+
+    @Override
+    public Order selectAfterValidOrderByCustomerId(String customerId) {
+        return orderMapper.selectAfterValidOrderByCustomerId(customerId);
+    }
 
     @Override
     public Order afterPayShareBenefits(String orderId) {
