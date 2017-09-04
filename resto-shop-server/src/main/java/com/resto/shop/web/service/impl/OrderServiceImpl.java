@@ -1329,7 +1329,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
-        MemcachedUtils.delete(orderId + "WxPay");
         if (MemcachedUtils.get(order.getCustomerId()+"createOrder") != null) {
             MemcachedUtils.delete(order.getCustomerId() + "createOrder");
         }
@@ -1456,6 +1455,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.REFUND_ARTICLE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.THIRD_MONEY_RED_PAY:
                     redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
@@ -1615,45 +1618,63 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         List<String> chargeList = new ArrayList<>();
         for (OrderPaymentItem item : payItemsList) {
-            String newPayItemId = ApplicationUtils.randomUUID();
+//            String newPayItemId = ApplicationUtils.randomUUID();
             switch (item.getPaymentModeId()) {
                 case PayMode.ACCOUNT_PAY:
                     accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER, order.getShopDetailId());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    item.setId(newPayItemId);
-                    orderPaymentItemService.insert(item);
+//                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+//                    item.setId(newPayItemId);
+//                    orderPaymentItemService.insert(item);
+                    orderPaymentItemService.delete(item.getId());
                     break;
                 case PayMode.CHARGE_PAY:
                     if(!chargeList.contains(item.getResultData())){
                         chargeList.add(item.getResultData());
                     }
-//                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    item.setId(newPayItemId);
-                    orderPaymentItemService.insert(item);
+                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+//                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+//                    item.setId(newPayItemId);
+//                    orderPaymentItemService.insert(item);
                     BigDecimal chargeValue = (BigDecimal) RedisUtil.get(item.getResultData()+"chargeValue");
                     if(chargeValue == null){
                         chargeValue = item.getPayValue();
                     }else{
                         chargeValue = chargeValue.add(item.getPayValue());
                     }
+                    orderPaymentItemService.delete(item.getId());
                     break;
                 case PayMode.REWARD_PAY:
                     if(!chargeList.contains(item.getResultData())){
                         chargeList.add(item.getResultData());
                     }
-//                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    item.setId(newPayItemId);
-                    orderPaymentItemService.insert(item);
+                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+//                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+//                    item.setId(newPayItemId);
+//                    orderPaymentItemService.insert(item);
                     BigDecimal rewardValue = (BigDecimal) RedisUtil.get(item.getResultData()+"rewardValue");
                     if(rewardValue == null){
                         rewardValue = item.getPayValue();
                     }else{
                         rewardValue = rewardValue.add(item.getPayValue());
                     }
+                    orderPaymentItemService.delete(item.getId());
                     break;
-
+                case PayMode.APPRAISE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    orderPaymentItemService.delete(item.getId());
+                    break;
+                case PayMode.SHARE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    orderPaymentItemService.delete(item.getId());
+                    break;
+                case PayMode.REFUND_ARTICLE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    orderPaymentItemService.delete(item.getId());
+                    break;
+                case PayMode.THIRD_MONEY_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    orderPaymentItemService.delete(item.getId());
+                    break;
             }
         }
         if(!CollectionUtils.isEmpty(chargeList)){
