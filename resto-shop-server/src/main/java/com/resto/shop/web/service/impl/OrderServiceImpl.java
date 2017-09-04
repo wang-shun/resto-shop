@@ -1152,7 +1152,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setIsPay(OrderPayState.PAYED);
             update(order);
         }
-
+        log.info("订单现在的状态2是"+order.getOrderState());
         if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getParentOrderId() == null && order.getPayType() == PayType.NOPAY) {
             updateChild(order);
         }
@@ -5049,6 +5049,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order selectOrderDetails(String orderId) {
         Order o = orderMapper.selectOrderDetails(orderId);
+        if(o == null){
+            return null;
+        }
         ShopDetail shop = shopDetailService.selectById(o.getShopDetailId());
         if (shop != null) {
             o.setShopName(shop.getName());
