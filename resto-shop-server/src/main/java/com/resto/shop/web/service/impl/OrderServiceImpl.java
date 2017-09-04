@@ -1631,7 +1631,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     if(!chargeList.contains(item.getResultData())){
                         chargeList.add(item.getResultData());
                     }
-//                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
 //                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
 //                    item.setId(newPayItemId);
 //                    orderPaymentItemService.insert(item);
@@ -1647,7 +1647,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     if(!chargeList.contains(item.getResultData())){
                         chargeList.add(item.getResultData());
                     }
-//                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
 //                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
 //                    item.setId(newPayItemId);
 //                    orderPaymentItemService.insert(item);
