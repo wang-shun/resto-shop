@@ -5052,6 +5052,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order selectOrderDetails(String orderId) {
         Order o = orderMapper.selectOrderDetails(orderId);
+        if(o == null){
+            return null;
+        }
         ShopDetail shop = shopDetailService.selectById(o.getShopDetailId());
         if (shop != null) {
             o.setShopName(shop.getName());
