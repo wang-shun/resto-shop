@@ -1635,10 +1635,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    item.setId(newPayItemId);
 //                    orderPaymentItemService.insert(item);
                     BigDecimal chargeValue = (BigDecimal) RedisUtil.get(item.getResultData()+"chargeValue");
-                    if(chargeValue == null){
-                        chargeValue = item.getPayValue();
-                    }else{
-                        chargeValue = chargeValue.add(item.getPayValue());
+                    if(!MemcachedUtils.add(item.getResultData()+"chargeValue", item.getPayValue(), 600)){
+                        MemcachedUtils.put(item.getResultData()+"chargeValue", item.getPayValue().add((BigDecimal) MemcachedUtils.get(item.getResultData()+"chargeValue")));
                     }
                     break;
                 case PayMode.REWARD_PAY:
@@ -1649,11 +1647,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
 //                    item.setId(newPayItemId);
 //                    orderPaymentItemService.insert(item);
-                    BigDecimal rewardValue = (BigDecimal) RedisUtil.get(item.getResultData()+"rewardValue");
-                    if(rewardValue == null){
-                        rewardValue = item.getPayValue();
-                    }else{
-                        rewardValue = rewardValue.add(item.getPayValue());
+//                    BigDecimal rewardValue = (BigDecimal) RedisUtil.get(item.getResultData()+"rewardValue");
+//                    if(rewardValue == null){
+//                        rewardValue = item.getPayValue();
+//                    }else{
+//                        rewardValue = rewardValue.add(item.getPayValue());
+//                    }
+                    if(!MemcachedUtils.add(item.getResultData()+"rewardValue", item.getPayValue(), 600)){
+                        MemcachedUtils.put(item.getResultData()+"rewardValue", item.getPayValue().add((BigDecimal) MemcachedUtils.get(item.getResultData()+"rewardValue")));
                     }
                     break;
                 case PayMode.APPRAISE_RED_PAY:
@@ -1672,8 +1673,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         if(!CollectionUtils.isEmpty(chargeList)){
             for(String id : chargeList){
-                BigDecimal rewardValue = (BigDecimal) RedisUtil.get(id+"rewardValue");
-                BigDecimal chargeValue = (BigDecimal) RedisUtil.get(id+"chargeValue");
+                BigDecimal rewardValue = (BigDecimal) MemcachedUtils.get(id+"rewardValue");
+                BigDecimal chargeValue = (BigDecimal) MemcachedUtils.get(id+"chargeValue");
                 log.info("哈哈哈rewardValue：" + rewardValue);
                 log.info("哈哈哈chargeValue：" + chargeValue);
                 chargeOrderService.refundMoney(chargeValue,rewardValue,id,order.getShopDetailId());
