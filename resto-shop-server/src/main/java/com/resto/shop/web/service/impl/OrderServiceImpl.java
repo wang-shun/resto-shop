@@ -2156,9 +2156,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		}catch (Exception e){
 			log.info("resto外卖订单抽成出错 "+e.getMessage());
 			e.printStackTrace();
-		}
+		}finally{
+            return count;
+        }
 
-			return count;
 		}
 
     @Override
