@@ -753,4 +753,11 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
      * @param orderList
      */
     void uploadLocalPosOrderList(List<Map<String, Object>> orderList);
+
+	/**
+	 * 用户最近一把有效订单
+	 * @param customerId
+	 * @return
+	 */
+	Order selectAfterValidOrderByCustomerId(String customerId);
 }

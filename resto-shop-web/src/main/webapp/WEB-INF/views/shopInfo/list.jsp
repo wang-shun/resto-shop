@@ -522,13 +522,26 @@
 					</div>
 
 					<div class="form-group">
-						<label class="col-md-4 control-label" >换桌是否开启：</label>
+						<label class="col-md-4 control-label" :class="{ formBox : m.isTurntable == 1}">换桌是否开启：</label>
 						<div  class="col-md-6 radio-list">
 							<label class="radio-inline">
 								<input type="radio" name="isTurntable"v-model="m.isTurntable" value="1">是
 							</label>
 							<label class="radio-inline">
 								<input type="radio" name="isTurntable" v-model="m.isTurntable" value="0">否
+							</label>
+						</div>
+					</div>
+					<div class="form-group" v-show="m.isTurntable == 1">
+						<label class="col-md-4 control-label" :class="{ formBox : m.isTurntable == 1}">打印方式：</label>
+						<div  class="col-md-6 radio-list checkbox">
+							<label style="margin-left: 16px;">
+								<input type="checkbox" name="turntablePrintReceipt" :true-value="1" v-model="m.turntablePrintReceipt">
+								&nbsp;&nbsp;前台打印
+							</label>
+							<label style="margin-left: 16px;">
+								<input type="checkbox" name="turntablePrintKitchen" :true-value="1"  v-model="m.turntablePrintKitchen" >
+								&nbsp;&nbsp;厨房打印
 							</label>
 						</div>
 					</div>
