@@ -84,6 +84,9 @@ public class OrderItemDto implements Serializable {
     //套餐子项id
     private Integer mealItemId;
 
+
+
+
     public Integer getPrintFailFlag() {
         return printFailFlag;
     }

@@ -45,6 +45,8 @@ public class Order implements Serializable {
         this.paymentAmount = orderDto.getPaymentAmount() == null ? BigDecimal.valueOf(0) : orderDto.getPaymentAmount();
         this.customerId = orderDto.getCustomerId() == null ? "0" : orderDto.getCustomerId();
         this.customerAddressId = StringUtils.isEmpty(orderDto.getCustomerAddressId()) ? null : orderDto.getCustomerAddressId();
+        this.mealAllNumber = orderDto.getMealAllNumber() == null ? 0 : orderDto.getMealAllNumber();
+        this.mealFeePrice = orderDto.getMealFeePrice() == null ? BigDecimal.valueOf(0) : orderDto.getMealFeePrice();
     }
 
 

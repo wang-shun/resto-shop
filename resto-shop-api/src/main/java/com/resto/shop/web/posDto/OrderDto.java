@@ -46,6 +46,9 @@ public class OrderDto implements Serializable {
         this.customerAddressId = order.getCustomerAddressId() == null ? "" : order.getCustomerAddressId();
         this.verCode = order.getVerCode() == null ? "" : order.getVerCode();
         this.payMode = order.getPayMode();
+        this.servicePrice = order.getServicePrice();
+        this.mealAllNumber = order.getMealAllNumber();
+        this.mealFeePrice = order.getMealFeePrice();
     }
 
     //订单id
@@ -110,6 +113,26 @@ public class OrderDto implements Serializable {
     private String verCode;
 
     private Integer payMode;
+
+    private Integer mealAllNumber;
+
+    private BigDecimal mealFeePrice;
+
+    public Integer getMealAllNumber() {
+        return mealAllNumber;
+    }
+
+    public void setMealAllNumber(Integer mealAllNumber) {
+        this.mealAllNumber = mealAllNumber;
+    }
+
+    public BigDecimal getMealFeePrice() {
+        return mealFeePrice;
+    }
+
+    public void setMealFeePrice(BigDecimal mealFeePrice) {
+        this.mealFeePrice = mealFeePrice;
+    }
 
     public Integer getPayMode() {
         return payMode;
