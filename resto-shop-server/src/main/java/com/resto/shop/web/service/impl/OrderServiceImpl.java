@@ -8994,6 +8994,65 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
+    public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, Integer type) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        //整单折扣统计菜品项
+        if(type == PosDiscount.ZHENGDAN){
+            Map map = new HashMap();
+            map.put("orderId", orderId);
+            map.put("count", "1=1");
+            List<OrderItem> oItems = orderItemService.selectOrderItemByOrderId(map);
+            order = posDiscountAction(oItems, discount, order);
+            List<Order> pOrder = orderMapper.selectListByParentId(orderId);
+            if(pOrder != null){
+                BigDecimal sum = new BigDecimal(0);
+                for(Order oP : pOrder){
+                    map.clear();
+                    map.put("orderId", oP.getId());
+                    map.put("count", "1=1");
+                    oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, oP);
+                    sum = sum.add(oP.getOrderMoney());
+                }
+                //修改主订单
+                order.setAmountWithChildren(order.getOrderMoney().add(sum).add(order.getServicePrice()).add(order.getMealFeePrice()));
+                orderMapper.updateByPrimaryKeySelective(order);
+            }
+        }
+
+        return null;
+    }
+
+    public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, Order order){
+        BigDecimal sum = new BigDecimal(0);
+        //修改菜品项
+        for(OrderItem oItem : orderItems){
+            oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
+            oItem.setPosDiscount(discount.multiply(new BigDecimal(100)) + "%");
+            sum.add(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
+        }
+        //修改子订单
+        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+            order.setOrderMoney(sum);
+            order.setPaymentAmount(sum);
+            orderMapper.updateByPrimaryKeySelective(order);
+        }
+        //修改主订单
+        if(order.getParentOrderId() == null || "".equals(order.getParentOrderId())){
+            if(order.getServicePrice().doubleValue() > 0){
+                order.setServicePrice(order.getServicePrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
+            if(order.getMealFeePrice().doubleValue() > 0){
+                order.setMealFeePrice(order.getMealFeePrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
+            order.setOrderMoney(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
+            BigDecimal value = orderMapper.selectPayBefore(order.getId());
+            order.setPaymentAmount(sum.subtract(value));
+            orderMapper.updateByPrimaryKeySelective(order);
+        }
+        return order;
+    }
+
+    @Override
     public Order afterPayShareBenefits(String orderId) {
         return orderMapper.selectByPrimaryKey(orderId);
     }
