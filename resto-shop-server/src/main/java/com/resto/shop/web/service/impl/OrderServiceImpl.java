@@ -683,8 +683,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             articleCount += item.getCount();
             item.setFinalPrice(finalMoney);
             item.setOrderId(orderId);
-            item.setBaseUnitPrice(item.getUnitPrice());
-            item.setPosDiscount("100%");
+//            item.setBaseUnitPrice(item.getUnitPrice());
+//            item.setPosDiscount("100%");
             totalMoney = totalMoney.add(finalMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
             originMoney = originMoney.add(item.getOriginalPrice().multiply(BigDecimal.valueOf(item.getCount()))).setScale(2, BigDecimal.ROUND_HALF_UP);
             Result check = new Result();
