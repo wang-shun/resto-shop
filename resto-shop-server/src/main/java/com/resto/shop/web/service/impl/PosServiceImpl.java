@@ -112,7 +112,10 @@ public class PosServiceImpl implements PosService {
         OrderDto orderDto = new OrderDto(order);
         JSONObject jsonObject = new JSONObject(orderDto);
         jsonObject.put("dataType", "orderCreated");
-        List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
+        Map map = new HashMap();
+        map.put("orderId",orderId);
+        map.put("count","count > 0");
+        List<OrderItem> orderItems = orderItemService.selectOrderItemByOrderId(map);
         List<OrderItemDto> orderItemDtos = new ArrayList<>();
         for(OrderItem orderItem : orderItems){
             OrderItemDto orderItemDto = new OrderItemDto(orderItem);
