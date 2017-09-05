@@ -409,7 +409,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
         if (!StringUtils.isEmpty(order.getTableNumber()) && order.getTableNumber().length() > 5) {
             jsonResult.setSuccess(false);
             jsonResult.setMessage("桌号异常,请扫码正确的二维码！");
@@ -684,6 +683,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             articleCount += item.getCount();
             item.setFinalPrice(finalMoney);
             item.setOrderId(orderId);
+            item.setBaseUnitPrice(item.getUnitPrice());
+            item.setPosDiscount("100%");
             totalMoney = totalMoney.add(finalMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
             originMoney = originMoney.add(item.getOriginalPrice().multiply(BigDecimal.valueOf(item.getCount()))).setScale(2, BigDecimal.ROUND_HALF_UP);
             Result check = new Result();
