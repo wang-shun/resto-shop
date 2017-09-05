@@ -427,7 +427,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         Brand brand = brandService.selectById(order.getBrandId());
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
         if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
@@ -6941,15 +6940,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             parent = order;
         }
 
-        Map customerMap = new HashMap(4);
-        customerMap.put("brandName", brand.getBrandName());
-        customerMap.put("fileName", customer.getId());
-        customerMap.put("type", "UserAction");
-        customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPostAnsc(LogUtils.url, customerMap);
-//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                "订单发送推送：" + msg.toString());
-
+//
         Order newOrder = new Order();
         newOrder.setId(order.getId());
         newOrder.setDistributionModeId(oldDistributionModeId);
