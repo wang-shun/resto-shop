@@ -151,8 +151,8 @@
         language:"zh-CN"
     });
     //得到当前流失唤醒优惠券的Id
-    var couponId = ${couponId};
-    var intoType = ${intoType}
+    var couponId = "${couponId}";
+    var intoType = ${intoType};
     var groupReleaseTableAPI;
     var personalLoansTableAPI;
     new Vue({

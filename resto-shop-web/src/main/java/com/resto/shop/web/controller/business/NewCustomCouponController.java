@@ -204,7 +204,7 @@ public class NewCustomCouponController extends GenericController{
 
     @RequestMapping("/goToGrant")
     public String goToGrant(String couponId, Integer intoType, HttpServletRequest request){
-        request.setAttribute("couponId", couponId == null ? "是通过会员信息报表进入" : couponId);
+        request.setAttribute("couponId", couponId);
         request.setAttribute("intoType", intoType);
         return "newcustomcoupon/grantCoupon";
     }
