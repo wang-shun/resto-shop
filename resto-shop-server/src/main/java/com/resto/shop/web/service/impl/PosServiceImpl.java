@@ -12,6 +12,7 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.dao.OrderMapper;
+import com.resto.shop.web.dao.PosMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.posDto.*;
@@ -81,6 +82,9 @@ public class PosServiceImpl implements PosService {
 
     @Autowired
     private OrderMapper orderMapper;
+
+    @Autowired
+    private PosMapper posMapper;
 
     @Override
     public String syncArticleStock(String shopId) {
@@ -445,4 +449,8 @@ public class PosServiceImpl implements PosService {
         MQMessageProducer.sendPlatformOrderMessage("1210056817231407326",1,"2f83afee7a0e4822a6729145dd53af33","8565844c69b94b0dbde38b0861df62c8");
     }
 
+    @Override
+    public List<ArticleSupport> syncArticleSupport() {
+        return posMapper.selectArticleSupport();
+    }
 }

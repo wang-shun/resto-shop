@@ -1,7 +1,9 @@
 package com.resto.shop.web.service;
 
 import com.resto.shop.web.model.Article;
+import com.resto.shop.web.posDto.ArticleSupport;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -96,7 +98,11 @@ public interface PosService {
      */
     void syncPosConfirmOrder(String orderId);
 
-
+    /**
+     * 同步菜品供应时间
+     * @return
+     */
+    List<ArticleSupport>  syncArticleSupport();
 
     void test();
 }
