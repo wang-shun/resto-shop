@@ -273,10 +273,14 @@ public class NewCustomCouponController extends GenericController{
                         if (object.get("customerId").toString().equalsIgnoreCase(orderMap.get("customerId").toString())) {
                             daysBetween = daysBetween(orderMap.get("lastOrderTime").toString(), newDateString);
                             //判断该用户满不满足订单条件
-                            if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount")) ? "0" : selectMap.get("orderCount")))) > 0
-                                    && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("orderTotal")) ? "0" : selectMap.get("orderTotal")))) > 0
-                                    && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("avgOrderMoney")) ? "0" : selectMap.get("avgOrderMoney")))) > 0
-                                    && daysBetween.compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("lastOrderDay")) ? "0" : selectMap.get("lastOrderDay")))) > 0) {
+                            if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount"))
+                                    ? "0" : selectMap.get("orderCount")))) > 0
+                                    && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("orderTotal"))
+                                    ? "0" : selectMap.get("orderTotal")))) > 0
+                                    && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("avgOrderMoney"))
+                                    ? "0" : selectMap.get("avgOrderMoney")))) > 0
+                                    && daysBetween.compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("lastOrderDay"))
+                                    ? "0" : selectMap.get("lastOrderDay")))) > 0) {
                                 meetOrder = true;
                             }
                             object.put("orderCount", orderMap.get("orderCount").toString());
