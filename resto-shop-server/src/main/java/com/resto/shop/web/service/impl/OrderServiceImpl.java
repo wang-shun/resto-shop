@@ -9004,7 +9004,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<OrderItem> oItems = orderItemService.selectOrderItemByOrderId(map);
             order = posDiscountAction(oItems, discount, order);
             List<Order> pOrder = orderMapper.selectListByParentId(orderId);
-            if(pOrder != null){
+            if(pOrder.size() > 0){
                 BigDecimal sum = new BigDecimal(0);
                 for(Order oP : pOrder){
                     map.clear();
@@ -9028,7 +9028,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for(OrderItem oItem : orderItems){
             oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
             oItem.setPosDiscount(discount.multiply(new BigDecimal(100)) + "%");
-            sum.add(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
+            oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
+            sum = sum.add(oItem.getFinalPrice());
+            orderItemService.update(oItem);
         }
         //修改子订单
         if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
@@ -9045,8 +9047,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setMealFeePrice(order.getMealFeePrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
             order.setOrderMoney(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
+            order.setPaymentAmount(sum);
             BigDecimal value = orderMapper.selectPayBefore(order.getId());
-            order.setPaymentAmount(sum.subtract(value));
+            if(value != null && value.doubleValue() > 0){
+                order.setPaymentAmount(sum.subtract(value));
+            }
             orderMapper.updateByPrimaryKeySelective(order);
         }
         return order;
