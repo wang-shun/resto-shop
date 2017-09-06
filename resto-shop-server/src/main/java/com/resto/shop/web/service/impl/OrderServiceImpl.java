@@ -7364,7 +7364,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, BigDecimal> orders = new HashMap<>();
         List<OrderItem> orderItems = refundOrder.getOrderItems();
         for (OrderItem orderItem : orderItems) {
-            BigDecimal itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
+            BigDecimal itemValue = new BigDecimal(0);
+            if(orderItem.getType().equals(ArticleType.SERVICE_PRICE)){
+                itemValue = order.getServicePrice().divide(new BigDecimal(order.getCustomerCount())).multiply(new BigDecimal(order.getBaseCustomerCount() - order.getCustomerCount()));
+            }else{
+                itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
+            }
             if (orders.containsKey(orderItem.getOrderId())) {
                 orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
                 MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", Integer.parseInt(MemcachedUtils.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
@@ -7618,7 +7623,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         o.setMealAllNumber(mealCount);
         o.setArticleCount(o.getArticleCount() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
-        o.setOriginalAmount(origin.add(o.getServicePrice()));
+        o.setOriginalAmount(origin.add(shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount()))));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
