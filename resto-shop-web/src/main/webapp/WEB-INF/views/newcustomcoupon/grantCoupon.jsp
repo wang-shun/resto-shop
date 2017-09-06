@@ -13,7 +13,13 @@
             返回
         </a>
     </c:if>
-    <br/><br/>
+    <c:if test="${intoType eq 1}">
+    <h2 class="text-center">
+        <strong>
+            会员筛选
+        </strong>
+    </h2>
+    </c:if>
     <ul class="nav nav-tabs" role="tablist" id="ulTab">
         <li role="presentation" class="active" @click="chooseType(1)">
             <a href="#groupRelease" aria-controls="groupRelease" role="tab" data-toggle="tab">
