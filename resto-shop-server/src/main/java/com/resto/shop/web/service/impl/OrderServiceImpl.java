@@ -9042,7 +9042,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setMealFeePrice(order.getMealFeePrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
             order.setOrderMoney(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
-            order.setPaymentAmount(sum);
+            order.setPaymentAmount(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
             BigDecimal value = orderMapper.selectPayBefore(order.getId());
             if(value != null && value.doubleValue() > 0){
                 order.setPaymentAmount(sum.subtract(value));
