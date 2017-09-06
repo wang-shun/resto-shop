@@ -7955,7 +7955,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0
                 && StringUtils.isBlank(order.getParentOrderId())) {
             Map<String, Object> refundItem = new HashMap<>();
-            refundItem.put("SUBTOTAL", -order.getServicePrice().divide(new BigDecimal(order.getCustomerCount())).multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))).doubleValue());
+            refundItem.put("SUBTOTAL", -(order.getServicePrice().divide(new BigDecimal(order.getCustomerCount())).multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))).doubleValue()));
             refundItem.put("ARTICLE_NAME", shopDetail.getServiceName() + "(退)");
             if ("27f56b31669f4d43805226709874b530".equals(brand.getId())) {
                 refundItem.put("ARTICLE_NAME", "就餐人数" + "(退)");
