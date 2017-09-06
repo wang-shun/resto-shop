@@ -9009,7 +9009,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     sum = sum.add(oP.getOrderMoney());
                 }
                 //修改主订单
-                order.setAmountWithChildren(order.getOrderMoney());
+                order.setAmountWithChildren(order.getOrderMoney().add(sum));
                 orderMapper.updateByPrimaryKeySelective(order);
             }
         }
