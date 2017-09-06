@@ -394,6 +394,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         JSONResult jsonResult = new JSONResult();
         String orderId = ApplicationUtils.randomUUID();
         order.setId(orderId);
+        order.setPosDiscount(new BigDecimal(1));
         Customer customer = customerService.selectById(order.getCustomerId());
 
         if (customer == null && "wechat".equals(order.getCreateOrderByAddress())) {
@@ -7955,7 +7956,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0
                 && StringUtils.isBlank(order.getParentOrderId())) {
             Map<String, Object> refundItem = new HashMap<>();
-            refundItem.put("SUBTOTAL", order.getServicePrice().divide(new BigDecimal(order.getCustomerCount())).multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))).multiply(new BigDecimal(-1)));
+            refundItem.put("SUBTOTAL", -shopDetail.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))).multiply(order.getPosDiscount()).doubleValue());
             refundItem.put("ARTICLE_NAME", shopDetail.getServiceName() + "(退)");
             if ("27f56b31669f4d43805226709874b530".equals(brand.getId())) {
                 refundItem.put("ARTICLE_NAME", "就餐人数" + "(退)");
@@ -9045,6 +9046,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
             order.setOrderMoney(sum);
             order.setPaymentAmount(sum);
+            order.setPosDiscount(discount);
             orderMapper.updateByPrimaryKeySelective(order);
         }
         //修改主订单
@@ -9061,6 +9063,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if(value != null && value.doubleValue() > 0){
                 order.setPaymentAmount(sum.subtract(value));
             }
+            order.setPosDiscount(discount);
             orderMapper.updateByPrimaryKeySelective(order);
         }
         return order;

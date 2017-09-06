@@ -241,6 +241,8 @@ public class Order implements Serializable{
 
     private Integer type;
 
+    private BigDecimal posDiscount;
+
     public Integer getTag() {
         return tag;
     }
@@ -976,6 +978,14 @@ public class Order implements Serializable{
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public BigDecimal getPosDiscount() {
+        return posDiscount;
+    }
+
+    public void setPosDiscount(BigDecimal posDiscount) {
+        this.posDiscount = posDiscount;
     }
 
     @Override
