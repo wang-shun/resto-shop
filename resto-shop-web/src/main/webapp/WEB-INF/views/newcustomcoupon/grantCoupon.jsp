@@ -1,9 +1,18 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div id="controller">
-    <a class="btn btn-info ajaxify" href="newcustomcoupon/list">
-        <span class="glyphicon glyphicon-circle-arrow-left"></span>
-        返回
-    </a>
+    <c:if test="${intoType eq 2}">
+        <a class="btn btn-info ajaxify" href="newcustomcoupon/list">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
+    <c:if test="${intoType eq 1}">
+        <a class="btn btn-info ajaxify" href="member/myList">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
     <br/><br/>
     <ul class="nav nav-tabs" role="tablist" id="ulTab">
         <li role="presentation" class="active" @click="chooseType(1)">
@@ -143,6 +152,7 @@
     });
     //得到当前流失唤醒优惠券的Id
     var couponId = ${couponId};
+    var intoType = ${intoType}
     var groupReleaseTableAPI;
     var personalLoansTableAPI;
     new Vue({
