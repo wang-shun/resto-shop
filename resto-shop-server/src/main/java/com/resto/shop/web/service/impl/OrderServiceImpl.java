@@ -7371,6 +7371,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (orders.containsKey(orderItem.getOrderId())) {
                     orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
                 } else {
+                    MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", 0);
                     orders.put(orderItem.getOrderId(), itemValue);
                 }
             }else{
