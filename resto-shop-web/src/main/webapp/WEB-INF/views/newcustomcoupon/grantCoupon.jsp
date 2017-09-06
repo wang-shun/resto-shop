@@ -79,8 +79,8 @@
                     </label>&nbsp;&nbsp;
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control col-xs-2" width="50" v-model="selectObject.avgOrderMoneyBegin" placeholder="请录入平均消费总额">&nbsp;&nbsp;至&nbsp;
-                    <input type="text" class="form-control" width="50" v-model="selectObject.avgOrderMoneyEnd" placeholder="请录入平均消费总额">&nbsp;&nbsp;元
+                    <input type="text" class="form-control col-xs-2" v-model="selectObject.avgOrderMoneyBegin" placeholder="请录入平均消费总额">&nbsp;&nbsp;至&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.avgOrderMoneyEnd" placeholder="请录入平均消费总额">&nbsp;&nbsp;元
                 </div>
             </form>
             <br/>
@@ -208,7 +208,8 @@
             selectObject : {
                 orderCountType : 0,
                 lastOrderDayType : 0,
-                orderTotalType : 0
+                orderTotalType : 0,
+                avgOrderMoneyType : 0
             }, //群体发放查询对象
             personalLoanSelectObject : null, //个人发放查询对象
             currentType : 1, //当前所在模块位置 1：群体发放 2：个人发放
