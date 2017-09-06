@@ -7340,7 +7340,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
                 customerCount = order.getCustomerCount() - orderItem.getCount();
-                servicePrice = shopDetail.getServicePrice().multiply(new BigDecimal(customerCount));
+//                servicePrice = shopDetail.getServicePrice().multiply(new BigDecimal(customerCount));
+                servicePrice = order.getServicePrice().divide(new BigDecimal(order.getCustomerCount())).multiply(new BigDecimal(customerCount));
                 orderMapper.refundServicePrice(order.getId(), servicePrice, customerCount);
 //                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                        "订单退了" + customerCount + "份服务费");
