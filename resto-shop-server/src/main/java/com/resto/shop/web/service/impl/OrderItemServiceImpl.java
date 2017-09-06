@@ -149,7 +149,7 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
 	public List<OrderItem> selectOrderItemByOrderIds(Map<String, Object> map) {
 		return orderitemMapper.selectOrderItemByOrderIds(map);
 	}
-	
+
 	@Override
 	public List<OrderItem> selectOrderItemByOrderId(Map<String, Object> map) {
 		return orderitemMapper.selectOrderItemByOrderId(map);

@@ -409,7 +409,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-
         if (!StringUtils.isEmpty(order.getTableNumber()) && order.getTableNumber().length() > 5) {
             jsonResult.setSuccess(false);
             jsonResult.setMessage("桌号异常,请扫码正确的二维码！");
@@ -684,6 +683,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             articleCount += item.getCount();
             item.setFinalPrice(finalMoney);
             item.setOrderId(orderId);
+            item.setBaseUnitPrice(item.getUnitPrice());
+            item.setPosDiscount("100%");
             totalMoney = totalMoney.add(finalMoney).setScale(2, BigDecimal.ROUND_HALF_UP);
             originMoney = originMoney.add(item.getOriginalPrice().multiply(BigDecimal.valueOf(item.getCount()))).setScale(2, BigDecimal.ROUND_HALF_UP);
             Result check = new Result();
@@ -8985,6 +8986,70 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order selectAfterValidOrderByCustomerId(String customerId) {
         return orderMapper.selectAfterValidOrderByCustomerId(customerId);
+    }
+
+    @Override
+    public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, Integer type) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        //整单折扣统计菜品项
+        if(type == PosDiscount.ZHENGDAN){
+            Map map = new HashMap();
+            map.put("orderId", orderId);
+            map.put("count", "1=1");
+            List<OrderItem> oItems = orderItemService.selectOrderItemByOrderId(map);
+            order = posDiscountAction(oItems, discount, order);
+            List<Order> pOrder = orderMapper.selectListByParentId(orderId);
+            if(pOrder.size() > 0){
+                BigDecimal sum = new BigDecimal(0);
+                for(Order oP : pOrder){
+                    map.clear();
+                    map.put("orderId", oP.getId());
+                    map.put("count", "1=1");
+                    oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, oP);
+                    sum = sum.add(oP.getOrderMoney());
+                }
+                //修改主订单
+                order.setAmountWithChildren(order.getOrderMoney().add(sum).add(order.getServicePrice()).add(order.getMealFeePrice()));
+                orderMapper.updateByPrimaryKeySelective(order);
+            }
+        }
+
+        return null;
+    }
+
+    public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, Order order){
+        BigDecimal sum = new BigDecimal(0);
+        //修改菜品项
+        for(OrderItem oItem : orderItems){
+            oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
+            oItem.setPosDiscount(discount.multiply(new BigDecimal(100)) + "%");
+            oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
+            sum = sum.add(oItem.getFinalPrice());
+            orderItemService.update(oItem);
+        }
+        //修改子订单
+        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+            order.setOrderMoney(sum);
+            order.setPaymentAmount(sum);
+            orderMapper.updateByPrimaryKeySelective(order);
+        }
+        //修改主订单
+        if(order.getParentOrderId() == null || "".equals(order.getParentOrderId())){
+            if(order.getServicePrice().doubleValue() > 0){
+                order.setServicePrice(order.getServicePrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
+            if(order.getMealFeePrice().doubleValue() > 0){
+                order.setMealFeePrice(order.getMealFeePrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
+            order.setOrderMoney(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
+            order.setPaymentAmount(sum);
+            BigDecimal value = orderMapper.selectPayBefore(order.getId());
+            if(value != null && value.doubleValue() > 0){
+                order.setPaymentAmount(sum.subtract(value));
+            }
+            orderMapper.updateByPrimaryKeySelective(order);
+        }
+        return order;
     }
 
     @Override

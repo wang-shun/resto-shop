@@ -9,8 +9,10 @@
         <result column="count" jdbcType="INTEGER" property="count"/>
         <result column="original_price" jdbcType="DECIMAL" property="originalPrice"/>
         <result column="unit_price" jdbcType="DECIMAL" property="unitPrice"/>
+        <result column="base_unit_price" jdbcType="DECIMAL" property="baseUnitPrice"/>
         <result column="final_price" jdbcType="DECIMAL" property="finalPrice"/>
         <result column="remark" jdbcType="VARCHAR" property="remark"/>
+        <result column="pos_discount" jdbcType="VARCHAR" property="posDiscount"/>
         <result column="sort" jdbcType="INTEGER" property="sort"/>
         <result column="status" jdbcType="INTEGER" property="status"/>
         <result column="order_id" jdbcType="VARCHAR" property="orderId"/>
@@ -38,8 +40,8 @@
         </association>
     </resultMap>
     <sql id="Base_Column_List">
-    id, article_name, article_designation, count, original_price, unit_price, final_price, 
-    remark, sort, status, order_id, article_id, type, parent_id, create_time,meal_item_id,recommend_id,orgin_count,refund_count,
+    id, article_name, article_designation, `count`, original_price, unit_price, base_unit_price, final_price,
+    remark, pos_discount, sort, status, order_id, article_id, `type`, parent_id, create_time,meal_item_id,recommend_id,orgin_count,refund_count,
     change_count,print_fail_flag
   </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
@@ -57,7 +59,7 @@
       count, original_price, unit_price, 
       final_price, remark, sort, 
       status, order_id, article_id, 
-      type, parent_id, create_time,orgin_count,change_count
+      `type`, parent_id, create_time,orgin_count,change_count
       )
     values (#{id,jdbcType=VARCHAR}, #{articleName,jdbcType=VARCHAR}, #{articleDesignation,jdbcType=VARCHAR}, 
       #{count,jdbcType=INTEGER}, #{originalPrice,jdbcType=DECIMAL}, #{unitPrice,jdbcType=DECIMAL}, 
@@ -79,7 +81,7 @@
                 article_designation,
             </if>
             <if test="count != null">
-                count,
+                `count`,
             </if>
             <if test="originalPrice != null">
                 original_price,
@@ -87,11 +89,17 @@
             <if test="unitPrice != null">
                 unit_price,
             </if>
+            <if test="baseUnitPrice != null">
+                base_unit_price,
+            </if>
             <if test="finalPrice != null">
                 final_price,
             </if>
             <if test="remark != null">
                 remark,
+            </if>
+            <if test="posDiscount != null">
+                pos_discount,
             </if>
             <if test="sort != null">
                 sort,
@@ -106,7 +114,7 @@
                 article_id,
             </if>
             <if test="type != null">
-                type,
+                `type`,
             </if>
             <if test="parentId != null">
                 parent_id,
@@ -143,11 +151,17 @@
             <if test="unitPrice != null">
                 #{unitPrice,jdbcType=DECIMAL},
             </if>
+            <if test="baseUnitPrice != null">
+                #{baseUnitPrice,jdbcType=DECIMAL},
+            </if>
             <if test="finalPrice != null">
                 #{finalPrice,jdbcType=DECIMAL},
             </if>
             <if test="remark != null">
                 #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="posDiscount != null">
+                #{posDiscount,jdbcType=VARCHAR},
             </if>
             <if test="sort != null">
                 #{sort,jdbcType=INTEGER},
@@ -199,11 +213,17 @@
             <if test="unitPrice != null">
                 unit_price = #{unitPrice,jdbcType=DECIMAL},
             </if>
+            <if test="baseUnitPrice != null">
+                base_unit_price = #{baseUnitPrice,jdbcType=DECIMAL},
+            </if>
             <if test="finalPrice != null">
                 final_price = #{finalPrice,jdbcType=DECIMAL},
             </if>
             <if test="remark != null">
                 remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="posDiscount != null">
+                pos_discount = #{posDiscount,jdbcType=VARCHAR},
             </if>
             <if test="sort != null">
                 sort = #{sort,jdbcType=INTEGER},
@@ -245,8 +265,10 @@
       count = #{count,jdbcType=INTEGER},
       original_price = #{originalPrice,jdbcType=DECIMAL},
       unit_price = #{unitPrice,jdbcType=DECIMAL},
+      base_unit_price = #{baseUnitPrice,jdbcType=DECIMAL},
       final_price = #{finalPrice,jdbcType=DECIMAL},
       remark = #{remark,jdbcType=VARCHAR},
+      pos_discount = #{posDiscount,jdbcType=VARCHAR},
       sort = #{sort,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       order_id = #{orderId,jdbcType=VARCHAR},
@@ -284,12 +306,13 @@
     </select>
     <insert id="insertBatch">
         insert into tb_order_item
-        (id, article_name, article_designation, count, original_price, unit_price, final_price, remark, sort, status,
+        (id, article_name, article_designation, count, original_price, unit_price, base_unit_price, final_price, remark, pos_discount, sort, status,
         order_id, article_id,type,parent_id,meal_item_id,recommend_id,orgin_count,meal_fee_number)
         values
         <foreach collection="list" item="t" separator=",">
             (#{t.id},#{t.articleName},#{t.articleDesignation},#{t.count},#{t.originalPrice},
-            #{t.unitPrice},#{t.finalPrice},#{t.remark},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},#{t.type},#{t.parentId},#{t.mealItemId},#{t.recommendId},#{t.count},#{t.mealFeeNumber})
+            #{t.unitPrice},#{t.baseUnitPrice},#{t.finalPrice},#{t.remark},#{t.posDiscount},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},
+            #{t.type},#{t.parentId},#{t.mealItemId},#{t.recommendId},#{t.count},#{t.mealFeeNumber})
         </foreach>
     </insert>
 
