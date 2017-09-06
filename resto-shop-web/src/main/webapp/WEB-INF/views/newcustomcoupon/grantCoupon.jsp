@@ -17,14 +17,23 @@
     <ul class="nav nav-tabs" role="tablist" id="ulTab">
         <li role="presentation" class="active" @click="chooseType(1)">
             <a href="#groupRelease" aria-controls="groupRelease" role="tab" data-toggle="tab">
-                <strong>群体发放</strong>
+                <strong>
+                    <c:if test="${intoType eq 2}">
+                        群体发放
+                    </c:if>
+                    <c:if test="${intoType eq 1}">
+                        会员筛选
+                    </c:if>
+                </strong>
             </a>
         </li>
-        <li role="presentation" @click="chooseType(2)">
-            <a href="#personalLoans" aria-controls="personalLoans" role="tab" data-toggle="tab">
-                <strong>个人发放</strong>
-            </a>
-        </li>
+        <c:if test="${intoType eq 2}">
+            <li role="presentation" @click="chooseType(2)">
+                <a href="#personalLoans" aria-controls="personalLoans" role="tab" data-toggle="tab">
+                    <strong>个人发放</strong>
+                </a>
+            </li>
+        </c:if>
     </ul>
     <br/>
     <div class="tab-content">
@@ -109,13 +118,18 @@
             </form>
             <br/>&nbsp;&nbsp;
             <button type="button" class="btn btn-success" @click="searchInfo">查询</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <c:if test="${intoType eq 2}">
             <button type="button" class="btn btn-primary" @click="grantCoupon">发放</button>
+            </c:if>
+            <c:if test="${intoType eq 1}">
+                <button type="button" class="btn btn-primary">下载</button>
+            </c:if>
             <br/><br/>
             <table id="groupReleaseTable" class="table table-striped table-bordered table-hover"
                    style="width: 100%;">
             </table>
         </div>
-
+        <c:if test="${intoType eq 2}">
         <!-- 个人发放 -->
         <div role="tabpanel" class="tab-pane" id="personalLoans">
             <form class="form-inline">
@@ -131,6 +145,7 @@
                    style="width: 100%;">
             </table>
         </div>
+        </c:if>
     </div>
 </div>
 <script src="assets/customer/date.js" type="text/javascript"></script>
@@ -227,60 +242,62 @@
                         that.groupReleaseTables();
                     }
                 });
-                that.personalLoansTable=$("#personalLoansTable").DataTable({
-                    lengthMenu: [ [100, 50, 10], [100, 50, 10] ],
-                    order: [[ 6, "desc" ]],
-                    columns : [
-                        {
-                            title : "用户类型",
-                            data : "customerType",
-                            orderable : false,
-                            s_filter: true
-                        },
-                        {
-                            title : "储值",
-                            data : "isValue",
-                            orderable : false,
-                            s_filter: true
-                        },
-                        {
-                            title : "昵称",
-                            data : "nickname",
-                            orderable : false
-                        },
-                        {
-                            title : "性别",
-                            data : "sex",
-                            orderable : false,
-                            s_filter: true
-                        },
-                        {
-                            title : "手机号",
-                            data : "telephone",
-                            orderable : false
-                        },
-                        {
-                            title : "生日",
-                            data : "birthday"
-                        },
-                        {
-                            title : "订单总数",
-                            data : "orderCount"
-                        },
-                        {
-                            title:"订单总额" ,
-                            data:"orderMoney"
-                        },
-                        {
-                            title:"平均消费金额" ,
-                            data:"AVGOrderMoney"
+                if (intoType == 2){
+                    that.personalLoansTable=$("#personalLoansTable").DataTable({
+                        lengthMenu: [ [100, 50, 10], [100, 50, 10] ],
+                        order: [[ 6, "desc" ]],
+                        columns : [
+                            {
+                                title : "用户类型",
+                                data : "customerType",
+                                orderable : false,
+                                s_filter: true
+                            },
+                            {
+                                title : "储值",
+                                data : "isValue",
+                                orderable : false,
+                                s_filter: true
+                            },
+                            {
+                                title : "昵称",
+                                data : "nickname",
+                                orderable : false
+                            },
+                            {
+                                title : "性别",
+                                data : "sex",
+                                orderable : false,
+                                s_filter: true
+                            },
+                            {
+                                title : "手机号",
+                                data : "telephone",
+                                orderable : false
+                            },
+                            {
+                                title : "生日",
+                                data : "birthday"
+                            },
+                            {
+                                title : "订单总数",
+                                data : "orderCount"
+                            },
+                            {
+                                title:"订单总额" ,
+                                data:"orderMoney"
+                            },
+                            {
+                                title:"平均消费金额" ,
+                                data:"AVGOrderMoney"
+                            }
+                        ],
+                        initComplete: function () {
+                            personalLoansTableAPI = this.api();
+                            that.personalLoansTables();
                         }
-                    ],
-                    initComplete: function () {
-                        personalLoansTableAPI = this.api();
-                        that.personalLoansTables();
-                    }
-                });
+                    });
+                }
             },
             //切换单品、套餐 type 1:单品 2:套餐 3:类别
             chooseType:function (type) {
@@ -289,22 +306,7 @@
             searchInfo : function() {
                 var that = this;
                 if (that.currentType == 1) {
-                    if (that.selectObject == null || ((that.selectObject.orderCount == null || that.selectObject.orderCount.trim() == "")
-                        && (that.selectObject.orderTotal == null || that.selectObject.orderTotal.trim() == "")
-                        && (that.selectObject.avgOrderMoney == null || that.selectObject.avgOrderMoney.trim() == "")
-                        && (that.selectObject.lastOrderDay == null || that.selectObject.lastOrderDay.trim() == "")
-                        && (that.selectObject.registerBeginDate == null || that.selectObject.registerBeginDate.trim() == "")
-                        && (that.selectObject.registerEndDate == null || that.selectObject.registerEndDate.trim() == "")
-                        && (that.selectObject.register == null || that.selectObject.register.trim() == "")
-                        && (that.selectObject.isValue == null || that.selectObject.isValue.trim() == "")
-                        && (that.selectObject.sex == null || that.selectObject.sex.trim() == "")
-                        )) {
-                        that.showDialog(function () {
-                            that.selectFunction();
-                        });
-                    }else {
-                        that.selectFunction();
-                    }
+                    that.selectFunction();
                 }else {
                     if (that.personalLoanSelectObject == null || that.personalLoanSelectObject.text == null || that.personalLoanSelectObject.text.trim() == "") {
                         that.showDialog(function () {
