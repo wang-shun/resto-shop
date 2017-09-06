@@ -7364,18 +7364,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, BigDecimal> orders = new HashMap<>();
         List<OrderItem> orderItems = refundOrder.getOrderItems();
         for (OrderItem orderItem : orderItems) {
-            BigDecimal itemValue = new BigDecimal(0);
             if(orderItem.getType().equals(ArticleType.SERVICE_PRICE)){
-                itemValue = order.getServicePrice().divide(new BigDecimal(order.getCustomerCount())).multiply(new BigDecimal(order.getBaseCustomerCount() - order.getCustomerCount()));
+                customerCount = order.getCustomerCount() - orderItem.getCount();
+                servicePrice = order.getServicePrice().divide(new BigDecimal(order.getCustomerCount())).multiply(new BigDecimal(customerCount));
+                BigDecimal itemValue = order.getServicePrice().subtract(servicePrice);
+                if (orders.containsKey(orderItem.getOrderId())) {
+                    orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
+                } else {
+                    orders.put(orderItem.getOrderId(), itemValue);
+                }
             }else{
-                itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
-            }
-            if (orders.containsKey(orderItem.getOrderId())) {
-                orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
-                MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", Integer.parseInt(MemcachedUtils.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
-            } else {
-                MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", orderItem.getCount());
-                orders.put(orderItem.getOrderId(), itemValue);
+                BigDecimal itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
+                if (orders.containsKey(orderItem.getOrderId())) {
+                    orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
+                    MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", Integer.parseInt(MemcachedUtils.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
+                } else {
+                    MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", orderItem.getCount());
+                    orders.put(orderItem.getOrderId(), itemValue);
+                }
             }
         }
         for (String id : orders.keySet()) {
