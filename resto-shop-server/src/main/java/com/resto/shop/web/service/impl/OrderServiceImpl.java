@@ -9018,6 +9018,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, Order order){
+        ShopDetail shop = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         BigDecimal sum = new BigDecimal(0);
         //修改菜品项
         for(OrderItem oItem : orderItems){
@@ -9036,10 +9037,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //修改主订单
         if(order.getParentOrderId() == null || "".equals(order.getParentOrderId())){
             if(order.getServicePrice().doubleValue() > 0){
-                order.setServicePrice(order.getServicePrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
+                order.setServicePrice(discount.multiply(new BigDecimal(shop.getIsUseServicePrice() * order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
             if(order.getMealFeePrice().doubleValue() > 0){
-                order.setMealFeePrice(order.getMealFeePrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
+                order.setMealFeePrice(discount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
             order.setOrderMoney(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
             order.setPaymentAmount(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
