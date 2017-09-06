@@ -20,6 +20,7 @@
         </strong>
     </h2>
     </c:if>
+    <c:if test="${intoType eq 2}"><br/><br/></c:if>
     <ul class="nav nav-tabs" role="tablist" id="ulTab">
         <li role="presentation" class="active" @click="chooseType(1)">
             <a href="#groupRelease" aria-controls="groupRelease" role="tab" data-toggle="tab">
