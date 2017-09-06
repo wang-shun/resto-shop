@@ -41,30 +41,60 @@
         <div role="tabpanel" class="tab-pane active" id="groupRelease">
             <form class="form-inline">
                 <div class="form-group">
-                    <label>消费次数&nbsp;大于</label>&nbsp;&nbsp;
+                    <label>消费次数&nbsp;
+                        <select v-model="selectObject.orderCountType">
+                            <option value="0">请选择</option>
+                            <option value="1">大于</option>
+                            <option value="2">小于</option>
+                            <option value="3">介于</option>
+                            <option value="4">不介于</option>
+                        </select>
+                    </label>&nbsp;&nbsp;
                     <input type="number" class="form-control" v-model="selectObject.orderCount" placeholder="请录入消费次数">&nbsp;&nbsp;次
                 </div>
-                <%--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--%>
-                <%--<div class="form-group">--%>
-                    <%--<label>消费次数<select></select>大于</label>&nbsp;&nbsp;--%>
-                    <%--<input type="text" class="form-control" placeholder="请录入消费次数">&nbsp;&nbsp;次--%>
-                <%--</div>--%>
             </form>
             <br/>
             <form class="form-inline">
                 <div class="form-group">
-                    <label>消费总额&nbsp;大于</label>&nbsp;&nbsp;
+                    <label>消费总额&nbsp;
+                        <select v-model="selectObject.orderTotalType">
+                            <option value="0">请选择</option>
+                            <option value="1">大于</option>
+                            <option value="2">小于</option>
+                            <option value="3">介于</option>
+                            <option value="4">不介于</option>
+                        </select>
+                    </label>&nbsp;&nbsp;
                     <input type="text" class="form-control" v-model="selectObject.orderTotal" placeholder="请录入消费总额">&nbsp;&nbsp;元
                 </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <div class="form-group">
-                    <label>平均消费金额&nbsp;大于</label>&nbsp;&nbsp;
-                    <input type="text" class="form-control" v-model="selectObject.avgOrderMoney" placeholder="请录入消费总额">&nbsp;&nbsp;元
+                    <label>平均消费金额&nbsp;
+                        <select v-model="selectObject.avgOrderMoneyType">
+                            <option value="0">请选择</option>
+                            <option value="1">大于</option>
+                            <option value="2">小于</option>
+                            <option value="3">介于</option>
+                            <option value="4">不介于</option>
+                        </select>
+                    </label>&nbsp;&nbsp;
+                </div>
+                <div class="form-group">
+                    <input type="text" class="form-control col-xs-2" width="50" v-model="selectObject.avgOrderMoneyBegin" placeholder="请录入平均消费总额">&nbsp;&nbsp;至&nbsp;
+                    <input type="text" class="form-control" width="50" v-model="selectObject.avgOrderMoneyEnd" placeholder="请录入平均消费总额">&nbsp;&nbsp;元
                 </div>
             </form>
             <br/>
             <form class="form-inline">
                 <div class="form-group">
-                    <label>最后消费日期距今&nbsp;超过</label>&nbsp;&nbsp;
+                    <label>最后消费日期距今&nbsp;
+                        <select v-model="selectObject.lastOrderDayType">
+                            <option value="0">请选择</option>
+                            <option value="1">大于</option>
+                            <option value="2">小于</option>
+                            <option value="3">介于</option>
+                            <option value="4">不介于</option>
+                        </select>
+                    </label>&nbsp;&nbsp;
                     <input type="number" class="form-control" v-model="selectObject.lastOrderDay" placeholder="请录入天数">&nbsp;&nbsp;天
                 </div>
             </form>
@@ -175,7 +205,11 @@
         data : {
             groupReleaseTable : {}, //群体发放datatables对象
             personalLoansTable : {}, //个人发放datatables对象
-            selectObject : null, //群体发放查询对象
+            selectObject : {
+                orderCountType : 0,
+                lastOrderDayType : 0,
+                orderTotalType : 0
+            }, //群体发放查询对象
             personalLoanSelectObject : null, //个人发放查询对象
             currentType : 1, //当前所在模块位置 1：群体发放 2：个人发放
             groupReleaseCustomerIds : "", //群体发放用户的Id
