@@ -272,195 +272,197 @@ public class NewCustomCouponController extends GenericController{
                     for (Map orderMap : orderList) {
                         if (object.get("customerId").toString().equalsIgnoreCase(orderMap.get("customerId").toString())) {
                             //判断该用户满不满足订单条件
-                            //判断消费次数比较类型Begin
-                            if (selectMap.get("orderCountType").equalsIgnoreCase("1")){//消费次数比较类型为大于
-                                if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount"))
-                                        ? "0" : selectMap.get("orderCount")))) > 0){
-                                    meetOrder = true;
+                            if (StringUtils.isBlank(selectMap.get("text"))) {
+                                //判断消费次数比较类型Begin
+                                if (selectMap.get("orderCountType").equalsIgnoreCase("1")) {//消费次数比较类型为大于
+                                    if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount"))
+                                            ? "0" : selectMap.get("orderCount")))) > 0) {
+                                        meetOrder = true;
+                                    }
+                                } else if (selectMap.get("orderCountType").equalsIgnoreCase("2")) {//消费次数比较类型为小于
+                                    if (StringUtils.isNotBlank(selectMap.get("orderCount"))) {
+                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCount"))) < 0) {
+                                            meetOrder = true;
+                                        }
+                                    } else {
+                                        meetOrder = true;
+                                    }
+                                } else if (selectMap.get("orderCountType").equalsIgnoreCase("3")) {//消费次数比较类型为介于
+                                    if (StringUtils.isNotBlank(selectMap.get("orderCountBegin")) && StringUtils.isBlank(selectMap.get("orderCountEnd"))) {//如果只录入了前面的数
+                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) >= 0) {
+                                            meetOrder = true;
+                                        }
+                                    } else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isBlank(selectMap.get("orderCountBegin"))) {//如果只录入了后面的数
+                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) <= 0) {
+                                            meetOrder = true;
+                                        }
+                                    } else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isNotBlank(selectMap.get("orderCountBegin"))) {//如果前后两个数都录入了
+                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) >= 0
+                                                && Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) <= 0) {
+                                            meetOrder = true;
+                                        }
+                                    } else {
+                                        meetOrder = true;
+                                    }
+                                } else if (selectMap.get("orderCountType").equalsIgnoreCase("4")) {//消费次数比较类型为不介于
+                                    if (StringUtils.isNotBlank(selectMap.get("orderCountBegin")) && StringUtils.isBlank(selectMap.get("orderCountEnd"))) {//如果只录入了前面的数
+                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) < 0) {
+                                            meetOrder = true;
+                                        }
+                                    } else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isBlank(selectMap.get("orderCountBegin"))) {//如果只录入了后面的数
+                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) > 0) {
+                                            meetOrder = true;
+                                        }
+                                    } else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isNotBlank(selectMap.get("orderCountBegin"))) {//如果前后两个数都录入了
+                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) < 0
+                                                || Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) > 0) {
+                                            meetOrder = true;
+                                        }
+                                    } else {
+                                        meetOrder = true;
+                                    }
                                 }
-                            }else if (selectMap.get("orderCountType").equalsIgnoreCase("2")){//消费次数比较类型为小于
-                                if (StringUtils.isNotBlank(selectMap.get("orderCount"))){
-                                    if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCount"))) < 0) {
-                                        meetOrder = true;
+                                //判断消费次数比较类型END
+                                //判断消费总额比较类型Begin
+                                if (meetOrder) {//在前一个条件满足的情况下在进行消费金额的判断
+                                    if (selectMap.get("orderTotalType").equalsIgnoreCase("1")) {//消费总额比较类型为大于
+                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("orderTotal"))
+                                                ? "0" : selectMap.get("orderTotal")))) > 0)) {
+                                            meetOrder = false;
+                                        }
+                                    } else if (selectMap.get("orderTotalType").equalsIgnoreCase("2")) {//消费总额比较类型为小于
+                                        if (StringUtils.isNotBlank(selectMap.get("orderTotal"))) {
+                                            if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotal"))) < 0)) {
+                                                meetOrder = false;
+                                            }
+                                        }
+                                    } else if (selectMap.get("orderTotalType").equalsIgnoreCase("3")) {//消费总额比较类型为介于
+                                        if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) && StringUtils.isBlank(selectMap.get("orderTotalEnd"))) {//如果只录入了前面的数
+                                            if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) >= 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isBlank(selectMap.get("orderTotalBegin"))) {//如果只录入了后面的数
+                                            if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) <= 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) && StringUtils.isNotBlank(selectMap.get("orderTotalEnd"))) {//如果前后两个数都录入了
+                                            if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) >= 0
+                                                    && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) <= 0)) {
+                                                meetOrder = false;
+                                            }
+                                        }
+                                    } else if (selectMap.get("orderTotalType").equalsIgnoreCase("4")) {//消费总额比较类型为不介于
+                                        if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) && StringUtils.isBlank(selectMap.get("orderTotalEnd"))) {//如果只录入了前面的数
+                                            if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) < 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isBlank(selectMap.get("orderTotalBegin"))) {//如果只录入了后面的数
+                                            if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) > 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isNotBlank(selectMap.get("orderTotalBegin"))) {//如果前后两个数都录入了
+                                            if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) < 0
+                                                    || new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) > 0)) {
+                                                meetOrder = false;
+                                            }
+                                        }
                                     }
-                                }else {
-                                    meetOrder = true;
                                 }
-                            }else if (selectMap.get("orderCountType").equalsIgnoreCase("3")){//消费次数比较类型为介于
-                                if (StringUtils.isNotBlank(selectMap.get("orderCountBegin")) && StringUtils.isBlank(selectMap.get("orderCountEnd"))){//如果只录入了前面的数
-                                    if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) >= 0) {
-                                        meetOrder = true;
+                                //判断消费总额比较类型End
+                                //判断平均消费金额比较类型Begin
+                                if (meetOrder) {//在前一个条件满足的情况下在进行消费金额的判断
+                                    if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("1")) {//平均消费总额比较类型为大于
+                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("avgOrderMoney"))
+                                                ? "0" : selectMap.get("avgOrderMoney")))) > 0)) {
+                                            meetOrder = false;
+                                        }
+                                    } else if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("2")) {//平均消费总额比较类型为小于
+                                        if (StringUtils.isNotBlank(selectMap.get("avgOrderMoney"))) {
+                                            if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoney"))) < 0)) {
+                                                meetOrder = false;
+                                            }
+                                        }
+                                    } else if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("3")) {//平均消费总额比较类型为介于
+                                        if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyEnd"))) {//如果只录入了前面的数
+                                            if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) >= 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyBegin"))) {//如果只录入了后面的数
+                                            if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) <= 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin"))) {//如果前后两个数都录入了
+                                            if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) >= 0
+                                                    && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) <= 0)) {
+                                                meetOrder = false;
+                                            }
+                                        }
+                                    } else if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("4")) {//平均消费总额比较类型为不介于
+                                        if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyEnd"))) {//如果只录入了前面的数
+                                            if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) < 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyBegin"))) {//如果只录入了后面的数
+                                            if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) > 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin"))) {//如果前后两个数都录入了
+                                            if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) < 0
+                                                    || new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) > 0)) {
+                                                meetOrder = false;
+                                            }
+                                        }
                                     }
-                                }else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isBlank(selectMap.get("orderCountBegin"))){//如果只录入了后面的数
-                                    if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) <= 0) {
-                                        meetOrder = true;
-                                    }
-                                }else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isNotBlank(selectMap.get("orderCountBegin"))){//如果前后两个数都录入了
-                                    if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) >= 0
-                                            && Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) <= 0) {
-                                        meetOrder = true;
-                                    }
-                                }else {
-                                    meetOrder = true;
                                 }
-                            }else if (selectMap.get("orderCountType").equalsIgnoreCase("4")){//消费次数比较类型为不介于
-                                if (StringUtils.isNotBlank(selectMap.get("orderCountBegin")) && StringUtils.isBlank(selectMap.get("orderCountEnd"))){//如果只录入了前面的数
-                                    if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) < 0) {
-                                        meetOrder = true;
+                                //判断平均消费总额比较类型End
+                                //判断最后消费日期距今比较类型Begin
+                                if (meetOrder) {//在前一个条件满足的情况下在进行消费金额的判断
+                                    daysBetween = daysBetween(orderMap.get("lastOrderTime").toString(), newDateString);
+                                    if (selectMap.get("lastOrderDayType").equalsIgnoreCase("1")) {//最后消费日期距今比较类型为大于
+                                        if (!(daysBetween.compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("lastOrderDay"))
+                                                ? "0" : selectMap.get("lastOrderDay")))) > 0)) {
+                                            meetOrder = false;
+                                        }
+                                    } else if (selectMap.get("lastOrderDayType").equalsIgnoreCase("2")) {//最后消费日期距今比较类型为小于
+                                        if (StringUtils.isNotBlank(selectMap.get("lastOrderDay"))) {
+                                            if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDay"))) < 0)) {
+                                                meetOrder = false;
+                                            }
+                                        }
+                                    } else if (selectMap.get("lastOrderDayType").equalsIgnoreCase("3")) {//最后消费日期距今比较类型为介于
+                                        if (StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin")) && StringUtils.isBlank(selectMap.get("lastOrderDayEnd"))) {//如果只录入了前面的数
+                                            if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayBegin"))) >= 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")) && StringUtils.isBlank(selectMap.get("lastOrderDayBegin"))) {//如果只录入了后面的数
+                                            if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayEnd"))) <= 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")) && StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin"))) {//如果前后两个数都录入了
+                                            if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayBegin"))) >= 0
+                                                    && daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayEnd"))) <= 0)) {
+                                                meetOrder = false;
+                                            }
+                                        }
+                                    } else if (selectMap.get("lastOrderDayType").equalsIgnoreCase("4")) {//最后消费日期距今比较类型为不介于
+                                        if (StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin")) && StringUtils.isBlank(selectMap.get("lastOrderDayEnd"))) {//如果只录入了前面的数
+                                            if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayBegin"))) < 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")) && StringUtils.isBlank(selectMap.get("lastOrderDayBegin"))) {//如果只录入了后面的数
+                                            if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayEnd"))) > 0)) {
+                                                meetOrder = false;
+                                            }
+                                        } else if (StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")) && StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin"))) {//如果前后两个数都录入了
+                                            if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayBegin"))) < 0
+                                                    || daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayEnd"))) > 0)) {
+                                                meetOrder = false;
+                                            }
+                                        }
                                     }
-                                }else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isBlank(selectMap.get("orderCountBegin"))){//如果只录入了后面的数
-                                    if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) > 0) {
-                                        meetOrder = true;
-                                    }
-                                }else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isNotBlank(selectMap.get("orderCountBegin"))){//如果前后两个数都录入了
-                                    if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) < 0
-                                            || Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) > 0) {
-                                        meetOrder = true;
-                                    }
-                                }else {
-                                    meetOrder = true;
                                 }
+                                //判断平均消费总额比较类型End
                             }
-                            //判断消费次数比较类型END
-                            //判断消费总额比较类型Begin
-                            if (meetOrder){//在前一个条件满足的情况下在进行消费金额的判断
-                                if (selectMap.get("orderTotalType").equalsIgnoreCase("1")){//消费总额比较类型为大于
-                                    if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("orderTotal"))
-                                            ? "0" : selectMap.get("orderTotal")))) > 0)){
-                                        meetOrder = false;
-                                    }
-                                }else if (selectMap.get("orderTotalType").equalsIgnoreCase("2")){//消费总额比较类型为小于
-                                    if (StringUtils.isNotBlank(selectMap.get("orderTotal"))){
-                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotal"))) < 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }
-                                }else if (selectMap.get("orderTotalType").equalsIgnoreCase("3")){//消费总额比较类型为介于
-                                    if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) && StringUtils.isBlank(selectMap.get("orderTotalEnd"))){//如果只录入了前面的数
-                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) >= 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isBlank(selectMap.get("orderTotalBegin"))){//如果只录入了后面的数
-                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) <= 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) && StringUtils.isNotBlank(selectMap.get("orderTotalEnd"))){//如果前后两个数都录入了
-                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) >= 0
-                                                && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) <= 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }
-                                }else if (selectMap.get("orderTotalType").equalsIgnoreCase("4")){//消费总额比较类型为不介于
-                                    if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) && StringUtils.isBlank(selectMap.get("orderTotalEnd"))){//如果只录入了前面的数
-                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) < 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isBlank(selectMap.get("orderTotalBegin"))){//如果只录入了后面的数
-                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) > 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isNotBlank(selectMap.get("orderTotalBegin"))){//如果前后两个数都录入了
-                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) < 0
-                                                || new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) > 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }
-                                }
-                            }
-                            //判断消费总额比较类型End
-                            //判断平均消费金额比较类型Begin
-                            if (meetOrder){//在前一个条件满足的情况下在进行消费金额的判断
-                                if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("1")){//平均消费总额比较类型为大于
-                                    if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("avgOrderMoney"))
-                                            ? "0" : selectMap.get("avgOrderMoney")))) > 0)){
-                                        meetOrder = false;
-                                    }
-                                }else if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("2")){//平均消费总额比较类型为小于
-                                    if (StringUtils.isNotBlank(selectMap.get("avgOrderMoney"))){
-                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoney"))) < 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }
-                                }else if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("3")){//平均消费总额比较类型为介于
-                                    if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyEnd"))){//如果只录入了前面的数
-                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) >= 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyBegin"))){//如果只录入了后面的数
-                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) <= 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin"))){//如果前后两个数都录入了
-                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) >= 0
-                                                && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) <= 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }
-                                }else if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("4")){//平均消费总额比较类型为不介于
-                                    if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyEnd"))){//如果只录入了前面的数
-                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) < 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyBegin"))){//如果只录入了后面的数
-                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) > 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin"))){//如果前后两个数都录入了
-                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) < 0
-                                                || new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) > 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }
-                                }
-                            }
-                            //判断平均消费总额比较类型End
-                            //判断最后消费日期距今比较类型Begin
-                            if (meetOrder){//在前一个条件满足的情况下在进行消费金额的判断
-                                daysBetween = daysBetween(orderMap.get("lastOrderTime").toString(), newDateString);
-                                if (selectMap.get("lastOrderDayType").equalsIgnoreCase("1")){//最后消费日期距今比较类型为大于
-                                    if (!(daysBetween.compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("lastOrderDay"))
-                                            ? "0" : selectMap.get("lastOrderDay")))) > 0)){
-                                        meetOrder = false;
-                                    }
-                                }else if (selectMap.get("lastOrderDayType").equalsIgnoreCase("2")){//最后消费日期距今比较类型为小于
-                                    if (StringUtils.isNotBlank(selectMap.get("lastOrderDay"))){
-                                        if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDay"))) < 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }
-                                }else if (selectMap.get("lastOrderDayType").equalsIgnoreCase("3")){//最后消费日期距今比较类型为介于
-                                    if (StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin")) && StringUtils.isBlank(selectMap.get("lastOrderDayEnd"))){//如果只录入了前面的数
-                                        if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayBegin"))) >= 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")) && StringUtils.isBlank(selectMap.get("lastOrderDayBegin"))){//如果只录入了后面的数
-                                        if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayEnd"))) <= 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")) && StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin"))){//如果前后两个数都录入了
-                                        if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayBegin"))) >= 0
-                                                && daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayEnd"))) <= 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }
-                                }else if (selectMap.get("lastOrderDayType").equalsIgnoreCase("4")){//最后消费日期距今比较类型为不介于
-                                    if (StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin")) && StringUtils.isBlank(selectMap.get("lastOrderDayEnd"))){//如果只录入了前面的数
-                                        if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayBegin"))) < 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")) && StringUtils.isBlank(selectMap.get("lastOrderDayBegin"))){//如果只录入了后面的数
-                                        if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayEnd"))) > 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")) && StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin"))){//如果前后两个数都录入了
-                                        if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayBegin"))) < 0
-                                                || daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayEnd"))) > 0)) {
-                                            meetOrder = false;
-                                        }
-                                    }
-                                }
-                            }
-                            //判断平均消费总额比较类型End
                             object.put("orderCount", orderMap.get("orderCount").toString());
                             object.put("orderMoney", orderMap.get("orderTotal").toString());
                             object.put("avgOrderMoney", orderMap.get("avgOrderMoney").toString());
