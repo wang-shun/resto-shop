@@ -314,7 +314,7 @@ public class NewCustomCouponController extends GenericController{
                                     }
                                 }else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isNotBlank(selectMap.get("orderCountBegin"))){//如果前后两个数都录入了
                                     if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) < 0
-                                            && Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) > 0) {
+                                            || Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) > 0) {
                                         meetOrder = true;
                                     }
                                 }else {
@@ -361,7 +361,7 @@ public class NewCustomCouponController extends GenericController{
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isNotBlank(selectMap.get("orderTotalBegin"))){//如果前后两个数都录入了
                                         if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) < 0
-                                                && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) > 0)) {
+                                                || new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) > 0)) {
                                             meetOrder = false;
                                         }
                                     }
@@ -407,7 +407,7 @@ public class NewCustomCouponController extends GenericController{
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin"))){//如果前后两个数都录入了
                                         if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) < 0
-                                                && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) > 0)) {
+                                                || new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) > 0)) {
                                             meetOrder = false;
                                         }
                                     }
@@ -454,7 +454,7 @@ public class NewCustomCouponController extends GenericController{
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")) && StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin"))){//如果前后两个数都录入了
                                         if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayBegin"))) < 0
-                                                && daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayEnd"))) > 0)) {
+                                                || daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDayEnd"))) > 0)) {
                                             meetOrder = false;
                                         }
                                     }
