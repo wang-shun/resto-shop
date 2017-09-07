@@ -272,7 +272,7 @@ public class NewCustomCouponController extends GenericController{
                     for (Map orderMap : orderList) {
                         if (object.get("customerId").toString().equalsIgnoreCase(orderMap.get("customerId").toString())) {
                             //判断该用户满不满足订单条件
-                            if (StringUtils.isBlank(selectMap.get("text")) && selectMap != null) {
+                            if (StringUtils.isBlank(selectMap.get("text")) && selectMap.size() != 0) {
                                 //判断消费次数比较类型Begin
                                 if (selectMap.get("orderCountType").equalsIgnoreCase("1")) {//消费次数比较类型为大于
                                     if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount"))
