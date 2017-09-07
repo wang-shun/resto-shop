@@ -325,43 +325,43 @@ public class NewCustomCouponController extends GenericController{
                             //判断消费总额比较类型Begin
                             if (meetOrder){//在前一个条件满足的情况下在进行消费金额的判断
                                 if (selectMap.get("orderTotalType").equalsIgnoreCase("1")){//消费总额比较类型为大于
-                                    if (!(Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderTotal"))
+                                    if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("orderTotal"))
                                             ? "0" : selectMap.get("orderTotal")))) > 0)){
                                         meetOrder = false;
                                     }
                                 }else if (selectMap.get("orderTotalType").equalsIgnoreCase("2")){//消费总额比较类型为小于
                                     if (StringUtils.isNotBlank(selectMap.get("orderTotal"))){
-                                        if (!(Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotal"))) < 0)) {
+                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotal"))) < 0)) {
                                             meetOrder = false;
                                         }
                                     }
                                 }else if (selectMap.get("orderTotalType").equalsIgnoreCase("3")){//消费总额比较类型为介于
                                     if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) && StringUtils.isBlank(selectMap.get("orderTotalEnd"))){//如果只录入了前面的数
-                                        if (!(Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalBegin"))) >= 0)) {
+                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) >= 0)) {
                                             meetOrder = false;
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isBlank(selectMap.get("orderTotalBegin"))){//如果只录入了后面的数
-                                        if (!(Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalEnd"))) <= 0)) {
+                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) <= 0)) {
                                             meetOrder = false;
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) && StringUtils.isNotBlank(selectMap.get("orderTotalEnd"))){//如果前后两个数都录入了
-                                        if (!(Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalBegin"))) >= 0
-                                                && Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalEnd"))) <= 0)) {
+                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) >= 0
+                                                && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) <= 0)) {
                                             meetOrder = false;
                                         }
                                     }
                                 }else if (selectMap.get("orderTotalType").equalsIgnoreCase("4")){//消费总额比较类型为不介于
                                     if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) && StringUtils.isBlank(selectMap.get("orderTotalEnd"))){//如果只录入了前面的数
-                                        if (!(Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalBegin"))) < 0)) {
+                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) < 0)) {
                                             meetOrder = false;
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isBlank(selectMap.get("orderTotalBegin"))){//如果只录入了后面的数
-                                        if (!(Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalEnd"))) > 0)) {
+                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) > 0)) {
                                             meetOrder = false;
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isNotBlank(selectMap.get("orderTotalBegin"))){//如果前后两个数都录入了
-                                        if (!(Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalBegin"))) < 0
-                                                && Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalEnd"))) > 0)) {
+                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalBegin"))) < 0
+                                                && new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotalEnd"))) > 0)) {
                                             meetOrder = false;
                                         }
                                     }
@@ -371,43 +371,43 @@ public class NewCustomCouponController extends GenericController{
                             //判断平均消费金额比较类型Begin
                             if (meetOrder){//在前一个条件满足的情况下在进行消费金额的判断
                                 if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("1")){//平均消费总额比较类型为大于
-                                    if (!(Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("avgOrderMoney"))
+                                    if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("avgOrderMoney"))
                                             ? "0" : selectMap.get("avgOrderMoney")))) > 0)){
                                         meetOrder = false;
                                     }
                                 }else if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("2")){//平均消费总额比较类型为小于
                                     if (StringUtils.isNotBlank(selectMap.get("avgOrderMoney"))){
-                                        if (!(Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf(selectMap.get("avgOrderMoney"))) < 0)) {
+                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoney"))) < 0)) {
                                             meetOrder = false;
                                         }
                                     }
                                 }else if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("3")){//平均消费总额比较类型为介于
                                     if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyEnd"))){//如果只录入了前面的数
-                                        if (!(Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf(selectMap.get("avgOrderMoneyBegin"))) >= 0)) {
+                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) >= 0)) {
                                             meetOrder = false;
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyBegin"))){//如果只录入了后面的数
-                                        if (!(Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf(selectMap.get("avgOrderMoneyEnd"))) <= 0)) {
+                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) <= 0)) {
                                             meetOrder = false;
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin"))){//如果前后两个数都录入了
-                                        if (!(Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf(selectMap.get("avgOrderMoneyBegin"))) >= 0
-                                                && Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf(selectMap.get("avgOrderMoneyEnd"))) <= 0)) {
+                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) >= 0
+                                                && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) <= 0)) {
                                             meetOrder = false;
                                         }
                                     }
                                 }else if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("4")){//平均消费总额比较类型为不介于
                                     if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyEnd"))){//如果只录入了前面的数
-                                        if (!(Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf(selectMap.get("avgOrderMoneyBegin"))) < 0)) {
+                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) < 0)) {
                                             meetOrder = false;
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isBlank(selectMap.get("avgOrderMoneyBegin"))){//如果只录入了后面的数
-                                        if (!(Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf(selectMap.get("avgOrderMoneyEnd"))) > 0)) {
+                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) > 0)) {
                                             meetOrder = false;
                                         }
                                     }else if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd")) && StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin"))){//如果前后两个数都录入了
-                                        if (!(Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf(selectMap.get("avgOrderMoneyBegin"))) < 0
-                                                && Integer.valueOf(orderMap.get("avgOrderMoney").toString()).compareTo(Integer.valueOf(selectMap.get("avgOrderMoneyEnd"))) > 0)) {
+                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyBegin"))) < 0
+                                                && new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoneyEnd"))) > 0)) {
                                             meetOrder = false;
                                         }
                                     }
