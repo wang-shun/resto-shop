@@ -560,7 +560,7 @@
                     that.object = {};
                     that.memberList = that.memberUserDtos;
                     if (that.memberList.length <= 1000){
-                        that.object = that.memberList;
+                        that.object.memberSelectionDtos = that.memberList;
                         $.post("member/createMemberSelectionDto",that.object,function (result) {
                             if (result.success){
                                 window.location.href = "member/downloadExcel?path="+result.data+"";
@@ -572,7 +572,7 @@
                     }else{
                         that.state = 2;
                         that.length = Math.ceil(that.memberList.length/1000);
-                        that.object = that.memberList.slice(that.start,that.end);
+                        that.object.memberSelectionDtos = that.memberList.slice(that.start,that.end);
                         $.post("member/createMemberSelectionDto",that.object,function (result) {
                             if (result.success){
                                 that.object.path = result.data;
@@ -605,9 +605,9 @@
                 var that = this;
                 try {
                     if (that.index == that.length) {
-                        that.object = that.memberList.slice(that.start);
+                        that.object.memberSelectionDtos = that.memberList.slice(that.start);
                     } else {
-                        that.object = that.memberList.slice(that.start, that.end);
+                        that.object.memberSelectionDtos = that.memberList.slice(that.start, that.end);
                     }
                     that.object.startPosition = that.startPosition;
                     $.post("member/appendMemberSelectionExcel", that.object, function (result) {
