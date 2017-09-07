@@ -89,7 +89,7 @@
                             <option value="4">不介于</option>
                         </select>
                     </label>&nbsp;&nbsp;
-                    <input type="text" v-show="selectObject.avgOrderMoneyType == 0 || selectObject.avgOrderMoneyType == 1 || selectObject.avgOrderMoneyType == 2" class="form-control" v-model="selectObject.avgOrderMoneyBegin" placeholder="请录入平均消费总额">&nbsp;
+                    <input type="text" v-show="selectObject.avgOrderMoneyType == 0 || selectObject.avgOrderMoneyType == 1 || selectObject.avgOrderMoneyType == 2" class="form-control" v-model="selectObject.avgOrderMoney" placeholder="请录入平均消费总额">&nbsp;
                 </div>
                 <div class="form-group" v-show="selectObject.avgOrderMoneyType == 3 || selectObject.avgOrderMoneyType == 4">
                     <input type="text" class="form-control" v-model="selectObject.avgOrderMoneyBegin" placeholder="请录入平均消费总额">&nbsp;&nbsp;至&nbsp;
