@@ -312,7 +312,7 @@ public class NewCustomCouponController extends GenericController{
                                     if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) > 0) {
                                         meetOrder = true;
                                     }
-                                }else if (StringUtils.isNotBlank(selectMap.get("orderCountBegin")) && StringUtils.isNotBlank(selectMap.get("orderCountBegin"))){//如果前后两个数都录入了
+                                }else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isNotBlank(selectMap.get("orderCountBegin"))){//如果前后两个数都录入了
                                     if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) < 0
                                             && Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountEnd"))) > 0) {
                                         meetOrder = true;
