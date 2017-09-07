@@ -510,7 +510,7 @@ public class NewCustomCouponController extends GenericController{
                             continue;
                         }
                     }
-                    //根据平均消费金额的比较类型，判断是否有录入查询条件
+                    //根据最后消费日期距今的比较类型，判断是否有录入查询条件
                     if (selectMap.get("lastOrderDayType").equalsIgnoreCase("1")
                             || selectMap.get("lastOrderDayType").equalsIgnoreCase("2")){
                         if (StringUtils.isNotBlank(selectMap.get("lastOrderDay"))){
