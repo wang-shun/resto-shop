@@ -552,12 +552,10 @@
                 });
             },
             createExcel　: function () {
+                var that = this;
                 try {
-                    var that = this;
-                    that.object = this.getDate();
-                    that.brandCustomer = that.brandCustomerCount;
+                    that.object = {};
                     that.memberList = that.memberUserDtos;
-                    that.object.brandCustomerCount = that.brandCustomer;
                     if (that.memberList.length <= 1000){
                         that.object.memberUserDtos = that.memberList;
                         $.post("member/member_excel",that.object,function (result) {
