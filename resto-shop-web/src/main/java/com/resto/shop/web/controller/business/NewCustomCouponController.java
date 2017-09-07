@@ -252,7 +252,7 @@ public class NewCustomCouponController extends GenericController{
                         ? new SimpleDateFormat("yyyy-MM-dd").format(customer.getCustomerDetail().getBirthDate()) : "--");
                 object.put("orderCount", 0);
                 object.put("orderMoney", 0);
-                object.put("AVGOrderMoney", 0);
+                object.put("avgOrderMoney", 0);
                 object.put("useOrder", customer.getUseOrder());
                 object.put("chargeOrder", customer.getChargeOrder());
                 array.add(object);
@@ -463,7 +463,7 @@ public class NewCustomCouponController extends GenericController{
                             //判断平均消费总额比较类型End
                             object.put("orderCount", orderMap.get("orderCount").toString());
                             object.put("orderMoney", orderMap.get("orderTotal").toString());
-                            object.put("AVGOrderMoney", orderMap.get("avgOrderMoney").toString());
+                            object.put("avgOrderMoney", orderMap.get("avgOrderMoney").toString());
                             orderList.remove(orderMap);
                             break;
                         }
