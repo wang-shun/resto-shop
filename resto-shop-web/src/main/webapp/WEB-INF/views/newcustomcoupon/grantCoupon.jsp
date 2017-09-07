@@ -59,8 +59,8 @@
                     <input type="number" v-show="selectObject.orderCountType == 0 || selectObject.orderCountType == 1 || selectObject.orderCountType == 2" class="form-control" v-model="selectObject.orderCount" placeholder="请录入消费次数">&nbsp;
                 </div>
                 <div class="form-group" v-show="selectObject.orderCountType == 3 || selectObject.orderCountType == 4">
-                    <input type="number" class="form-control" v-model="selectObject.orderCountBegin" placeholder="请录入消费次数">&nbsp;&nbsp;至&nbsp;
-                    <input type="number" class="form-control" v-model="selectObject.orderCountEnd" placeholder="请录入消费次数">&nbsp;&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.orderCountBegin" placeholder="请录入消费次数">&nbsp;&nbsp;至&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.orderCountEnd" placeholder="请录入消费次数">&nbsp;&nbsp;
                 </div>次
             </form>
             <br/>
@@ -239,7 +239,6 @@
         },
         watch : {
             "selectObject.orderCountType" : function (newValue, oldValue) {
-                alert();
                 if ((newValue == 1 || newValue == 2) && (oldValue == 3 || oldValue == 4)){
                     this.selectObject.orderCountBegin = "";
                     this.selectObject.orderCountEnd = "";
