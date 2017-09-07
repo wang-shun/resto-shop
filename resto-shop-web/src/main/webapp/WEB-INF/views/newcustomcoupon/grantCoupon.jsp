@@ -240,7 +240,9 @@
             startPosition : 1006,
             index : 1,
             state : 1,
-            path : null
+            path : null,
+            memberUserDtos : [],
+            memberList : []
         },
         created : function() {
             this.initDataTables();
@@ -426,7 +428,9 @@
                                     //重绘搜索列
                                     that.groupReleaseTables();
                                     toastr.success("查询成功");
-                                    console.log(that.groupReleaseCustomerIds);
+                                    if (intoType == 1){
+                                        that.memberUserDtos = result.data;
+                                    }
                                 }else {
                                     toastr.error("查询失败");
                                 }
@@ -455,7 +459,6 @@
                                     //重绘搜索列
                                     that.personalLoansTables();
                                     toastr.success("查询成功");
-                                    console.log(that.personalLoansCustomerIds);
                                 }else {
                                     toastr.error("查询失败");
                                 }
