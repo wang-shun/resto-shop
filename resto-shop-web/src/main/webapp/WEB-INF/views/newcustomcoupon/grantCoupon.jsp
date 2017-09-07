@@ -237,6 +237,17 @@
         created : function() {
             this.initDataTables();
         },
+        watch : {
+            "selectObject.orderCountType" : function (newValue, oldValue) {
+                alert();
+                if ((newValue == 1 || newValue == 2) && (oldValue == 3 || oldValue == 4)){
+                    this.selectObject.orderCountBegin = "";
+                    this.selectObject.orderCountEnd = "";
+                }else if ((newValue == 3 || newValue == 4) && (oldValue == 1 || oldValue == 2)){
+                    this.selectObject.orderCount = "";
+                }
+            }
+        },
         methods : {
             initDataTables:function () {
                 //that代表 vue对象

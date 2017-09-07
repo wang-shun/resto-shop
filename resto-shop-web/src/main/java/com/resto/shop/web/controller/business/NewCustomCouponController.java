@@ -279,6 +279,8 @@ public class NewCustomCouponController extends GenericController{
                                         if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCount"))) > 0) {
                                             meetOrder = true;
                                         }
+                                    } else {
+                                        meetOrder = true;
                                     }
                                 } else if (selectMap.get("orderCountType").equalsIgnoreCase("2")) {//消费次数比较类型为小于
                                     if (StringUtils.isNotBlank(selectMap.get("orderCount"))) {
