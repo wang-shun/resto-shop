@@ -472,55 +472,70 @@ public class NewCustomCouponController extends GenericController{
                 //如果录如过订单条件但该用户没有满足订单条件则将该用户从列表中移除掉
                 if (!meetOrder) {
                     //根据消费次数的比较类型，判断是否有录入查询条件
-                    if (selectMap.get("orderCountType").equalsIgnoreCase("1")
-                            || selectMap.get("orderCountType").equalsIgnoreCase("2")){
+                    if (selectMap.get("orderCountType").equalsIgnoreCase("1") || selectMap.get("orderCountType").equalsIgnoreCase("2")){
                         if (StringUtils.isNotBlank(selectMap.get("orderCount"))){
-                            iterator.remove();
-                            continue;
+                            if (!(selectMap.get("orderCountType").equalsIgnoreCase("2") && !object.getBoolean("useOrder") && Integer.valueOf(selectMap.get("orderCount")) != 0)){
+                                iterator.remove();
+                                continue;
+                            }
                         }
                     }else {
                         if (StringUtils.isNotBlank(selectMap.get("orderCountBegin")) || StringUtils.isNotBlank(selectMap.get("orderCountEnd"))){
-                            iterator.remove();
-                            continue;
+                            if (!(selectMap.get("orderCountType").equalsIgnoreCase("4") && !object.getBoolean("useOrder") && Integer.valueOf(selectMap.get("orderCountBegin")) != 0)){
+                                iterator.remove();
+                                continue;
+                            }
                         }
                     }
                     //根据消费总额的比较类型，判断是否有录入查询条件
                     if (selectMap.get("orderTotalType").equalsIgnoreCase("1")
                             || selectMap.get("orderTotalType").equalsIgnoreCase("2")){
                         if (StringUtils.isNotBlank(selectMap.get("orderTotal"))){
-                            iterator.remove();
-                            continue;
+                            if (!(selectMap.get("orderTotalType").equalsIgnoreCase("2") && !object.getBoolean("useOrder") && Integer.valueOf(selectMap.get("orderTotal")) != 0)){
+                                iterator.remove();
+                                continue;
+                            }
                         }
                     }else {
                         if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) || StringUtils.isNotBlank(selectMap.get("orderTotalEnd"))){
-                            iterator.remove();
-                            continue;
+                            if (!(selectMap.get("orderTotalType").equalsIgnoreCase("4") && !object.getBoolean("useOrder") && Integer.valueOf(selectMap.get("orderTotalBegin")) != 0)){
+                                iterator.remove();
+                                continue;
+                            }
                         }
                     }
                     //根据平均消费金额的比较类型，判断是否有录入查询条件
                     if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("1")
                             || selectMap.get("avgOrderMoneyType").equalsIgnoreCase("2")){
                         if (StringUtils.isNotBlank(selectMap.get("avgOrderMoney"))){
-                            iterator.remove();
-                            continue;
+                            if (!(selectMap.get("avgOrderMoneyType").equalsIgnoreCase("2") && !object.getBoolean("useOrder") && Integer.valueOf(selectMap.get("avgOrderMoney")) != 0)){
+                                iterator.remove();
+                                continue;
+                            }
                         }
                     }else {
                         if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin")) || StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd"))){
-                            iterator.remove();
-                            continue;
+                            if (!(selectMap.get("avgOrderMoneyType").equalsIgnoreCase("4") && !object.getBoolean("useOrder") && Integer.valueOf(selectMap.get("avgOrderMoneyBegin")) != 0)){
+                                iterator.remove();
+                                continue;
+                            }
                         }
                     }
                     //根据最后消费日期距今的比较类型，判断是否有录入查询条件
                     if (selectMap.get("lastOrderDayType").equalsIgnoreCase("1")
                             || selectMap.get("lastOrderDayType").equalsIgnoreCase("2")){
                         if (StringUtils.isNotBlank(selectMap.get("lastOrderDay"))){
-                            iterator.remove();
-                            continue;
+                            if (!(selectMap.get("lastOrderDayType").equalsIgnoreCase("2") && !object.getBoolean("useOrder") && Integer.valueOf(selectMap.get("lastOrderDay")) != 0)){
+                                iterator.remove();
+                                continue;
+                            }
                         }
                     }else {
                         if (StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin")) || StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd"))){
-                            iterator.remove();
-                            continue;
+                            if (!(selectMap.get("lastOrderDayType").equalsIgnoreCase("4") && !object.getBoolean("useOrder") && Integer.valueOf(selectMap.get("lastOrderDayBegin")) != 0)){
+                                iterator.remove();
+                                continue;
+                            }
                         }
                     }
                 }
