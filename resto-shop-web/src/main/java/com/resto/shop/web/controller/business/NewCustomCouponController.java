@@ -472,7 +472,7 @@ public class NewCustomCouponController extends GenericController{
                     }
                 }
                 //如果录如过订单条件但该用户没有满足订单条件则将该用户从列表中移除掉
-                if (!meetOrder) {
+                if (!meetOrder && StringUtils.isBlank(selectMap.get("text")) && selectMap.size() != 0) {
                     //根据消费次数的比较类型，判断是否有录入查询条件
                     if (selectMap.get("orderCountType").equalsIgnoreCase("1") || selectMap.get("orderCountType").equalsIgnoreCase("2")){
                         if (StringUtils.isNotBlank(selectMap.get("orderCount"))){
