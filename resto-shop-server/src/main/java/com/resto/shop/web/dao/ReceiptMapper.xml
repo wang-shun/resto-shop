@@ -161,7 +161,9 @@
         AND o.customer_id=#{customerId,jdbcType=VARCHAR}
         ORDER BY pay_time DESC) t1
     WHERE t1.receipt_money!=0.00
+    <if test="state != null" >
         AND t1.state=#{state,jdbcType=INTEGER}
+    </if>
   </select>
   <resultMap id="posMap" type="com.resto.shop.web.dto.ReceiptPos">
     <result column="id" property="receiptId" jdbcType="VARCHAR"/>
