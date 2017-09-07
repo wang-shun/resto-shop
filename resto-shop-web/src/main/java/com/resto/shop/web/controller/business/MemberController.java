@@ -28,7 +28,8 @@ import com.resto.brand.web.dto.MemberUserDto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
- import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -282,7 +283,7 @@ public class MemberController extends GenericController{
     //下载会员信息报表
     @RequestMapping("/createMemberSelectionDto")
     @ResponseBody
-    public Result createMemberSelectionDto(@RequestParam List<MemberSelectionDto> memberSelectionDtos, HttpServletRequest request){
+    public Result createMemberSelectionDto(@RequestBody List<MemberSelectionDto> memberSelectionDtos, HttpServletRequest request){
         List<ShopDetail> shopDetailList = getCurrentShopDetails();
         if(shopDetailList==null){
             shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
@@ -331,12 +332,12 @@ public class MemberController extends GenericController{
      * 追加筛选信息
      * @param path
      * @param startPosition
-     * @param memberUserDto
+     * @param memberSelectionDtos
      * @return
      */
     @RequestMapping("/appendMemberSelectionExcel")
     @ResponseBody
-    public Result appendMemberSelectionExcel(String path, Integer startPosition, @RequestParam List<MemberSelectionDto> memberSelectionDtos, MemberUserDto memberUserDto){
+    public Result appendMemberSelectionExcel(String path, Integer startPosition, @RequestBody List<MemberSelectionDto> memberSelectionDtos){
         try {
             String[][] items = new String[memberSelectionDtos.size()][];
             int i = 0;
