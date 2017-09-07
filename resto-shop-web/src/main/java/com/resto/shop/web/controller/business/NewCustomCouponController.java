@@ -419,9 +419,10 @@ public class NewCustomCouponController extends GenericController{
                                 if (meetOrder) {//在前一个条件满足的情况下在进行消费金额的判断
                                     daysBetween = daysBetween(orderMap.get("lastOrderTime").toString(), newDateString);
                                     if (selectMap.get("lastOrderDayType").equalsIgnoreCase("1")) {//最后消费日期距今比较类型为大于
-                                        if (!(daysBetween.compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("lastOrderDay"))
-                                                ? "0" : selectMap.get("lastOrderDay")))) > 0)) {
-                                            meetOrder = false;
+                                        if (StringUtils.isNotBlank(selectMap.get("lastOrderDay"))) {
+                                            if (!(daysBetween.compareTo(Integer.valueOf(selectMap.get("lastOrderDay"))) > 0)) {
+                                                meetOrder = false;
+                                            }
                                         }
                                     } else if (selectMap.get("lastOrderDayType").equalsIgnoreCase("2")) {//最后消费日期距今比较类型为小于
                                         if (StringUtils.isNotBlank(selectMap.get("lastOrderDay"))) {
