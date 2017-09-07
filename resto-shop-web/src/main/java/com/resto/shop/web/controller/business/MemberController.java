@@ -327,39 +327,4 @@ public class MemberController extends GenericController{
         }
         return getSuccessResult(path);
     }
-
-    /**
-     * 追加筛选信息
-     * @param path
-     * @param startPosition
-     * @param memberSelectionDtos
-     * @return
-     */
-    @RequestMapping("/appendMemberSelectionExcel")
-    @ResponseBody
-    public Result appendMemberSelectionExcel(String path, Integer startPosition, @RequestBody List<MemberSelectionDto> memberSelectionDtos){
-        try {
-            String[][] items = new String[memberSelectionDtos.size()][];
-            int i = 0;
-            for (MemberSelectionDto memberSelectionDto : memberSelectionDtos){
-                items[i] = new String[9];
-                items[i][0] = memberSelectionDto.getCustomerType();
-                items[i][1] = memberSelectionDto.getIsValue();
-                items[i][2] = memberSelectionDto.getNickname();
-                items[i][3] = memberSelectionDto.getSex();
-                items[i][4] = memberSelectionDto.getTelephone();
-                items[i][5] = memberSelectionDto.getBirthday();
-                items[i][6] = memberSelectionDto.getOrderCount();
-                items[i][7] = memberSelectionDto.getOrderMoney();
-                items[i][8] = memberSelectionDto.getAVGOrderMoney();
-                i++;
-            }
-            AppendToExcelUtil.insertRows(path,startPosition,items);
-        } catch (Exception e){
-            log.error("追加会员报表筛选会员信息出错！");
-            e.printStackTrace();
-            return new Result(false);
-        }
-        return getSuccessResult();
-    }
 }
