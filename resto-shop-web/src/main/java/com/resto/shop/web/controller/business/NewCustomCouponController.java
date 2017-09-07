@@ -275,9 +275,10 @@ public class NewCustomCouponController extends GenericController{
                             if (StringUtils.isBlank(selectMap.get("text")) && selectMap.size() != 0) {
                                 //判断消费次数比较类型Begin
                                 if (selectMap.get("orderCountType").equalsIgnoreCase("1")) {//消费次数比较类型为大于
-                                    if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf((StringUtils.isBlank(selectMap.get("orderCount"))
-                                            ? "0" : selectMap.get("orderCount")))) > 0) {
-                                        meetOrder = true;
+                                    if (StringUtils.isNotBlank(selectMap.get("orderCount"))) {
+                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCount"))) > 0) {
+                                            meetOrder = true;
+                                        }
                                     }
                                 } else if (selectMap.get("orderCountType").equalsIgnoreCase("2")) {//消费次数比较类型为小于
                                     if (StringUtils.isNotBlank(selectMap.get("orderCount"))) {
@@ -326,9 +327,10 @@ public class NewCustomCouponController extends GenericController{
                                 //判断消费总额比较类型Begin
                                 if (meetOrder) {//在前一个条件满足的情况下在进行消费金额的判断
                                     if (selectMap.get("orderTotalType").equalsIgnoreCase("1")) {//消费总额比较类型为大于
-                                        if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("orderTotal"))
-                                                ? "0" : selectMap.get("orderTotal")))) > 0)) {
-                                            meetOrder = false;
+                                        if (StringUtils.isNotBlank(selectMap.get("orderTotal"))) {
+                                            if (!(new BigDecimal(orderMap.get("orderTotal").toString()).compareTo(new BigDecimal(selectMap.get("orderTotal"))) > 0)) {
+                                                meetOrder = false;
+                                            }
                                         }
                                     } else if (selectMap.get("orderTotalType").equalsIgnoreCase("2")) {//消费总额比较类型为小于
                                         if (StringUtils.isNotBlank(selectMap.get("orderTotal"))) {
@@ -372,9 +374,10 @@ public class NewCustomCouponController extends GenericController{
                                 //判断平均消费金额比较类型Begin
                                 if (meetOrder) {//在前一个条件满足的情况下在进行消费金额的判断
                                     if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("1")) {//平均消费总额比较类型为大于
-                                        if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal((StringUtils.isBlank(selectMap.get("avgOrderMoney"))
-                                                ? "0" : selectMap.get("avgOrderMoney")))) > 0)) {
-                                            meetOrder = false;
+                                        if (StringUtils.isNotBlank(selectMap.get("avgOrderMoney"))) {
+                                            if (!(new BigDecimal(orderMap.get("avgOrderMoney").toString()).compareTo(new BigDecimal(selectMap.get("avgOrderMoney"))) > 0)) {
+                                                meetOrder = false;
+                                            }
                                         }
                                     } else if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("2")) {//平均消费总额比较类型为小于
                                         if (StringUtils.isNotBlank(selectMap.get("avgOrderMoney"))) {
