@@ -168,7 +168,9 @@
             <button type="button" class="btn btn-primary" @click="grantCoupon">发放</button>
             </c:if>
             <c:if test="${intoType eq 1}">
-                <button type="button" class="btn btn-primary">下载</button>
+                <button type="button" class="btn btn-primary" @click="createExcel" v-if="state == 1">下载</button>
+                <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中。请勿刷新页面</button>
+                <button type="button" class="btn btn-success" @click="download" v-if="state == 3">已完成，点击下载</button>
             </c:if>
             <br/><br/>
             <table id="groupReleaseTable" class="table table-striped table-bordered table-hover"
@@ -230,7 +232,15 @@
             personalLoanSelectObject : null, //个人发放查询对象
             currentType : 1, //当前所在模块位置 1：群体发放 2：个人发放
             groupReleaseCustomerIds : "", //群体发放用户的Id
-            personalLoansCustomerIds : "" //个人发放用户的Id
+            personalLoansCustomerIds : "", //个人发放用户的Id
+            object : {},
+            length : 0,
+            start : 0,
+            end : 1000,
+            startPosition : 1006,
+            index : 1,
+            state : 1,
+            path : null
         },
         created : function() {
             this.initDataTables();
@@ -540,6 +550,103 @@
                         });
                     }
                 });
+            },
+            createExcel　: function () {
+                try {
+                    var that = this;
+                    that.object = this.getDate();
+                    that.brandCustomer = that.brandCustomerCount;
+                    that.memberList = that.memberUserDtos;
+                    that.object.brandCustomerCount = that.brandCustomer;
+                    if (that.memberList.length <= 1000){
+                        that.object.memberUserDtos = that.memberList;
+                        $.post("member/member_excel",that.object,function (result) {
+                            if (result.success){
+                                window.location.href = "member/downloadExcel?path="+result.data+"";
+                            }else{
+                                toastr.clear();
+                                toastr.error("下载报表出错");
+                            }
+                        });
+                    }else{
+                        that.state = 2;
+                        that.length = Math.ceil(that.memberList.length/1000);
+                        that.object.memberUserDtos = that.memberList.slice(that.start,that.end);
+                        $.post("member/member_excel",that.object,function (result) {
+                            if (result.success){
+                                that.object.path = result.data;
+                                that.start = that.end;
+                                that.end = that.start + 1000;
+                                that.index++;
+                                that.appendExcel();
+                            }else{
+                                that.state = 1;
+                                that.start = 0;
+                                that.end = 1000;
+                                that.startPosition = 1006;
+                                that.index = 1;
+                                toastr.clear();
+                                toastr.error("生成报表出错");
+                            }
+                        });
+                    }
+                } catch (e){
+                    that.state = 1;
+                    that.start = 0;
+                    that.end = 1000;
+                    that.startPosition = 1006;
+                    that.index = 1;
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试")
+                }
+            },
+            appendExcel : function () {
+                var that = this;
+                try {
+                    if (that.index == that.length) {
+                        that.object.memberUserDtos = that.memberList.slice(that.start);
+                    } else {
+                        that.object.memberUserDtos = that.memberList.slice(that.start, that.end);
+                    }
+                    that.object.startPosition = that.startPosition;
+                    $.post("member/appendExcel", that.object, function (result) {
+                        if (result.success) {
+                            that.start = that.end;
+                            that.end = that.start + 1000;
+                            that.startPosition = that.startPosition + 1000;
+                            that.index++;
+                            if (that.index - 1 == that.length) {
+                                that.state = 3;
+                            } else {
+                                that.appendExcel();
+                            }
+                        } else {
+                            that.state = 1;
+                            that.start = 0;
+                            that.end = 1000;
+                            that.startPosition = 1006;
+                            that.index = 1;
+                            toastr.clear();
+                            toastr.error("生成报表出错");
+                        }
+                    });
+                }catch (e){
+                    that.state = 1;
+                    that.start = 0;
+                    that.end = 1000;
+                    that.startPosition = 1006;
+                    that.index = 1;
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试");
+                }
+            },
+            download : function () {
+                window.location.href = "member/downloadExcel?path="+this.object.path+"";
+                this.state = 1;
+                this.start = 0;
+                this.end = 1000;
+                this.startPosition = 1006;
+                this.index = 1;
             }
         }
     });
