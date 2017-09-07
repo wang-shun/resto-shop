@@ -342,7 +342,7 @@
                             },
                             {
                                 title:"平均消费金额" ,
-                                data:"aVGOrderMoney"
+                                data:"avgOrderMoney"
                             }
                         ],
                         initComplete: function () {
