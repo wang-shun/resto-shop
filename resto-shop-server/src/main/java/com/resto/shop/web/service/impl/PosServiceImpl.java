@@ -225,6 +225,7 @@ public class PosServiceImpl implements PosService {
                 }
             }
         }else{
+            RedisUtil.set(articleId + Common.KUCUN, 0);
             articleService.setEmpty(articleId);
             List<ArticlePrice> articlePrices = articlePriceService.selectByArticleId(articleId);
             if (!CollectionUtils.isEmpty(articlePrices)) {
