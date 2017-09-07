@@ -77,8 +77,8 @@
                     <input type="number" v-show="selectObject.orderTotalType == 0 || selectObject.orderTotalType == 1 || selectObject.orderTotalType == 2" class="form-control" v-model="selectObject.orderTotal" placeholder="请录入消费总额">&nbsp;
                 </div>
                 <div class="form-group" v-show="selectObject.orderTotalType == 3 || selectObject.orderTotalType == 4">
-                    <input type="number" class="form-control" v-model="selectObject.orderTotalBegin" placeholder="请录入消费总额">&nbsp;&nbsp;至&nbsp;
-                    <input type="number" class="form-control" v-model="selectObject.orderTotalEnd" placeholder="请录入消费总额">&nbsp;&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.orderTotalBegin" placeholder="请录入消费总额">&nbsp;&nbsp;至&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.orderTotalEnd" placeholder="请录入消费总额">&nbsp;&nbsp;
                 </div>元&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 <div class="form-group">
                     <label>平均消费金额&nbsp;
@@ -92,8 +92,8 @@
                     <input type="number" v-show="selectObject.avgOrderMoneyType == 0 || selectObject.avgOrderMoneyType == 1 || selectObject.avgOrderMoneyType == 2" class="form-control" v-model="selectObject.avgOrderMoney" placeholder="请录入平均消费总额">&nbsp;
                 </div>
                 <div class="form-group" v-show="selectObject.avgOrderMoneyType == 3 || selectObject.avgOrderMoneyType == 4">
-                    <input type="number" class="form-control" v-model="selectObject.avgOrderMoneyBegin" placeholder="请录入平均消费总额">&nbsp;&nbsp;至&nbsp;
-                    <input type="number" class="form-control" v-model="selectObject.avgOrderMoneyEnd" placeholder="请录入平均消费总额">&nbsp;&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.avgOrderMoneyBegin" placeholder="请录入平均消费总额">&nbsp;&nbsp;至&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.avgOrderMoneyEnd" placeholder="请录入平均消费总额">&nbsp;&nbsp;
                 </div>元
             </form>
             <br/>
@@ -110,8 +110,8 @@
                     <input type="number" v-show="selectObject.lastOrderDayType == 0 || selectObject.lastOrderDayType == 1 || selectObject.lastOrderDayType == 2" class="form-control" class="form-control" v-model="selectObject.lastOrderDay" placeholder="请录入天数">&nbsp;
                 </div>
                 <div class="form-group" v-show="selectObject.lastOrderDayType == 3 || selectObject.lastOrderDayType == 4">
-                    <input type="number" class="form-control" v-model="selectObject.lastOrderDayBegin" placeholder="请录入天数">&nbsp;&nbsp;至&nbsp;
-                    <input type="number" class="form-control" v-model="selectObject.lastOrderDayEnd" placeholder="请录入天数">&nbsp;&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.lastOrderDayBegin" placeholder="请录入天数">&nbsp;&nbsp;至&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.lastOrderDayEnd" placeholder="请录入天数">&nbsp;&nbsp;
                 </div>天
             </form>
             <br/>
@@ -244,6 +244,30 @@
                     this.selectObject.orderCountEnd = "";
                 }else if ((newValue == 3 || newValue == 4) && (oldValue == 1 || oldValue == 2)){
                     this.selectObject.orderCount = "";
+                }
+            },
+            "selectObject.lastOrderDayType" : function (newValue, oldValue) {
+                if ((newValue == 1 || newValue == 2) && (oldValue == 3 || oldValue == 4)){
+                    this.selectObject.lastOrderDayBegin = "";
+                    this.selectObject.lastOrderDayEnd = "";
+                }else if ((newValue == 3 || newValue == 4) && (oldValue == 1 || oldValue == 2)){
+                    this.selectObject.lastOrderDay = "";
+                }
+            },
+            "selectObject.orderTotalType" : function (newValue, oldValue) {
+                if ((newValue == 1 || newValue == 2) && (oldValue == 3 || oldValue == 4)){
+                    this.selectObject.orderTotalBegin = "";
+                    this.selectObject.orderTotalEnd = "";
+                }else if ((newValue == 3 || newValue == 4) && (oldValue == 1 || oldValue == 2)){
+                    this.selectObject.orderTotal = "";
+                }
+            },
+            "selectObject.avgOrderMoneyType" : function (newValue, oldValue) {
+                if ((newValue == 1 || newValue == 2) && (oldValue == 3 || oldValue == 4)){
+                    this.selectObject.avgOrderMoneyBegin = "";
+                    this.selectObject.avgOrderMoneyEnd = "";
+                }else if ((newValue == 3 || newValue == 4) && (oldValue == 1 || oldValue == 2)){
+                    this.selectObject.avgOrderMoney = "";
                 }
             }
         },
