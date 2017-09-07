@@ -355,17 +355,17 @@ public class NewCustomCouponController extends GenericController{
                                         meetOrder = true;
                                     }
                                 }else if (selectMap.get("orderTotalType").equalsIgnoreCase("4")){//消费次数比较类型为不介于
-                                    if (StringUtils.isNotBlank(selectMap.get("orderCountBegin")) && StringUtils.isBlank(selectMap.get("orderCountEnd"))){//如果只录入了前面的数
-                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) < 0) {
+                                    if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) && StringUtils.isBlank(selectMap.get("orderTotalEnd"))){//如果只录入了前面的数
+                                        if (Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalBegin"))) < 0) {
                                             meetOrder = true;
                                         }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("orderCountEnd")) && StringUtils.isBlank(selectMap.get("orderCountBegin"))){//如果只录入了后面的数
-                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) > 0) {
+                                    }else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isBlank(selectMap.get("orderTotalBegin"))){//如果只录入了后面的数
+                                        if (Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalEnd"))) > 0) {
                                             meetOrder = true;
                                         }
-                                    }else if (StringUtils.isNotBlank(selectMap.get("orderCountBegin")) && StringUtils.isNotBlank(selectMap.get("orderCountBegin"))){//如果前后两个数都录入了
-                                        if (Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) < 0
-                                                && Integer.valueOf(orderMap.get("orderCount").toString()).compareTo(Integer.valueOf(selectMap.get("orderCountBegin"))) > 0) {
+                                    }else if (StringUtils.isNotBlank(selectMap.get("orderTotalEnd")) && StringUtils.isNotBlank(selectMap.get("orderTotalBegin"))){//如果前后两个数都录入了
+                                        if (Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalBegin"))) < 0
+                                                && Integer.valueOf(orderMap.get("orderTotal").toString()).compareTo(Integer.valueOf(selectMap.get("orderTotalEnd"))) > 0) {
                                             meetOrder = true;
                                         }
                                     }else {
