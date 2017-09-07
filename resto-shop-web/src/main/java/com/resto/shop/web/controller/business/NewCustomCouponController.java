@@ -471,7 +471,11 @@ public class NewCustomCouponController extends GenericController{
                 }
                 //如果录如过订单条件但该用户没有满足订单条件则将该用户从列表中移除掉
                 if (!meetOrder && (StringUtils.isNotBlank(selectMap.get("orderCount")) || StringUtils.isNotBlank(selectMap.get("orderTotal"))
-                        || StringUtils.isNotBlank(selectMap.get("avgOrderMoney")) || StringUtils.isNotBlank(selectMap.get("lastOrderDay")))) {
+                        || StringUtils.isNotBlank(selectMap.get("avgOrderMoney")) || StringUtils.isNotBlank(selectMap.get("lastOrderDay"))
+                        || StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) || StringUtils.isNotBlank(selectMap.get("orderTotalEnd"))
+                        || StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin")) || StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd"))
+                        || StringUtils.isNotBlank(selectMap.get("orderCountBegin")) || StringUtils.isNotBlank(selectMap.get("orderCountEnd"))
+                        || StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin")) || StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")))) {
                     iterator.remove();
                     continue;
                 }
