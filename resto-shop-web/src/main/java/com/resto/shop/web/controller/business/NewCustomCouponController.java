@@ -470,14 +470,59 @@ public class NewCustomCouponController extends GenericController{
                     }
                 }
                 //如果录如过订单条件但该用户没有满足订单条件则将该用户从列表中移除掉
-                if (!meetOrder && (StringUtils.isNotBlank(selectMap.get("orderCount")) || StringUtils.isNotBlank(selectMap.get("orderTotal"))
-                        || StringUtils.isNotBlank(selectMap.get("avgOrderMoney")) || StringUtils.isNotBlank(selectMap.get("lastOrderDay"))
-                        || StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) || StringUtils.isNotBlank(selectMap.get("orderTotalEnd"))
-                        || StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin")) || StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd"))
-                        || StringUtils.isNotBlank(selectMap.get("orderCountBegin")) || StringUtils.isNotBlank(selectMap.get("orderCountEnd"))
-                        || StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin")) || StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd")))) {
-                    iterator.remove();
-                    continue;
+                if (!meetOrder) {
+                    //根据消费次数的比较类型，判断是否有录入查询条件
+                    if (selectMap.get("orderCountType").equalsIgnoreCase("1")
+                            || selectMap.get("orderCountType").equalsIgnoreCase("2")){
+                        if (StringUtils.isNotBlank(selectMap.get("orderCount"))){
+                            iterator.remove();
+                            continue;
+                        }
+                    }else {
+                        if (StringUtils.isNotBlank(selectMap.get("orderCountBegin")) || StringUtils.isNotBlank(selectMap.get("orderCountEnd"))){
+                            iterator.remove();
+                            continue;
+                        }
+                    }
+                    //根据消费总额的比较类型，判断是否有录入查询条件
+                    if (selectMap.get("orderTotalType").equalsIgnoreCase("1")
+                            || selectMap.get("orderTotalType").equalsIgnoreCase("2")){
+                        if (StringUtils.isNotBlank(selectMap.get("orderTotal"))){
+                            iterator.remove();
+                            continue;
+                        }
+                    }else {
+                        if (StringUtils.isNotBlank(selectMap.get("orderTotalBegin")) || StringUtils.isNotBlank(selectMap.get("orderTotalEnd"))){
+                            iterator.remove();
+                            continue;
+                        }
+                    }
+                    //根据平均消费金额的比较类型，判断是否有录入查询条件
+                    if (selectMap.get("avgOrderMoneyType").equalsIgnoreCase("1")
+                            || selectMap.get("avgOrderMoneyType").equalsIgnoreCase("2")){
+                        if (StringUtils.isNotBlank(selectMap.get("avgOrderMoney"))){
+                            iterator.remove();
+                            continue;
+                        }
+                    }else {
+                        if (StringUtils.isNotBlank(selectMap.get("avgOrderMoneyBegin")) || StringUtils.isNotBlank(selectMap.get("avgOrderMoneyEnd"))){
+                            iterator.remove();
+                            continue;
+                        }
+                    }
+                    //根据平均消费金额的比较类型，判断是否有录入查询条件
+                    if (selectMap.get("lastOrderDayType").equalsIgnoreCase("1")
+                            || selectMap.get("lastOrderDayType").equalsIgnoreCase("2")){
+                        if (StringUtils.isNotBlank(selectMap.get("lastOrderDay"))){
+                            iterator.remove();
+                            continue;
+                        }
+                    }else {
+                        if (StringUtils.isNotBlank(selectMap.get("lastOrderDayBegin")) || StringUtils.isNotBlank(selectMap.get("lastOrderDayEnd"))){
+                            iterator.remove();
+                            continue;
+                        }
+                    }
                 }
                 //判断是否录如过储值条件，有则进行筛选
                 if (object.getBoolean("chargeOrder")) {
