@@ -32,6 +32,10 @@ public class ReceiptTitleServiceImpl extends GenericServiceImpl<ReceiptTitle,Str
     public int updateByPrimaryKeySelective(ReceiptTitle record){
         return receiptTitleMapper.updateByPrimaryKeySelective(record);
     }
+    @Override
+    public ReceiptTitle selectByPrimaryKey(String id){
+        return receiptTitleMapper.selectByPrimaryKey(id);
+    }
 
     @Override
     public List<ReceiptTitle> selectOneList(String customerId){
