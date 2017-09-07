@@ -294,7 +294,7 @@ public class MemberController extends GenericController{
         String path = request.getSession().getServletContext().getRealPath(fileName);
         //定义列
         String[]columns={"customerType","isValue","nickname","sex","telephone","birthday","orderCount","orderMoney"
-                ,"AVGOrderMoney"};
+                ,"avgOrderMoney"};
         //定义数据
         List<MemberSelectionDto>  result = memberSelectionDtos;
         String shopName = "";

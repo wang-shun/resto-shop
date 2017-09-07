@@ -287,7 +287,7 @@
                         },
                         {
                             title:"平均消费金额" ,
-                            data:"AVGOrderMoney"
+                            data:"avgOrderMoney"
                         }
                     ],
                     initComplete: function () {
