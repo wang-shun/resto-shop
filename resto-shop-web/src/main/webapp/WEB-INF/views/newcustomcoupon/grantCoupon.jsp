@@ -560,8 +560,8 @@
                     that.object = {};
                     that.memberList = that.memberUserDtos;
                     if (that.memberList.length <= 1000){
-                        that.object.memberUserDtos = that.memberList;
-                        $.post("member/member_excel",that.object,function (result) {
+                        that.object = that.memberList;
+                        $.post("member/createMemberSelectionDto",that.object,function (result) {
                             if (result.success){
                                 window.location.href = "member/downloadExcel?path="+result.data+"";
                             }else{
@@ -572,8 +572,8 @@
                     }else{
                         that.state = 2;
                         that.length = Math.ceil(that.memberList.length/1000);
-                        that.object.memberUserDtos = that.memberList.slice(that.start,that.end);
-                        $.post("member/member_excel",that.object,function (result) {
+                        that.object = that.memberList.slice(that.start,that.end);
+                        $.post("member/createMemberSelectionDto",that.object,function (result) {
                             if (result.success){
                                 that.object.path = result.data;
                                 that.start = that.end;
@@ -605,12 +605,12 @@
                 var that = this;
                 try {
                     if (that.index == that.length) {
-                        that.object.memberUserDtos = that.memberList.slice(that.start);
+                        that.object = that.memberList.slice(that.start);
                     } else {
-                        that.object.memberUserDtos = that.memberList.slice(that.start, that.end);
+                        that.object = that.memberList.slice(that.start, that.end);
                     }
                     that.object.startPosition = that.startPosition;
-                    $.post("member/appendExcel", that.object, function (result) {
+                    $.post("member/appendMemberSelectionExcel", that.object, function (result) {
                         if (result.success) {
                             that.start = that.end;
                             that.end = that.start + 1000;
