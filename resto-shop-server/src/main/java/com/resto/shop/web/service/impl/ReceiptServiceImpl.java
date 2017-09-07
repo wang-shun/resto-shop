@@ -76,6 +76,16 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     }
 
     @Override
+    public int updateByPrimaryKeySelective(Receipt record){
+        return receiptMapper.updateByPrimaryKeySelective(record);
+    }
+
+    @Override
+    public int updateState(Receipt record){
+        return receiptMapper.updateState(record);
+    }
+
+    @Override
     public List<ReceiptOrder> selectReceiptOrderList(String customerId,String state){
         if(state==null||state.equals("")){
             return receiptMapper.selectReceiptOrderList(customerId,null);
@@ -88,8 +98,12 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
         return receiptMapper.getReceiptOrderList(Integer.parseInt(receiptId));
     }
     @Override
-    public List<ReceiptPos> getReceiptList(String shopId){
-        return receiptMapper.getReceiptList(shopId);
+    public List<ReceiptPos> getReceiptList(String shopId,String state){
+        if(state==null||state.equals("")){
+            return receiptMapper.getReceiptList(shopId,null);
+        }else{
+            return receiptMapper.getReceiptList(shopId,Integer.parseInt(state));
+        }
     }
 
     /**

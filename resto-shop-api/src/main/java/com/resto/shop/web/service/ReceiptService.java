@@ -16,12 +16,16 @@ public interface ReceiptService extends GenericService<Receipt, String> {
 
     int insertSelective(Receipt record);
 
+    int updateByPrimaryKeySelective(Receipt record);
+
+    int updateState(Receipt record);
+
     //根据状态查询发票订单
     List<ReceiptOrder> selectReceiptOrderList(String customerId, String state);
     //根据店铺id，查询该店铺下的发票
     ReceiptPosOrder getReceiptOrderList(String receiptId);
     //根据发票id，查询发票详情
-    List<ReceiptPos> getReceiptList(String shopId);
+    List<ReceiptPos> getReceiptList(String shopId,String state);
     //发票打印
     List<Map<String, Object>> printReceiptOrder(String ShopId, String receiptId);
 }

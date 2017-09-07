@@ -2,6 +2,7 @@ package com.resto.shop.web.dao;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.ReceiptTitle;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public interface ReceiptTitleMapper extends GenericDao<ReceiptTitle,String> {
 
     int updateByPrimaryKey(ReceiptTitle record);
 
-    List<ReceiptTitle> selectOneList(String customerId);
+    List<ReceiptTitle> selectOneList(@Param("customerId")String customerId);
 
-    List<ReceiptTitle> selectTypeList(String customerId,Integer type);
+    List<ReceiptTitle> selectTypeList(@Param("customerId")String customerId, @Param("type")Integer type);
 }

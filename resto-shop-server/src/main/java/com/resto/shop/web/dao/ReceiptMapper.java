@@ -22,9 +22,11 @@ public interface ReceiptMapper extends GenericDao<Receipt,String> {
 
     int updateByPrimaryKey(Receipt record);
 
+    int updateState(Receipt record);
+
     List<ReceiptOrder> selectReceiptOrderList(@Param("customerId")String customerId, @Param("state")Integer state);
 
     ReceiptPosOrder getReceiptOrderList(@Param("receiptId")Integer receiptId);
 
-    List<ReceiptPos> getReceiptList(@Param("shopId")String shopId);
+    List<ReceiptPos> getReceiptList(@Param("shopId")String shopId,@Param("state")Integer state);
 }

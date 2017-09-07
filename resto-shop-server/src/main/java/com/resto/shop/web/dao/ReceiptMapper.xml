@@ -127,6 +127,18 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <update id="updateState" parameterType="com.resto.shop.web.model.Receipt" >
+    update tb_receipt
+    <set >
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Receipt" >
     update tb_receipt
     set order_number = #{orderNumber,jdbcType=VARCHAR},
@@ -180,6 +192,9 @@
     WHERE r.order_number = o.serial_number
     AND t.id=r.receipt_title_id
     AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
+    <if test="state != null" >
+      AND r.state=#{state,jdbcType=INTEGER}
+    </if>
   </select>
   <resultMap id="posOrderMap" type="com.resto.shop.web.dto.ReceiptPosOrder">
     <result column="id" property="receiptId" jdbcType="VARCHAR"/>
