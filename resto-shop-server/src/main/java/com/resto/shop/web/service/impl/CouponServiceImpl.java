@@ -68,6 +68,12 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         return list;
     }
 
+    @Override
+    public List<Coupon> listCouponUsed(Coupon coupon) {
+        List<Coupon> list=couponMapper.listCouponUsed(coupon);
+        return list;
+    }
+
 	@Resource
 	OrderPaymentItemService orderPaymentItemService;
 
@@ -83,18 +89,18 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     public Coupon useCoupon(BigDecimal totalMoney, Order order) throws AppException {
 
         Coupon coupon = selectById(order.getUseCoupon());
-        //判断优惠卷是否已使用
+        //判断优惠券是否已使用
         if(coupon.getIsUsed()){
             throw new AppException(AppException.COUPON_IS_USED);
         }
-        //判断优惠卷有效期
+        //判断优惠券有效期
         Date beginDate = DateUtil.getDateBegin(coupon.getBeginDate());
         Date endDate = DateUtil.getDateEnd(coupon.getEndDate());
         Date now = new Date();
         if(beginDate.getTime()>now.getTime()||endDate.getTime()<now.getTime()){
             throw new AppException(AppException.COUPON_IS_EXPIRE);
         }
-        //判断优惠卷使用时间段
+        //判断优惠券使用时间段
         int beginMin = DateUtil.getMinOfDay(coupon.getBeginTime());
         int endMin = DateUtil.getMinOfDay(coupon.getEndTime());
         int nowMin = DateUtil.getMinOfDay(now);
@@ -102,17 +108,17 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
             throw new AppException(AppException.COUPON_TIME_ERR);
         }
 
-        //判断优惠卷使用类型是否0 或者是否等于订单类型
+        //判断优惠券使用类型是否0 或者是否等于订单类型
         if(coupon.getDistributionModeId()!=0&&coupon.getDistributionModeId()!=order.getDistributionModeId()){
             if(coupon.getDistributionModeId()!=1&&order.getDistributionModeId()!=3){
                 throw new AppException(AppException.COUPON_MODE_ERR);
             }
         }
-        //判断优惠卷订单金额是否大于优惠卷可用金额
+        //判断优惠券订单金额是否大于优惠券可用金额
         if(totalMoney.compareTo(totalMoney)<0){
             throw new AppException(AppException.COUPON_MIN_AMOUNT_ERR);
         }
-        //判断是否使用了余额 并且 当前优惠卷可否使用余额
+        //判断是否使用了余额 并且 当前优惠券可否使用余额
         if(order.isUseAccount()&&!coupon.getUseWithAccount()){
             throw new AppException(AppException.COUPON_NOT_USEACCOUNT);
         }
@@ -131,7 +137,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 	public void refundCoupon(String id) {
 		Coupon coupon = selectById(id);
 		coupon.setIsUsed(false);
-		coupon.setRemark("退还优惠卷");
+		coupon.setRemark("退还优惠券");
 		update(coupon);
 	}
 
@@ -177,7 +183,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 		item.setPaymentModeId(PayMode.COUPON_PAY);
 		item.setPayTime(new Date());
 		item.setPayValue(coupon.getValue());
-		item.setRemark("优惠卷支付:" + item.getPayValue());
+		item.setRemark("优惠券支付:" + item.getPayValue());
 		item.setResultData(coupon.getId());
 		orderPaymentItemService.insert(item);
 	}
@@ -206,7 +212,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
                 Coupon coupon = new Coupon();
                 Date beginDate = new Date();
 
-                //判断优惠卷有效日期类型
+                //判断优惠券有效日期类型
                 if (customCoupon.getTimeConsType().equals(TimeCons.MODELA)){ //按天
                     coupon.setBeginDate(beginDate);
                     coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,customCoupon.getCouponValiday()));
@@ -215,7 +221,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
                     coupon.setEndDate(customCoupon.getEndDateTime());
                 }
 
-                //判断是店铺优惠卷还是品牌优惠卷
+                //判断是店铺优惠券还是品牌优惠券
                 if(customCoupon.getIsBrand() == 1 && customCoupon.getBrandId() != null){
                     coupon.setBrandId(customCoupon.getBrandId());
                 }else{
@@ -230,24 +236,26 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
                 coupon.setName(customCoupon.getCouponName());
                 coupon.setValue(customCoupon.getCouponValue());
                 coupon.setMinAmount(customCoupon.getCouponMinMoney());
-                coupon.setCouponType(4);
+                coupon.setCouponType(customCoupon.getCouponType());
                 coupon.setBeginTime(customCoupon.getBeginTime());
                 coupon.setEndTime(customCoupon.getEndTime());
                 coupon.setUseWithAccount(customCoupon.getUseWithAccount());
                 coupon.setDistributionModeId(customCoupon.getDistributionModeId());
-                coupon.setCouponSource(CouponSource.REAL_TIME_COUPON);
+                coupon.setCouponSource(CouponSource.getCouponSourceByType(coupon.getCouponType()));
                 coupon.setCustomerId(customer.getId());
                 coupon.setRecommendDelayTime(0);
                 for(int i = 0; i < customCoupon.getCouponNumber(); i++){
                     insertCoupon(coupon);
                     coupons.add(coupon);
                 }
-                realTimeCouponIds = realTimeCouponIds.concat(customCoupon.getId().toString()).concat(",");
+                if (coupon.getCouponSource().equalsIgnoreCase(CouponSource.REAL_TIME_COUPON)) {
+                    realTimeCouponIds = realTimeCouponIds.concat(customCoupon.getId().toString()).concat(",");
+                }
             }
             if (org.apache.commons.lang3.StringUtils.isNotBlank(realTimeCouponIds)){
                 Customer newCustomer = new Customer();
                 newCustomer.setId(customer.getId());
-                //得到用户领取过的实时优惠卷Id
+                //得到用户领取过的实时优惠券Id
                 realTimeCouponIds = realTimeCouponIds.substring(0,realTimeCouponIds.length() - 1);
                 if (customer.getRealTimeCouponIds() != null){
                     realTimeCouponIds = customer.getRealTimeCouponIds().concat(",").concat(realTimeCouponIds);
@@ -257,7 +265,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
             }
         }catch (Exception e){
             e.printStackTrace();
-            log.error("发放实时优惠卷出错！");
+            log.error("发放实时优惠券出错！");
             return new ArrayList<>();
         }
         return coupons;

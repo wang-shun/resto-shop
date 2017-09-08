@@ -158,13 +158,43 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-4" v-if="m.photoType == 1">
                                 <label class="col-md-5 control-label">餐品图片</label>
                                 <div class="col-md-7">
                                     <input type="hidden" name="photoSmall" v-model="m.photoSmall">
                                     <img-file-upload class="form-control" @success="uploadSuccess"
                                                      @error="uploadError"></img-file-upload>
                                     <img v-if="m.photoSmall" :src="m.photoSmall" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4" v-if="m.photoType == 2">
+                                <label class="col-md-5 control-label">餐品图片</label>
+                                <div class="col-md-7">
+                                    <input type="hidden" name="photoLittle" v-model="m.photoLittle">
+                                    <img-file-upload class="form-control" @success="uploadSuccessLittle"
+                                                     @error="uploadError"></img-file-upload>
+                                    <img v-if="m.photoLittle" :src="m.photoLittle" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4" v-if="m.photoType == 3">
+                                <label class="col-md-5 control-label">餐品图片</label>
+                                <div class="col-md-7">无图</div>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label class="col-md-5 control-label">菜品图片显示类型</label>
+                                <div  class="col-md-7">
+                                    <label class="radio-inline">
+                                        <input type="radio" name="photoType" v-model="m.photoType" value="1"> 大图
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="photoType" v-model="m.photoType" value="2"> 小图
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="photoType" v-model="m.photoType" value="3"> 无图
+                                    </label>
                                 </div>
                             </div>
 
@@ -1044,6 +1074,13 @@
                             $("[name='photoSmall']").val(url).trigger("change");
                             C.simpleMsg("上传成功");
                             $("#photoSmall").attr("src", "/" + url);
+                        }
+                        ,
+                        uploadSuccessLittle: function (url) {
+                            console.log(url);
+                            $("[name='photoLittle']").val(url).trigger("change");
+                            C.simpleMsg("上传成功");
+                            $("#photoLittle").attr("src", "/" + url);
                         }
                         ,
                         uploadError: function (msg) {

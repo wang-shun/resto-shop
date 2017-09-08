@@ -187,4 +187,9 @@
   <select id="selectByShareMoney" resultType="java.math.BigDecimal">
     SELECT sum(money) from tb_account_log where account_id = #{accountId} and source = 4
   </select>
+
+  <!-- 根据 账户ID 查询 分享返利总数 -->
+  <select id="selectByShareMoneyCount" resultType="java.lang.Integer">
+    SELECT count(1) from tb_account_log where account_id = #{accountId} and source = 4
+  </select>
 </mapper>

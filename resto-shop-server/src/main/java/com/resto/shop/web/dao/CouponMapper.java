@@ -59,6 +59,13 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
      */
     List<Coupon> listCouponByShopId(Coupon coupon);
 
+    /**
+     * 查询用户已使用的优惠券
+     * @param coupon
+     * @return
+     */
+    List<Coupon> listCouponUsed(Coupon coupon);
+
 
     /**
      * 根据用户得到用户的优惠券

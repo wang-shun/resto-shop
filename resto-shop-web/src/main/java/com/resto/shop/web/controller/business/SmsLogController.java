@@ -58,4 +58,6 @@ public class SmsLogController extends GenericController{
 		smslogService.delete(id);
 		return Result.getSuccess();
 	}
+
+
 }

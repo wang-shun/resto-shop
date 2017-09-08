@@ -137,10 +137,30 @@
   </select>
 
  <select id="selectByTimeAndShopId" resultType="Appraise">
-     select <include refid="Base_Column_List"/> from tb_appraise
+     SELECT
+     a.id,
+     a.picture_url,
+     a.level,
+     a.create_time,
+     a.content,
+     a.status,
+     a.type,
+     a.feedback,
+     a.red_money,
+     a.customer_id,
+     a.order_id,
+     a.article_id,
+     a.shop_detail_id,
+     c.nickname,
+     c.head_photo,
+     c.sex
+     FROM
+     tb_appraise a
+     LEFT JOIN tb_customer c
+     on a.customer_id = c.id
      WHERE
-     shop_detail_id =#{shopId} AND
-     <![CDATA[ create_time >= #{beginDate} AND create_time <= #{endDate}]]>
+     a.shop_detail_id =#{shopId} AND
+     <![CDATA[ a.create_time >= #{beginDate} AND a.create_time <= #{endDate}]]>
  </select>
 
     <select id="selectAppraiseShopDto" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.AppraiseShopDto">
@@ -158,7 +178,8 @@
         IFNULL(tc.telephone,'--') telephone,
         td.order_money orderMoney,
         ta.red_money redMoney,
-        ta.content
+        ta.content,
+        td.table_number tablenumber
         from tb_appraise ta
         inner join tb_order td
         on ta.order_id = td.id
@@ -168,4 +189,31 @@
         and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
         and td.shop_detail_id = #{shopId}
     </select>
+
+	<select id="selectByTimeAndBrandId" resultType="Appraise" >
+		SELECT
+			 a.id,
+			 a.picture_url,
+			 a.level,
+			 a.create_time,
+			 a.content,
+			 a.status,
+			 a.type,
+			 a.feedback,
+			 a.red_money,
+			 a.customer_id,
+			 a.order_id,
+			 a.article_id,
+			 a.shop_detail_id,
+			 c.nickname,
+			 c.head_photo,
+			 c.sex
+			 FROM
+			 tb_appraise a
+			 LEFT JOIN tb_customer c
+			 on a.customer_id = c.id
+			 WHERE
+			 <![CDATA[ a.create_time >= #{beginDate} AND a.create_time <= #{endDate}]]>
+	</select>
+
 </mapper>

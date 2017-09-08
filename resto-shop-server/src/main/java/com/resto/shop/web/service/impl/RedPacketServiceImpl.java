@@ -12,6 +12,7 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.dao.RedPacketMapper;
+import com.resto.shop.web.dto.ShareMoneyDto;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.model.RedPacket;
@@ -41,8 +42,8 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
 
     @Override
     public void useRedPacketPay(BigDecimal redPay, String customerId, Order order, Brand brand, ShopDetail shopDetail) {
-        //扣除红包，扣除顺序 评论红包-->分享红包-->退菜红包
-        Integer[] redType = {0,1,2};
+        //扣除红包，扣除顺序 评论红包-->分享红包-->退菜红包-->第三方储值余额   --2017-08-23新增红包类型wtl
+        Integer[] redType = {0,1,2,3};
         for(Integer type : redType){
             redPay = useRedPacket(type,redPay,customerId,order,brand,shopDetail);
             //如果已扣完则不再扣除
@@ -78,6 +79,9 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
                 case RedType.REFUND_ARTICLE_RED:
                     item.setPaymentModeId(PayMode.REFUND_ARTICLE_RED_PAY);
                     break;
+                case RedType.THIRD_MONEY:
+                    item.setPaymentModeId(PayMode.THIRD_MONEY_RED_PAY);
+                    break;
             }
 			item.setPayTime(new Date());
 			item.setPayValue(redPacket.getRedRemainderMoney());
@@ -107,6 +111,9 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
                 case RedType.REFUND_ARTICLE_RED:
                     item.setPaymentModeId(PayMode.REFUND_ARTICLE_RED_PAY);
                     break;
+                case RedType.THIRD_MONEY:
+                    item.setPaymentModeId(PayMode.THIRD_MONEY_RED_PAY);
+                    break;
             }
             item.setPayTime(new Date());
             item.setPayValue(redPay);
@@ -132,5 +139,10 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
     @Override
     public void refundRedPacket(BigDecimal payValue, String Id) {
         redPacketMapper.refundRedPacket(payValue,Id);
+    }
+
+    @Override
+    public List<ShareMoneyDto> selectShareMoneyList(String customerId, Integer currentPage, Integer showCount) {
+        return redPacketMapper.selectShareMoneyList(customerId, currentPage, showCount);
     }
 }

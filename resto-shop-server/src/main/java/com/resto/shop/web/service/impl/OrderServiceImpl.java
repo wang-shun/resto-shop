@@ -1,10 +1,13 @@
 package com.resto.shop.web.service.impl;
 
+import cn.restoplus.rpc.common.util.StringUtil;
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.enums.BehaviorType;
+import com.resto.brand.core.enums.DetailType;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.*;
@@ -17,13 +20,15 @@ import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
+import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
+import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
-import com.resto.shop.web.service.OrderRemarkService;
-import com.resto.shop.web.util.JdbcSmsUtils;
+import com.resto.shop.web.service.AccountService;
+import com.resto.shop.web.util.BrandAccountSendUtil;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -46,9 +51,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.resto.brand.core.util.HttpClient.doPost;
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
-import static com.resto.brand.core.util.OrderCountUtils.formatDouble;
 import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
 
 /**
@@ -154,21 +159,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     private GetNumberService getNumberService;
 
+    @Resource
+    private  WetherService wetherService;
+
     @Autowired
     private CustomerDetailMapper customerDetailMapper;
 
     @Resource
     private OrderRefundRemarkMapper orderRefundRemarkMapper;
 
+    @Autowired
+    private DayDataMessageService dayDataMessageService;
+
 
     @Resource
-	private  DayAppraiseMessageService dayAppraiseMessageService;
-
-
-    @Resource
-	private  DayDataMessageService dayDataMessageService;
-
-
+	private BrandAccountLogService brandAccountLogService;
 
     @Override
     public GenericDao<Order, String> getDao() {
@@ -193,18 +198,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     ArticleTopService articleTopService;
 
-    @Resource
-    OrderRemarkService orderRemarkService;
-
     @Autowired
     private TableQrcodeService tableQrcodeService;
 
     @Autowired
     private AreaService areaService;
 
+    @Autowired
+    private SmsLogService smsLogService;
+
+    @Autowired
+    private DayAppraiseMessageService dayAppraiseMessageService;
+
 
     @Resource
-			private  WetherService wetherService;
+	private  AccountSettingService accountSettingService;
+
+
+    @Resource
+	private BrandAccountService brandAccountService;
+
+    @Resource
+	private AccountNoticeService accountNoticeService;
+
+
 
     Logger log = LoggerFactory.getLogger(getClass());
 
@@ -301,7 +318,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setPaymentModeId(PayMode.COUPON_PAY);
                 item.setPayTime(order.getCreateTime());
                 item.setPayValue(coupon.getValue());
-                item.setRemark("优惠卷支付:" + item.getPayValue());
+                item.setRemark("优惠券支付:" + item.getPayValue());
                 item.setResultData(coupon.getId());
                 orderPaymentItemService.insert(item);
                 payment = payment.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -402,6 +419,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
+        if (order.getOrderItems().isEmpty()) {
+            throw new AppException(AppException.ORDER_ITEMS_EMPTY);
+        }
 
         if (brandSetting.getIsUseServicePrice() == Common.YES && shopDetail.getIsUseServicePrice() == Common.YES
                 && (order.getCustomerCount() == null || order.getCustomerCount() == 0)
@@ -444,6 +464,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 jsonResult.setMessage("下单失败，订单金额变动，请重新下单！");
                 return jsonResult;
             }
+//            if((farOrder.getIsPay() == OrderPayState.PAYING || farOrder.getIsPay() == OrderPayState.NOT_PAY) && farOrder.getPayMode() == OrderPayMode.WX_PAY
+//                    && farOrder.getOrderState() == OrderState.SUBMIT && farOrder.getPayType() == PayType.NOPAY){
+//                jsonResult.setSuccess(false);
+//                jsonResult.setMessage("正在微信付款中，请勿加菜！");
+//                return jsonResult;
+//            }
         }
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
         List<Article> articles = articleService.selectList(order.getShopDetailId());
@@ -743,22 +769,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPaymentModeId(PayMode.COUPON_PAY);
                     item.setPayTime(order.getCreateTime());
                     item.setPayValue(coupon.getValue());
-                    item.setRemark("优惠卷支付:" + item.getPayValue());
+                    item.setRemark("优惠券支付:" + item.getPayValue());
                     item.setResultData(coupon.getId());
                     orderPaymentItemService.insert(item);
 //                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                        "订单使用优惠卷支付了：" + item.getPayValue());
+//                        "订单使用优惠券支付了：" + item.getPayValue());
 //                    Map couponPaymap = new HashMap(4);
 //                    couponPaymap.put("brandName", brand.getBrandName());
 //                    couponPaymap.put("fileName", order.getId());
 //                    couponPaymap.put("type", "orderAction");
-//                    couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠卷支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
+//                    couponPaymap.put("content", "订单:"+order.getId()+"订单使用优惠券支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
 //                    doPostAnsc(url, couponPaymap);
 //                    Map CustomerCouponPaymap = new HashMap(4);
 //                    CustomerCouponPaymap.put("brandName", brand.getBrandName());
 //                    CustomerCouponPaymap.put("fileName", customer.getId());
 //                    CustomerCouponPaymap.put("type", "UserAction");
-//                    CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠卷支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+//                    CustomerCouponPaymap.put("content", "用户:"+customer.getNickname()+"使用优惠券支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
 //                    doPostAnsc(url, CustomerCouponPaymap);
                     LogTemplateUtils.getCouponByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
                     LogTemplateUtils.getCouponByUserType(brand.getBrandName(), customer.getId(), customer.getNickname(), item.getPayValue());
@@ -939,6 +965,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && detail.getContinueOrderScan() == Common.NO) {
                 order.setTableNumber(order.getVerCode());
             }
+            if (order.getDistributionModeId() == DistributionType.DELIVERY_MODE_ID) {
+                order.setTableNumber(order.getVerCode());
+            }
 
             if (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && detail.getContinueOrderScan() == Common.YES) {
                 order.setNeedScan(Common.YES);
@@ -1100,1695 +1129,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         update(parent);
     }
 
-	@Override
-	public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, WechatConfig wechatConfig, Brand brand) {
-		//1.结店退款
-		refundShopDetailOrder(shopDetail);
-		//2查询天气
-		Wether wether =wetherService.selectDateAndShopId(shopDetail.getId(),DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
-		if(wether==null){//说明没有调用定时任务 ---
-			wether = new Wether();
-			wether.setDayWeather("---");
-			wether.setDayTemperature(-1);
-			wether.setWeekady(-1);
-		}
-		//短信第一版用来发日结短信
-		Map<String, String> dayMapByFirstEdtion = querryDateDataByFirstEdtion(shopDetail, offLineOrder);
-		//3发短信推送/微信推送
-		pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
-		//3判断是否需要发送旬短信
-//		int temp = DateUtil.getEarlyMidLate();
-//		switch (temp){
-//			case  1:
-//				//第一版旬结短信
-//				Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail);
-//				pushMessageByFirstEdtion(xunMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
-//				break;
-//
-//			case 2:
-//				Map<String, String> xunMapByFirstEdtion2 = querryXunDataByFirstEditon(shopDetail);
-//				pushMessageByFirstEdtion(xunMapByFirstEdtion2, shopDetail, wechatConfig, brand.getBrandName());
-//				break;
-//
-//			case 3:
-//				Map<String, String> xunMapByFirstEdtion3 = querryXunDataByFirstEditon(shopDetail);
-//				pushMessageByFirstEdtion(xunMapByFirstEdtion3, shopDetail, wechatConfig, brand.getBrandName());
-//
-//				Map<String, String> monthMapByFirstEdtion = querryMonthDataByFirstEditon(shopDetail, offLineOrder);
-//				pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand.getBrandName());
-//				break;
-//
-//		}
-
-		//第二版短信内容由于模板原因无法发送短信 因此保留第一版短信 第二版数据存到大数据库数据库中
-		insertDateData(shopDetail,offLineOrder,wether,brand);
-	}
-
-
-
-	private void refundShopDetailOrder(ShopDetail shopDetail) {
-		String[] orderStates = new String[]{OrderState.SUBMIT + "", OrderState.PAYMENT + ""};//未付款和未全部付款和已付款
-		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER + ""};//已付款未下单
-		List<Order> orderList = orderMapper.selectByOrderSatesAndProductionStates(shopDetail.getId(), orderStates, productionStates);
-		for (Order order : orderList) {
-			if (!order.getClosed()) {//判断订单是否已被关闭，只对未被关闭的订单做退单处理
-				sendWxRefundMsg(order);
-			}
-		}
-		// 查询已付款且有支付项但是生产状态没有改变的订单
-		List<Order> orderstates = orderMapper.selectHasPayNoChangeStatus(shopDetail.getId(), DateUtil.getDateBegin(new Date()), DateUtil.getDateEnd(new Date()));
-		if (!orderstates.isEmpty()) {
-			for (Order o : orderstates) {
-				if (o.getOrderMode() == ShopMode.CALL_NUMBER) {
-					o.setProductionStatus(ProductionStatus.HAS_CALL);
-				} else {
-					o.setProductionStatus(ProductionStatus.PRINTED);
-				}
-				orderMapper.updateByPrimaryKeySelective(o);
-			}
-		}
-
-	}
-
-
-
-	/**
-	 * 第一版短信 日结数据封装
-	 * @param shopDetail
-	 * @param offLineOrder
-	 * @return
-	 */
-	private Map<String,String> querryDateDataByFirstEdtion(ShopDetail shopDetail, OffLineOrder offLineOrder) {
-		// 查询该店铺是否结过店
-		OffLineOrder offLineOrder1 = offLineOrderMapper.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopDetail.getId(), DateUtil.getDateBegin(new Date()), DateUtil.getDateEnd(new Date()));
-		if (null != offLineOrder1) {
-			offLineOrder1.setState(0);
-			offLineOrderMapper.updateByPrimaryKeySelective(offLineOrder1);
-		}
-		offLineOrder.setId(ApplicationUtils.randomUUID());
-		offLineOrder.setState(1);
-		offLineOrder.setResource(OfflineOrderSource.OFFLINE_POS);
-		offLineOrderMapper.insertSelective(offLineOrder);
-
-		//----1.定义时间---
-		Date todayBegin = DateUtil.getDateBegin(new Date());
-		Date todayEnd = DateUtil.getDateEnd(new Date());
-		//本月的开始时间 本月结束时间
-		String beginMonth = DateUtil.getMonthBegin();
-		Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginMonth));
-		Date end = todayEnd;
-		//三.定义线下订单
-		//本日线下订单总数(堂吃)
-		int todayEnterCount = 0;
-		//本日线下订单总额(堂吃)
-		BigDecimal todayEnterTotal = BigDecimal.ZERO;
-		//本月线下订单总数
-		int monthEnterCount = 0;
-		//本月线下订单总额
-		BigDecimal monthEnterTotal = BigDecimal.ZERO;
-
-		//4.外卖订单
-		//本日外卖订单数
-		int todayDeliverOrders = 0;
-		//本日外卖订单总额
-		BigDecimal todayOrderBooks = BigDecimal.ZERO;
-		//本月外卖订单数
-		int monthDeliverOrder = 0;
-		//本月外卖订单总额
-		BigDecimal monthOrderBooks = BigDecimal.ZERO;
-		//查询pos端店铺录入信息(线下订单+外卖订单都是pos端录入的)
-		List<OffLineOrder> offLineOrderList = offLineOrderMapper.selectlistByTimeSourceAndShopId(shopDetail.getId(), begin, end, OfflineOrderSource.OFFLINE_POS);
-		if (!offLineOrderList.isEmpty()) {
-			for (OffLineOrder of : offLineOrderList) {
-				List<Integer> getTime = DateUtil.getDayByToday(of.getCreateTime());
-				if (getTime.contains(2)) {//本日中
-					todayEnterCount += of.getEnterCount();
-					todayEnterTotal = todayEnterTotal.add(of.getEnterTotal());
-					todayDeliverOrders += of.getDeliveryOrders();
-					todayOrderBooks = todayOrderBooks.add(of.getOrderBooks());
-				}
-				if (getTime.contains(10)) {
-					monthEnterCount += of.getEnterCount();
-					monthEnterTotal = monthEnterTotal.add(of.getEnterTotal());
-					monthDeliverOrder += of.getDeliveryOrders();
-					monthOrderBooks = monthOrderBooks.add(of.getOrderBooks());
-				}
-			}
-		}
-		//查询当日新增用户的订单
-		List<Order> newCustomerOrders = orderMapper.selectNewCustomerOrderByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
-		//新增用户的订单总数
-		int newCustomerOrderNum = 0;
-		//新增用户的订单总额
-		BigDecimal newCustomerOrderTotal = BigDecimal.ZERO;
-		//新增分享用户的的订单总数
-		int newShareCustomerOrderNum = 0;
-		//新增分享用户的订单总额
-		BigDecimal newShareCustomerOrderTotal = BigDecimal.ZERO;
-		//新增自然用户的订单总数
-		int newNormalCustomerOrderNum = 0;
-		//新增自然用户的订单总额
-		BigDecimal newNormalCustomerOrderTotal = BigDecimal.ZERO;
-		if (!newCustomerOrders.isEmpty()) {
-			for (Order o : newCustomerOrders) {
-				newCustomerOrderNum++;
-				newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
-					newShareCustomerOrderNum++;
-					newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				} else {
-					newNormalCustomerOrderNum++; //是新增用户
-					newNormalCustomerOrderTotal = newNormalCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				}
-			}
-		}
-		//查询回头用户的
-		List<BackCustomerDto> backCustomerDtos = orderMapper.selectBackCustomerByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
-		//回头用户
-		Set<String> backCustomerId = new HashSet<>();
-		//二次回头用户
-		Set<String> backTwoCustomerId = new HashSet<>();
-		//多次回头用户
-		Set<String> backTwoMoreCustomerId = new HashSet<>();
-		if (!backCustomerDtos.isEmpty()) {
-			for (BackCustomerDto b : backCustomerDtos) {
-				backCustomerId.add(b.getCustomerId());
-				if (b.getNum() == 1) { //只要以前出现过一次那么就是二次回头用户 而非 ==2
-					backTwoCustomerId.add(b.getCustomerId());
-				} else if (b.getNum() > 1) {
-					backTwoMoreCustomerId.add(b.getCustomerId());
-				}
-			}
-		}
-		//查询当日已消费的订单
-		//回头用户的订单总数
-		int backCustomerOrderNum = 0;
-		//二次回头用户的订单总数
-		int backTwoCustomerOrderNum = 0;
-		//多次回头用户的订单总数
-		int backTwoMoreCustomerOderNum = 0;
-		//回头用户的订单总额
-		BigDecimal backCustomerOrderTotal = BigDecimal.ZERO;
-		//二次回头用户的订单总额
-		BigDecimal backTwoCustomerOrderTotal = BigDecimal.ZERO;
-		//多次回头用户的订单总额
-		BigDecimal backTwoMoreCustomerOrderTotal = BigDecimal.ZERO;
-		List<Order> orders = orderMapper.selectCompleteByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
-		if (!orders.isEmpty()) {
-			for (Order o : orders) {
-				if (o.getCreateTime().compareTo(todayBegin) > 0 && o.getCreateTime().compareTo(todayEnd) < 0) {//今日内订单
-					if (backCustomerId.contains(o.getCustomerId())) {
-						backCustomerOrderNum++;
-						backCustomerOrderTotal = backCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-					}
-					if (backTwoCustomerId.contains(o.getCustomerId())) {
-						backTwoCustomerOrderNum++;
-						backTwoCustomerOrderTotal = backTwoCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-					}
-					if (backTwoMoreCustomerId.contains(o.getCustomerId())) {
-						backTwoMoreCustomerOrderTotal = backTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-						backTwoMoreCustomerOderNum++;
-					}
-				}
-			}
-		}
-		//2定义resto订单
-		//本日resto订单总数 新增+回头
-		int todayRestoCount = backCustomerOrderNum + newCustomerOrderNum;
-		//本日resto订单总额
-		BigDecimal todayRestoTotal = BigDecimal.ZERO;
-		//本月resto订单总数
-		Set<String> monthRestoCount = new HashSet<>();
-		//本月resto订单总额
-		BigDecimal monthRestoTotal = BigDecimal.ZERO;
-		//定义折扣合计
-		BigDecimal discountTotal = BigDecimal.ZERO;
-		//红包
-		BigDecimal redPackTotal = BigDecimal.ZERO;
-		//优惠券
-		BigDecimal couponTotal = BigDecimal.ZERO;
-		//充值赠送
-		BigDecimal chargeReturn = BigDecimal.ZERO;
-		//折扣比率
-		String discountRatio = "";
-		//本日用户消费比率
-		String todayCustomerRatio = "";
-		//回头用户消费比率
-		String todayBackCustomerRatio = "";
-		//新增用户比率
-		String todayNewCustomerRatio = "";
-
-		List<Order> monthOrders = orderMapper.selectListsmsByShopId(begin, end, shopDetail.getId());
-		if (!monthOrders.isEmpty()) {
-			for (Order o : monthOrders) {
-				//封装   1.resto订单总额     3.resto订单总数  4订单中的实收总额  5新增用户的订单总额  6自然到店的用户总额  7分享到店的用户总额
-				//8回头用户的订单总额  9二次回头用户的订单总额  10多次回头用户的订单总额 11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-				//本日 begin-----------------------
-				// if (DateUtil.getDayByToday(o.getCreateTime()).contains(2)) {
-				/**
-				 * 报表数据中的订单数  如果子订单和父订单算是一个订单
-				 * 小程序+每日短信里的子订单和父订单算是两个订单
-				 *
-				 */
-
-				if (o.getCreateTime().compareTo(todayBegin) > 0 && o.getCreateTime().compareTo(todayEnd) < 0) {//今日内订单
-					//1.resto订单总额
-					todayRestoTotal = todayRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-
-					//11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-					if (!o.getOrderPaymentItems().isEmpty()) {
-						//订单支付项
-						for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
-							if (oi.getPaymentModeId() == PayMode.ACCOUNT_PAY) {
-								redPackTotal = redPackTotal.add(oi.getPayValue());
-							} else if (oi.getPaymentModeId() == PayMode.COUPON_PAY) {
-								couponTotal = couponTotal.add(oi.getPayValue());
-							} else if (oi.getPaymentModeId() == PayMode.REWARD_PAY) {
-								chargeReturn = chargeReturn.add(oi.getPayValue());
-							}
-						}
-					}
-					discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
-					if (todayRestoTotal.add(discountTotal).compareTo(BigDecimal.ZERO) > 0) {
-						discountRatio = discountTotal.divide(todayRestoTotal.add(discountTotal), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
-					}
-				}
-				//本日end----------
-				//本月开始------
-				//订单总额
-				monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				//本月结束
-			}
-		}
-
-		//本日用户消费比率 R+线下+外卖
-		//到店总笔数 线上+线下
-		double dmax = todayEnterCount + todayRestoCount;
-		if (dmax != 0) {
-			//本日用户消费比率
-			todayCustomerRatio = formatDouble((todayRestoCount / dmax) * 100);
-			//本日新增用户利率
-			todayNewCustomerRatio = formatDouble((newCustomerOrderNum / dmax) * 100);
-			//本日回头用户的消费比率
-			todayBackCustomerRatio = formatDouble((backCustomerOrderNum / dmax) * 100);
-		}
-
-		//五星
-		int fiveStar = 0;
-		//四星
-		int fourStar = 0;
-		//3星-1星
-		int oneToThreeStar = 0;
-		//3定义满意度
-		//本日满意度
-		String todaySatisfaction = "";
-		//本旬满意度
-		String theTenDaySatisfaction = "";
-		//本月满意度
-		String monthSatisfaction = "";
-
-		int dayAppraiseNum = 0;//当日评价的总单数
-		int xunAppraiseNum = 0;//本旬评价的总单数
-		int monthAppraiseSum = 0;//本月评价的单数
-
-		double dayAppraiseSum = 0;//当日所有评价的总分数
-		double xunAppraiseSum = 0;//上旬所有评价的总分数
-		double monthAppraiseNum = 0;//本月所有评价的总分数
-
-		/**
-		 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
-		 * 去评价 而现在 是查当天下单当天评价
-		 *
-		 *
-		 */
-
-		//单独查询评价和分数
-
-		List<Appraise> appraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), begin, end);
-
-		if (!appraises.isEmpty()) {
-			for (Appraise a : appraises) {
-				//本日 begin-----------------------
-				if (DateUtil.getDayByToday(a.getCreateTime()).contains(2)) {
-					dayAppraiseNum++;
-					dayAppraiseSum += a.getLevel() * 20;
-					if (a.getLevel() == 5) {
-						fiveStar++;
-					} else if (a.getLevel() == 4) {
-						fourStar++;
-					} else {
-						oneToThreeStar++;
-					}
-				}
-				//本旬开始
-				if (DateUtil.getDayByToday(a.getCreateTime()).contains(12)) {
-					//2.满意度
-					xunAppraiseNum++;
-					xunAppraiseSum += a.getLevel() * 20;
-				}
-				//本旬结束
-
-				//本月开始------
-				//.满意度
-
-				monthAppraiseNum++;
-				monthAppraiseSum += a.getLevel() * 20;
-
-				//本月结束
-			}
-			//循环完之后操作--
-			if (dayAppraiseNum != 0) {
-				todaySatisfaction = formatDouble(dayAppraiseSum / dayAppraiseNum);
-			}
-			if (xunAppraiseNum != 0) {
-				theTenDaySatisfaction = formatDouble(xunAppraiseSum / xunAppraiseNum);
-			}
-
-			if (monthAppraiseNum != 0) {
-				monthSatisfaction = formatDouble(monthAppraiseSum / monthAppraiseNum);
-			}
-
-			//评论结束------------------------
-		}
-
-		//发送本日信息 本月信息 上旬信息
-		//本日信息
-		StringBuilder todayContent = new StringBuilder();
-
-		todayContent.append("{")
-				.append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
-				.append("datetime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd")).append("'").append(",")
-				//到店总笔数(r+线下)-----
-				.append("arriveCount:").append("'").append(todayEnterCount + todayRestoCount).append("'").append(",")
-				//到店消费总额 我们的总额+线下的总额，不包含外卖金额
-				.append("arriveTotalAmount:").append("'").append(todayEnterTotal.add(todayRestoTotal)).append("'").append(",")
-				//用户消费笔数  R+订单总数
-				.append("customerPayCount:").append("'").append(todayRestoCount).append("'").append(",")
-				//用户消费金额: (r+订单总额)
-				.append("customerPayAmount:").append("'").append(todayRestoTotal).append("'").append(",")
-				//用户消费比率  今日 R+订单总数/（R+订单总数+线下堂吃订单数+外卖订单数））
-				.append("userPayPercent:").append("'").append(todayCustomerRatio).append("%").append("'").append(",")
-				//回头消费比率 R+多次消费用户数/R+消费用户数）
-				.append("userBackPercent:").append("'").append(todayBackCustomerRatio).append("%").append("'").append(",")
-				//新增用户比率 （今日 R+新增用户数/R+消费用户数）
-				.append("newCustomerPercent:").append("'").append(todayNewCustomerRatio).append("%").append("'").append(",")
-				//新用户消费
-				.append("newCustomerPay:").append("'").append(newCustomerOrderNum).append("笔/").append(newCustomerOrderTotal).append("'").append(",")
-				// 其中自然用户
-				.append("natureCustomerPay:").append("'").append(newNormalCustomerOrderNum).append("笔/").append(newNormalCustomerOrderTotal).append("'").append(",")
-				//其中分享用户
-				.append("shareCustomerPay:").append("'").append(newShareCustomerOrderNum).append("笔/").append(newShareCustomerOrderTotal).append("'").append(",")
-				//回头用户消费
-				.append("customerBackPay:").append("'").append(backCustomerOrderNum).append("笔/").append(backCustomerOrderTotal).append("'").append(",")
-				//二次回头用户
-				.append("secondBackPay:").append("'").append(backTwoCustomerOrderNum).append("笔/").append(backTwoCustomerOrderTotal).append("'").append(",")
-				//多次回头
-				.append("moreBackPay:").append("'").append(backTwoMoreCustomerOderNum).append("笔/").append(backTwoMoreCustomerOrderTotal).append("'").append(",")
-				//折扣合计:648.05（使用红包总额+使用优惠券总额+使用充值赠送总额）
-				.append("discountTotal:").append("'").append(discountTotal).append("'").append(",")
-				//红包
-				.append("redPayTotal:").append("'").append(redPackTotal).append("'").append(",")
-				//优惠券
-				.append("couponTotal:").append("'").append(couponTotal).append("'").append(",")
-				//充值赠送
-				.append("chargeTotal:").append("'").append(chargeReturn).append("'").append(",")
-				//折扣比率2.7%（折扣合计/(堂吃消费总额＋折扣合计)
-				.append("discountPercent:").append("'").append(discountRatio).append("%").append("'").append(",")
-				//五星评论
-				.append("goodCount:").append("'").append(fiveStar).append("'").append(",")
-				//本日改进意见
-				.append("badCount:").append("'").append(fourStar).append("'").append(",")
-				//本日差评投诉
-				.append("terribleCount:").append("'").append(oneToThreeStar).append("'").append(",")
-				//本日满意度
-				.append("satisfied1:").append("'").append(todaySatisfaction).append("'").append(",")
-				//本旬满意度
-				.append("satisfied2:").append("'").append(theTenDaySatisfaction).append("'").append(",")
-				//本月满意度
-				.append("satisfied3:").append("'").append(monthSatisfaction).append("'").append(",")
-				//今日外卖金额
-				.append("outFoodTotal:").append("'").append(todayOrderBooks).append("'").append(",")
-				//总营业额
-				.append("totalOrderMoney:").append("'").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("'").append(",")
-				//本月总额
-				.append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("'")
-				.append("}");
-
-		//封装微信推送文本
-		StringBuilder sb = new StringBuilder();
-		sb
-				.append("店铺名称:").append(shopDetail.getName()).append("\n")
-				.append("时间:").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss")).append("\n")
-				.append("到店总笔数:").append(todayEnterCount + todayRestoCount).append("\n")
-				.append("到店消费总额:").append(todayEnterTotal.add(todayRestoTotal)).append("\n")
-				.append("---------------------").append("\n")
-				.append("用户消费比数:").append(todayRestoCount).append("\n")
-				.append("用户消费金额").append(todayRestoTotal).append("\n")
-				.append("---------------------").append("\n")
-				.append("用户消费比率:").append(todayCustomerRatio).append("%").append("\n")
-				.append("回头消费比率:").append(todayBackCustomerRatio).append("%").append("\n")
-				.append("新增用户比率:").append(todayNewCustomerRatio).append("%").append("\n")
-				.append("---------------------").append("\n")
-				.append("新用户消费:").append(newCustomerOrderNum).append("笔/").append(newCustomerOrderTotal).append("\n")
-				.append("其中自然用户:").append(newNormalCustomerOrderNum).append("笔/").append(newNormalCustomerOrderTotal).append("\n")
-				.append("其中分享用户:").append(newShareCustomerOrderNum).append("笔/").append(newShareCustomerOrderTotal).append("\n")
-				.append("回头用户消费:").append(backCustomerOrderNum).append("笔/").append(backCustomerOrderTotal).append("\n")
-				.append("二次回头用户:").append(backTwoCustomerOrderNum).append("笔/").append(backTwoCustomerOrderTotal).append("\n")
-				.append("多次回头用户:").append(backTwoMoreCustomerOderNum).append("笔/").append(backTwoMoreCustomerOrderTotal).append("\n")
-				.append("---------------------").append("\n")
-				.append("折扣合计:").append(discountTotal).append("\n")
-				.append("红包:").append(redPackTotal).append("\n")
-				.append("优惠券:").append(couponTotal).append("\n")
-				.append("充值赠送:").append(chargeReturn).append("\n")
-				.append("折扣比率").append(discountRatio).append("\n")
-				.append("---------------------").append("\n")
-				.append("本日五星评论:").append(fiveStar).append("\n")
-				.append("本日更改意见:").append(fourStar).append("\n")
-				.append("本日差评投诉:").append(oneToThreeStar).append("\n")
-				.append("本日满意度:").append(todaySatisfaction).append("\n")
-				.append("本旬满意度:").append(theTenDaySatisfaction).append("\n")
-				.append("本月满意度:").append(monthSatisfaction).append("\n")
-				.append("---------------------").append("\n")
-				.append("今日外卖金额:").append(todayOrderBooks).append("\n")
-				.append("今日总营业额:").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("\n")
-				.append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("\n");
-
-		Map<String, String> map = new HashMap<>();
-		map.put("sms", todayContent.toString());
-		map.put("wechat", sb.toString());
-		return map;
-	}
-
-	private void insertDateData(ShopDetail shopDetail, OffLineOrder offLineOrder, Wether wether,Brand brand) {
-		// 查询该店铺是否结过店
-		OffLineOrder offLineOrder1 = offLineOrderMapper.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopDetail.getId(), DateUtil.getDateBegin(new Date()), DateUtil.getDateEnd(new Date()));
-		if (null != offLineOrder1) {
-			offLineOrder1.setState(0);
-			offLineOrderMapper.updateByPrimaryKeySelective(offLineOrder1);
-		}
-		offLineOrder.setId(ApplicationUtils.randomUUID());
-		offLineOrder.setState(1);
-		offLineOrder.setResource(OfflineOrderSource.OFFLINE_POS);
-		offLineOrderMapper.insertSelective(offLineOrder);
-
-		//----1.定义时间---
-		Date todayBegin = DateUtil.getDateBegin(new Date());
-		Date todayEnd = DateUtil.getDateEnd(new Date());
-
-		//本月的开始时间 本月结束时间
-		String begin = DateUtil.getMonthBegin();
-		Date monthBegin = DateUtil.getDateBegin(DateUtil.fomatDate(begin));
-		Date monthEnd = todayEnd;
-
-		//旬开始时间 旬结束时间
-
-		Date xunBegin = new Date() ;
-		Date xunEnd = todayEnd;
-
-		int temp = DateUtil.getEarlyMidLate(new Date());//1.上旬 2.中旬 3下旬
-		if(temp==1){
-			xunBegin = monthBegin;
-		}else if(temp==2){
-			xunBegin = DateUtil.getAfterDayDate(monthBegin,10);
-		}else if(temp==3){
-			xunBegin = DateUtil.getAfterDayDate(monthBegin,20);
-		}
-
-		//三.定义线下订单
-		//本日线下订单总数(堂吃)
-		int todayEnterCount = 0;
-		//本日线下订单总额(堂吃)
-		BigDecimal todayEnterTotal = BigDecimal.ZERO;
-
-		//本旬线下订单总数(堂吃)
-		int xunEnterCount = 0;
-		//本旬线下订单总额(堂吃)
-		BigDecimal xunEnterTotal = BigDecimal.ZERO;
-
-		//本月线下订单总数
-		int monthEnterCount = 0;
-		//本月线下订单总额
-		BigDecimal monthEnterTotal = BigDecimal.ZERO;
-
-		//4.外卖订单
-		//本日外卖订单数
-		int todayDeliverOrders = 0;
-		//本日外卖订单总额
-		BigDecimal todayOrderBooks = BigDecimal.ZERO;
-
-		//本旬外卖订单数
-		int xunDeliverOrders = 0;
-		//本旬外卖订单总额
-		BigDecimal xunOrderBooks = BigDecimal.ZERO;
-
-		//本月外卖订单数
-		int monthDeliverOrders = 0;
-		//本月外卖订单总额
-		BigDecimal monthOrderBooks = BigDecimal.ZERO;
-		//查询pos端店铺录入信息(线下订单+外卖订单都是pos端录入的)
-
-		//查询本日店铺录入信息(线下订单+外卖订单都是pos端录入的)
-		List<OffLineOrder> todayOffLineOrderList = offLineOrderMapper.selectlistByTimeSourceAndShopId(shopDetail.getId(), todayBegin,todayEnd, OfflineOrderSource.OFFLINE_POS);
-		if (!todayOffLineOrderList.isEmpty()) {
-			for (OffLineOrder of : todayOffLineOrderList) {
-				todayEnterCount += of.getEnterCount();
-				todayEnterTotal = todayEnterTotal.add(of.getEnterTotal());
-				todayDeliverOrders += of.getDeliveryOrders();
-				todayOrderBooks = todayOrderBooks.add(of.getOrderBooks());
-			}
-		}
-
-		//查询本旬店铺录入信息(线下订单+外卖订单都是pos端录入的)
-		List<OffLineOrder> xunOffLineOrderList = offLineOrderMapper.selectlistByTimeSourceAndShopId(shopDetail.getId(), xunBegin, xunEnd, OfflineOrderSource.OFFLINE_POS);
-		if (!xunOffLineOrderList.isEmpty()) {
-			for (OffLineOrder of : xunOffLineOrderList) {
-				xunEnterCount += of.getEnterCount();
-				xunEnterTotal = xunEnterTotal.add(of.getEnterTotal());
-				xunDeliverOrders += of.getDeliveryOrders();
-				xunOrderBooks = xunOrderBooks.add(of.getOrderBooks());
-			}
-		}
-
-		//查询本月店铺录入信息(线下订单+外卖订单都是pos端录入的)
-		List<OffLineOrder> monthOffLineOrderList = offLineOrderMapper.selectlistByTimeSourceAndShopId(shopDetail.getId(), monthBegin, monthEnd, OfflineOrderSource.OFFLINE_POS);
-		if (!monthOffLineOrderList.isEmpty()) {
-			for (OffLineOrder of : monthOffLineOrderList) {
-				monthEnterCount += of.getEnterCount();
-				monthEnterTotal = monthEnterTotal.add(of.getEnterTotal());
-				monthDeliverOrders += of.getDeliveryOrders();
-				monthOrderBooks = monthOrderBooks.add(of.getOrderBooks());
-			}
-		}
-
-		//查询当日新增用户的订单
-		List<Order> todayNewCustomerOrders = orderMapper.selectNewCustomerOrderByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
-		//新增用户的订单总数
-		int todayNewCustomerOrderNum = 0;
-		//新增用户的订单总额
-		BigDecimal todayNewCustomerOrderTotal = BigDecimal.ZERO;
-		//新增分享用户的的订单总数
-		int todayNewShareCustomerOrderNum = 0;
-		//新增分享用户的订单总额
-		BigDecimal  todayNewShareCustomerOrderTotal = BigDecimal.ZERO;
-		//新增自然用户的订单总数
-		int  todayNewNormalCustomerOrderNum = 0;
-		//新增自然用户的订单总额
-		BigDecimal  todayNewNormalCustomerOrderTotal = BigDecimal.ZERO;
-		if (!todayNewCustomerOrders.isEmpty()) {
-			for (Order o : todayNewCustomerOrders) {
-				todayNewCustomerOrderNum++;
-				todayNewCustomerOrderTotal = todayNewCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
-					todayNewShareCustomerOrderNum++;
-					todayNewShareCustomerOrderTotal = todayNewShareCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				} else {
-					todayNewNormalCustomerOrderNum++; //是新增用户
-					todayNewNormalCustomerOrderTotal = todayNewNormalCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				}
-			}
-		}
-
-
-		//查询回头用户的
-		List<BackCustomerDto> todayBackCustomerDtos = orderMapper.selectBackCustomerByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
-		//回头用户
-		Set<String> todayBackCustomerId = new HashSet<>();
-		//二次回头用户
-		Set<String> todayBackTwoCustomerId = new HashSet<>();
-		//多次回头用户
-		Set<String> todayBackTwoMoreCustomerId = new HashSet<>();
-		if (!todayBackCustomerDtos.isEmpty()) {
-			for (BackCustomerDto b : todayBackCustomerDtos) {
-				todayBackCustomerId.add(b.getCustomerId());
-				if (b.getNum() == 1) { //只要以前出现过一次那么就是二次回头用户 而非 ==2
-					todayBackTwoCustomerId.add(b.getCustomerId());
-				} else if (b.getNum() > 1) {
-					todayBackTwoMoreCustomerId.add(b.getCustomerId());
-				}
-			}
-		}
-		//查询当日已消费的订单
-		//回头用户的订单总数
-		int todayBackCustomerOrderNum = 0;
-		//二次回头用户的订单总数
-		int  todayBackTwoCustomerOrderNum = 0;
-		//多次回头用户的订单总数
-		int  todayBackTwoMoreCustomerOderNum = 0;
-		//回头用户的订单总额
-		BigDecimal  todayBackCustomerOrderTotal = BigDecimal.ZERO;
-		//二次回头用户的订单总额
-		BigDecimal todayBackTwoCustomerOrderTotal = BigDecimal.ZERO;
-		//多次回头用户的订单总额
-		BigDecimal todayBackTwoMoreCustomerOrderTotal = BigDecimal.ZERO;
-		List<Order> orders = orderMapper.selectCompleteByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
-		if (!orders.isEmpty()) {
-			for (Order o : orders) {
-				if (todayBackCustomerId.contains(o.getCustomerId())) {
-					todayBackCustomerOrderNum++;
-					todayBackCustomerOrderTotal = todayBackCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				}
-				if (todayBackTwoCustomerId.contains(o.getCustomerId())) {
-					todayBackTwoCustomerOrderNum++;
-					todayBackTwoCustomerOrderTotal = todayBackTwoCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				}
-				if (todayBackTwoMoreCustomerId.contains(o.getCustomerId())) {
-					todayBackTwoMoreCustomerOrderTotal = todayBackTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-					todayBackTwoMoreCustomerOderNum++;
-				}
-			}
-		}
-		//2定义resto订单
-		//本日resto订单总数
-		int todayRestoCount = todayNewCustomerOrderNum+todayBackCustomerOrderNum;
-
-		//本日resto订单总额
-		BigDecimal todayRestoTotal = BigDecimal.ZERO;
-		//本月resto订单总数
-		Set<String> monthRestoCount = new HashSet<>();
-		//本月resto订单总额
-		BigDecimal monthRestoTotal = BigDecimal.ZERO;
-		//定义折扣合计
-		BigDecimal discountTotal = BigDecimal.ZERO;
-		//红包
-		BigDecimal redPackTotal = BigDecimal.ZERO;
-		//优惠券
-		BigDecimal couponTotal = BigDecimal.ZERO;
-		//充值赠送
-		BigDecimal chargeReturn = BigDecimal.ZERO;
-		//折扣比率
-		String discountRatio = "";
-		//本日用户消费比率
-		String todayCustomerRatio = "";
-		//回头用户消费比率
-		String todayBackCustomerRatio = "";
-		//新增用户比率
-		String todayNewCustomerRatio = "";
-
-		List<Order> monthOrders = orderMapper.selectListsmsByShopId(monthBegin, monthEnd, shopDetail.getId());
-		if (!monthOrders.isEmpty()) {
-			for (Order o : monthOrders) {
-				//封装   1.resto订单总额     3.resto订单总数  4订单中的实收总额  5新增用户的订单总额  6自然到店的用户总额  7分享到店的用户总额
-				//8回头用户的订单总额  9二次回头用户的订单总额  10多次回头用户的订单总额 11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-				//本日 begin-----------------------
-				// if (DateUtil.getDayByToday(o.getCreateTime()).contains(2)) {
-				/**
-				 * 报表数据中的订单数  如果子订单和父订单算是一个订单
-				 * 小程序+每日短信里的子订单和父订单算是两个订单
-				 *
-				 */
-				List<Integer> getTime = DateUtil.getDayByToday(o.getCreateTime());
-				if (getTime.contains(2)) {//今日内订单
-					//1.resto订单总额
-					todayRestoTotal = todayRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-					//11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-					if (!o.getOrderPaymentItems().isEmpty()) {
-						//订单支付项
-						for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
-							if (oi.getPaymentModeId() == PayMode.ACCOUNT_PAY) {
-								redPackTotal = redPackTotal.add(oi.getPayValue());
-							} else if (oi.getPaymentModeId() == PayMode.COUPON_PAY) {
-								couponTotal = couponTotal.add(oi.getPayValue());
-							} else if (oi.getPaymentModeId() == PayMode.REWARD_PAY) {
-								chargeReturn = chargeReturn.add(oi.getPayValue());
-							}
-						}
-					}
-					discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
-					if (todayRestoTotal.add(discountTotal).compareTo(BigDecimal.ZERO) > 0) {
-						discountRatio = discountTotal.divide(todayRestoTotal.add(discountTotal), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
-					}
-				}
-				//本日end----------
-				//本月开始------
-				//订单总额
-				monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				//本月结束
-			}
-		}
-
-		//本日用户消费比率 R+线下+外卖
-		//到店总笔数 线上+线下
-		double dmax = todayEnterCount + todayRestoCount;
-		if (dmax != 0) {
-			//本日用户消费比率
-			todayCustomerRatio = formatDouble((todayRestoCount / dmax) * 100);
-			//本日新增用户利率
-			todayNewCustomerRatio = formatDouble((todayNewCustomerOrderNum / dmax) * 100);
-			//本日回头用户的消费比率
-			todayBackCustomerRatio = formatDouble((todayBackCustomerOrderNum / dmax) * 100);
-		}
-
-		//本日五星
-		int todayFiveStar = 0;
-		//本日四星
-		int todayFourStar = 0;
-		//本日3星-1星
-		int todayOneToThreeStar = 0;
-
-		//本旬五星
-		int xunFiveStar = 0;
-		//本旬四星
-		int xunFourStar = 0;
-		//本旬3星-1星
-		int xunOneToThreeStar = 0;
-
-		//本月五星
-		int monthFiveStar = 0;
-		//本月四星
-		int monthFourStar = 0;
-		//本月3星-1星
-		int monthOneToThreeStar = 0;
-
-
-		//3定义满意度
-		//本日满意度
-		String todaySatisfaction = "";
-		//本旬满意度
-		String xunSatisfaction = "";
-		//本月满意度
-		String monthSatisfaction = "";
-
-		int todayAppraiseNum = 0;//当日评价的总单数
-		int xunAppraiseNum = 0;//本旬评价的总单数
-		int monthAppraiseSum = 0;//本月评价的单数
-
-		double todayAppraiseSum = 0;//当日所有评价的总分数
-		double xunAppraiseSum = 0;//上旬所有评价的总分数
-		double monthAppraiseNum = 0;//本月所有评价的总分数
-
-		/**
-		 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
-		 * 去评价 而现在 是查当天下单当天评价
-		 *
-		 *
-		 */
-
-		//单独查询评价和分数
-
-		//查本日
-		List<Appraise> todayAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), todayBegin, todayEnd);
-		//存评论数据
-		if(!todayAppraises.isEmpty()){
-			for(Appraise a:todayAppraises){
-				JdbcSmsUtils.saveTodayAppraise(a,brand.getId(),shopDetail.getId());
-			}
-
-		}
-
-
-		if (!todayAppraises.isEmpty()) {
-			for (Appraise a : todayAppraises) {
-				//本日 begin-----------------------
-				todayAppraiseNum++;
-				todayAppraiseSum += a.getLevel() * 20;
-				if (a.getLevel() == 5) {
-					todayFiveStar++;
-				} else if (a.getLevel() == 4) {
-					todayFourStar++;
-				} else {
-					todayOneToThreeStar++;
-				}
-			}
-
-			//循环完之后操作--
-			if (todayAppraiseNum != 0) {
-				todaySatisfaction = formatDouble(todayAppraiseSum / todayAppraiseNum);
-			}
-
-		}
-
-		//查本旬
-		List<Appraise> xunAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), xunBegin, xunEnd);
-
-		if (!xunAppraises.isEmpty()) {
-			for (Appraise a : xunAppraises) {
-				//本旬 begin-----------------------
-				xunAppraiseNum++;
-				xunAppraiseSum += a.getLevel() * 20;
-				if (a.getLevel() == 5) {
-					xunFiveStar++;
-				} else if (a.getLevel() == 4) {
-					xunFourStar++;
-				} else {
-					xunOneToThreeStar++;
-				}
-			}
-
-			//循环完之后操作--
-			if (xunAppraiseNum != 0) {
-				xunSatisfaction = formatDouble(xunAppraiseSum / xunAppraiseNum);
-			}
-
-		}
-
-		//查本月
-		List<Appraise> monthAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), monthBegin, monthEnd);
-
-		if (!monthAppraises.isEmpty()) {
-			for (Appraise a : monthAppraises) {
-				//本月 begin-----------------------
-				monthAppraiseNum++;
-				monthAppraiseSum += a.getLevel() * 20;
-				if (a.getLevel() == 5) {
-					monthFiveStar++;
-				} else if (a.getLevel() == 4) {
-					monthFourStar++;
-				} else {
-					monthOneToThreeStar++;
-				}
-			}
-
-			//循环完之后操作--
-			if (monthAppraiseNum != 0) {
-				monthSatisfaction = formatDouble(monthAppraiseSum / monthAppraiseNum);
-			}
-
-		}
-
-		//存满意度
-		JdbcSmsUtils.saveStations(todaySatisfaction,xunSatisfaction,monthSatisfaction,brand.getId(),shopDetail.getId());
-
-
-		//查询菜品今日top10
-		//1.查询好评的总数(本日)
-		int  todayGoodNum = 0;
-		todayGoodNum = articleTopService.selectSumGoodByTime(todayBegin, todayEnd, shopDetail.getId());
-		//查询差评总数
-		int todayBadNum = 0;
-		todayBadNum = articleTopService.selectSumBadByTime(todayBegin, todayEnd, shopDetail.getId());
-
-		//查询好评top10
-		List<ArticleTopDto> todayGoodList = articleTopService.selectListByTimeAndGoodType(todayBegin, todayEnd, shopDetail.getId());
-
-		//查询差评top10
-		List<ArticleTopDto> todayBadList = articleTopService.selectListByTimeAndBadType(todayBegin, todayEnd, shopDetail.getId());
-
-		//yz 2017-07-25 dayDataMessage 被merge了
-		//存储结店数据
-		int times=1;//默认是今天第一次结店  次数存redis中 之后++
-		DayDataMessage ds = new DayDataMessage();
-		ds.setId(ApplicationUtils.randomUUID());
-		ds.setShopId(shopDetail.getId());
-		ds.setType(DayMessageType.DAY_TYPE);//日结
-		ds.setShopName(shopDetail.getName());
-		ds.setWeekDay(wether.getWeekady());
-		ds.setDate(new Date());
-		ds.setTimes(times);//当日结店次数
-		ds.setWether(wether.getDayWeather());
-		ds.setTemperature(wether.getDayTemperature());
-		ds.setOrderNumber(todayEnterCount + todayRestoCount);//到店总笔数
-		ds.setOrderSum(todayEnterTotal.add(todayRestoTotal));//到店消费总额
-		ds.setCustomerOrderNumber(todayRestoCount);
-		ds.setCustomerOrderSum(todayRestoTotal);
-		ds.setCustomerOrderRatio(todayCustomerRatio+"%");
-		ds.setNewCustomerOrderRatio(todayNewCustomerRatio+"%");
-		ds.setBackCustomerOrderRatio(todayBackCustomerRatio+"%");
-		ds.setNewCuostomerOrderNum(todayNewCustomerOrderNum);//新用户订单数
-		ds.setNewCustomerOrderSum(todayNewCustomerOrderTotal);
-		ds.setNewNormalCustomerOrderNum(todayNewNormalCustomerOrderNum);
-		ds.setNewNormalCustomerOrderSum(todayNewNormalCustomerOrderTotal);
-		ds.setNewShareCustomerOrderNum(todayNewShareCustomerOrderNum);
-		ds.setNewShareCustomerOrderSum(todayNewShareCustomerOrderTotal);
-		ds.setBackCustomerOrderNum(todayBackCustomerOrderNum);
-		ds.setBackCustomerOrderSum(todayBackCustomerOrderTotal);
-		ds.setBackTwoCustomerOrderNum(todayBackTwoCustomerOrderNum);
-		ds.setBackTwoCustomerOrderSum(todayBackTwoCustomerOrderTotal);
-		ds.setBackTwoMoreCustomerOrderNum(todayBackTwoMoreCustomerOderNum);
-		ds.setBackTwoMoreCustomerOrderSum(todayBackTwoMoreCustomerOrderTotal);
-		ds.setDiscountTotal(discountTotal);
-		ds.setRedPack(redPackTotal);
-		ds.setCoupon(couponTotal);
-		ds.setChargeReward(chargeReturn);
-		ds.setDiscountRatio(discountRatio);
-		ds.setTakeawayTotal(todayOrderBooks);
-		ds.setBussinessTotal(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks));//本日营业总额
-		ds.setMonthTotal(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal));//本月营业总额
-		dayDataMessageService.insert(ds);
-		JdbcSmsUtils.saveDayDataMessage(ds,shopDetail.getId());
-
-
-		//存今日goodTop10
-		if(todayGoodList!=null&&!todayGoodList.isEmpty()){
-			for(int i=0;i<todayGoodList.size();i++){
-				JdbcSmsUtils.saveGoodTop(todayGoodList.get(i),brand,shopDetail,MessageType.DAY_MESSAGE,todayGoodNum,(i+1));
-			}
-
-		}
-
-		//存今日BadTop10
-		if(todayBadList!=null&&!todayBadList.isEmpty()){
-			for(int i=0;i<todayBadList.size();i++){
-				JdbcSmsUtils.saveBadTop(todayBadList.get(i),brand,shopDetail,MessageType.DAY_MESSAGE,todayBadNum,(i+1));
-			}
-
-		}
-
-		//查询菜品本旬top10
-		//1.查询好评的总数(本日)
-		int  xunGoodNum = 0;
-		xunGoodNum = articleTopService.selectSumGoodByTime(xunBegin, xunEnd, shopDetail.getId());
-		//查询差评总数
-		int xunBadNum = 0;
-		xunBadNum = articleTopService.selectSumBadByTime(xunBegin, xunEnd, shopDetail.getId());
-
-		//查询好评top10
-		List<ArticleTopDto> xunGoodList = articleTopService.selectListByTimeAndGoodType(xunBegin, xunEnd, shopDetail.getId());
-
-		//查询差评top10
-		List<ArticleTopDto> xunBadList = articleTopService.selectListByTimeAndBadType(xunBegin, xunEnd, shopDetail.getId());
-
-		//存本旬goodTop10
-		if(xunGoodList!=null&&!xunGoodList.isEmpty()){
-			for(int i=0;i<xunGoodList.size();i++){
-				JdbcSmsUtils.saveGoodTop(xunGoodList.get(i),brand,shopDetail,MessageType.XUN_MESSAGE,xunGoodNum,(i+1));
-			}
-
-		}
-
-		//存本旬BadTop10
-		if(xunBadList!=null&&!xunBadList.isEmpty()){
-			for(int i=0;i<xunBadList.size();i++){
-				JdbcSmsUtils.saveBadTop(xunBadList.get(i),brand,shopDetail,MessageType.XUN_MESSAGE,xunBadNum,(i+1));
-			}
-
-		}
-
-
-		//查询菜品本月top10
-		//1.查询好评的总数(本月)
-		int  monthGoodNum = 0;
-		monthGoodNum = articleTopService.selectSumGoodByTime(monthBegin, monthEnd, shopDetail.getId());
-		//查询差评总数
-		int monthBadNum = 0;
-		monthBadNum = articleTopService.selectSumBadByTime(monthBegin, monthEnd, shopDetail.getId());
-
-		//查询好评top10
-		List<ArticleTopDto> monthGoodList = articleTopService.selectListByTimeAndGoodType(monthBegin, monthEnd, shopDetail.getId());
-
-		//查询差评top10
-		List<ArticleTopDto> monthBadList = articleTopService.selectListByTimeAndBadType(monthBegin, monthEnd, shopDetail.getId());
-
-		//存本月goodTop10
-		if(monthGoodList!=null&&!monthGoodList.isEmpty()){
-			for(int i=0;i<monthGoodList.size();i++){
-				JdbcSmsUtils.saveGoodTop(monthGoodList.get(i),brand,shopDetail,MessageType.MONTH_MESSAGE,monthGoodNum,(i+1));
-			}
-
-		}
-
-		//存本月BadTop10
-		if(monthBadList!=null&&!monthBadList.isEmpty()){
-			for(int i=0;i<monthBadList.size();i++){
-				JdbcSmsUtils.saveBadTop(monthBadList.get(i),brand,shopDetail,MessageType.MONTH_MESSAGE,monthBadNum,(i+1));
-			}
-
-		}
-
-		//存评论数据
-		DayAppraiseMessageWithBLOBs dm = new DayAppraiseMessageWithBLOBs();
-		dm.setId(ApplicationUtils.randomUUID());
-		dm.setShopId(shopDetail.getId());
-		dm.setShopName(shopDetail.getName());
-		dm.setDate(new Date());
-		dm.setState(true);
-		dm.setWether(wether.getDayWeather());
-		dm.setWeekDay(wether.getWeekady());
-		dm.setTemperature(wether.getDayTemperature());
-		dm.setType(DayMessageType.DAY_TYPE);
-		dm.setFiveStar(todayFiveStar);
-		dm.setFourStar(todayFourStar);
-		dm.setOneThreeStar(todayOneToThreeStar);
-		dm.setDaySatisfaction(todaySatisfaction);
-		dm.setXunSatisfaction(xunSatisfaction);
-		dm.setMonthSatisfaction(monthSatisfaction);
-		if (todayGoodNum == 0) {//无好评
-			dm.setRedList("----无好评----");
-		} else {
-			if (!todayGoodList.isEmpty()) {
-				com.alibaba.fastjson.JSONObject redJson = new com.alibaba.fastjson.JSONObject();
-				for (int i = 0; i < todayGoodList.size(); i++) {
-					//1、27% 剁椒鱼头
-					// sbScore.append("top"+(i + 1)).append("：").append(NumberUtil.getFormat(todayGoodList.get(i).getNum(), todayGoodNum)).append("%").append(" ").append(todayGoodList.get(i).getName())
-					StringBuilder sb = new StringBuilder();
-					sb.append(NumberUtil.getFormat(todayGoodList.get(i).getNum(), todayGoodNum)).append("%").append(" ").append(todayGoodList.get(i).getName());
-					redJson.put("top"+(i+1),sb.toString());
-				}
-				dm.setRedList(com.alibaba.fastjson.JSONObject.toJSONString(redJson));
-			}
-		}
-		if (todayBadNum == 0) {//无差评
-			dm.setBadList("------无差评-----");
-		} else {
-			if (!todayBadList.isEmpty()) {
-				com.alibaba.fastjson.JSONObject bakcJson = new com.alibaba.fastjson.JSONObject();
-				for (int i = 0; i < todayBadList.size(); i++) {
-					//1、27% 剁椒鱼头
-					//sbScore.append("top"+(i + 1)).append("：").append(NumberUtil.getFormat(todayBadList.get(i).getNum(), todayBadNum)).append("%").append(" ").append(todayBadList.get(i).getName()).append("\n");
-					StringBuilder sb = new StringBuilder();
-					sb.append(NumberUtil.getFormat(todayBadList.get(i).getNum(), todayBadNum)).append("%").append(" ").append(todayBadList.get(i).getName());
-					bakcJson.put("top"+(i+1),sb.toString());
-				}
-				dm.setBadList(com.alibaba.fastjson.JSONObject.toJSONString(bakcJson));
-			}
-		}
-		dayAppraiseMessageService.insert(dm);
-
-
-	}
-
-	private void pushMessageByFirstEdtion(Map<String, String> querryMap, ShopDetail shopDetail, WechatConfig wechatConfig, String brandName) {
-		if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
-			//截取电话号码
-			String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
-			String[] tels = telephones.split(",");
-			for (String s : tels) {
-				String smsResult = SMSUtils.sendMessage(s, querryMap.get("sms"), "餐加", "SMS_46725122", null);//推送本日信息
-
-				System.err.println("短信返回内容："+smsResult);
-				//记录日志
-				LogTemplateUtils.dayMessageSms(brandName, shopDetail.getName(), s, smsResult);
-				Customer c = customerService.selectByTelePhone(s);
-				/**
-				 发送客服消息
-				 */
-				if (null != c) {
-					WeChatUtils.sendDayCustomerMsgASync(querryMap.get("wechat"), c.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret(), s, brandName, shopDetail.getName());
-				}
-			}
-
-		}
-	}
-
-	/**
-	 * 第一版日结短信 xun 结数据的封装
-	 * @param shopDetail
-	 * @return
-	 */
-	private Map<String,String> querryXunDataByFirstEditon(ShopDetail shopDetail) {
-		//----1.定义时间---
-		Date xunBegin = DateUtil.getAfterDayDate(new Date(), -10);
-		Date xunEnd = new Date();
-		//三.定义线下订单
-		//本旬线下订单总数(堂吃)
-		int xunEnterCount = 0;
-		//本旬线下订单总额(堂吃)
-		BigDecimal xunEnterTotal = BigDecimal.ZERO;
-		//4.外卖订单
-		//本旬外卖订单数
-		int xunDeliverOrders = 0;
-		//本旬外卖订单总额
-		BigDecimal xunOrderBooks = BigDecimal.ZERO;
-
-		//查询pos端店铺录入信息(线下订单+外卖订单都是pos端录入的)
-		List<OffLineOrder> offLineOrderList = offLineOrderMapper.selectlistByTimeSourceAndShopId(shopDetail.getId(), xunBegin, xunEnd, OfflineOrderSource.OFFLINE_POS);
-		if (!offLineOrderList.isEmpty()) {
-			for (OffLineOrder of : offLineOrderList) {
-				xunEnterTotal = xunEnterTotal.add(of.getEnterTotal());//
-				xunEnterCount += of.getEnterCount();
-				xunDeliverOrders += of.getDeliveryOrders();
-				xunOrderBooks = xunOrderBooks.add(of.getOrderBooks());
-			}
-		}
-		//查询本旬新增用户的订单
-		List<Order> newCustomerOrders = orderMapper.selectNewCustomerOrderByShopIdAndTime(shopDetail.getId(), xunBegin, xunEnd);
-		//新增用户的订单总数
-		int newCustomerOrderNum = 0;
-		//新增用户的订单总额
-		BigDecimal newCustomerOrderTotal = BigDecimal.ZERO;
-		//新增分享用户的的订单总数
-		int newShareCustomerOrderNum = 0;
-		//新增分享用户的订单总额
-		BigDecimal newShareCustomerOrderTotal = BigDecimal.ZERO;
-		//新增自然用户的订单总数
-		int newNormalCustomerOrderNum = 0;
-		//新增自然用户的订单总额
-		BigDecimal newNormalCustomerOrderTotal = BigDecimal.ZERO;
-		if (!newCustomerOrders.isEmpty()) {
-			for (Order o : newCustomerOrders) {
-				newCustomerOrderNum++;
-				newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
-					newShareCustomerOrderNum++;
-					newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				} else {
-					newNormalCustomerOrderNum++; //是新增用户
-					newNormalCustomerOrderTotal = newNormalCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				}
-			}
-		}
-		//查询回头用户的
-		List<BackCustomerDto> backCustomerDtos = orderMapper.selectBackCustomerByShopIdAndTime(shopDetail.getId(), xunBegin, xunEnd);
-		//回头用户
-		Set<String> backCustomerId = new HashSet<>();
-		//二次回头用户
-		Set<String> backTwoCustomerId = new HashSet<>();
-		//多次回头用户
-		Set<String> backTwoMoreCustomerId = new HashSet<>();
-		if (!backCustomerDtos.isEmpty()) {
-			for (BackCustomerDto b : backCustomerDtos) {
-				backCustomerId.add(b.getCustomerId());
-				if (b.getNum() == 1) { //只要以前出现过一次那么就是二次回头用户 而非 ==2
-					backTwoCustomerId.add(b.getCustomerId());
-				} else if (b.getNum() > 1) {
-					backTwoMoreCustomerId.add(b.getCustomerId());
-				}
-			}
-		}
-		//回头用户的订单总数
-		int backCustomerOrderNum = 0;
-		//二次回头用户的订单总数
-		int backTwoCustomerOrderNum = 0;
-		//多次回头用户的订单总数
-		int backTwoMoreCustomerOderNum = 0;
-		//回头用户的订单总额
-		BigDecimal backCustomerOrderTotal = BigDecimal.ZERO;
-		//二次回头用户的订单总额
-		BigDecimal backTwoCustomerOrderTotal = BigDecimal.ZERO;
-		//多次回头用户的订单总额
-		BigDecimal backTwoMoreCustomerOrderTotal = BigDecimal.ZERO;
-		List<Order> orders = orderMapper.selectCompleteByShopIdAndTime(shopDetail.getId(), xunBegin, xunEnd);
-		if (!orders.isEmpty()) {
-			for (Order o : orders) {
-				if (backCustomerId.contains(o.getCustomerId())) {
-					backCustomerOrderNum++;
-					backCustomerOrderTotal = backCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				}
-				if (backTwoCustomerId.contains(o.getCustomerId())) {
-					backTwoCustomerOrderNum++;
-					backTwoCustomerOrderTotal = backTwoCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				}
-				if (backTwoMoreCustomerId.contains(o.getCustomerId())) {
-					backTwoMoreCustomerOrderTotal = backTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-					backTwoMoreCustomerOderNum++;
-				}
-			}
-		}
-		//2定义resto订单
-		//本旬resto订单总数
-//        Set<String> xunRestoCount = new HashSet<>();
-		int xunRestoCount = newCustomerOrderNum + backCustomerOrderNum;
-
-		//本旬resto订单总额
-		BigDecimal xunRestoTotal = BigDecimal.ZERO;
-
-		//定义折扣合计
-		BigDecimal discountTotal = BigDecimal.ZERO;
-		//红包
-		BigDecimal redPackTotal = BigDecimal.ZERO;
-		//优惠券
-		BigDecimal couponTotal = BigDecimal.ZERO;
-		//充值赠送
-		BigDecimal chargeReturn = BigDecimal.ZERO;
-		//折扣比率
-		String discountRatio = "";
-		//本旬用户消费比率
-		String xunCustomerRatio = "";
-		//回头用户消费比率
-		String xunBackCustomerRatio = "";
-		//新增用户比率
-		String xunNewCustomerRatio = "";
-
-		List<Order> xunOrders = orderMapper.selectListsmsByShopId(xunBegin, xunEnd, shopDetail.getId());
-		if (!xunOrders.isEmpty()) {
-			for (Order o : xunOrders) {
-				//封装   1.resto订单总额     3.resto订单总数  4订单中的实收总额  5新增用户的订单总额  6自然到店的用户总额  7分享到店的用户总额
-				//8回头用户的订单总额  9二次回头用户的订单总额  10多次回头用户的订单总额 11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-				//本日 begin-----------------------
-				/**
-				 * 报表数据中的订单数  如果子订单和父订单算是一个订单
-				 * 小程序+每日短信里的子订单和父订单算是两个订单
-				 *
-				 */
-				//1.resto订单总额
-				xunRestoTotal = xunRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				//11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-				if (!o.getOrderPaymentItems().isEmpty()) {
-					//订单支付项
-					for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
-						if (oi.getPaymentModeId() == PayMode.ACCOUNT_PAY) {
-							redPackTotal = redPackTotal.add(oi.getPayValue());
-						} else if (oi.getPaymentModeId() == PayMode.COUPON_PAY) {
-							couponTotal = couponTotal.add(oi.getPayValue());
-						} else if (oi.getPaymentModeId() == PayMode.REWARD_PAY) {
-							chargeReturn = chargeReturn.add(oi.getPayValue());
-						}
-					}
-				}
-				discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
-				discountRatio = discountTotal.divide(xunRestoTotal.add(discountTotal), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
-			}
-		}
-
-		//本旬用户消费比率 R+线下+外卖
-		//到店总笔数 线上+线下
-		double dmax = xunEnterCount + xunRestoCount;
-		if (dmax != 0) {
-			//本旬用户消费比率
-			xunCustomerRatio = formatDouble((xunRestoCount / dmax) * 100);
-			//本旬新增用户利率
-			xunNewCustomerRatio = formatDouble((newCustomerOrderNum / dmax) * 100);
-			//本日回头用户的消费比率
-			xunBackCustomerRatio = formatDouble((backCustomerOrderNum / dmax) * 100);
-		}
-
-		//五星
-		int fiveStar = 0;
-		//四星
-		int fourStar = 0;
-		//3星-1星
-		int oneToThreeStar = 0;
-		//3定义满意度
-		//本旬满意度
-		String theTenDaySatisfaction = "";
-
-		int xunAppraiseNum = 0;//本旬评价的总单数
-		double xunAppraiseSum = 0;//本旬所有评价的总分数
-
-		/**
-		 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
-		 * 去评价 而现在 是查当天下单当天评价
-		 *
-		 *
-		 */
-
-		//单独查询评价和分数
-		List<Appraise> appraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), xunBegin, xunEnd);
-		if (!appraises.isEmpty()) {
-			for (Appraise a : appraises) {
-				xunAppraiseNum++;
-				xunAppraiseSum += a.getLevel() * 20;
-				if (a.getLevel() == 5) {
-					fiveStar++;
-				} else if (a.getLevel() == 4) {
-					fourStar++;
-				} else {
-					oneToThreeStar++;
-				}
-			}
-			if (xunAppraiseNum != 0) {
-				theTenDaySatisfaction = formatDouble(xunAppraiseSum / xunAppraiseNum);
-			}
-		}
-
-		BigDecimal xunChargeMoney = BigDecimal.ZERO;
-		//查询充值
-		List<ChargeOrder> chargeOrderList = chargeOrderService.selectByDateAndShopId(DateUtil.formatDate(xunBegin, "yyyy-MM-dd"), DateUtil.formatDate(xunEnd, "yyyy-MM-dd"), shopDetail.getId());
-		if (!chargeOrderList.isEmpty()) {
-			for (ChargeOrder c : chargeOrderList) {
-				xunChargeMoney = xunChargeMoney.add(c.getChargeMoney());
-			}
-		}
-
-		//查询菜品top10
-		//1.查询好评的总数(旬内)
-		int goodNum = 0;
-		goodNum = articleTopService.selectSumGoodByTime(xunBegin, xunEnd, shopDetail.getId());
-		//查询差评总数
-		int badNum = 0;
-		badNum = articleTopService.selectSumBadByTime(xunBegin, xunEnd, shopDetail.getId());
-
-		//查询好评top10
-		List<ArticleTopDto> goodList = articleTopService.selectListByTimeAndGoodType(xunBegin, xunEnd, shopDetail.getId());
-
-		//查询差评top10
-		List<ArticleTopDto> badList = articleTopService.selectListByTimeAndBadType(xunBegin, xunEnd, shopDetail.getId());
-
-		//封装微信推送文本
-		StringBuilder sb = new StringBuilder();
-		sb
-				.append("店铺名称:").append(shopDetail.getName()).append("\n")
-				.append("时间:").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss")).append("\n")
-				.append("本旬总结").append("\n")
-				.append("到店总笔数:").append(xunEnterCount + xunRestoCount).append("\n")
-				.append("到店消费总额:").append(xunEnterTotal.add(xunRestoTotal)).append("\n")
-				.append("---------------------").append("\n")
-				.append("Resto+用户消费比数:").append(xunRestoCount).append("\n")
-				.append("Resto+用户消费金额").append(xunRestoTotal).append("\n")
-				.append("---------------------").append("\n")
-				.append("Resto+用户消费比率:").append(xunCustomerRatio).append("%").append("\n")
-				.append("Resto+回头消费比率:").append(xunBackCustomerRatio).append("%").append("\n")
-				.append("Resto+新增用户比率:").append(xunNewCustomerRatio).append("%").append("\n")
-				.append("---------------------").append("\n")
-				.append("Resto+新用户消费:").append(newCustomerOrderNum).append("笔/").append(newCustomerOrderTotal).append("\n")
-				.append("Resto+其中自然用户:").append(newNormalCustomerOrderNum).append("笔/").append(newNormalCustomerOrderTotal).append("\n")
-				.append("Resto+其中分享用户:").append(newShareCustomerOrderNum).append("笔/").append(newShareCustomerOrderTotal).append("\n")
-				.append("Resto+回头用户消费:").append(backCustomerOrderNum).append("笔/").append(backCustomerOrderTotal).append("\n")
-				.append("Resto+二次回头用户:").append(backTwoCustomerOrderNum).append("笔/").append(backTwoCustomerOrderTotal).append("\n")
-				.append("Resto+多次回头用户:").append(backTwoMoreCustomerOderNum).append("笔/").append(backTwoMoreCustomerOrderTotal).append("\n")
-				.append("---------------------").append("\n")
-				.append("折扣合计:").append(discountTotal).append("\n")
-				.append("红包:").append(redPackTotal).append("\n")
-				.append("优惠券:").append(couponTotal).append("\n")
-				.append("充值赠送:").append(chargeReturn).append("\n")
-				.append("折扣比率").append(discountRatio).append("\n")
-				.append("---------------------").append("\n")
-				.append("本旬五星评论:").append(fiveStar).append("\n")
-				.append("本旬更改意见:").append(fourStar).append("\n")
-				.append("本旬差评投诉:").append(oneToThreeStar).append("\n")
-				.append("本旬满意度:").append(theTenDaySatisfaction).append("\n")
-				.append("---------------------").append("\n")
-				.append("本旬外卖金额:").append(xunOrderBooks).append("\n")
-				.append("本旬实收:").append(xunEnterTotal.add(xunRestoTotal).add(xunOrderBooks)).append("\n")
-				.append("本旬充值:").append(xunChargeMoney).append("\n")
-				.append("---------------------").append("\n")
-				.append("本旬红榜top10：").append("\n");
-
-		//封装好评top10
-		if (goodNum == 0) {//无好评
-			sb.append("------无-----");
-		} else {
-			if (!goodList.isEmpty()) {//
-				for (int i = 0; i < goodList.size(); i++) {
-					//1、27% 剁椒鱼头
-					sb.append(i + 1).append(".").append(NumberUtil.getFormat(goodList.get(i).getNum(), goodNum)).append("%").append(" ").append(goodList.get(i).getName()).append("\n");
-				}
-			}
-		}
-
-
-		sb.append("本旬黑榜top10：").append("\n");
-		//封装差评top10
-		if (badNum == 0) {//无差评
-			sb.append("------无-----");
-		} else {
-			if (!badList.isEmpty()) {//
-				for (int i = 0; i < badList.size(); i++) {
-					//1、27% 剁椒鱼头
-					sb.append(i + 1).append(".").append(NumberUtil.getFormat(badList.get(i).getNum(), badNum)).append("%").append(" ").append(badList.get(i).getName()).append("\n");
-				}
-			}
-		}
-		Map<String, String> map = new HashMap<>();
-		map.put("wechat", sb.toString());
-		return map;
-	}
-
-	/**
-	 * 第一版短信 月结数据封装
-	 * @param shopDetail
-	 * @param offLineOrder
-	 * @return
-	 */
-	private Map<String,String> querryMonthDataByFirstEditon(ShopDetail shopDetail, OffLineOrder offLineOrder) {
-		//----1.定义时间---
-		Date monthBegin =DateUtil.fomatDate(DateUtil.getMonthBegin());
-		Date monthEnd = new Date();
-		//三.定义线下订单
-		//本月线下订单总数(堂吃)
-		int monthEnterCount = 0;
-		//本月线下订单总额(堂吃)
-		BigDecimal monthEnterTotal = BigDecimal.ZERO;
-		//4.外卖订单
-		//本月外卖订单数
-		int monthDeliverOrders = 0;
-		//本月外卖订单总额
-		BigDecimal monthOrderBooks = BigDecimal.ZERO;
-
-		//查询pos端店铺录入信息(线下订单+外卖订单都是pos端录入的)
-		List<OffLineOrder> offLineOrderList = offLineOrderMapper.selectlistByTimeSourceAndShopId(shopDetail.getId(), monthBegin, monthEnd, OfflineOrderSource.OFFLINE_POS);
-		if (!offLineOrderList.isEmpty()) {
-			for (OffLineOrder of : offLineOrderList) {
-				monthEnterTotal = monthEnterTotal.add(of.getEnterTotal());//
-				monthEnterCount += of.getEnterCount();
-				monthDeliverOrders += of.getDeliveryOrders();
-				monthOrderBooks = monthOrderBooks.add(of.getOrderBooks());
-			}
-		}
-		//查询本月新增用户的订单
-		List<Order> newCustomerOrders = orderMapper.selectNewCustomerOrderByShopIdAndTime(shopDetail.getId(), monthBegin, monthEnd);
-		//新增用户的订单总数
-		int newCustomerOrderNum = 0;
-		//新增用户的订单总额
-		BigDecimal newCustomerOrderTotal = BigDecimal.ZERO;
-		//新增分享用户的的订单总数
-		int newShareCustomerOrderNum = 0;
-		//新增分享用户的订单总额
-		BigDecimal newShareCustomerOrderTotal = BigDecimal.ZERO;
-		//新增自然用户的订单总数
-		int newNormalCustomerOrderNum = 0;
-		//新增自然用户的订单总额
-		BigDecimal newNormalCustomerOrderTotal = BigDecimal.ZERO;
-		if (!newCustomerOrders.isEmpty()) {
-			for (Order o : newCustomerOrders) {
-				newCustomerOrderNum++;
-				newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
-					newShareCustomerOrderNum++;
-					newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				} else {
-					newNormalCustomerOrderNum++; //是新增用户
-					newNormalCustomerOrderTotal = newNormalCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				}
-			}
-		}
-		//查询回头用户的
-		List<BackCustomerDto> backCustomerDtos = orderMapper.selectBackCustomerByShopIdAndTime(shopDetail.getId(), monthBegin, monthEnd);
-		//回头用户
-		Set<String> backCustomerId = new HashSet<>();
-		//二次回头用户
-		Set<String> backTwoCustomerId = new HashSet<>();
-		//多次回头用户
-		Set<String> backTwoMoreCustomerId = new HashSet<>();
-		if (!backCustomerDtos.isEmpty()) {
-			for (BackCustomerDto b : backCustomerDtos) {
-				backCustomerId.add(b.getCustomerId());
-				if (b.getNum() == 1) { //只要以前出现过一次那么就是二次回头用户 而非 ==2
-					backTwoCustomerId.add(b.getCustomerId());
-				} else if (b.getNum() > 1) {
-					backTwoMoreCustomerId.add(b.getCustomerId());
-				}
-			}
-		}
-		//回头用户的订单总数
-		int backCustomerOrderNum = 0;
-		//二次回头用户的订单总数
-		int backTwoCustomerOrderNum = 0;
-		//多次回头用户的订单总数
-		int backTwoMoreCustomerOderNum = 0;
-		//回头用户的订单总额
-		BigDecimal backCustomerOrderTotal = BigDecimal.ZERO;
-		//二次回头用户的订单总额
-		BigDecimal backTwoCustomerOrderTotal = BigDecimal.ZERO;
-		//多次回头用户的订单总额
-		BigDecimal backTwoMoreCustomerOrderTotal = BigDecimal.ZERO;
-		List<Order> orders = orderMapper.selectCompleteByShopIdAndTime(shopDetail.getId(), monthBegin, monthEnd);
-		if (!orders.isEmpty()) {
-			for (Order o : orders) {
-				if (backCustomerId.contains(o.getCustomerId())) {
-					backCustomerOrderNum++;
-					backCustomerOrderTotal = backCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				}
-				if (backTwoCustomerId.contains(o.getCustomerId())) {
-					backTwoCustomerOrderNum++;
-					backTwoCustomerOrderTotal = backTwoCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				}
-				if (backTwoMoreCustomerId.contains(o.getCustomerId())) {
-					backTwoMoreCustomerOrderTotal = backTwoMoreCustomerOrderTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-					backTwoMoreCustomerOderNum++;
-				}
-			}
-		}
-		//2定义resto订单
-		//本月resto订单总数
-//        Set<String> MonthRestoCount = new HashSet<>();
-		int monthRestoCount = newCustomerOrderNum + backCustomerOrderNum;
-
-		//本月resto订单总额
-		BigDecimal monthRestoTotal = BigDecimal.ZERO;
-
-		//定义折扣合计
-		BigDecimal discountTotal = BigDecimal.ZERO;
-		//红包
-		BigDecimal redPackTotal = BigDecimal.ZERO;
-		//优惠券
-		BigDecimal couponTotal = BigDecimal.ZERO;
-		//充值赠送
-		BigDecimal chargeReturn = BigDecimal.ZERO;
-		//折扣比率
-		String discountRatio = "";
-		//本月用户消费比率
-		String monthCustomerRatio = "";
-		//回头用户消费比率
-		String monthBackCustomerRatio = "";
-		//新增用户比率
-		String monthNewCustomerRatio = "";
-
-		List<Order> monthOrders = orderMapper.selectListsmsByShopId(monthBegin, monthEnd, shopDetail.getId());
-		if (!monthOrders.isEmpty()) {
-			for (Order o : monthOrders) {
-				//封装   1.resto订单总额     3.resto订单总数  4订单中的实收总额  5新增用户的订单总额  6自然到店的用户总额  7分享到店的用户总额
-				//8回头用户的订单总额  9二次回头用户的订单总额  10多次回头用户的订单总额 11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-				//本日 begin-----------------------
-				/**
-				 * 报表数据中的订单数  如果子订单和父订单算是一个订单
-				 * 小程序+每日短信里的子订单和父订单算是两个订单
-				 *
-				 */
-				//1.resto订单总额
-				monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getOrderMode(), o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				//11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-				if (!o.getOrderPaymentItems().isEmpty()) {
-					//订单支付项
-					for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
-						if (oi.getPaymentModeId() == PayMode.ACCOUNT_PAY) {
-							redPackTotal = redPackTotal.add(oi.getPayValue());
-						} else if (oi.getPaymentModeId() == PayMode.COUPON_PAY) {
-							couponTotal = couponTotal.add(oi.getPayValue());
-						} else if (oi.getPaymentModeId() == PayMode.REWARD_PAY) {
-							chargeReturn = chargeReturn.add(oi.getPayValue());
-						}
-					}
-				}
-				discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
-				discountRatio = discountTotal.divide(monthRestoTotal.add(discountTotal), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
-			}
-		}
-
-		//本月用户消费比率 R+线下+外卖
-		//到店总笔数 线上+线下
-		double dmax = monthEnterCount + monthRestoCount;
-		if (dmax != 0) {
-			//本月用户消费比率
-			monthCustomerRatio = formatDouble((monthRestoCount / dmax) * 100);
-			//本月新增用户利率
-			monthNewCustomerRatio = formatDouble((newCustomerOrderNum / dmax) * 100);
-			//本月回头用户的消费比率
-			monthBackCustomerRatio = formatDouble((backCustomerOrderNum / dmax) * 100);
-		}
-
-		//五星
-		int fiveStar = 0;
-		//四星
-		int fourStar = 0;
-		//3星-1星
-		int oneToThreeStar = 0;
-		//3定义满意度
-		//本月满意度
-		String monthSatisfaction = "";
-
-		int monthAppraiseNum = 0;//本月评价的总单数
-		double monthAppraiseSum = 0;//本月所有评价的总分数
-
-		/**
-		 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
-		 * 去评价 而现在 是查当天下单当天评价
-		 *
-		 *
-		 */
-
-		//单独查询评价和分数
-		List<Appraise> appraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), monthBegin, monthEnd);
-		if (!appraises.isEmpty()) {
-			for (Appraise a : appraises) {
-				monthAppraiseNum++;
-				monthAppraiseSum += a.getLevel() * 20;
-				if (a.getLevel() == 5) {
-					fiveStar++;
-				} else if (a.getLevel() == 4) {
-					fourStar++;
-				} else {
-					oneToThreeStar++;
-				}
-			}
-			if (monthAppraiseNum != 0) {
-				monthSatisfaction = formatDouble(monthAppraiseSum / monthAppraiseNum);
-			}
-		}
-
-		BigDecimal monthChargeMoney = BigDecimal.ZERO;
-		//查询充值
-		List<ChargeOrder> chargeOrderList = chargeOrderService.selectByDateAndShopId(DateUtil.formatDate(monthBegin, "yyyy-MM-dd"), DateUtil.formatDate(monthEnd, "yyyy-MM-dd"), shopDetail.getId());
-		if (!chargeOrderList.isEmpty()) {
-			for (ChargeOrder c : chargeOrderList) {
-				monthChargeMoney = monthChargeMoney.add(c.getChargeMoney());
-			}
-		}
-
-		//查询菜品top10
-		//1.查询好评的总数(月内)
-		int goodNum = 0;
-		goodNum = articleTopService.selectSumGoodByTime(monthBegin, monthEnd, shopDetail.getId());
-		//查询差评总数
-		int badNum = 0;
-		badNum = articleTopService.selectSumBadByTime(monthBegin, monthEnd, shopDetail.getId());
-
-		//查询好评top10
-		List<ArticleTopDto> goodList = articleTopService.selectListByTimeAndGoodType(monthBegin, monthEnd, shopDetail.getId());
-
-		//查询差评top10
-		List<ArticleTopDto> badList = articleTopService.selectListByTimeAndBadType(monthBegin, monthEnd, shopDetail.getId());
-
-		//封装微信推送文本
-		StringBuilder sb = new StringBuilder();
-		sb
-				.append("店铺名称:").append(shopDetail.getName()).append("\n")
-				.append("时间:").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss")).append("\n")
-				.append("本月总结").append("\n")
-				.append("到店总笔数:").append(monthEnterCount + monthRestoCount).append("\n")
-				.append("到店消费总额:").append(monthEnterTotal.add(monthRestoTotal)).append("\n")
-				.append("---------------------").append("\n")
-				.append("Resto+用户消费比数:").append(monthRestoCount).append("\n")
-				.append("Resto+用户消费金额").append(monthRestoTotal).append("\n")
-				.append("---------------------").append("\n")
-				.append("Resto+用户消费比率:").append(monthCustomerRatio).append("%").append("\n")
-				.append("Resto+回头消费比率:").append(monthBackCustomerRatio).append("%").append("\n")
-				.append("Resto+新增用户比率:").append(monthNewCustomerRatio).append("%").append("\n")
-				.append("---------------------").append("\n")
-				.append("Resto+新用户消费:").append(newCustomerOrderNum).append("笔/").append(newCustomerOrderTotal).append("\n")
-				.append("Resto+其中自然用户:").append(newNormalCustomerOrderNum).append("笔/").append(newNormalCustomerOrderTotal).append("\n")
-				.append("Resto+其中分享用户:").append(newShareCustomerOrderNum).append("笔/").append(newShareCustomerOrderTotal).append("\n")
-				.append("Resto+回头用户消费:").append(backCustomerOrderNum).append("笔/").append(backCustomerOrderTotal).append("\n")
-				.append("Resto+二次回头用户:").append(backTwoCustomerOrderNum).append("笔/").append(backTwoCustomerOrderTotal).append("\n")
-				.append("Resto+多次回头用户:").append(backTwoMoreCustomerOderNum).append("笔/").append(backTwoMoreCustomerOrderTotal).append("\n")
-				.append("---------------------").append("\n")
-				.append("折扣合计:").append(discountTotal).append("\n")
-				.append("红包:").append(redPackTotal).append("\n")
-				.append("优惠券:").append(couponTotal).append("\n")
-				.append("充值赠送:").append(chargeReturn).append("\n")
-				.append("折扣比率").append(discountRatio).append("\n")
-				.append("---------------------").append("\n")
-				.append("本月五星评论:").append(fiveStar).append("\n")
-				.append("本月更改意见:").append(fourStar).append("\n")
-				.append("本月差评投诉:").append(oneToThreeStar).append("\n")
-				.append("本月满意度:").append(monthSatisfaction).append("\n")
-				.append("---------------------").append("\n")
-				.append("本月外卖金额:").append(monthOrderBooks).append("\n")
-				.append("本月实收:").append(monthEnterTotal.add(monthRestoTotal).add(monthOrderBooks)).append("\n")
-				.append("本月充值:").append(monthChargeMoney).append("\n")
-				.append("---------------------").append("\n")
-				.append("本月红榜top10：").append("\n");
-
-		//封装好评top10
-		if (goodNum == 0) {//无好评
-			sb.append("------无-----");
-		} else {
-			if (!goodList.isEmpty()) {//
-				for (int i = 0; i < goodList.size(); i++) {
-					//1、27% 剁椒鱼头
-					sb.append(i + 1).append(".").append(NumberUtil.getFormat(goodList.get(i).getNum(), goodNum)).append("%").append(" ").append(goodList.get(i).getName()).append("\n");
-				}
-			}
-		}
-
-		sb.append("本月黑榜top10：").append("\n");
-		//封装差评top10
-		if (badNum == 0) {//无差评
-			sb.append("------无-----");
-		} else {
-			if (!badList.isEmpty()) {//
-				for (int i = 0; i < badList.size(); i++) {
-					//1、27% 剁椒鱼头
-					sb.append(i + 1).append(".").append(NumberUtil.getFormat(badList.get(i).getNum(), badNum)).append("%").append(" ").append(badList.get(i).getName()).append("\n");
-				}
-			}
-		}
-		Map<String, String> map = new HashMap<>();
-		map.put("wechat", sb.toString());
-		return map;
-	}
-
-
-	public Result checkArticleList(OrderItem orderItem, int count) {
+    public Result checkArticleList(OrderItem orderItem, int count) {
 
         Boolean result = true;
         String msg = "";
@@ -2804,8 +1145,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     public Order payOrderSuccess(Order order) {
-
-
         if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             order.setOrderState(OrderState.PAYMENT);
             order.setIsPay(OrderPayState.PAYED);
@@ -2990,6 +1329,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Result refundPaymentByUnfinishedOrder(String orderId) {
         Result result = new Result();
         Order order = selectById(orderId);
+        if (MemcachedUtils.get(order.getCustomerId()+"createOrder") != null) {
+            MemcachedUtils.delete(order.getCustomerId() + "createOrder");
+        }
         if (order.getOrderState() != OrderState.SUBMIT) {
             return new Result(false);
         }
@@ -3043,6 +1385,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 //            orderMapper.setStockBySuit(order.getShopDetailId());//自动更新套餐数量
         }
+
+        //用户取消微信支付记录UserAction日志
+        Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
+        Map customerMap = new HashMap(4);
+        customerMap.put("brandName", brand.getBrandName());
+        customerMap.put("fileName", order.getCustomerId());
+        customerMap.put("type", "UserAction");
+        customerMap.put("content", "用户:"+order.getCustomerId()+"取消微信支付，订单Id:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, customerMap);
         return result;
     }
 
@@ -3104,6 +1455,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
                 case PayMode.REFUND_ARTICLE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
+                case PayMode.THIRD_MONEY_RED_PAY:
                     redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
@@ -3189,6 +1544,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "orderAction");
         map.put("content", "订单:" + order.getId() + "已取消,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
+        if (!MemcachedUtils.add(order.getCustomerId() + "createOrder", 1, 30)) {
+            MemcachedUtils.delete(order.getCustomerId() + "createOrder");
+        }
     }
 
     @Override
@@ -3258,31 +1616,71 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     private void refundOrderHoufu(Order order) {
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        List<String> chargeList = new ArrayList<>();
         for (OrderPaymentItem item : payItemsList) {
-            String newPayItemId = ApplicationUtils.randomUUID();
+//            String newPayItemId = ApplicationUtils.randomUUID();
             switch (item.getPaymentModeId()) {
                 case PayMode.ACCOUNT_PAY:
                     accountService.addAccount(item.getPayValue(), item.getResultData(), "取消订单返还", AccountLog.SOURCE_CANCEL_ORDER, order.getShopDetailId());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    item.setId(newPayItemId);
-                    orderPaymentItemService.insert(item);
+//                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+//                    item.setId(newPayItemId);
+//                    orderPaymentItemService.insert(item);
                     break;
                 case PayMode.CHARGE_PAY:
-                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    item.setId(newPayItemId);
-                    orderPaymentItemService.insert(item);
+                    if(!chargeList.contains(item.getResultData())){
+                        chargeList.add(item.getResultData());
+                    }
+//                    chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+//                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+//                    item.setId(newPayItemId);
+//                    orderPaymentItemService.insert(item);
+//                    BigDecimal chargeValue = (BigDecimal) RedisUtil.get(item.getResultData()+"chargeValue");
+                    if(!MemcachedUtils.add(item.getResultData()+"chargeValue", item.getPayValue(), 600)){
+                        MemcachedUtils.put(item.getResultData()+"chargeValue", item.getPayValue().add((BigDecimal) MemcachedUtils.get(item.getResultData()+"chargeValue")));
+                    }
                     break;
                 case PayMode.REWARD_PAY:
-                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
-                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
-                    item.setId(newPayItemId);
-                    orderPaymentItemService.insert(item);
+                    if(!chargeList.contains(item.getResultData())){
+                        chargeList.add(item.getResultData());
+                    }
+//                    chargeOrderService.refundReward(item.getPayValue(), item.getResultData(), order.getShopDetailId());
+//                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+//                    item.setId(newPayItemId);
+//                    orderPaymentItemService.insert(item);
+//                    BigDecimal rewardValue = (BigDecimal) RedisUtil.get(item.getResultData()+"rewardValue");
+//                    if(rewardValue == null){
+//                        rewardValue = item.getPayValue();
+//                    }else{
+//                        rewardValue = rewardValue.add(item.getPayValue());
+//                    }
+                    if(!MemcachedUtils.add(item.getResultData()+"rewardValue", item.getPayValue(), 600)){
+                        MemcachedUtils.put(item.getResultData()+"rewardValue", item.getPayValue().add((BigDecimal) MemcachedUtils.get(item.getResultData()+"rewardValue")));
+                    }
                     break;
-
+                case PayMode.APPRAISE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    break;
+                case PayMode.SHARE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    break;
+                case PayMode.REFUND_ARTICLE_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    break;
+                case PayMode.THIRD_MONEY_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    break;
             }
-
         }
+        if(!CollectionUtils.isEmpty(chargeList)){
+            for(String id : chargeList){
+                BigDecimal rewardValue = (BigDecimal) MemcachedUtils.get(id+"rewardValue");
+                BigDecimal chargeValue = (BigDecimal) MemcachedUtils.get(id+"chargeValue");
+                chargeOrderService.refundMoney(chargeValue,rewardValue,id,order.getShopDetailId());
+                MemcachedUtils.delete(id+"rewardValue");
+                MemcachedUtils.delete(id+"chargeValue");
+            }
+        }
+        orderPaymentItemService.deleteByOrderId(order.getId());
         Brand brand = brandService.selectById(order.getBrandId());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
@@ -3414,10 +1812,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Order printSuccess(String orderId) throws AppException {
+    public Order printSuccess(String orderId,Boolean openBrandAccount,AccountSetting accountSetting) throws AppException {
         Order order = selectById(orderId);
         Brand brand = brandService.selectById(order.getBrandId());
-        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         if (StringUtils.isEmpty(order.getParentOrderId())) {
             log.info("打印成功，订单为主订单，允许加菜-:" + order.getId());
             LogTemplateUtils.getParentOrderPrintSuccessByOrderType(brand.getBrandName(), order.getId(), order.getProductionStatus());
@@ -3444,7 +1841,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setProductionStatus(ProductionStatus.PRINTED);
         order.setPrintOrderTime(new Date());
         order.setAllowCancel(false);
-        update(order);
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
+        //yz 2017/07/29计费系统
+        Boolean flag = false;
+        if (openBrandAccount!=null) {
+            if (openBrandAccount) {
+                flag = true;
+                if (accountSetting == null) {
+                    accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+                }
+            } else {
+                flag = brandSetting.getOpenBrandAccount() == 1;
+
+            }
+        }
+		update(order);
+        //判断是否已经记录过该订单
+		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
+		if(brandAccountLog!=null){
+			return order;
+		}
+
+        updateBrandAccount(order,flag,accountSetting);
 //        Map map = new HashMap(4);
 //        map.put("brandName", brand.getBrandName());
 //        map.put("fileName", shopDetail.getName());
@@ -3464,6 +1882,300 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //logBaseService.insertLogBaseInfoState(shopDetail, customer, orderId, LogBaseState.PRINT);
         return order;
     }
+
+	/**
+	 * yz 2017 07/31 计费系统 下单成功后发送短信--
+	 * 下单成功后 根据计费系统的设置 更新账户余额 和记录账户流水日志
+	 * @param order
+	 * @param openBrandAccount
+	 * @param accountSetting
+	 */
+	private void updateBrandAccount(Order order, Boolean openBrandAccount, AccountSetting accountSetting) {
+//		if(order.getPayType()==PayType.NOPAY&&order.getOrderState()==1){//后付会走两次paySuccess 所以如果是后付 并且支付状态为1的时候就不记录
+//			return;
+//		}
+		//在外层已经判断过 同一个品牌的同一订单不会记录两次 所以不用考虑后付打印两次的情况
+
+    	BigDecimal money = BigDecimal.ZERO;
+		BrandAccountLog blog = new BrandAccountLog();
+		BrandAccount brandAccount = brandAccountService.selectByBrandId(order.getBrandId());
+		ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+
+		if(accountSetting==null){
+			BrandSetting bt = brandSettingService.selectByBrandId(order.getBrandId());
+			accountSetting = accountSettingService.selectByBrandSettingId(bt.getId());
+			openBrandAccount = bt.getOpenBrandAccount()==1;
+		}
+
+		//根据用户id查询 用户已经消费的订单
+		List<Order> list = orderMapper.selectOrderListByCustomerIdAndShopId(order.getShopDetailId(),order.getCustomerId());
+		Boolean flag = false;//flag的标记是用于判断是否是回头用户 //默认不是
+		if(!list.isEmpty()){//这个人在这个店铺有过订单 说明是回头用户
+			flag = true;
+		}
+    	if(openBrandAccount){//说明开启了品牌账户设置
+				//就算出应扣费金额
+			money = getJifeiMoney(order,accountSetting,flag);
+			//BigDecimal remain = brandAccount.getAccountBalance().subtract(money);//剩余账户余额 = 账户余额减去-扣除的余额
+			//这里不计算 剩余扣费的金额 因为在扣费的时候可能存在 其它人已经扣费了，这样账户余额就不是此时的账户余额
+
+			blog.setSerialNumber(order.getId());
+			blog.setCreateTime(new Date());
+			blog.setBrandId(order.getBrandId());
+			blog.setShopId(order.getShopDetailId());
+			blog.setFoundChange(money.negate());
+			blog.setGroupName(shopDetail.getName());
+			blog.setAccountId(brandAccount.getId());
+			//blog.setRemain(remain);
+			blog.setOrderMoney(order.getOrderMoney());
+
+			if(order.getParentOrderId()==null){
+				blog.setIsParent(true);
+			}
+
+
+			if(accountSetting.getOpenAllOrder()==1){//所有订单抽成
+				blog.setDetail(DetailType.ORDER_SELL);
+			}
+			if(accountSetting.getOpenAllOrder()==2){ //所有订单实际支付抽成
+				blog.setDetail(DetailType.ORDER_REAL_SELL);
+			}
+
+			if(accountSetting.getOpenBackCustomerOrder()==1){ //回头用户订单抽成
+					blog.setDetail(DetailType.BACK_CUSTOMER_ORDER_SELL);
+					//是要计算回头用户订单 如果该订单不是回头用户的订单则直接结束该方法
+					if(!flag){
+						return;
+					}
+			}
+
+			if(accountSetting.getOpenBackCustomerOrder()==2){
+					blog.setDetail(DetailType.BACK_CUSTOMER_ORDER_REAL_SELL);//回头用户订单实付抽成
+				    if(!flag){
+				    	return;
+					}
+			}
+
+			blog.setBehavior(BehaviorType.SELL);
+
+			// 创建账户日志流水 和更新账户
+//			Integer id = brandAccount.getId();
+//			brandAccount = new BrandAccount();
+//			brandAccount.setId(id);
+//			brandAccount.setUpdateTime(new Date());
+
+			brandAccountLogService.updateBrandAccountAndLog(blog,brandAccount.getId(),money);
+
+			/**
+			 * 拉取最新的 品牌账户信息
+			 */
+			BrandAccount brandAccount2 = brandAccountService.selectById(brandAccount.getId());
+
+			/*
+		     判断是否要发短信
+			**/
+			Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
+
+			List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
+
+			Result result =  BrandAccountSendUtil.sendSms(brandAccount2,noticeList,brand.getBrandName(),accountSetting);
+			if(result.isSuccess()){
+				Long accountSettingId = accountSetting.getId();
+				AccountSetting as = new AccountSetting();
+				as.setId(accountSettingId);
+				as.setType(1);
+				accountSettingService.update(as);
+				//发送消息队列通知 消费者24小时后再次查询账户余额情况 如果不符合要求则更改发短信为可以发状态
+				log.info("有订单产生计费并且该品牌账户已经欠费---");
+				log.info("开始发送延时消息队列--");
+				MQMessageProducer.sendBrandAccountSms(brand.getId(),MQSetting.DELAY_TIME);
+			}
+
+		}
+	}
+
+	/**
+	 * 获取 所有订单的计费 / 回头用户消费订单计费
+	 * @param order
+	 * @param accountSetting
+	 * @return
+	 */
+	private BigDecimal getJifeiMoney(Order order, AccountSetting accountSetting,Boolean flag) {
+
+		//定义抽成比率后的价格
+		BigDecimal money = BigDecimal.ZERO;
+
+		//定义订单的总额(实际支付的金额)
+		BigDecimal jifeiMoney = BigDecimal.ZERO;
+
+		if(accountSetting.getOpenAllOrder()==BrandAccountPayType.ALL_ORDER_MONEY){//说明是 所有订单是/订单总额 抽成
+//			if(order.getPayType()==PayType.PAY){//如果是先付
+//				jifeiMoney = order.getOrderMoney();
+//			}else if(order.getPayType()==PayType.NOPAY){//如果是后付
+//				if(order.getAmountWithChildren().compareTo(BigDecimal.ZERO)>0){
+//					jifeiMoney = order.getAmountWithChildren();
+//				}else {
+//					jifeiMoney = order.getOrderMoney();
+//				}
+//			}
+			//不用考虑先付还是后付款
+			jifeiMoney = order.getOrderMoney();
+			money = jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue())).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
+			System.err.println("计算出订单总额抽成金额为："+money);
+		}else if(accountSetting.getOpenAllOrder()==BrandAccountPayType.REAL_ORDER_MONEY) {//说明是 所有订单/实际支付金额抽成
+			List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+			if(orderPaymentItems!=null&&!orderPaymentItems.isEmpty()){
+				//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
+				for(OrderPaymentItem oi:orderPaymentItems){
+					if(oi.getPaymentModeId()==PayMode.WEIXIN_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+					   oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
+					   oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+					   oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
+							){
+						jifeiMoney = jifeiMoney.add(oi.getPayValue());
+					}
+				}
+			}
+			log.info("订单id为："+order.getId()+"jifeimoney为"+jifeiMoney);
+			money =(jifeiMoney.multiply(new BigDecimal(accountSetting.getAllOrderValue()))).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
+			System.err.println("计算出订单实付抽成金额为："+money);
+		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.ALL_ORDER_MONEY &&flag){//回头用户订单  /订单总额抽成
+			//是回头用户才会计算金额
+				if(order.getPayType()==0){//如果是先付
+					jifeiMoney = order.getOrderMoney();
+				}else if(order.getPayType()==1){//如果是后付
+					if(order.getAmountWithChildren().compareTo(BigDecimal.ZERO)>0){
+						jifeiMoney = order.getAmountWithChildren();
+					}else {
+						jifeiMoney = order.getOrderMoney();
+					}
+				}
+				money = (jifeiMoney.multiply( new BigDecimal(accountSetting.getAllOrderValue()))).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
+			System.err.println("回头用户订单总额："+money);
+		}else if(accountSetting.getOpenBackCustomerOrder()==BrandAccountPayType.REAL_ORDER_MONEY&&flag){//回头用户 /实际支付总额抽成
+			//是回头用户才会计算金额
+				List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+				if(!orderPaymentItems.isEmpty()){
+					//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
+					for(OrderPaymentItem oi:orderPaymentItems){
+						if(oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+								oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
+								oi.getPaymentModeId()==PayMode.CRASH_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+								oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
+								){
+							jifeiMoney = jifeiMoney.add(oi.getPayValue());
+						}
+					}
+				}
+				money = (jifeiMoney.multiply( new BigDecimal(accountSetting.getBackCustomerOrderValue()))).divide(new BigDecimal(jifeiType.STATISH),jifeiType.NUM,BigDecimal.ROUND_HALF_UP);
+			System.err.println("回头用户实付订单总额："+money);
+		}
+		return money;
+	}
+
+
+
+	@Override
+    public int printUpdate(String orderId) {
+		Order o = new Order();
+		o.setId(orderId);
+		o.setProductionStatus(ProductionStatus.GET_IT);
+		int count = orderMapper.updateByPrimaryKeySelective(o);
+		//yz 2017/08/03 计费系统 添加账户设置(简单版) ---resto+外卖订单
+
+		try{
+			BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
+			if (brandSetting.getOpenBrandAccount() == 1) {//说明开启了品牌账户
+				//查询品牌账户设置
+				AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+				//定义抽成的金额
+				BigDecimal money = BigDecimal.ZERO;
+
+				if (accountSetting.getOpenOutFoodOrder() == 1) {//开启resto外卖订单 并且按订单总额抽成
+					//计算resto外卖 的 抽成金额 (外卖都是先付所以就直接计算)
+					money = o.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? o.getAmountWithChildren() : o.getOrderMoney();
+				} else if (accountSetting.getOpenOutFoodOrder() == 2) {//开启resto外卖订单 并且按实际支付 抽成
+					List<OrderPaymentItem> orderPaymentItemList = orderPaymentItemService.selectByOrderId(o.getId());
+
+					if(!orderPaymentItemList.isEmpty()){
+						for (OrderPaymentItem oi : orderPaymentItemList) {
+							//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
+							if(oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
+									oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
+									oi.getPaymentModeId()==PayMode.CRASH_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
+									oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
+									){
+								money = money.add(oi.getPayValue());
+							}
+						}
+					}
+				}
+				//记录日志 和更新账户
+				BrandAccount brandAccount = brandAccountService.selectByBrandId(o.getBrandId());
+				ShopDetail s = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
+
+				BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
+				BrandAccountLog blog = new BrandAccountLog();
+				blog.setSerialNumber(o.getSerialNumber());
+				blog.setCreateTime(new Date());
+				blog.setBrandId(o.getBrandId());
+				blog.setShopId(o.getShopDetailId());
+				blog.setFoundChange(money.negate());
+				blog.setGroupName(s.getName());
+				blog.setAccountId(brandAccount.getId());
+				blog.setRemain(remain);
+				blog.setOrderMoney(o.getOrderMoney());
+				if(o.getParentOrderId()!=null){
+					blog.setIsParent(true);
+				}
+
+				if(accountSetting.getOpenOutFoodOrder()==1){//Resto+外卖订单抽成
+					blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_SELL);
+				}
+				if(accountSetting.getOpenOutFoodOrder()==2){ //Resto+外卖订单实付抽成
+					blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_REAL_SELL);
+				}
+
+				blog.setBehavior(BehaviorType.SELL);
+
+				// 创建账户日志流水 和更新账户
+				Integer id = brandAccount.getId();
+				brandAccount = new BrandAccount();
+				brandAccount.setId(id);
+				brandAccount.setUpdateTime(new Date());
+				brandAccount.setAccountBalance(remain);
+				brandAccountLogService.insert(blog);
+				brandAccountService.update(brandAccount);
+				//yz TODO//判断品牌账户是否需要发送通知(账户不足通知)---
+				Brand brand = brandService.selectByPrimaryKey(o.getBrandId());
+
+				List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
+
+				//拉取最新的brandAccount
+				BrandAccount brandAccount2 = brandAccountService.selectById(brandAccount.getId());
+
+				Result result =  BrandAccountSendUtil.sendSms(brandAccount2,noticeList,brand.getBrandName(),accountSetting);
+				if(result.isSuccess()){
+					Long accountSettingId = accountSetting.getId();
+					AccountSetting as = new AccountSetting();
+					as.setId(accountSettingId);
+					as.setType(1);
+					accountSettingService.update(as);
+					//发送消息队列通知 消费者24小时后再次查询账户余额情况 如果不符合要求则更改发短信为可以发状态
+					log.info("有resto+外卖订单产生计费并且该品牌账户已经欠费---");
+					log.info("开始发送延时消息队列--");
+					MQMessageProducer.sendBrandAccountSms(brand.getId(), MQSetting.DELAY_TIME);
+				}
+
+			}
+		}catch (Exception e){
+			log.info("resto外卖订单抽成出错 "+e.getMessage());
+			e.printStackTrace();
+		}finally{
+            return count;
+        }
+
+		}
 
     @Override
     public List<Order> selectTodayOrder(String shopId, int[] proStatus) {
@@ -3754,6 +2466,154 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
+    @Override
+    public List<Map<String, Object>> printTurnTable(Order order,String oldtableNumber){
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        List<Printer> ticketPrinter=new ArrayList<>();
+        if(shopDetail.getTurntablePrintType()==3){
+            ticketPrinter.addAll(printerService.selectPrintByType(order.getShopDetailId(),PrinterType.KITCHEN));
+            ticketPrinter.addAll(printerService.selectPrintByType(order.getShopDetailId(),PrinterType.RECEPTION));
+        }else if(shopDetail.getTurntablePrintType()==1){
+            ticketPrinter.addAll(printerService.selectPrintByType(order.getShopDetailId(),PrinterType.KITCHEN));
+        }else if(shopDetail.getTurntablePrintType()==2){
+            ticketPrinter.addAll(printerService.selectPrintByType(order.getShopDetailId(),PrinterType.RECEPTION));
+        }
+        for (Printer printer : ticketPrinter) {
+            if (shopDetail.getIsPosNew() == Common.YES) {
+                getTurnTableModelNew(order, printer,shopDetail,printTask,oldtableNumber);
+            } else {
+                getTurnTableModel(order, printer, printTask,oldtableNumber);
+            }
+        }
+        Brand brand = brandService.selectById(order.getBrandId());
+        JSONArray json = new JSONArray(printTask);
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "订单:" + order.getId() + "返回打印换桌模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, map);
+        return printTask;
+    }
+
+    private void getTurnTableModel(Order order, Printer printer, List<Map<String, Object>> printTask,String oldtableNumber) {
+        String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";//桌号
+        String serialNumber = order.getSerialNumber();//序列号
+        String modeText = "转台";
+
+        //保存基本信息
+        Map<String, Object> print = new HashMap<String, Object>();
+        print.put("PORT", printer.getPort());
+        print.put("OID", order.getId());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID", print_id);
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("ORDER_ID", serialNumber);
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm"));
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("TABLE_NUMBER", oldtableNumber);
+        //添加当天打印订单的序号
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(), Integer.valueOf(order.getTableNumber()));
+        if (tableQrcode == null) {
+            data.put("ORDER_NUMBER",  "---");
+        } else {
+            if (tableQrcode.getAreaId() == null) {
+                data.put("ORDER_NUMBER", "---");
+            } else {
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                if (area == null) {
+                    data.put("ORDER_NUMBER", "---");
+                } else {
+                    data.put("ORDER_NUMBER", area.getName());
+                }
+            }
+
+        }
+        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+        Map<String, Object> item = new HashMap<String, Object>();
+        Map<String, Object> itemOld = new HashMap<String, Object>();
+        itemOld.put("ARTICLE_COUNT","台号");
+        itemOld.put("ARTICLE_NAME","               "+oldtableNumber);
+        items.add(itemOld);
+        Map<String, Object> itemNew = new HashMap<String, Object>();
+        itemNew.put("ARTICLE_COUNT","转至");
+        itemNew.put("ARTICLE_NAME","               "+tableNumber);
+        items.add(itemNew);
+        data.put("ITEMS", items);
+        data.put("CUSTOMER_SATISFACTION", "");
+        data.put("CUSTOMER_SATISFACTION_DEGREE", "");
+        data.put("CUSTOMER_PROPERTY", "");
+        print.put("DATA", data);
+        print.put("STATUS", "0");
+        print.put("TICKET_TYPE", TicketType.KITCHEN);
+        //添加到 打印集合
+        printTask.add(print);
+        RedisUtil.set(print_id, print);
+    }
+
+    private void getTurnTableModelNew(Order order, Printer printer,ShopDetail shopDetail, List<Map<String, Object>> printTask,String oldtableNumber) {
+        String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";//桌号
+        String serialNumber = order.getSerialNumber();//序列号
+        String modeText = "转台";
+
+        //保存基本信息
+        Map<String, Object> print = new HashMap<String, Object>();
+        print.put("PORT", printer.getPort());
+        print.put("OID", order.getId());
+        print.put("IP", printer.getIp());
+        print.put("PRINT_STATUS", order.getPrintKitchenFlag());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID",print_id);
+        print.put("TASK_ID", "");
+        print.put("TASK_ORDER_ID", order.getId());
+        print.put("LINE_WIDTH", shopDetail.getPageSize() == 0 ? 48 : 42);
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("ORDER_ID", serialNumber);
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DISTRIBUTION_MODE", modeText);
+        data.put("TABLE_NUMBER", oldtableNumber);
+        //添加当天打印订单的序号
+        TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(), Integer.valueOf(order.getTableNumber()));
+        if (tableQrcode == null) {
+            data.put("ORDER_NUMBER", "---");
+        } else {
+            if (tableQrcode.getAreaId() == null) {
+                data.put("ORDER_NUMBER", "---");
+            } else {
+                Area area = areaService.selectById(tableQrcode.getAreaId());
+                if (area == null) {
+                    data.put("ORDER_NUMBER", "---");
+                } else {
+                    data.put("ORDER_NUMBER", area.getName());
+                }
+            }
+
+        }
+        List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
+        Map<String, Object> itemOld = new HashMap<String, Object>();
+        itemOld.put("ARTICLE_COUNT","台号");
+        itemOld.put("ARTICLE_NAME","               "+oldtableNumber);
+        items.add(itemOld);
+        Map<String, Object> itemNew = new HashMap<String, Object>();
+        itemNew.put("ARTICLE_COUNT","转至");
+        itemNew.put("ARTICLE_NAME","               "+tableNumber);
+        items.add(itemNew);
+        data.put("ITEMS", items);
+        data.put("CUSTOMER_SATISFACTION", "");
+        data.put("CUSTOMER_SATISFACTION_DEGREE", "");
+        data.put("CUSTOMER_PROPERTY", "");
+        print.put("DATA", data);
+        print.put("STATUS", "0");
+        print.put("TICKET_TYPE", TicketTypeNew.TICKET);
+        print.put("TICKET_MODE", TicketTypeNew.KITCHEN_TICKET);
+        //添加到 打印集合
+        printTask.add(print);
+        RedisUtil.set(print_id, print);
+    }
+
+
     private void getRecommendModel(String recommendId, Order order, Printer printer, ShopDetail shopDetail, List<Map<String, Object>> printTask) {
         //桌号
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
@@ -3822,11 +2682,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
             //得到无限制情况下用户的订单数
             int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
-            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+            /*if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
                 gao.append("【高频】");
             }//无限制的时候
             else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
                 gao.append("【高频】");
+            }*/
+            if(gaoCount!=0){
+                gao.append("消费"+gaoCount+"次");
+            }else{
+                gao.append("新顾客");
             }
         }
         data.put("CUSTOMER_SATISFACTION", star.toString());
@@ -3948,11 +2813,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
             //得到无限制情况下用户的订单数
             int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
-            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+            /*if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
                 gao.append("【高频】");
             }//无限制的时候
             else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
                 gao.append("【高频】");
+            }*/
+            if(gaoCount!=0){
+                gao.append("消费"+gaoCount+"次");
+            }else{
+                gao.append("新顾客");
             }
         }
         data.put("CUSTOMER_SATISFACTION", star.toString());
@@ -4247,11 +3117,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
             //得到无限制情况下用户的订单数
             int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
-            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+            /*if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
                 gao.append("【高频】");
             }//无限制的时候
             else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
                 gao.append("【高频】");
+            }*/
+            if(gaoCount!=0){
+                gao.append("消费"+gaoCount+"次");
+            }else{
+                gao.append("新顾客");
             }
         }
         data.put("CUSTOMER_SATISFACTION", star.toString());
@@ -4398,11 +3273,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
             //得到无限制情况下用户的订单数
             int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
-            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+           /* if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
                 gao.append("【高频】");
             }//无限制的时候
             else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
                 gao.append("【高频】");
+            }*/
+            if(gaoCount!=0){
+                gao.append("消费"+gaoCount+"次");
+            }else{
+                gao.append("新顾客");
             }
         }
         data.put("CUSTOMER_SATISFACTION", star.toString());
@@ -4492,7 +3372,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         logMap.put("fileName", shopDetail.getName());
         logMap.put("type", "posAction");
         logMap.put("content", "订单:" + order.getId() + "被商家手动打印总单，请求服务器地址为:" + MQSetting.getLocalIP());
-        doPostAnsc(url, logMap);
+        doPostAnsc(url,logMap);
         List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
         if (selectPrinterId == null) {
             if (printer.size() > 0) {
@@ -4690,11 +3570,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
             //得到无限制情况下用户的订单数
             int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
-            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+            /*if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
                 gao.append("【高频】");
             }//无限制的时候
             else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
                 gao.append("【高频】");
+            }*/
+            if(gaoCount!=0){
+                gao.append("消费"+gaoCount+"次");
+            }else{
+                gao.append("新顾客");
             }
         }
         String modeText = getModeText(order);
@@ -4711,16 +3596,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         if (order.getPayType() == PayType.NOPAY && (order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM)) {
+            //如果带打印机是区域打印机，判断他是否开启打结账单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
-        } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getOrderState() == OrderState.SUBMIT) {
+        } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getPayMode() != OrderPayMode.WX_PAY
+                && order.getPayMode() != OrderPayMode.ALI_PAY && order.getOrderState() == OrderState.SUBMIT) {
+            //如果带打印机是区域打印机，判断他是否开启打结账单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY) {
+            //如果带打印机是区域打印机，判断他是否开启打消费单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfConsumption().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
         } else {
             if (order.getParentOrderId() != null) {
                 //加菜的话  判断他主订单  如果主订单是后付  则显示(结账单)
                 Order faOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
                 if (faOrder.getPayType() == PayType.NOPAY) {
+                    //如果带打印机是区域打印机，判断他是否开启打结账单
+                    if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                        return null;
+                    }
                     data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
                 } else {
                     data.put("RESTAURANT_NAME", shopDetail.getName());
@@ -4989,11 +3891,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
             //得到无限制情况下用户的订单数
             int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
-            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+            /*if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
                 gao.append("【高频】");
             }//无限制的时候
             else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
                 gao.append("【高频】");
+            }*/
+            if(gaoCount!=0){
+                gao.append("消费"+gaoCount+"次");
+            }else{
+                gao.append("新顾客");
             }
         }
         String modeText = getModeText(order);
@@ -5010,16 +3917,31 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         if (order.getPayType() == PayType.NOPAY && (order.getOrderState() == OrderState.PAYMENT || order.getOrderState() == OrderState.CONFIRM)) {
+            //如果带打印机是区域打印机，判断他是否开启打结账单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
-        } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getOrderState() == OrderState.SUBMIT) {
+        } else if (order.getPayType() == PayType.NOPAY && order.getPayMode() != OrderPayMode.YUE_PAY && order.getPayMode() != OrderPayMode.WX_PAY &&
+                order.getPayMode() != OrderPayMode.ALI_PAY  && order.getOrderState() == OrderState.SUBMIT) {
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
         } else if (order.getOrderState() == OrderState.SUBMIT && order.getPayType() == PayType.NOPAY) {
+            //如果带打印机是区域打印机，判断他是否开启打消费单
+            if (printer.getRange().equals(Common.YES) && printer.getBillOfConsumption().equals(Common.NO)){
+                return null;
+            }
             data.put("RESTAURANT_NAME", shopDetail.getName() + " (消费清单)");
         } else {
             if (order.getParentOrderId() != null) {
                 //加菜的话  判断他主订单  如果主订单是后付  则显示(结账单)
                 Order faOrder = orderMapper.selectByPrimaryKey(order.getParentOrderId());
                 if (faOrder.getPayType() == PayType.NOPAY) {
+                    if (printer.getRange().equals(Common.YES) && printer.getBillOfAccount().equals(Common.NO)){
+                        return null;
+                    }
                     data.put("RESTAURANT_NAME", shopDetail.getName() + " (结账单)");
                 } else {
                     data.put("RESTAURANT_NAME", shopDetail.getName());
@@ -5124,6 +4046,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
+
     public void getOrderItems(OrderItem article, List<Map<String, Object>> items, List<Map<String, Object>> refundItems) {
         Map<String, Object> item = new HashMap<>();
         item.put("SUBTOTAL", article.getOriginalPrice().multiply(new BigDecimal(article.getChangeCount() != null && article.getChangeCount().compareTo(0) > 0 ? article.getChangeCount() : article.getOrginCount())));
@@ -5153,9 +4076,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (article.getRefundCount() != 0) {
                     Map<String, Object> refundItem = new HashMap<>();
                     refundItem.put("SUBTOTAL", -article.getOriginalPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
-                    if (article.getArticleName().contains("加")) {
-                        article.setArticleName(article.getArticleName().substring(0, article.getArticleName().indexOf("(") - 1));
-                    }
+//                    if (article.getArticleName().contains("加")) {
+//                        article.setArticleName(article.getArticleName().substring(0, article.getArticleName().indexOf("(") - 1));
+//                    }
                     refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
                     refundItem.put("ARTICLE_COUNT", -article.getRefundCount());
                     refundItems.add(refundItem);
@@ -5167,7 +4090,54 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order confirmOrder(Order order) {
         order = selectById(order.getId());
-        if (order.getOrderState() != OrderState.PAYMENT) {
+        if (order == null || order.getOrderState() != OrderState.PAYMENT) {
+            return null;
+        }
+        if (order.getParentOrderId() != null) {
+            return null;
+        }
+        if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
+            return null;
+        }
+        Brand brand = brandService.selectById(order.getBrandId());
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        log.info("开始确认订单:" + order.getId());
+        Integer orginState = order.getOrderState();//订单开始确认的状体
+        if (order.getConfirmTime() == null && !order.getClosed()) {
+            order.setOrderState(OrderState.CONFIRM);
+            order.setConfirmTime(new Date());
+            order.setAllowCancel(false);
+            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+            if (order.getParentOrderId() == null) {
+                log.info("如果订单金额大于 评论金额 则允许评论" + order.getId());
+                if (setting.getAppraiseMinMoney().compareTo(order.getOrderMoney()) <= 0 || setting.getAppraiseMinMoney().compareTo(order.getAmountWithChildren()) <= 0) {
+                    order.setAllowAppraise(true);
+                }
+            } else {
+                log.info("最小评论金额为:" + setting.getAppraiseMinMoney() + ", oid:" + order.getId());
+                order.setAllowAppraise(false);
+            }
+            update(order);
+            //Map orderMap = new HashMap(4);
+//            orderMap.put("brandName", brand.getBrandName());
+//            orderMap.put("fileName", order.getId());
+//            orderMap.put("type", "orderAction");
+//            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPostAnsc(url, orderMap);
+            /**
+             * 记录订单自动确认2-10过程
+             */
+            LogTemplateUtils.getConfirmByOrderType(brand.getBrandName(), order, orginState, "confirmOrder");
+
+            return order;
+        }
+        return null;
+    }
+
+    @Override
+    public Order confirmWaiMaiOrder(Order order) {
+        order = selectById(order.getId());
+        if (order == null || order.getParentOrderId() != null) {
             return null;
         }
         if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
@@ -5211,7 +4181,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order confirmBossOrder(Order order) {
         order = selectById(order.getId());
-        if (order.getOrderState() != OrderState.PAYMENT) {
+        if (order == null || order.getOrderState() != OrderState.PAYMENT) {
+            return null;
+        }
+        if (order.getParentOrderId() != null) {
             return null;
         }
         if (order.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
@@ -5353,7 +4326,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 return printTask;
             }
         }else{
-
             if(!MemcachedUtils.add(orderId+"print",1)){
                 return printTask;
             }
@@ -5947,95 +4919,86 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Map<String, Object> callMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
         //封装品牌的数据
-        OrderPayDto brandPayDto = new OrderPayDto(brandName, BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
+        BrandOrderReportDto brandOrderReportDto;
+        Map<String, Object> selectBrandMap = new HashMap<>();
+        selectBrandMap.put("beginDate", beginDate);
+        selectBrandMap.put("endDate", endDate);
+        selectBrandMap.put("brandId", brandId);
+        brandOrderReportDto=orderMapper.procDayAllOrderItemBrand(selectBrandMap);
+        brandOrderReportDto.setBrandName(brandName);
+        if(brandOrderReportDto.getOrderCount()!=0&&brandOrderReportDto.getOrderPrice()!=null){
+            BigDecimal singlePrice = new BigDecimal(brandOrderReportDto.getOrderPrice().doubleValue()/brandOrderReportDto.getOrderCount());
+            brandOrderReportDto.setSinglePrice(new BigDecimal(singlePrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+        }else{
+            brandOrderReportDto.setSinglePrice(new BigDecimal("0.00"));
+        }
+        if(brandOrderReportDto.getPeopleCount()!=null&&brandOrderReportDto.getPeopleCount()!=0&&brandOrderReportDto.getOrderPrice()!=null){
+            BigDecimal perPersonPrice = new BigDecimal(brandOrderReportDto.getOrderPrice().doubleValue()/brandOrderReportDto.getPeopleCount());
+            brandOrderReportDto.setPerPersonPrice(new BigDecimal(perPersonPrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+        }else{
+            brandOrderReportDto.setPerPersonPrice(new BigDecimal("0.00"));
+        }
+        if(brandOrderReportDto.getPeopleCount()==null){
+            brandOrderReportDto.setPeopleCount(0);
+        }
+        BigDecimal initial=new BigDecimal("0.00");
+        if(brandOrderReportDto.getOrderPrice()==null){
+            brandOrderReportDto.setOrderPrice(initial);
+        }
+        if(brandOrderReportDto.getTangshiPrice()==null){
+            brandOrderReportDto.setTangshiPrice(initial);
+        }
+        if(brandOrderReportDto.getWaidaiPrice()==null){
+            brandOrderReportDto.setWaidaiPrice(initial);
+        }
+        if(brandOrderReportDto.getWaimaiPrice()==null){
+            brandOrderReportDto.setWaimaiPrice(initial);
+        }
         //封装店铺的数据
-        List<OrderPayDto> shopPayDto = new ArrayList<>();
-        for (ShopDetail shopDetail : shopDetailList) {
-            OrderPayDto ot = new OrderPayDto(shopDetail.getId(), shopDetail.getName(), BigDecimal.ZERO, 0, BigDecimal.ZERO, "0");
-            shopPayDto.add(ot);
-        }
-        //用来接收分段查询出来的订单金额信息
-        List<ShopIncomeDto> shopIncomeDtosItem = new ArrayList<>();
-        shopIncomeDtosItem.add(new ShopIncomeDto());
-        //用来累加分段查询出来的订单金额信息
-        List<ShopIncomeDto> shopIncomeDtosItems = new ArrayList<>();
-        //用来接收分段查询出来的订单支付项信息
-        List<ShopIncomeDto> shopIncomeDtosPayMent = new ArrayList<>();
-        shopIncomeDtosPayMent.add(new ShopIncomeDto());
-        //用来累加分段查询出来的订单支付项信息
-        List<ShopIncomeDto> shopIncomeDtosPayMents = new ArrayList<>();
-        Map<String, Object> selectMap = new HashMap<>();
-        selectMap.put("beginDate", beginDate);
-        selectMap.put("endDate", endDate);
-        for (int pageNo = 0; (shopIncomeDtosItem != null && !shopIncomeDtosItem.isEmpty())
-                || (shopIncomeDtosPayMent != null && !shopIncomeDtosPayMent.isEmpty()); pageNo ++){
-            selectMap.put("pageNo", pageNo * 1000);
-            shopIncomeDtosItem = orderMapper.callProcDayAllOrderItem(selectMap);
-            shopIncomeDtosPayMent = orderMapper.callProcDayAllOrderPayMent(selectMap);
-            shopIncomeDtosItems.addAll(shopIncomeDtosItem);
-            shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
-        }
-        BigDecimal brandActualPayment = BigDecimal.ZERO;
-        BigDecimal brandVirtualPayment = BigDecimal.ZERO;
-        BigDecimal shopActualPayment = BigDecimal.ZERO;
-        BigDecimal shopVirtualPayment = BigDecimal.ZERO;
-        for (OrderPayDto shopOrderPayDto : shopPayDto){
-            //循环累加店铺订单总额、订单数
-            for (ShopIncomeDto shopIncomeDtoItem : shopIncomeDtosItems){
-                if (shopOrderPayDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoItem.getShopDetailId())){
-                    shopOrderPayDto.setOrderMoney(shopOrderPayDto.getOrderMoney().add(shopIncomeDtoItem.getTotalIncome()));
-                    if (StringUtils.isBlank(shopIncomeDtoItem.getParentOrderId())){
-                        shopOrderPayDto.setNumber(shopOrderPayDto.getNumber() + 1);
-                    }
-                }
+        List<ShopOrderReportDto> shopOrderReportDtoLists = new ArrayList<ShopOrderReportDto>();
+        for(int i = 0; i < shopDetailList.size(); i++){
+            ShopDetail shopDetail=shopDetailList.get(i);
+            ShopOrderReportDto shopOrderReportDto= new ShopOrderReportDto();
+            Date begin = DateUtil.getformatBeginDate(beginDate);
+            Date end = DateUtil.getformatEndDate(endDate);
+            shopOrderReportDto=orderMapper.procDayAllOrderItemShop(begin,end,shopDetail.getId());
+            BigDecimal initial_=new BigDecimal("0.00");
+            if(shopOrderReportDto.getShop_orderCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
+                BigDecimal ssinglePrice= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_orderCount());
+                shopOrderReportDto.setShop_singlePrice(new BigDecimal(ssinglePrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+            }else{
+                shopOrderReportDto.setShop_singlePrice(initial_);
             }
-            //循环累加得到店铺的实际支付、虚拟支付的值
-            for (ShopIncomeDto shopIncomeDtoPayMent : shopIncomeDtosPayMents){
-                if (shopOrderPayDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoPayMent.getShopDetailId())){
-                    shopActualPayment = shopActualPayment.add(shopIncomeDtoPayMent.getWechatIncome()).add(shopIncomeDtoPayMent.getAliPayment())
-                            .add(shopIncomeDtoPayMent.getChargeAccountIncome()).add(shopIncomeDtoPayMent.getBackCartPay()).add(shopIncomeDtoPayMent.getMoneyPay());
-                    shopVirtualPayment = shopVirtualPayment.add(shopIncomeDtoPayMent.getRedIncome()).add(shopIncomeDtoPayMent.getCouponIncome()).add(shopIncomeDtoPayMent.getChargeGifAccountIncome())
-                            .add(shopIncomeDtoPayMent.getWaitNumberIncome());
-                }
+
+            if(shopOrderReportDto.getShop_peopleCount()!=null&&shopOrderReportDto.getShop_peopleCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
+                BigDecimal speopleCount= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_peopleCount());
+                shopOrderReportDto.setShop_perPersonPrice(new BigDecimal(speopleCount.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+            }else{
+                shopOrderReportDto.setShop_perPersonPrice(initial_);
             }
-            //计算店铺订单平均金额
-            if (shopOrderPayDto.getNumber().equals(0)){
-                shopOrderPayDto.setAverage(shopOrderPayDto.getOrderMoney());
-            }else {
-                shopOrderPayDto.setAverage(shopOrderPayDto.getOrderMoney().divide(new BigDecimal(shopOrderPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
+            if(shopOrderReportDto.getShop_peopleCount()==null){
+                shopOrderReportDto.setShop_peopleCount(0);
             }
-            //计算店铺营销撬动率
-            if (shopVirtualPayment.equals(BigDecimal.ZERO) || shopVirtualPayment.intValue() == 0){
-                shopOrderPayDto.setMarketPrize("0");
-            }else {
-                shopOrderPayDto.setMarketPrize((shopActualPayment.divide(shopVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
+            if(shopOrderReportDto.getShop_orderPrice()==null){
+                shopOrderReportDto.setShop_orderPrice(initial_);
             }
-            //累加得到品牌实际支付的值
-            brandActualPayment = brandActualPayment.add(shopActualPayment);
-            //累加得到品牌虚拟支付的值
-            brandVirtualPayment = brandVirtualPayment.add(shopVirtualPayment);
-            //店铺虚拟、实际支付的值归零
-            shopActualPayment = BigDecimal.ZERO;
-            shopVirtualPayment = BigDecimal.ZERO;
-            brandPayDto.setOrderMoney(brandPayDto.getOrderMoney().add(shopOrderPayDto.getOrderMoney()));
-            brandPayDto.setNumber(brandPayDto.getNumber() + shopOrderPayDto.getNumber());
-        }
-        //计算品牌订单平均金额
-        if (brandPayDto.getNumber().equals(0)){
-            brandPayDto.setAverage(brandPayDto.getOrderMoney());
-        }else {
-            brandPayDto.setAverage(brandPayDto.getOrderMoney().divide(new BigDecimal(brandPayDto.getNumber()), 2, BigDecimal.ROUND_HALF_UP));
-        }
-        //计算品牌营销撬动率
-        if (brandVirtualPayment.equals(BigDecimal.ZERO) || brandVirtualPayment.intValue() == 0){
-            brandPayDto.setMarketPrize("0");
-        }else {
-            brandPayDto.setMarketPrize((brandActualPayment.divide(brandVirtualPayment, 2, BigDecimal.ROUND_HALF_UP)).toString());
+            if(shopOrderReportDto.getShop_tangshiPrice()==null){
+                shopOrderReportDto.setShop_tangshiPrice(initial_);
+            }
+            if(shopOrderReportDto.getShop_waidaiPrice()==null){
+                shopOrderReportDto.setShop_waidaiPrice(initial_);
+            }
+            if(shopOrderReportDto.getShop_waimaiPrice()==null){
+                shopOrderReportDto.setShop_waimaiPrice(initial_);
+            }
+            shopOrderReportDto.setShopDetailId(shopDetail.getId());
+            shopOrderReportDto.setShopName(shopDetail.getName());
+            shopOrderReportDtoLists.add(shopOrderReportDto);
         }
         //封装返回Map集
         Map<String, Object> map = new HashMap<>();
-        map.put("shopId", shopPayDto);
-        map.put("brandId", brandPayDto);
+        map.put("shopId", shopOrderReportDtoLists);
+        map.put("brandId", brandOrderReportDto);
         return map;
     }
 
@@ -6134,6 +5097,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order selectOrderDetails(String orderId) {
         Order o = orderMapper.selectOrderDetails(orderId);
+        if(o == null){
+            return null;
+        }
         ShopDetail shop = shopDetailService.selectById(o.getShopDetailId());
         if (shop != null) {
             o.setShopName(shop.getName());
@@ -6827,7 +5793,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             selectOrderMap.clear();
             selectOrderMap.put("orderIds", orderIds);
-            selectOrderMap.put("count", "refund_count != 0 and type != 4");
+            selectOrderMap.put("count", "refund_count != 0");
             List<OrderItem> canceledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
             for (OrderItem orderItem : canceledOrderItems) {
                 canceledProductCount = canceledProductCount.add(new BigDecimal(orderItem.getRefundCount()));
@@ -7251,6 +6217,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
+    @Override
+    public List<Order> selectByOrderSatesAndProductionStatesTakeout(String shopId, String[] orderStates,
+                                                             String[] productionStates) {
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+        if (shopDetail.getShopMode() == ShopMode.HOUFU_ORDER) {
+            return orderMapper.listHoufuUnFinishedOrder(shopId);
+
+        } else if (shopDetail.getShopMode() == ShopMode.BOSS_ORDER) {
+            List<Order> order=orderMapper.selectOrderByBossTakeout(shopId);
+            //return orderMapper.selectOrderByBossTakeout(shopId);
+            return order;
+        } else {
+            List<Order> order=orderMapper.selectByOrderSatesAndProductionStatesTakeout(shopId, orderStates, productionStates);
+            //return orderMapper.selectByOrderSatesAndProductionStatesTakeout(shopId, orderStates, productionStates);
+            return order;
+        }
+
+
+    }
+
 
     @Override
     public Order payOrderModeFive(String orderId) {
@@ -7403,58 +6389,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         accountService.payOrder(order, factMoney, customer, null, null);
     }
 
-
-
-
-    public void sendWxRefundMsg(Order order) {
-        if (checkRefundLimit(order)) {
-            autoRefundOrder(order.getId());
-            log.info("款项自动退还到相应账户:" + order.getId());
-            Customer customer = customerService.selectById(order.getCustomerId());
-            WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
-            Brand brand = brandService.selectById(customer.getBrandId());
-            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-            StringBuilder sb = null;
-            if (order.getOrderState().equals(OrderState.SUBMIT)) {//未支付和未完成支付
-                sb = new StringBuilder("亲,今日未完成支付的订单已被商家取消,欢迎下次再来本店消费\n");
-            } else {//已支付未消费
-                sb = new StringBuilder("亲,今日未消费订单已自动退款,欢迎下次再来本店消费\n");
-            }
-            sb.append("订单编号:" + order.getSerialNumber() + "\n");
-            if (order.getOrderMode() != null) {
-                switch (order.getOrderMode()) {
-                    case ShopMode.TABLE_MODE:
-                        sb.append("桌号:" + (order.getTableNumber() != null ? order.getTableNumber() : "无") + "\n");
-                        break;
-                    default:
-                        sb.append("消费码：" + (order.getVerCode() != null ? order.getVerCode() : "无") + "\n");
-                        break;
-                }
-            }
-            if (order.getShopName() == null || "".equals(order.getShopName())) {
-                order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
-            }
-            sb.append("店铺名：" + order.getShopName() + "\n");
-            sb.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
-            sb.append("订单明细：\n");
-            List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
-            for (OrderItem item : orderItem) {
-                sb.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
-            }
-            sb.append("订单金额：" + order.getOrderMoney() + "\n");
-            WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "订单发送推送：" + sb.toString());
-            Map map = new HashMap(4);
-            map.put("brandName", brand.getBrandName());
-            map.put("fileName", customer.getId());
-            map.put("type", "UserAction");
-            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + sb.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPostAnsc(LogUtils.url, map);
-        } else {
-            log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
-        }
-    }
 
     @Override
     public Order getOrderDetail(String orderId) {
@@ -7891,6 +6825,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderitemMapper.deleteByPrimaryKey(zpOrderItem.getId());
                 }
             }
+
             update(order);
             updateCount = baseArticleCount.subtract(new BigDecimal(count));
             String message = "";
@@ -8050,11 +6985,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
             //得到无限制情况下用户的订单数
             int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
-            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+            /*if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
                 gao.append("【高频】");
             }//无限制的时候
             else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
                 gao.append("【高频】");
+            }*/
+            if(gaoCount!=0){
+                gao.append("消费"+gaoCount+"次");
+            }else{
+                gao.append("新顾客");
             }
         }
         String modeText = getModeText(order);
@@ -8180,6 +7120,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 redPacket.setShopDetailId(order.getShopDetailId());
                                 redPacket.setRedRemainderMoney(backMoney);
                                 redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+                                redPacket.setOrderId(order.getId());
                                 redPacketService.insert(redPacket);
                                 Map map = new HashMap(4);
                                 map.put("brandName", brand.getBrandName());
@@ -8255,6 +7196,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 redPacket.setShopDetailId(order.getShopDetailId());
                                 redPacket.setRedRemainderMoney(backMoney);
                                 redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+                                redPacket.setOrderId(order.getId());
                                 redPacketService.insert(redPacket);
                                 Map accountMap = new HashMap(4);
                                 accountMap.put("brandName", brand.getBrandName());
@@ -8310,6 +7252,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             redPacket.setShopDetailId(order.getShopDetailId());
             redPacket.setRedRemainderMoney(order.getRefundMoney());
             redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+            redPacket.setOrderId(order.getId());
             redPacketService.insert(redPacket);
             Map map = new HashMap(4);
             map.put("brandName", brand.getBrandName());
@@ -8324,6 +7267,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜返还红包" + order.getRefundMoney() + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(url, orderMap);
         }
+    }
+
+    public void refundArticleNoPay(Order order){
+        OrderPaymentItem back = new OrderPaymentItem();
+        back.setId(ApplicationUtils.randomUUID());
+        back.setOrderId(order.getId());
+        back.setPaymentModeId(PayMode.REFUND_CRASH);
+        back.setPayTime(new Date());
+        back.setPayValue(new BigDecimal(-1).multiply(order.getRefundMoney()));
+        back.setRemark("现金退款:" + order.getRefundMoney());
+
+        back.setResultData("线下现金退款总金额：" + order.getRefundMoney());
+        orderPaymentItemService.insert(back);
     }
 
     @Override
@@ -8412,7 +7368,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
             if (orders.containsKey(orderItem.getOrderId())) {
                 orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
+                MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", Integer.parseInt(MemcachedUtils.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
             } else {
+                MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", orderItem.getCount());
                 orders.put(orderItem.getOrderId(), itemValue);
             }
         }
@@ -8454,12 +7412,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPaymentModeId(PayMode.COUPON_PAY);
                     item.setPayTime(new Date());
                     item.setPayValue(coupon.getValue());
-                    item.setRemark("优惠卷支付:" + item.getPayValue());
+                    item.setRemark("优惠券支付:" + item.getPayValue());
                     price = price.subtract(item.getPayValue());
                     item.setResultData(coupon.getId());
                     orderPaymentItemService.insert(item);
                     UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                            "订单使用优惠卷支付了：" + item.getPayValue());
+                            "订单使用优惠券支付了：" + item.getPayValue());
                 } else {
 //                    Coupon coupon = couponService.selectById(couponId);
 //                    pay = pay.subtract(coupon.getValue());
@@ -8516,6 +7474,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                                "订单使用银联支付了：" + item.getPayValue());
 //                        updateChild(order);
+                        Map map = new HashMap(4);
+                        map.put("brandName", brand.getBrandName());
+                        map.put("fileName", order.getCustomerId());
+                        map.put("type", "UserAction");
+                        map.put("content", "用户:"+order.getCustomerId()+"发起银联支付："+item.getPayValue()+",订单号为："+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPost(url, map);
                         break;
                     case OrderPayMode.XJ_PAY:
                         order.setPaymentAmount(pay);
@@ -8532,6 +7496,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                                "订单使用现金支付了：" + item.getPayValue());
 //                        updateChild(order);
+                        Map map1 = new HashMap(4);
+                        map1.put("brandName", brand.getBrandName());
+                        map1.put("fileName", order.getCustomerId());
+                        map1.put("type", "UserAction");
+                        map1.put("content", "用户:"+order.getCustomerId()+"发起现金支付："+item.getPayValue()+",订单号为："+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPost(url, map1);
                         break;
                     case OrderPayMode.JF_PAY:
                         order.setPaymentAmount(pay);
@@ -8635,7 +7605,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             if (item.getRefundCount() > 0 && item.getType() != OrderItemType.MEALS_CHILDREN) {
                 sum += item.getRefundCount();
-
+                sum += item.getRefundCount();
             }
             if (item.getType() != OrderItemType.MEALS_CHILDREN) {
                 base += item.getOrginCount();
@@ -8647,18 +7617,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
-        o.setArticleCount(base - sum);
+        o.setArticleCount(o.getArticleCount() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
-            o.setCountWithChild(o.getCountWithChild() - order.getOrderItems().size());
+            o.setCountWithChild(o.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
         }
         if (o.getParentOrderId() != null) {
             Order parent = selectById(o.getParentOrderId());
             parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
-            parent.setCountWithChild(parent.getCountWithChild() - order.getOrderItems().size());
+            parent.setCountWithChild(parent.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
             update(parent);
             Map map = new HashMap(4);
             map.put("brandName", brandSetting.getBrandName());
@@ -8944,7 +7914,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal articleCount = new BigDecimal(0);
         BigDecimal orderMoney = new BigDecimal(0);
         for (OrderItem article : orderItems) {
-            Article a = articleService.selectById(article.getArticleId().indexOf("@") > -1 ? article.getArticleId().substring(0, article.getArticleId().indexOf("@")) : article.getArticleId());
             Map<String, Object> refundItem = new HashMap<>();
             refundItem.put("SUBTOTAL", -article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())).doubleValue());
             refundItem.put("ARTICLE_NAME", article.getArticleName() + "(退)");
@@ -8954,6 +7923,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMoney = orderMoney.add(article.getUnitPrice().multiply(new BigDecimal(article.getRefundCount())));
             if (article.getType() != OrderItemType.MEALS_CHILDREN && order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
                 refundItem = new HashMap<>();
+                String aid = article.getArticleId();
+                if (aid.indexOf("@") > -1) {
+                    aid = aid.substring(0, aid.indexOf("@"));
+                }
+                Article a = articleService.selectById(aid);
                 refundItem.put("SUBTOTAL", -shopDetail.getMealFeePrice().multiply(
                         new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(a.getMealFeeNumber()))).doubleValue());
                 refundItem.put("ARTICLE_NAME", shopDetail.getMealFeeName() + "(退)");
@@ -9027,11 +8001,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             int gaoCount = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), shopDetail.getConsumeConfineTime());
             //得到无限制情况下用户的订单数
             int gaoCountlong = orderMapper.selectByCustomerCount(order.getCustomerId(), shopDetail.getConsumeConfineUnit(), 0);
-            if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
+            /*if (shopDetail.getConsumeNumber() > 0 && gaoCount > shopDetail.getConsumeNumber() && shopDetail.getConsumeConfineUnit() != 3) {
                 gao.append("【高频】");
             }//无限制的时候
             else if (shopDetail.getConsumeConfineUnit() == 3 && gaoCountlong > shopDetail.getConsumeNumber()) {
                 gao.append("【高频】");
+            }*/
+            if(gaoCount!=0){
+                gao.append("消费"+gaoCount+"次");
+            }else{
+                gao.append("新顾客");
             }
         }
         String modeText = getModeText(order);
@@ -9097,7 +8076,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer originState = order.getOrderState();
         Brand brand = brandService.selectByPrimaryKey(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-        Customer customer = customerService.selectById(order.getCustomerId());
         orderMapper.confirmOrderPos(orderId);
         if (order.getPayType() == PayType.NOPAY) {
             confirmOrder(order);
@@ -9113,6 +8091,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
+
+        Map map1 = new HashMap(4);
+        map1.put("brandName", brand.getBrandName());
+        map1.put("fileName", order.getCustomerId());
+        map1.put("type", "UserAction");
+        map1.put("content", "用户:"+order.getCustomerId()+"的订单："+order.getId()+"在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
+        doPost(url, map1);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
         return order;
     }
@@ -9357,9 +8342,39 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             paymentItem.setOrderId(orderId);
             orderPaymentItemService.insert(paymentItem);
         }
-        if (!payMode.equals(1) && !payMode.equals(2)) {
+        if (!payMode.equals(PayMode.WEIXIN_PAY) && !payMode.equals(PayMode.ACCOUNT_PAY)) {
             orderMapper.confirmOrderPos(orderId);
         }
+
+        //日志记录
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", order.getCustomerId());
+        map.put("type", "UserAction");
+        StringBuffer msg = new StringBuffer("用户:"+order.getCustomerId()+"订单在pos端被结算，结算方式为:");
+        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+        for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
+            msg.append(orderPaymentItem.getRemark() + "\n");
+        }
+        msg.append("请求服务器地址为:"+MQSetting.getLocalIP());
+        map.put("content", msg.toString());
+        doPost(url, map);
+
+        //yz 计费系统 后付款 pos端 结算时计费
+		BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
+		//yz 2017/07/29计费系统
+		//判断是否已经记录过该订单
+		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
+
+		//--
+		if(brandAccountLog!=null){
+			return order;
+		}
+
+		if(brandSetting.getOpenBrandAccount()==1){//说明开启了品牌账户
+			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+			updateBrandAccount(order,true,accountSetting);
+		}
         return order;
     }
 
@@ -9379,14 +8394,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<Map<String, Object>> reminder(String orderItemId) {
-        OrderItem orderItem = orderitemMapper.selectByPrimaryKey(orderItemId);
-        List<OrderItem> orderItems = orderitemMapper.getListByParentId(orderItemId);
-        orderItems.add(orderItem);
-        Order order = orderMapper.selectByPrimaryKey(orderItem.getOrderId());
+    public List<Map<String, Object>> reminder(String orderItemIds, String orderId) {
+        String[] itemIds = orderItemIds.split(",");
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        Integer oldDis = order.getDistributionModeId();
         order.setDistributionModeId(DistributionType.REMINDER_ORDER);
-        List<OrderItem> orderItemList = getOrderItemsWithChild(orderItems);
-        return printKitchen(order, orderItemList);
+        for (String itemId : itemIds){
+            OrderItem orderItem = orderitemMapper.selectByPrimaryKey(itemId);
+            List<OrderItem> orderItems = orderitemMapper.getListByParentId(itemId);
+            orderItems.add(orderItem);
+            List<OrderItem> orderItemList = getOrderItemsWithChild(orderItems);
+            printTask.addAll(printKitchen(order, orderItemList));
+        }
+        Order newOrder = new Order();
+        newOrder.setId(orderId);
+        newOrder.setDistributionModeId(oldDis);
+        orderMapper.updateByPrimaryKeySelective(newOrder);
+        return printTask;
     }
 
     List<OrderItem> getOrderItemsWithChild(List<OrderItem> orderItems) {
@@ -9420,6 +8445,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return items;
     }
 
+
+
+
+
     @Override
     public void fixErrorOrder() {
         orderMapper.fixAllowContinueOrder(new Date());
@@ -9440,12 +8469,529 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
+    public Order customerByOrderForMyPage(String customerId, String shopId) {
+        Order order = orderMapper.customerByOrderForMyPage(customerId, shopId);
+        return order;
+    }
+
+    @Override
     public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate) {
         return orderMapper.addRefundArticleDto(beginDate, endDate);
     }
 
+	@Override
+	public Summarry selctSummaryShopData(String beginDate, String endDate, String shopId) {
+
+		Summarry s = new Summarry();
+		//定义时间
+		Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginDate));
+		Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
+
+		BigDecimal offLineOrderMoney = BigDecimal.ZERO;
+
+		List<OffLineOrder> offLineOrderList = offLineOrderMapper.selectByShopIdAndTime(shopId,begin,end);
+		if(!offLineOrderList.isEmpty()){
+			for(OffLineOrder offLineOrder:offLineOrderList){
+				offLineOrderMoney = offLineOrderMoney.add(offLineOrder.getEnterTotal());
+			}
+		}
+		s.setLineOffOrderMoney(offLineOrderMoney);//线下消费金额
+
+		//查询该段时间内的新增用户订单
+		List<Order> newCustomerOrders = orderMapper.selectNewCustomerOrderByShopIdAndTime(shopId,begin,end);
+
+		//新增用户的订单总数
+		int newCustomerOrderNum = 0;
+
+		//分享用户的订单总数
+		int newShareCustomerOrderNum = 0;
+
+		//新增用户的订单金额
+		BigDecimal newCustomerOrderMoney = BigDecimal.ZERO;
+
+		//分享用户的订单金额
+		BigDecimal newShareCustomerOrderMoney = BigDecimal.ZERO;
+
+
+		if(!newCustomerOrders.isEmpty()){
+			for(Order o:newCustomerOrders){
+				newCustomerOrderNum++;
+				newCustomerOrderMoney = newCustomerOrderMoney.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+				if(o.getCustomer()!=null&& StringUtil.isNotEmpty(o.getCustomer().getShareCustomer())){
+					//说明是分享用户
+					newShareCustomerOrderNum++;
+					newShareCustomerOrderMoney = newShareCustomerOrderMoney.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+				}
+			}
+		}
+		//获取到 新用户消费笔数 + 分享用户消费笔数
+
+		s.setNewCustomerOrderNum(newCustomerOrderNum);
+		s.setNewShareCustomerOrderNum(newShareCustomerOrderNum);
+		s.setNewCustomerOrderMoney(newCustomerOrderMoney);
+		s.setNewShareCustomerMoney(newShareCustomerOrderMoney);
+
+
+		//查询回头用户
+		List<BackCustomerDto> backCustomerDtos = orderMapper.selectBackCustomerByShopIdAndTime(shopId, begin, end);
+		Set<String> backCustomerId = new HashSet<>();
+		if(!backCustomerDtos.isEmpty()){
+			for(BackCustomerDto b:backCustomerDtos){
+				backCustomerId.add(b.getCustomerId());
+			}
+		}
+
+
+		//定义回头用户消费笔数
+		int backCustomerOrderNum = 0;
+		//回头用户消费金额
+		BigDecimal backCustomerOrderMoney = BigDecimal.ZERO;
+
+		//查询 出 所有的订单 根据该订单是否是回头用户来判断 回头用户订单
+		List<Order> orders = orderMapper.selectCompleteByShopIdAndTime(shopId,begin,end);
+		if(!orders.isEmpty()){
+			for(Order o:orders){
+				if(backCustomerId.contains(o.getCustomerId())){
+					backCustomerOrderNum++;
+					backCustomerOrderMoney = backCustomerOrderMoney.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+				}
+			}
+		}
+		s.setBackCustomerMoney(backCustomerOrderMoney);
+
+		s.setBackCustomerOrder(backCustomerOrderNum);
+		//用户消费笔数= 新用户消费笔数+回头用户消费笔数
+
+		s.setCustomerOrderNum(backCustomerOrderNum+newCustomerOrderNum);
+
+		s.setCustomerOrderMoney(backCustomerOrderMoney.add(newCustomerOrderMoney));
+
+
+		//折扣比率
+		String discountRatio = "";
+
+		//resto订单总额
+		BigDecimal restoTotal = BigDecimal.ZERO;
+		//红包
+		BigDecimal redPackTotal = BigDecimal.ZERO;
+		//优惠券
+		BigDecimal couponTotal = BigDecimal.ZERO;
+		//充值赠送
+		BigDecimal chargeReturn = BigDecimal.ZERO;
+		//折扣合计
+		BigDecimal discountTotal = BigDecimal.ZERO;
+
+
+		if(!orders.isEmpty()){
+			for(Order o:orders){
+				//resto订单总额
+				restoTotal = restoTotal.add(getOrderMoney(o.getPayType(),o.getOrderMoney(),o.getAmountWithChildren()));
+				if(!o.getOrderPaymentItems().isEmpty()){
+					//订单支付项
+					for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
+						switch (oi.getPaymentModeId()){
+							case PayMode.ACCOUNT_PAY:
+								redPackTotal = redPackTotal.add(oi.getPayValue());
+								break;
+							case PayMode.COUPON_PAY:
+								couponTotal = couponTotal.add(oi.getPayValue());
+								break;
+							case PayMode.REWARD_PAY:
+								chargeReturn = chargeReturn.add(oi.getPayValue());
+								break;
+							default:
+								break;
+						}
+
+					}
+
+				}
+				discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
+				discountRatio = discountTotal.divide(restoTotal.add(discountTotal),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
+
+			}
+		}
+
+		s.setRestoTotalMoney(restoTotal);
+
+		s.setStatisfaction(discountRatio);
+
+		//评论数
+		int fiveStar = 0;
+
+		int fourStar = 0;
+
+		int oneToThreeStar = 0;
+
+		//总评价数
+		int appraiseNum = 0;
+		//总分数
+
+		double appraiseSum = 0;
+
+
+		/**
+		 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
+		 * 去评价 而现在 是查当天下单当天评价所以需要单独查询
+		 *
+		 *
+		 */
+
+		//单独查询评价和分数
+		List<Appraise> appraises = appraiseService.selectByTimeAndShopId(shopId, begin, end);
+		if(!appraises.isEmpty()){
+			for(Appraise a:appraises){
+				appraiseNum++;
+				appraiseSum+=a.getLevel()*20;
+				if(a.getLevel() == 5){
+					fiveStar++;
+				}else if(a.getLevel() == 4){
+					fourStar++;
+				}else{
+					oneToThreeStar++;
+				}
+			}
+		}
+
+		//评论数
+		s.setFiveStar(fiveStar);
+		s.setFourStar(fourStar);
+		s.setOneToThree(oneToThreeStar);
+    	return  s;
+	}
+
     @Override
     public List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap) {
         return orderMapper.selectMealServiceSales(selectMap);
+    }
+
+    @Override
+    public List<Map<String, Object>> badAppraisePrintOrder(String orderId) {
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        //得到订单信息
+        Order order = selectById(orderId);
+        //得到店铺信息
+        ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        //得到所有打印机信息
+        List<Printer> printerList = new ArrayList<>();
+        if (shopDetail.getBadAppraisePrintReceipt()){
+            printerList.addAll(printerService.selectPrintByType(order.getShopDetailId(), 2));
+        }
+        if (shopDetail.getBadAppraisePrintKitchen()){
+            printerList.addAll(printerService.selectPrintByType(order.getShopDetailId(), 1));
+        }
+        //得到桌号
+        TableQrcode tableQrcode =  tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(), Integer.valueOf(order.getTableNumber()));
+        //得到该笔订单的评论信息
+        Appraise appraise = appraiseService.selectDeatilByOrderId(order.getId());
+        //得到该笔订单给差评的菜品Id
+        String[] articleIds = appraise.getArticleId().split(",");
+        //得到差评菜品的订单信息
+        List<OrderItem> orderItems = orderItemService.selectByArticleIds(articleIds);
+        OrderItem[] orderItemList  = new OrderItem[orderItems.size()];
+        for (int i = 0; i < orderItems.size() ; i++){
+            orderItemList[i] = orderItems.get(i);
+        }
+        //封装打印模板
+        for (Printer printer : printerList) {
+            badAppraiseOrderGetKitchenModel(orderItemList, order, printer, appraise, tableQrcode, printTask);
+        }
+        return printTask;
+    }
+
+	@Override
+	public Summarry selctSummaryBrandData(String beginDate, String endDate, String brandId) {
+			//定义时间
+			Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginDate));
+			Date end = DateUtil.getDateEnd(DateUtil.fomatDate(endDate));
+
+			//查询该段时间内的新增用户订单
+			List<Order> newCustomerOrders = orderMapper.selectNewCustomerOrderByBrandIdAndTime(brandId,begin,end);
+
+			//新增用户的订单总数
+			int newCustomerOrderNum = 0;
+
+			//分享用户的订单总数
+			int newShareCustomerOrderNum = 0;
+
+			if(!newCustomerOrders.isEmpty()){
+				for(Order o:newCustomerOrders){
+					newCustomerOrderNum++;
+					if(o.getCustomer()!=null&& StringUtil.isNotEmpty(o.getCustomer().getShareCustomer())){
+						//说明是分享用户
+						newShareCustomerOrderNum++;
+					}
+				}
+			}
+			//获取到 新用户消费笔数 + 分享用户消费笔数
+			Summarry s = new Summarry();
+
+
+			//查询回头用户
+			List<BackCustomerDto> backCustomerDtos = orderMapper.selectBackCustomerByBrandIdAndTime(brandId, begin, end);
+			Set<String> backCustomerId = new HashSet<>();
+			if(!backCustomerDtos.isEmpty()){
+				for(BackCustomerDto b:backCustomerDtos){
+					backCustomerId.add(b.getCustomerId());
+				}
+			}
+
+
+			//定义回头用户消费笔数
+			int backCustomerOrderNum = 0;
+			List<Order> orders = orderMapper.selectCompleteByBrandIdAndTime(brandId,begin,end);
+			if(!orders.isEmpty()){
+				for(Order o:orders){
+					if(backCustomerId.contains(o.getCustomerId())){
+						backCustomerOrderNum++;
+					}
+				}
+			}
+			//用户消费笔数= 新用户消费笔数+回头用户消费笔数
+
+
+			//折扣比率
+			String discountRatio = "";
+
+			//resto订单总额
+			BigDecimal restoTotal = BigDecimal.ZERO;
+			//红包
+			BigDecimal redPackTotal = BigDecimal.ZERO;
+			//优惠券
+			BigDecimal couponTotal = BigDecimal.ZERO;
+			//充值赠送
+			BigDecimal chargeReturn = BigDecimal.ZERO;
+			//折扣合计
+			BigDecimal discountTotal = BigDecimal.ZERO;
+
+
+
+			List<Order> orderList = orderMapper.selectListsmsByBrandId(begin, end, brandId);
+			if(!orderList.isEmpty()){
+				for(Order o:orderList){
+					//resto订单总额
+					restoTotal = restoTotal.add(getOrderMoney(o.getPayType(),o.getOrderMoney(),o.getAmountWithChildren()));
+					if(!o.getOrderPaymentItems().isEmpty()){
+						//订单支付项
+						for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
+							if (oi.getPaymentModeId() == PayMode.ACCOUNT_PAY) {
+								redPackTotal = redPackTotal.add(oi.getPayValue());
+							} else if (oi.getPaymentModeId() == PayMode.COUPON_PAY) {
+								couponTotal = couponTotal.add(oi.getPayValue());
+							} else if (oi.getPaymentModeId() == PayMode.REWARD_PAY) {
+								chargeReturn = chargeReturn.add(oi.getPayValue());
+							}
+						}
+					}
+					discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
+					discountRatio = discountTotal.divide(restoTotal.add(discountTotal),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
+
+				}
+			}
+
+			s.setStatisfaction(discountRatio);
+
+			//评论数
+			int fiveStar = 0;
+
+			int fourStar = 0;
+
+			int oneToThreeStar = 0;
+
+			//总评价数
+			int appraiseNum = 0;
+			//总分数
+
+			double appraiseSum = 0;
+
+
+			/**
+			 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
+			 * 去评价 而现在 是查当天下单当天评价所以需要单独查询
+			 *
+			 *
+			 */
+
+			//单独查询评价和分数
+			List<Appraise> appraises = appraiseService.selectByTimeAndBrandId(begin, end);
+			if(!appraises.isEmpty()){
+				for(Appraise a:appraises){
+					appraiseNum++;
+					appraiseSum+=a.getLevel()*20;
+					if(a.getLevel() == 5){
+						fiveStar++;
+					}else if(a.getLevel() == 4){
+						fourStar++;
+					}else{
+						oneToThreeStar++;
+					}
+				}
+			}
+
+			//评论数
+			s.setFiveStar(fiveStar);
+			s.setFourStar(fourStar);
+			s.setOneToThree(oneToThreeStar);
+			return  s;
+
+	}
+
+
+	/**
+     * 得到差评订单的打印模板
+     * @param orderItemList
+     * @param order
+     * @param printer
+     * @param appraise
+     * @param tableQrcode
+     * @param printTask
+     */
+    private void badAppraiseOrderGetKitchenModel(OrderItem[] orderItemList, Order order, Printer printer, Appraise appraise, TableQrcode tableQrcode, List<Map<String, Object>> printTask) {
+        //保存 菜品的名称和数量
+        List<Map<String, Object>> items = new ArrayList<>();
+        //封装菜品信息
+        OrderItem orderItem;
+        for (int i = 1; i < orderItemList.length; i++) {
+            for (int j = 0; j < orderItemList.length - i; j++) {
+                if (orderItemList[j].getArticleName().length() > orderItemList[j+1].getArticleName().length()){
+                    orderItem = orderItemList[j];
+                    orderItemList[j] = orderItemList[j+1];
+                    orderItemList[j+1] = orderItem;
+                }
+            }
+        }
+        //得到最小的菜品名称的长度
+        Integer minLength = orderItemList[0].getArticleName().length();
+        Map<String, Object> item = new HashMap<>();
+        for (OrderItem article : orderItemList){
+            if (article.getArticleName().length() > minLength){
+                item.put("ARTICLE_NAME", getSpaceNumber(10 - ((article.getArticleName().length() - minLength) * 2)).concat(article.getCount().toString()));
+            }else{
+                item.put("ARTICLE_NAME", getSpaceNumber(10).concat(article.getCount().toString()));
+            }
+            item.put("ARTICLE_COUNT", article.getArticleName());
+            items.add(item);
+            item = new HashMap<>();
+        }
+        String serialNumber = order.getSerialNumber();//序列号
+        String modeText = DistributionType.getModeText(DistributionType.BAD_APPRAISE_ORDER);//就餐模式
+        //保存打印信息
+        Map<String, Object> print = new HashMap<>();
+        print.put("PORT", printer.getPort());
+        print.put("OID", order.getId());
+        print.put("IP", printer.getIp());
+        print.put("PRINT_TASK_ID", ApplicationUtils.randomUUID());
+        print.put("ORDER_ID", serialNumber);
+        Map<String, Object> data = new HashMap<>();
+        //订单Id
+        data.put("ORDER_ID", serialNumber);
+        //订单时间
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        //订单模式
+        data.put("DISTRIBUTION_MODE", modeText);
+        //桌号
+        data.put("TABLE_NUMBER", order.getTableNumber());
+        //该桌号所在区域
+        data.put("ORDER_NUMBER", tableQrcode != null && StringUtils.isNotBlank(tableQrcode.getAreaName()) ? tableQrcode.getAreaName() : "-");
+        data.put("ITEMS", items);
+        //得到当前评论星级
+        StringBuilder star = new StringBuilder();
+        if (appraise != null) {
+            if (appraise != null && appraise.getLevel() < 5) {
+                for (int i = 0; i < appraise.getLevel(); i++) {
+                    star.append("★");
+                }
+                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
+                    star.append("☆");
+                }
+            } else if (appraise != null && appraise.getLevel() == 5) {
+                star.append("★★★★★");
+            }
+        } else {
+            star.append("☆☆☆☆☆");
+        }
+        data.put("CUSTOMER_SATISFACTION", star.toString());
+        //声明对象存储差评用户信息
+        StringBuilder customerInfo = new StringBuilder();
+        //得到该订单用户信息
+        Customer customer = customerService.selectById(order.getCustomerId());
+        //判断用户手机号是否为空
+        if (StringUtils.isNotBlank(customer.getTelephone())){
+            customerInfo.append("["+ customer.getTelephone() +"]");
+        }
+        //判断用户性别
+        if (!customer.getSex().equals(Common.NO)){
+            if (customer.getSex().equals(Common.YES)){
+                customerInfo.append("[先生]");
+            }else {
+                customerInfo.append("[女士]");
+            }
+        }
+        data.put("CUSTOMER_PROPERTY", customerInfo.toString());
+        //评价内容
+        String[] feedBacks = appraise.getFeedback().split(",");
+        StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        for (String feedBack : feedBacks){
+            if (feedBack.indexOf("差") != -1){
+                builder.append(feedBack).append(",");
+            }
+        }
+        String content = builder.toString();
+        content = content.substring(0, content.length() - 1).concat(")").concat(appraise.getContent());
+        data.put("MEMO", "评价内容：" + content);
+        print.put("DATA", data);
+        print.put("STATUS", "0");
+        print.put("TICKET_TYPE", TicketType.KITCHEN);
+        //添加到 打印集合
+        printTask.add(print);
+    }
+
+    /**
+     * 得到空格字符串
+     * @param spaceNumber
+     * @return
+     */
+    private String getSpaceNumber(Integer spaceNumber){
+        StringBuilder builder = new StringBuilder();
+        for (int i =0; i < spaceNumber; i++){
+            builder.append(" ");
+        }
+        return builder.toString();
+    }
+
+    @Override
+    public List<Map<String, String>> selectCustomerOrderCount(List<String> customerIds) {
+        return orderMapper.selectCustomerOrderCount(customerIds);
+    }
+
+	@Override
+	public List<Order> selectHasPayNoChangeStatus(String shopId, Date dateBegin, Date dateEnd) {
+		return orderMapper.selectHasPayNoChangeStatus(shopId,dateBegin,dateEnd);
+	}
+
+	@Override
+	public List<Order> selectNewCustomerOrderByShopIdAndTime(String shopId, Date begin, Date end) {
+		return orderMapper.selectNewCustomerOrderByShopIdAndTime(shopId,begin,end);
+	}
+
+	@Override
+	public List<BackCustomerDto> selectBackCustomerByShopIdAndTime(String shopId, Date begin, Date end) {
+		return orderMapper.selectBackCustomerByShopIdAndTime(shopId,begin,end);
+	}
+
+	@Override
+	public List<Order> selectCompleteByShopIdAndTime(String shopId, Date begin, Date end) {
+		return orderMapper.selectCompleteByShopIdAndTime(shopId,begin,end);
+	}
+
+    @Override
+    public Order selectAfterValidOrderByCustomerId(String customerId) {
+        return orderMapper.selectAfterValidOrderByCustomerId(customerId);
+    }
+
+    @Override
+    public Order afterPayShareBenefits(String orderId) {
+        return orderMapper.selectByPrimaryKey(orderId);
     }
 }

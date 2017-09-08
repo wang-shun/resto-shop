@@ -127,6 +127,6 @@ public class RedisUtil {
 
 
     public static void main(String[] args) {
-        set("test","1",100l);
+    	set("test","1",100l);
     }
 }

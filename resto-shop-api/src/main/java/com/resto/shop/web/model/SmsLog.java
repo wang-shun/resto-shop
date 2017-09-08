@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 public class SmsLog implements Serializable {
-    public static final Integer CODE = 1;//验证码短信 
 
     private Long id;
 

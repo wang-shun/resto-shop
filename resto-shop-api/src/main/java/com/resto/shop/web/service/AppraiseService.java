@@ -4,6 +4,7 @@ import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.AppraiseShopDto;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Appraise;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
@@ -70,4 +71,13 @@ public interface AppraiseService extends GenericService<Appraise, String> {
     List<Appraise> selectByTimeAndShopId(String  id, Date begin, Date end);
 
     List<AppraiseShopDto> selectAppraiseShopDto(Map<String, Object> selectMap);
+
+	/**
+	 * yz 2017/07/28
+	 * 时间内品牌分数查询
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+	List<Appraise> selectByTimeAndBrandId( Date begin, Date end);
 }

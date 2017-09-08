@@ -25,9 +25,16 @@ public interface AccountLogService extends GenericService<AccountLog, String> {
 	List<String> selectBrandMarketing(Map<String, String> selectMap);
 
 	/**
-	 * 根据 账户ID 查询 分享返利总额 s
+	 * 根据 账户ID 查询 分享返利总额
 	 * @param accountId
 	 * @return
      */
 	BigDecimal selectByShareMoney(String accountId);
+
+	/**
+	 * 根据 账户ID 查询 分享返利总数
+	 * @param accountId
+	 * @return
+	 */
+	Integer selectByShareMoneyCount(String accountId);
 }

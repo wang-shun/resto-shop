@@ -40,4 +40,6 @@ public interface SmsLogMapper  extends GenericDao<SmsLog,Long> {
 	 * @return
 	 */
 	List<SmsLog> selectListByBrandId(String brandId);
+
+    SmsLog selectByMap(Map<String, Object> selectMap);
 }

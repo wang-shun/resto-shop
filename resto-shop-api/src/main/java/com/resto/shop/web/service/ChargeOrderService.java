@@ -43,6 +43,8 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 
 	void refundCharge(BigDecimal payValue, String id,String shopDetailId);
 
+	void refundMoney(BigDecimal charge,BigDecimal reward, String id,String shopDetailId);
+
 
 	void refundReward(BigDecimal payValue, String id,String shopDetailId);
 
@@ -99,4 +101,8 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 
 
 	RechargeLogDto selectShopRechargeLog(String beginDate,String endDate,String shopId);
+
+	List<Map<String, Object>> getChargeSumInfo(Map<String, Object> selectMap);
+
+	List<String> selectCustomerChargeOrder(List<String> customerIds);
 }

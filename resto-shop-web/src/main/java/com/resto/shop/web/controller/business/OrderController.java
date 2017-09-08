@@ -9,17 +9,16 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.AppendToExcelUtil;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.web.dto.BrandOrderReportDto;
 import com.resto.brand.web.dto.OrderDetailDto;
 import com.resto.brand.web.dto.OrderPayDto;
+import com.resto.brand.web.dto.ShopOrderReportDto;
 import com.resto.brand.web.model.OrderException;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.OrderExceptionService;
 import com.resto.brand.web.service.ShopDetailService;
-import com.resto.shop.web.constant.DistributionType;
-import com.resto.shop.web.constant.OrderState;
-import com.resto.shop.web.constant.PayMode;
-import com.resto.shop.web.constant.ProductionStatus;
+import com.resto.shop.web.constant.*;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.Order;
@@ -39,10 +38,8 @@ import javax.swing.*;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Controller
 @RequestMapping("orderReport")
@@ -84,7 +81,7 @@ public class OrderController extends GenericController{
 	@SuppressWarnings("unchecked")
 	@RequestMapping("create_brand_excel")
 	@ResponseBody
-	public Result create_brand_excel(String beginDate,String endDate,OrderPayDto orderPayDto,HttpServletRequest request){
+	public Result create_brand_excel(String beginDate, String endDate, ShopOrderReportDto shopOrderReportDto, HttpServletRequest request){
 
 		List<ShopDetail> shopDetailList = getCurrentShopDetails();
 		if(shopDetailList==null){
@@ -95,17 +92,32 @@ public class OrderController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"name","number","orderMoney","average","marketPrize"};
+		String[]columns={"shopName","shop_orderCount","shop_orderPrice","shop_orderCount","shop_peopleCount","shop_orderCount","shop_tangshiCount","shop_tangshiPrice","shop_waidaiCount","shop_waidaiPrice","shop_waimaiCount","shop_waimaiPrice"};
 		//定义数据
-		List<OrderPayDto>  result = new ArrayList<>();
+		//List<OrderPayDto>  result = new ArrayList<>();
+		List<ShopOrderReportDto>  result = new ArrayList<>();
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
         filter.getExcludes().add("brandOrderDto");
         filter.getExcludes().add("shopOrderDtos");
-        String json = JSON.toJSONString(orderPayDto.getBrandOrderDto(), filter);
-        OrderPayDto brandOrderDto = JSON.parseObject(json, OrderPayDto.class);
-        result.add(brandOrderDto);
-        json = JSON.toJSONString(orderPayDto.getShopOrderDtos(), filter);
-        List<OrderPayDto> shopOrderDtos = JSON.parseObject(json, new TypeReference<List<OrderPayDto>>(){});
+        String json = JSON.toJSONString(shopOrderReportDto.getBrandOrderDto(), filter);
+        //OrderPayDto brandOrderDto = JSON.parseObject(json, OrderPayDto.class);
+		BrandOrderReportDto bandOrderReportDto=JSON.parseObject(json, BrandOrderReportDto.class);
+		ShopOrderReportDto b_shopOrderReportDto=new ShopOrderReportDto();
+		b_shopOrderReportDto.setShopName(bandOrderReportDto.getBrandName());
+		b_shopOrderReportDto.setShop_orderCount(bandOrderReportDto.getOrderCount());
+		b_shopOrderReportDto.setShop_orderPrice(bandOrderReportDto.getOrderPrice());
+		b_shopOrderReportDto.setShop_singlePrice(bandOrderReportDto.getSinglePrice());
+		b_shopOrderReportDto.setShop_peopleCount(bandOrderReportDto.getPeopleCount());
+		b_shopOrderReportDto.setShop_perPersonPrice(bandOrderReportDto.getPerPersonPrice());
+		b_shopOrderReportDto.setShop_tangshiCount(bandOrderReportDto.getTangshiCount());
+		b_shopOrderReportDto.setShop_tangshiPrice(bandOrderReportDto.getTangshiPrice());
+		b_shopOrderReportDto.setShop_waidaiCount(bandOrderReportDto.getWaidaiCount());
+		b_shopOrderReportDto.setShop_waidaiPrice(bandOrderReportDto.getWaidaiPrice());
+		b_shopOrderReportDto.setShop_waimaiCount(bandOrderReportDto.getWaimaiCount());
+		b_shopOrderReportDto.setShop_waimaiPrice(bandOrderReportDto.getWaimaiPrice());
+        result.add(b_shopOrderReportDto);
+        json = JSON.toJSONString(shopOrderReportDto.getShopOrderDtos(), filter);
+        List<ShopOrderReportDto> shopOrderDtos = JSON.parseObject(json, new TypeReference<List<ShopOrderReportDto>>(){});
         result.addAll(shopOrderDtos);
 		String shopName="";
 		for (ShopDetail shopDetail : shopDetailList) {
@@ -122,9 +134,9 @@ public class OrderController extends GenericController{
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = {{"品牌名称/店铺名称","25"},{"订单总数(份)","25"},{"订单金额(元)","25"},{"订单平均金额(元)","25"},{"营销撬动率","25"}};
+		String[][] headers = {{"品牌/店铺","25"},{"订单总数","25"},{"订单总额","25"},{"单均","25"},{"就餐人数","25"},{"人均","25"},{"堂吃订单数","25"},{"堂吃订单额","25"},{"外带订单数","25"},{"外带订单额","25"},{"R+外卖订单数","25"},{"R+外卖订单额","25"}};
 		//定义excel工具类对象
-		ExcelUtil<OrderPayDto> excelUtil=new ExcelUtil<OrderPayDto>();
+		ExcelUtil<ShopOrderReportDto> excelUtil=new ExcelUtil<ShopOrderReportDto>();
 		try{
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.ExportExcel(headers, columns, result, out, map);
@@ -275,9 +287,15 @@ public class OrderController extends GenericController{
 			if(temp.compareTo(BigDecimal.ZERO)>0){
                 ot.setIncomePrize(real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"");
 			}
+			if(o.getTableNumber()!=null){
+				ot.setTableNumber(o.getTableNumber());
+			}else {
+				ot.setTableNumber("--");
+			}
 			//订单金额
 			ot.setOrderMoney(o.getOrderMoney());
 			ot.setMoneyPay(ot.getMoneyPay().subtract(ot.getGiveChangePayment()));
+			ot.setDistributionModeId(o.getDistributionModeId());
 			listDto.add(ot);
 		}
 		return listDto;
@@ -344,7 +362,7 @@ public class OrderController extends GenericController{
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
 		String[]columns={"shopName","createTime","telephone","orderState","orderMoney","weChatPay","accountPay","couponPay","chargePay","rewardPay","waitRedPay",
-                "aliPayment","moneyPay","backCartPay","shanhuiPay","integralPay","articleBackPay","incomePrize"};
+                "aliPayment","moneyPay","backCartPay","shanhuiPay","integralPay","articleBackPay"};
 		//定义数据
 		List<OrderDetailDto> result = new ArrayList<>();
 		//获取店铺名称
@@ -360,11 +378,23 @@ public class OrderController extends GenericController{
             shopName = shopName.substring(0,shopName.length() - 1);
         }
         if (orderDetailDto.getShopOrderList() != null){
-            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-            filter.getExcludes().add("shopOrderList");
-            String json = JSON.toJSONString(orderDetailDto.getShopOrderList(), filter);
-            result = JSON.parseObject(json, new TypeReference<List<OrderDetailDto>>(){});
-        }
+			SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+			filter.getExcludes().add("shopOrderList");
+			String json = JSON.toJSONString(orderDetailDto.getShopOrderList(), filter);
+			List<OrderDetailDto> list = JSON.parseObject(json, new TypeReference<List<OrderDetailDto>>(){});
+			for(OrderDetailDto orderDetailDto_:list){
+				if(orderDetailDto_.getDistributionModeId()==1){
+					orderDetailDto_.setShopName("堂吃");
+				}else if(orderDetailDto_.getDistributionModeId()==2){
+					orderDetailDto_.setShopName("外卖");
+				}else if(orderDetailDto_.getDistributionModeId()==3){
+					orderDetailDto_.setShopName("外带");
+				}else{
+					orderDetailDto_.setShopName("未知");
+				}
+				result.add(orderDetailDto_);
+			}
+		}
 		Map<String,String> map = new HashMap<>();
 		map.put("brandName", getBrandName());
 		map.put("shops", shopName);
@@ -375,10 +405,9 @@ public class OrderController extends GenericController{
 		map.put("reportTitle", ""+ (shopId == null || shopId == "" ? "会员" : "店铺") +"订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = {{"店铺","25"},{"下单时间","25"},{"手机号","25"},{"订单状态","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},
+		String[][] headers = {{"订单类型","25"},{"下单时间","25"},{"手机号","25"},{"订单状态","25"},{"订单金额(元)","25"},{"微信支付(元)","25"},{"红包支付(元)","25"},
                 {"优惠券支付(元)","25"},{"充值金额支付(元)","25"},{"充值赠送金额支付(元)","25"},{"等位红包支付(元)","25"},{"支付宝支付(元)","25"},
-                {"现金实收(元)","25"},{"银联支付(元)","25"},{"闪惠支付(元)","25"},{"会员支付(元)","25"},{"退菜返还红包(元)","25"}
-                ,{"营销撬动率","25"}};
+                {"现金实收(元)","25"},{"银联支付(元)","25"},{"闪惠支付(元)","25"},{"会员支付(元)","25"},{"退菜返还红包(元)","25"}};
 		//定义excel工具类对象
 		ExcelUtil<OrderDetailDto> excelUtil=new ExcelUtil<OrderDetailDto>();
 		try{
@@ -513,4 +542,188 @@ public class OrderController extends GenericController{
 //        orderService.cleanShopOrder(s,null);
 //        return  getSuccessResult();
 //    }
+
+	@RequestMapping("/createMonthDto")
+	@ResponseBody
+	public Result createMonthDto(String year, String month, Integer type, HttpServletRequest request){
+		//得到传入的某年某月一共有多少天
+		Integer monthDay = getMonthDay(year, month);
+		// 导出文件名
+		String typeName = type.equals(Common.YES) ? "店铺订单报表月报表" : "品牌订单报表月报表" ;
+		String str = typeName + year.concat("-").concat(month).concat("-01") + "至"
+				+ year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)) + ".xls";
+		//得到文件存储路径
+		String path = request.getSession().getServletContext().getRealPath(str);
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			//得到该品牌所有店铺
+			List<ShopDetail> shopDetails = getCurrentShopDetails();
+			//初始化店铺名称集合
+			String[] shopNames = new String[1];
+			//初始化数据集合
+			BrandOrderReportDto[][] result = new BrandOrderReportDto[1][monthDay];
+			//查询本月订单
+			List<Order> orderList = orderService.selectListBybrandId(year.concat("-").concat(month).concat("-01"), year.concat("-").concat(month).concat("-" + String.valueOf(monthDay))
+					, getCurrentBrandId());
+			//用来保存每次循环没有用到的订单
+			List<Order> orders = new ArrayList<>();
+			//声明迭代器
+			Iterator<Order> orderIterator = orderList.iterator();
+			//初始化订单报表实体
+			BrandOrderReportDto orderReportDto = new BrandOrderReportDto();
+			if (type.equals(Common.YES)) {
+				shopNames = new String[shopDetails.size()];
+				//重新new一个二位数组，行是店铺数、列是天数
+				result = new BrandOrderReportDto[shopDetails.size()][monthDay];
+				//初始化i用来记录当前所在店铺
+				int i = 0;
+				//初始化j用来记录当前所在天数
+				int j = 0;
+				//循环每个店铺，每个店铺相当于一个sheet
+				for (ShopDetail shopDetail : shopDetails){
+					//循环每一天，封装每个sheet的数据
+					for (int day = 0; day < monthDay; day++){
+						Date beginDate = getBeginDay(year, month, day);
+						Date endDate = getEndDay(year, month, day);
+						//判断当天是否又产生订单，有则进入逻辑判断
+						if (!orderList.isEmpty()) {
+							while (orderIterator.hasNext()) {
+								//得到当前订单
+								Order order = orderIterator.next();
+								//循环订单找到某店铺某一天的数据
+								if (order.getShopDetailId().equalsIgnoreCase(shopDetail.getId()) && order.getCreateTime().getTime() >= beginDate.getTime()
+										&& order.getCreateTime().getTime() <= endDate.getTime()) {
+									//当时订单金额累加
+									orderReportDto.setOrderPrice(orderReportDto.getOrderPrice().add(order.getOrderMoney()));
+									//判断是否为父订单
+									if (StringUtils.isBlank(order.getParentOrderId())){
+										//就餐人数累加
+										orderReportDto.setPeopleCount(orderReportDto.getPeopleCount() + (order.getCustomerCount() == null ? 0 : order.getCustomerCount()));
+										//当日订单数累加
+										orderReportDto.setOrderCount(orderReportDto.getOrderCount() + 1);
+									}
+									if (order.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){ //就餐模式为堂食
+										//堂食订单数累加
+										orderReportDto.setTangshiCount(orderReportDto.getTangshiCount() + 1);
+										//堂食订单总额累加
+										orderReportDto.setTangshiPrice(orderReportDto.getTangshiPrice().add(order.getOrderMoney()));
+									}else if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)){ //就餐模式为外带
+										//外带订单数累加
+										orderReportDto.setWaidaiCount(orderReportDto.getWaidaiCount() + 1);
+										//外带订单额累加
+										orderReportDto.setWaidaiPrice(orderReportDto.getWaidaiPrice().add(order.getOrderMoney()));
+									}else if (order.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){ //就餐模式为外卖
+										//外卖订单数累加
+										orderReportDto.setWaimaiCount(orderReportDto.getWaimaiCount() + 1);
+										//外卖订单额累加
+										orderReportDto.setWaimaiPrice(orderReportDto.getWaimaiPrice().add(order.getOrderMoney()));
+									}
+								}else {
+									orders.add(order);
+								}
+							}
+							orderIterator = orders.iterator();
+							orders = new ArrayList<>();
+						}
+						//计算单均：订单总额/订单总数
+						orderReportDto.setSinglePrice(orderReportDto.getOrderCount() != 0 ? orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getOrderCount()), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO);
+						//计算人均：订单总额/就餐人数
+						orderReportDto.setPerPersonPrice(orderReportDto.getPeopleCount() != 0 ? orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getPeopleCount()), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO);
+						orderReportDto.setBrandName(format.format(beginDate));
+						result[i][j] = orderReportDto;
+						j++;
+						orderReportDto = new BrandOrderReportDto();
+					}
+					shopNames[i] = shopDetail.getName();
+					//所在店铺下标累加
+					i++;
+					//将所在天数恢复初始值
+					j = 0;
+				}
+			}else {
+				//得到所有店铺名称
+				StringBuilder builder = new StringBuilder();
+				for (ShopDetail shopDetail : shopDetails){
+					builder.append(shopDetail.getName()).append(",");
+				}
+				String shopName = builder.toString();
+				shopName = shopName.substring(0, shopName.length() - 1);
+				shopNames[0] = shopName;
+				//初始化j用来记录当前所在天数
+				int j = 0;
+				//循环每一天，封装每个sheet的数据
+				for (int day = 0; day < monthDay; day++){
+					Date beginDate = getBeginDay(year, month, day);
+					Date endDate = getEndDay(year, month, day);
+					//判断当天是否又产生订单，有则进入逻辑判断
+					if (!orderList.isEmpty()) {
+						while (orderIterator.hasNext()) {
+							//得到当前订单
+							Order order = orderIterator.next();
+							//循环订单找到某店铺某一天的数据
+							if (order.getCreateTime().getTime() >= beginDate.getTime() && order.getCreateTime().getTime() <= endDate.getTime()) {
+								//当时订单金额累加
+								orderReportDto.setOrderPrice(orderReportDto.getOrderPrice().add(order.getOrderMoney()));
+								//判断是否为父订单
+								if (StringUtils.isBlank(order.getParentOrderId())){
+									//就餐人数累加
+									orderReportDto.setPeopleCount(orderReportDto.getPeopleCount() + (order.getCustomerCount() == null ? 0 : order.getCustomerCount()));
+									//当日订单数累加
+									orderReportDto.setOrderCount(orderReportDto.getOrderCount() + 1);
+								}
+								if (order.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){ //就餐模式为堂食
+									//堂食订单数累加
+									orderReportDto.setTangshiCount(orderReportDto.getTangshiCount() + 1);
+									//堂食订单总额累加
+									orderReportDto.setTangshiPrice(orderReportDto.getTangshiPrice().add(order.getOrderMoney()));
+								}else if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)){ //就餐模式为外带
+									//外带订单数累加
+									orderReportDto.setWaidaiCount(orderReportDto.getWaidaiCount() + 1);
+									//外带订单额累加
+									orderReportDto.setWaidaiPrice(orderReportDto.getWaidaiPrice().add(order.getOrderMoney()));
+								}else if (order.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){ //就餐模式为外卖
+									//外卖订单数累加
+									orderReportDto.setWaimaiCount(orderReportDto.getWaimaiCount() + 1);
+									//外卖订单额累加
+									orderReportDto.setWaimaiPrice(orderReportDto.getWaimaiPrice().add(order.getOrderMoney()));
+								}
+							}else {
+								orders.add(order);
+							}
+						}
+						orderIterator = orders.iterator();
+						orders = new ArrayList<>();
+					}
+					//计算单均：订单总额/订单总数
+					orderReportDto.setSinglePrice(orderReportDto.getOrderCount() != 0 ? orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getOrderCount()), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO);
+					//计算人均：订单总额/就餐人数
+					orderReportDto.setPerPersonPrice(orderReportDto.getPeopleCount() != 0 ? orderReportDto.getOrderPrice().divide(new BigDecimal(orderReportDto.getPeopleCount()), 2, BigDecimal.ROUND_HALF_UP) : BigDecimal.ZERO);
+					orderReportDto.setBrandName(format.format(beginDate));
+					result[0][j] = orderReportDto;
+					j++;
+					orderReportDto = new BrandOrderReportDto();
+				}
+			}
+			//封装excel基本信息
+			Map<String, Object> map = new HashMap<>();
+			map.put("brandName", getBrandName());
+			map.put("beginDate", year.concat("-").concat(month).concat("-01"));
+			map.put("reportType", typeName);// 表的头，第一行内容
+			map.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
+			map.put("num", "10");// 显示的位置
+			map.put("timeType", "yyyy-MM-dd");
+			map.put("reportTitle", shopNames);// 表的名字
+			String[][] headers = {{"日期","25"},{"订单总数","25"},{"订单总额","25"},{"单均","25"},{"就餐人数","25"},{"人均","25"},{"堂吃订单数","25"},{"堂吃订单额","25"},{"外带订单数","25"},{"外带订单额","25"},{"R+外卖订单数","25"},{"R+外卖订单额","25"}};
+			String[] columns = {"brandName","orderCount","orderPrice","singlePrice","peopleCount","perPersonPrice","tangshiCount","tangshiPrice","waidaiCount","waidaiPrice","waimaiCount","waimaiPrice"};
+			ExcelUtil<BrandOrderReportDto> excelUtil = new ExcelUtil<>();
+			OutputStream out = new FileOutputStream(path);
+			excelUtil.createMonthDtoExcel(headers, columns, result, out, map);
+			out.close();
+		}catch (Exception e){
+			e.printStackTrace();
+			log.error("生成月订单报表出错！");
+			return new Result(false);
+		}
+		return getSuccessResult(path);
+	}
 }

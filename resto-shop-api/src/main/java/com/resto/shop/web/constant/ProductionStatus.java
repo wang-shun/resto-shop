@@ -51,6 +51,8 @@ public class ProductionStatus {
 			return "已取餐";
 		case ProductionStatus.NOT_PRINT:
 			return "已下单,未打印";
+		case ProductionStatus.REFUND_ARTICLE:
+			return "退菜取消";
 		default:
 			return "未知状态";
 		}

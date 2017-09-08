@@ -3,11 +3,9 @@ package com.resto.shop.web.config;
 import javax.annotation.Resource;
 
 import com.resto.brand.web.service.*;
-import com.resto.shop.web.model.DayAppraiseMessage;
-import com.resto.shop.web.service.DayAppraiseMessageService;
-import com.resto.shop.web.service.DayDataMessageService;
-import com.resto.shop.web.service.LogBaseService;
-import com.resto.shop.web.service.ThirdService;
+import com.resto.brand.web.service.OrderRemarkService;
+import com.resto.brand.web.service.TableQrcodeService;
+import com.resto.shop.web.service.*;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportResource;
@@ -113,23 +111,68 @@ public class ServerConfig {
     public WeBrandScoreService weBrandScoreService(){ return  proxy.create(WeBrandScoreService.class); }
 
     @Bean
+    public OrderRemarkService boOrderRemarkService(){ return  proxy.create(OrderRemarkService.class); }
+
+    @Bean
     public ElemeTokenService elemeTokenService(){ return  proxy.create(ElemeTokenService.class); }
 
 
+    @Bean
+    public  WetherService wetherService(){
+        return proxy.create(WetherService.class);
+    }
+
+    @Bean
+    public DayDataMessageService dayDataMessageService(){
+        return proxy.create(DayDataMessageService.class);
+    }
+
+    @Bean
+    public DayAppraiseMessageService dayAppraiseMessageService(){
+        return proxy.create(DayAppraiseMessageService.class);
+    }
+
+    //品牌账户
 	@Bean
-	public  WetherService wetherService(){
-		return proxy.create(WetherService.class);
+	public BrandAccountService brandAccountService(){
+
+    	return proxy.create(BrandAccountService.class);
+	}
+
+	//品牌账户日志(流水)
+	@Bean
+	public  BrandAccountLogService brandAccountLogService(){
+		return proxy.create(BrandAccountLogService.class);
+	}
+
+	//品牌账户设置
+	@Bean
+	public AccountSettingService accountSettingService(){
+
+		return proxy.create(AccountSettingService.class);
 	}
 
 	@Bean
-	public DayDataMessageService dayDataMessageService(){
-		return proxy.create(DayDataMessageService.class);
+	public AccountAddressInfoService accountAddressInfoService(){
+
+		return proxy.create(AccountAddressInfoService.class);
 	}
 
 	@Bean
-	public DayAppraiseMessageService dayAppraiseMessageService(){
-		return proxy.create(DayAppraiseMessageService.class);
+	public AccountChargeOrderService accountChargeOrderService(){
+		return proxy.create(AccountChargeOrderService.class);
 	}
+
+	@Bean
+	public AccountNoticeService accountNoticeService(){
+		return proxy.create(AccountNoticeService.class);
+	}
+
+	@Bean
+	public CloseShopService closeShopService(){
+		return proxy.create(CloseShopService.class);
+	}
+
 
 
 }

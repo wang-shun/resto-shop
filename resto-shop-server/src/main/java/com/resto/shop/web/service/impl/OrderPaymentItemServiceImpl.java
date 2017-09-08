@@ -154,7 +154,17 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     }
 
     @Override
+    public OrderPaymentItem selectWeChatPayResultData(String shopId) {
+        return orderpaymentitemMapper.selectWeChatPayResultData(shopId);
+    }
+
+    @Override
     public List<OrderPaymentItem> selectRefundPayMent(String orderId) {
         return orderpaymentitemMapper.selectRefundPayMent(orderId);
+    }
+
+    @Override
+    public int deleteByOrderId(String orderId) {
+        return orderpaymentitemMapper.deleteByOrderId(orderId);
     }
 }

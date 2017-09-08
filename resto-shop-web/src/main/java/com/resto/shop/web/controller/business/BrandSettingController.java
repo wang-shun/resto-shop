@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.springframework.stereotype.Controller;
@@ -50,11 +51,10 @@ public class BrandSettingController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid BrandSetting brandSetting){
-		
 		brandSettingService.update(brandSetting);
-		if(RedisUtil.get(getCurrentBrandId()+"setting") != null){
+		/*if(RedisUtil.get(getCurrentBrandId()+"setting") != null){
 			RedisUtil.remove(getCurrentBrandId()+"setting");
-		}
+		}*/
 		Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
 		ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
 		LogTemplateUtils.brandSettingEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());

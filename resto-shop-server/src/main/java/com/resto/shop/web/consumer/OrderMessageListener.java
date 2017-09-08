@@ -9,11 +9,7 @@ import com.aliyun.openservices.ons.api.MessageListener;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.model.*;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.BrandSettingService;
-import com.resto.brand.web.service.ShareSettingService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.brand.web.service.WechatConfigService;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.constant.OrderState;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
@@ -68,6 +64,18 @@ public class OrderMessageListener implements MessageListener {
 
     @Resource
     NewCustomCouponService newcustomcouponService;
+
+    @Resource
+	BrandAccountService brandAccountService;
+
+    @Resource
+	AccountSettingService accountSettingService;
+
+
+    @Resource
+	AccountNoticeService accountNoticeService;
+
+
     @Resource
     LogBaseService logBaseService;
     @Value("#{propertyConfigurer['orderMsg']}")
@@ -110,12 +118,50 @@ public class OrderMessageListener implements MessageListener {
         	return executeRecommendMsg(message);
         }else if(tag.equals(MQSetting.TAG_BOSS_ORDER)){
             return executeBossOrderMsg(message);
-        }
+        }else if(tag.equals(MQSetting.TAG_BRAND_ACCOUNT_SEND)){
+        	return excuteBrandAccountMsg(message);
+		}
         return Action.ReconsumeLater;
     }
 
+	private Action excuteBrandAccountMsg(Message message) {
 
-    private Action executeNoticeShareCustomer(Message message) throws UnsupportedEncodingException {
+    	log.info("消费者开始消费品牌账户欠费消息。。");
+		try {
+			String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
+			JSONObject json = JSONObject.parseObject(msg);
+			//品牌账户
+			BrandAccount brandAccount = brandAccountService.selectByBrandId(json.getString("brandId"));
+			//账户提醒设置
+			Boolean flag = true;//默认商户已经充钱
+
+			List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
+			if(!noticeList.isEmpty()){
+				for(AccountNotice accountNotice:noticeList){
+					if(brandAccount.getAccountBalance().compareTo(accountNotice.getNoticePrice())<0){// 账户只要小于设置就代表商户没充或者没有冲够钱 更改账户设置为 未发送短信
+						flag = false;
+						//更新设置
+						log.info("账户没有充值或者充值--把账户设置已发送欠费短信改为未发送欠费短信");
+						BrandSetting brandSetting = brandSettingService.selectByBrandId(json.getString("brandId"));
+						AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+						Long id = accountSetting.getId();
+						AccountSetting ast = new AccountSetting();
+						ast.setType(0);
+						ast.setId(id);
+						accountSettingService.update(ast);
+						break;
+					}
+				}
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			return Action.ReconsumeLater;
+		}
+		return Action.CommitMessage;
+	}
+
+
+	private Action executeNoticeShareCustomer(Message message) throws UnsupportedEncodingException {
         try {
             String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
             Customer customer = JSONObject.parseObject(msg, Customer.class);
@@ -148,6 +194,13 @@ public class OrderMessageListener implements MessageListener {
     
     
     //优惠券过期提前推送消息队列
+
+	/**
+	 * 方法已过期 wtl
+	 * @param message
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 */
     private Action executeRecommendMsg(Message message) throws UnsupportedEncodingException {
         try {
             String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
@@ -173,7 +226,7 @@ public class OrderMessageListener implements MessageListener {
             doPostAnsc(LogUtils.url, map);
             map.put("content","用户:"+customer.getNickname()+"优惠券过期发短信提醒"+"请求地址:"+MQSetting.getLocalIP());
             if(setting.getIsSendCouponMsg() == Common.YES){
-                sendNote(shopName,pr,name,pushDay,customer.getId(),map);
+                sendNote(shopName,pr,name,pushDay,customer.getId());
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -185,14 +238,16 @@ public class OrderMessageListener implements MessageListener {
     }
     
   //发送短信
-    private void sendNote(String shop,String price,String name,String pushDay,String customerId,Map<String,String>logMap){
+    private void sendNote(String shop,String price,String name,String pushDay,String customerId){
         Customer customer=customerService.selectById(customerId);
     	Map param = new HashMap();
         param.put("shop", shop);
 		param.put("price", price);
 		param.put("name", name);
 		param.put("day", pushDay);
-        SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004",logMap);
+        JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param), "餐加", "SMS_43790004");
+
+
     }
 
     //
@@ -401,6 +456,9 @@ public class OrderMessageListener implements MessageListener {
             Order order = JSON.parseObject(msg, Order.class);
             DataSourceContextHolder.setDataSourceName(order.getBrandId());
             log.info("执行自动确认逻辑" + order.getId());
+            if(order.getProductionStatus()==4){
+                orderService.confirmWaiMaiOrder(order);
+            }else
             orderService.confirmOrder(order);
         }catch (Exception e){
             e.printStackTrace();

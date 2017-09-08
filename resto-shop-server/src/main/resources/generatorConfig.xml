@@ -41,6 +41,6 @@
 
         <!--对应数据库表名 mybatis-generator:generate -->
 
-       <table tableName="we_return_customer" domainObjectName="WeReturnCustomer" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
+       <table tableName="tb_day_appraise_message" domainObjectName="DayAppraiseMessage" enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false" enableSelectByExample="false" selectByExampleQueryId="false"></table>
     </context>
 </generatorConfiguration>

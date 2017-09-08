@@ -21,11 +21,12 @@
         <result column="distance_birthday_day" property="distanceBirthdayDay"/>
         <result column="real_time_coupon_begin_time" property="realTimeCouponBeginTime"/>
         <result column="real_time_coupon_end_time" property="realTimeCouponEndTime"/>
+        <result column="is_brand" property="isBrand"/>
     </resultMap>
     <sql id="Base_Column_List">id, name, coupon_value, coupon_validay, coupon_number, create_time, use_with_account, coupon_name, coupon_min_money, begin_time, end_time, is_activty, brand_id, distribution_mode_id
-,recommend_delay_time,distance_birthday_day,real_time_coupon_begin_time,real_time_coupon_end_time</sql>
-    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select
-        <include refid="Base_Column_List"/> from tb_new_custom_coupon where id = #{id,jdbcType=BIGINT}
+,recommend_delay_time,distance_birthday_day,real_time_coupon_begin_time,real_time_coupon_end_time,is_brand</sql>
+    <select id="selectByPrimaryKey" resultType="com.resto.shop.web.model.NewCustomCoupon" parameterType="java.lang.Long">
+       select  * from tb_new_custom_coupon where id = #{id,jdbcType=BIGINT}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">delete from tb_new_custom_coupon where id = #{id,jdbcType=BIGINT}</delete>
     <insert id="insert" parameterType="com.resto.shop.web.model.NewCustomCoupon">insert into tb_new_custom_coupon (id, name, coupon_value, coupon_validay, coupon_number, create_time, use_with_account, coupon_name, coupon_min_money, begin_time, end_time, is_activty, brand_id, distribution_mode_id) values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{couponValue,jdbcType=DECIMAL}, #{couponValiday,jdbcType=INTEGER}, #{couponNumber,jdbcType=INTEGER}, #{createTime,jdbcType=TIMESTAMP}, #{useWithAccount,jdbcType=BIT}, #{couponName,jdbcType=VARCHAR}, #{couponMinMoney,jdbcType=DECIMAL}, #{beginTime,jdbcType=TIME}, #{endTime,jdbcType=TIME}, #{isActivty,jdbcType=BIT}, #{brandId,jdbcType=VARCHAR}, #{distributionModeId,jdbcType=INTEGER})</insert>
@@ -125,8 +126,8 @@
     <select id="selectListByBrandId" resultType="NewCustomCoupon">
         select id,name,coupon_value,coupon_validay,coupon_number,create_time,coupon_type,shop_detail_id,is_brand,
         use_with_account,coupon_name,coupon_min_money,begin_time,end_time,is_activty,brand_id,distribution_mode_id,time_cons_type,begin_date_time,end_date_time,
-        recommend_delay_time,distance_birthday_day,DATE_FORMAT(real_time_coupon_begin_time,'%Y-%m-%d %H:%I:%s') realTimeCouponBeginTimeString,
-        DATE_FORMAT(real_time_coupon_end_time,'%Y-%m-%d %H:%I:%s') realTimeCouponEndTimeString
+        recommend_delay_time,distance_birthday_day,DATE_FORMAT(real_time_coupon_begin_time,'%Y-%m-%d %H:%i:%s') realTimeCouponBeginTimeString,
+        DATE_FORMAT(real_time_coupon_end_time,'%Y-%m-%d %H:%i:%s') realTimeCouponEndTimeString
         from tb_new_custom_coupon where (brand_id=#{brandId}
         and is_brand = 1 ) or ( is_brand = 0 and shop_detail_id = #{shopId} )
     </select>

@@ -184,5 +184,9 @@
                 App.initAjax();
             })
         })
+
+        function format(str) {
+            Date.prototype.format(str)
+        }
 	</script>
 </html>

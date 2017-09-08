@@ -2,10 +2,9 @@ package com.resto.shop.web.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -195,4 +194,70 @@ public abstract class GenericController{
     public void initBinder(WebDataBinder binder) {
         binder.setAutoGrowCollectionLimit(Integer.MAX_VALUE);
     }
+
+	/**
+	 * 计算两个日期之间相差的天数
+	 * @param smdate 较小的时间
+	 * @param bdate  较大的时间
+	 * @return 相差天数
+	 * @throws ParseException
+	 */
+	public static int daysBetween(Date smdate,Date bdate) throws ParseException
+	{
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		smdate=sdf.parse(sdf.format(smdate));
+		bdate=sdf.parse(sdf.format(bdate));
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(smdate);
+		long time1 = cal.getTimeInMillis();
+		cal.setTime(bdate);
+		long time2 = cal.getTimeInMillis();
+		long between_days=(time2-time1)/(1000*3600*24);
+
+		return Integer.parseInt(String.valueOf(between_days));
+	}
+
+	/**
+	 *字符串的日期格式的计算
+	 */
+	public static int daysBetween(String smdate,String bdate) throws ParseException{
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(sdf.parse(smdate));
+		long time1 = cal.getTimeInMillis();
+		cal.setTime(sdf.parse(bdate));
+		long time2 = cal.getTimeInMillis();
+		long between_days=(time2-time1)/(1000*3600*24);
+
+		return Integer.parseInt(String.valueOf(between_days));
+	}
+
+	public Integer getMonthDay(String year, String month){
+		Calendar calendar = Calendar.getInstance();
+		calendar.set(Calendar.YEAR, Integer.parseInt(year));
+		calendar.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+		return calendar.getActualMaximum(Calendar.DATE);
+	}
+
+	public Date getBeginDay(String year, String month, Integer day){
+		Calendar beginDate = Calendar.getInstance();
+		beginDate.set(Calendar.YEAR, Integer.parseInt(year));
+		beginDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+		beginDate.set(Calendar.DATE, day + 1);
+		beginDate.set(Calendar.HOUR_OF_DAY, 0);
+		beginDate.set(Calendar.MINUTE, 0);
+		beginDate.set(Calendar.SECOND,1);
+		return beginDate.getTime();
+	}
+
+	public Date getEndDay(String year, String month, Integer day){
+		Calendar endDate = Calendar.getInstance();
+		endDate.set(Calendar.YEAR, Integer.parseInt(year));
+		endDate.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+		endDate.set(Calendar.DATE, day + 1);
+		endDate.set(Calendar.HOUR_OF_DAY, 23);
+		endDate.set(Calendar.MINUTE, 59);
+		endDate.set(Calendar.SECOND,59);
+		return endDate.getTime();
+	}
 }

@@ -20,6 +20,8 @@ public class PayMode {
     public static final int SHANHUI_PAY = 16; //闪惠支付  大众点评
     public static final int INTEGRAL_PAY = 17; //会员积分支付
     public static final int GIVE_CHANGE = 18; //找零
+    public static final int REFUND_CRASH = 19; //现金退款
+    public static final int THIRD_MONEY_RED_PAY = 20; //第三方储值余额支付
 
     public static String getPayModeName(int state){
 	    switch (state) {
@@ -44,7 +46,7 @@ public class PayMode {
             case ALI_PAY:
                 return "支付宝支付";
             case ARTICLE_BACK_PAY:
-                return "退菜返还金额";
+                return "退菜返还余额";
             case CRASH_PAY:
                 return "现金支付";
             case APPRAISE_RED_PAY:
@@ -59,6 +61,10 @@ public class PayMode {
                 return "会员支付";
             case GIVE_CHANGE:
                 return "找零";
+            case REFUND_CRASH:
+                return "现金退款";
+            case THIRD_MONEY_RED_PAY:
+                return "第三方储值余额支付";
             default:
                 return "";
             }

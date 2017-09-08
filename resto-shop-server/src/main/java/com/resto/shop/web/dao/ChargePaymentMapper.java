@@ -26,6 +26,9 @@ public interface ChargePaymentMapper  extends GenericDao<ChargePayment,String> {
 
 	List<ChargePayment> selectPayList(@Param("begin")Date begin,@Param("end")Date end);
 	
-
+	RechargeLogDto selectRechargeLog(@Param("begin")Date begin,@Param("end")Date end,@Param("brandId")String brandId);
 	
+	RechargeLogDto selectShopRechargeLog(@Param("begin")Date begin,@Param("end")Date end,@Param("shopId")String shopId);
+
+    ChargePayment selectPayData(@Param("shopId") String shopId);
 }

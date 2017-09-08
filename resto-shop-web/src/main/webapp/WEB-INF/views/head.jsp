@@ -6,13 +6,23 @@
 		<!-- BEGIN LOGO -->
 		<div class="page-logo">
 			<a href="javascript:(0)"> <img	src="<%=resourcePath%>/assets/pages/img/Resto+.png" width="110px" height="20px"	alt="logo" class="logo-default" style="margin-top: 15px;" />
-			</a>
-			<div class="menu-toggler sidebar-toggler"></div>
+
+            </a>
+			<div class="menu-toggler sidebar-toggler">
+                <%--<img src="http://app1.showapi.com/weather/icon/day/08.png">--%>
+            </div>
+
 		</div>
+		<%--<div>--%>
+			<%--<span style="color:#F00" >${wether_info.provinceName}/${wether_info.cityName}日期：${wether_info.dateTime} 星期：${wether_info.weekady} 天气:${wether_info.dayWeather}/${wether_info.dayTemperature}℃</span>--%>
+			<%--<img src=${wether_info.dayWeatherPic}>--%>
+		<%--</div>--%>
+
 		<!-- END LOGO -->
 		<!-- BEGIN RESPONSIVE MENU TOGGLER -->
 		<a href="javascript:;" class="menu-toggler responsive-toggler"
-			data-toggle="collapse" data-target=".navbar-collapse"> </a>
+			data-toggle="collapse" data-target=".navbar-collapse">
+        </a>
 		<!-- END RESPONSIVE MENU TOGGLER -->
 		<!-- BEGIN TOP NAVIGATION MENU -->
 		<div class="top-menu">

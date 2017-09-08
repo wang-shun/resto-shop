@@ -308,20 +308,55 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 
 
+	/**
+	 * 更新该餐品库存 （-1）（无规格）
+	 * @param articleId 餐品id
+	 * @return
+	 */
+	Boolean updateArticleStock(@Param("articleId") String articleId,@Param("type") String type,@Param("count") Integer count);
+
+	/**
+	 * 更新该餐品库存 （-1）（有规格）
+	 * @param articleId 餐品id
+	 * @return
+	 */
+	Boolean updateArticlePriceStock(@Param("articleId") String articleId,@Param("type") String type,@Param("count") Integer count);
+
+	/**
+	 * 库存为0时设置沽清	---	tb_article
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setEmpty(String articleId);
 
 
+	/**
+	 * 库存为0时设置沽清	---	tb_article_price
+	 * @param articleId
+	 * @return
+	 */
+	Boolean setArticlePriceEmpty(String articleId);
 
 
+	/**
+	 * 还原库存时重置售罄状态	---	tb_article
+	 * @param articleId
+	 * @return
+     */
+	Boolean setEmptyFail(String articleId);
 
-	
+	/**
+	 * 还原库存时重置售罄状态	---	tb_article_price
+	 * @param articleId
+	 * @return
+     */
+	Boolean setArticlePriceEmptyFail(String articleId);
 
-	
-	
-
-	
-
-
-
+	/**
+	 * 将单品最低库存设置为 套餐库存
+	 * @return
+	 */
+	Boolean setStockBySuit(@Param("shopId")String shopId);
 
 	BigDecimal getPayment(Map<String, Object> selectMap);
 
@@ -419,6 +454,14 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      */
     List<Order> selectByOrderSatesAndProductionStates(@Param("shopId")String shopId,@Param("orderStates")String[] orderStates,@Param("productionStates")String[] productionStates);
 
+	/**
+	 * 根据订单状态和生产状态查询指定店铺的订单  (包含外卖)
+	 * @param shopId
+	 * @param orderStates
+	 * @param productionStates
+	 * @return
+	 */
+	List<Order> selectByOrderSatesAndProductionStatesTakeout(@Param("shopId")String shopId,@Param("orderStates")String[] orderStates,@Param("productionStates")String[] productionStates);
     /**
      * 查询所有不正常的订单(并非异常订单)
      * 原因：所有支付的订单(2,10,11,12) 都会去打印，如果打印机有问题或连结不上最终也只会到异常订单里面 不会出现 0,1的情况
@@ -556,10 +599,16 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     Double selectAppraiseSumByShopId(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate") Date endDate);
 
 	/**
-	 * 大boss模式下查询新增订单
+	 * 大boss模式下查询新增订单(不包含外卖订单)
 	 */
 
 	List<Order> selectOrderByBoss(String shopId);
+
+	/**
+	 * 大boss模式下查询新增订单(包含外卖订单)
+	 */
+
+	List<Order> selectOrderByBossTakeout(String shopId);
 
 	/**
 	 * 返回用户的最后一比订单时间
@@ -587,6 +636,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
      * @return
      */
     List<Order> selectNewCustomerOrderByShopIdAndTime(@Param("shopId") String id, @Param("beginDate") Date todayBegin,@Param("endDate") Date todayEnd);
+
 
     /**
      * 回头用户
@@ -643,19 +693,24 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     List<Order> selectBaseToKCListByShopId(@Param("shopId") String shopId, @Param("beginDate") Date begin,@Param("endDate") Date end);
 
-
+    List<Article> getStockBySuit(String shopId);
 
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 
-	void colseOrder(String orderId);
 
 	List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap);
+
+	ShopOrderReportDto procDayAllOrderItemShop(Date beginDate, Date endDate, String shopId);
+
+	BrandOrderReportDto procDayAllOrderItemBrand(Map<String, Object> selectMap);
 
 	List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap);
 
 	void fixAllowContinueOrder(@Param("beginDate") Date begin);
 
 	List<Order> getAllowAppraise();
+	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
+    void colseOrder(String orderId);
 
 	/**
 	 * 查询退菜报表list
@@ -666,4 +721,60 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<RefundArticleOrder> addRefundArticleDto(@Param("beginDate") String beginDate,@Param("endDate") String endDate);
 
 	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
+
+	/**
+	 * yz 2017/07/28
+	 * 新增用户的订单 以品牌为基准
+	 * @param brandId
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+	List<Order> selectNewCustomerOrderByBrandIdAndTime(@Param("brandId") String brandId, @Param("beginDate") Date begin, @Param("endDate") Date end);
+
+	/**
+	 * yz 2017/07/28
+	 * 品牌回头用户
+	 * @param brandId
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+	List<BackCustomerDto> selectBackCustomerByBrandIdAndTime(@Param("brandId") String brandId,@Param("beginDate") Date begin, @Param("endDate") Date end);
+
+	/**
+	 * yz 2017/07/28
+	 * 品牌回头订单
+	 * @param brandId
+	 * @param begin
+	 * @param end
+	 * @return
+	 */
+	List<Order> selectCompleteByBrandIdAndTime(@Param("brandId") String brandId, @Param("beginDate") Date begin, @Param("endDate") Date end);
+
+	/**
+	 * yz 2017/07/28
+	 * @param begin
+	 * @param end
+	 * @param brandId
+	 * @return
+	 */
+	List<Order> selectListsmsByBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+
+	/**
+	 * yz 2017/07/31 用户id+shopId 查询已经消费订单
+	 * @param shopDetailId
+	 * @param customerId
+	 * @return
+	 */
+	List<Order> selectOrderListByCustomerIdAndShopId(@Param("shopId") String shopDetailId, @Param("customerId") String customerId);
+
+	List<Map<String, String>> selectCustomerOrderCount(List<String> customerIds);
+
+	/**
+	 * 用户最近一把有效订单
+	 * @param customerId
+	 * @return
+     */
+	Order selectAfterValidOrderByCustomerId(String customerId);
 }

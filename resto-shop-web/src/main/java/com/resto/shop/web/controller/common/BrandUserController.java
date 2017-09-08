@@ -1,5 +1,7 @@
 package com.resto.shop.web.controller.common;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -9,8 +11,9 @@ import javax.validation.Valid;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.service.BrandService;
+import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.web.model.*;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.config.SessionKey;
 import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.shiro.SecurityUtils;
@@ -22,16 +25,10 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.web.model.BrandUser;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.service.BrandUserService;
-import com.resto.brand.web.service.RoleService;
-import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 
 
@@ -53,6 +50,20 @@ public class BrandUserController extends GenericController{
 
     @Resource
     private RoleService roleService;
+
+    @Resource
+    private WetherService wetherService;
+
+
+    @Resource
+	BrandSettingService brandSettingService;
+
+
+    @Resource
+	AccountNoticeService accountNoticeService;
+
+    @Resource
+	BrandAccountService brandAccountService;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -92,6 +103,30 @@ public class BrandUserController extends GenericController{
             session.setAttribute(SessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());
             List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
             session.setAttribute(SessionKey.CURRENT_SHOP_NAMES,shopDetailList);
+            Wether wether = wetherService.selectDateAndShopId(authUserInfo.getShopDetailId(), DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+
+            Boolean flag = true;
+			BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+			if(brandSetting!=null&&brandSetting.getOpenBrandAccount()==1){
+				BrandAccount brandAccount = brandAccountService.selectByBrandSettingId(brandSetting.getId());
+				if(brandAccount!=null){
+					List<AccountNotice> accountNotices = accountNoticeService.selectByAccountId(brandAccount.getId());
+					if(accountNotices!=null&&!accountNotices.isEmpty()){
+						BigDecimal min = accountNotices.get(0).getNoticePrice();//默认第一个最小
+						for(int i=0;i<accountNotices.size();i++){
+							if(accountNotices.get(i).getNoticePrice().compareTo(min)<0){
+								min = accountNotices.get(i).getNoticePrice();
+							}
+						}
+						if(brandAccount.getAccountBalance().compareTo(min)<0){//如果品牌账户小于设置值
+							flag = false;
+						}
+					}
+				}
+
+			}
+			session.setAttribute(SessionKey.OPEN_BRAND_ACCOUNT,flag);
+            session.setAttribute(SessionKey.WETHERINFO,wether);
 
 //            HttpSession session = request.getSession();
 //            session.setAttribute(RedisSessionKey.USER_INFO, JsonUtils.objectToJson(authUserInfo));//存用户的信息

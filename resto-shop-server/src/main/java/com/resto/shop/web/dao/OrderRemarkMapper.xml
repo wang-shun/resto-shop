@@ -4,19 +4,17 @@
 <mapper namespace="com.resto.shop.web.dao.OrderRemarkMapper">
     <resultMap id="BaseResultMap" type="com.resto.shop.web.model.OrderRemark" >
         <id column="id" property="id"/>
-        <result column="remark_name" property="remarkName"/>
-        <result column="sort" property="sort"/>
-        <result column="state" property="state"/>
+        <result column="bo_order_remark_id" property="boOrderRemarkId"/>
         <result column="create_time" property="createTime"/>
         <result column="shop_detail_id" property="shopDetailId"/>
         <result column="brand_id" property="brandId"/>
     </resultMap>
     <sql id="Base_Column_List">
-        id, remark_name, sort, state, create_time, shop_detail_id, brand_id
+        id, bo_order_remark_id, create_time, shop_detail_id, brand_id
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
-          <include refid="Base_Column_List"/>
+        <include refid="Base_Column_List"/>
         from tb_order_remark where id = #{id}
     </select>
 
@@ -26,14 +24,8 @@
             <if test="id != null">
                 id,
             </if>
-            <if test="remarkName != null">
-                remark_name,
-            </if>
-            <if test="sort != null">
-                sort,
-            </if>
-            <if test="state != null">
-                state,
+            <if test="boOrderRemarkId != null">
+                bo_order_remark_id,
             </if>
             <if test="createTime != null">
                 create_time,
@@ -50,14 +42,8 @@
             <if test="id != null">
                 #{id},
             </if>
-            <if test="remarkName != null">
-                #{remarkName},
-            </if>
-            <if test="sort != null">
-                #{sort},
-            </if>
-            <if test="state != null">
-                #{state},
+            <if test="boOrderRemarkId != null">
+                #{boOrderRemarkId},
             </if>
             <if test="createTime != null">
                 #{createTime},
@@ -74,14 +60,8 @@
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OrderRemark">
         update tb_order_remark
         <set>
-            <if test="remarkName != null">
-                remark_name = #{remarkName},
-            </if>
-            <if test="sort != null">
-                sort = #{sort},
-            </if>
-            <if test="state != null">
-                state = #{state},
+            <if test="boOrderRemarkId != null">
+                bo_order_remark_id = #{boOrderRemarkId},
             </if>
             <if test="createTime != null">
                 create_time = #{createTime},
@@ -100,22 +80,15 @@
         delete from tb_order_remark where id = #{id}
     </delete>
 
+    <delete id="deleteByBoOrderRemarkId" parameterType="java.lang.String">
+        delete from tb_order_remark where bo_order_remark_id = #{boOrderRemarkId}
+    </delete>
+
     <select id="selectList" resultMap="BaseResultMap">
-        select * from tb_order_remark ORDER BY sort asc
+        select * from tb_order_remark
     </select>
 
-    <select id="selectOrderRemarks" resultMap="BaseResultMap">
-        select * from tb_order_remark where state = 1 and shop_detail_id = #{shopId} ORDER BY sort asc
-    </select>
-    
-    <select id="selectOrderRemarkName" resultType="java.lang.String">
-        select GROUP_CONCAT(remark_name) remarkName from tb_order_remark where id in
-        <foreach collection="array" item="id" open="(" separator="," close=")">
-            #{id}
-        </foreach>
-    </select>
-
-    <select id="selectOrderRemarkAll" resultMap="BaseResultMap">
-        select * from tb_order_remark where shop_detail_id = #{shopId} ORDER BY sort asc
+    <select id="selectOrderRemarkByShopId" resultType="com.resto.shop.web.model.OrderRemark" parameterType="java.lang.String">
+        select * from tb_order_remark where shop_detail_id = #{shopId}
     </select>
 </mapper>

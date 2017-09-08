@@ -68,7 +68,8 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
 
     @Override
     public List<Unit> getUnitByArticleidWechat(String articleId) {
-        return unitMapper.getUnitByArticleidWechat(articleId);
+        List<Unit> units = unitMapper.getUnitByArticleidWechat(articleId);
+        return units;
     }
 
     @Override

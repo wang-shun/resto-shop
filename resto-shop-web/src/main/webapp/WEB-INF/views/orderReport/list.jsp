@@ -35,44 +35,87 @@
             <div class="panel panel-info">
                 <div class="panel-heading text-center">
                     <strong style="margin-right:100px;font-size:22px">品牌订单报表</strong>
+                    <button type="button" style="float: right;" @click="openModal(0)" class="btn btn-primary">月报表</button>
                 </div>
                 <div class="panel-body">
                     <table id="brandOrderTable" class="table table-striped table-bordered table-hover" width="100%">
                         <thead>
                         <tr><th>品牌</th>
-                            <th>订单总额(元)</th>
-                            <th>订单总数(份)</th>
-                            <th>订单平均金额(元)</th>
-                            <th>营销撬动率</th>
+                            <th>订单总数</th>
+                            <th>订单总额</th>
+                            <th>单均</th>
+                            <th>就餐人数</th>
+                            <th>人均</th>
+                            <th>堂吃订单数</th>
+                            <th>堂吃订单额</th>
+                            <th>外带订单数</th>
+                            <th>外带订单额</th>
+                            <th>R+外卖订单数</th>
+                            <th>R+外卖订单额</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <template v-if="brandOrder.name != null">
+                        <%--<template v-if="brandOrder.brandName != null">--%>
                             <tr>
-                                <td><strong>{{brandOrder.name}}</strong></td>
-                                <td>{{brandOrder.orderMoney}}</td>
-                                <td>{{brandOrder.number}}</td>
-                                <td>{{brandOrder.average}}</td>
-                                <td>{{brandOrder.marketPrize}}</td>
+                                <td><strong>{{brandOrder.brandName}}</strong></td>
+                                <td>{{brandOrder.orderCount}}</td>
+                                <td>{{brandOrder.orderPrice}}</td>
+                                <td>{{brandOrder.singlePrice}}</td>
+                                <td>{{brandOrder.peopleCount}}</td>
+                                <td>{{brandOrder.perPersonPrice}}</td>
+                                <td>{{brandOrder.tangshiCount}}</td>
+                                <td>{{brandOrder.tangshiPrice}}</td>
+                                <td>{{brandOrder.waidaiCount}}</td>
+                                <td>{{brandOrder.waidaiPrice}}</td>
+                                <td>{{brandOrder.waimaiCount}}</td>
+                                <td>{{brandOrder.waimaiPrice}}</td>
                             </tr>
-                        </template>
+                       <%-- </template>
                         <template v-else>
                             <tr>
                                 <td align="center" colspan="5">
                                     暂时没有数据...
                                 </td>
                             </tr>
-                        </template>
+                        </template>--%>
                         </tbody>
                     </table>
                 </div>
 
                 <div class="panel-heading text-center">
                     <strong style="margin-right:100px;font-size:22px">店铺订单报表</strong>
+                    <button type="button" style="float: right;" @click="openModal(1)" class="btn btn-primary">月报表</button>
                 </div>
                 <div class="panel-body">
                     <table id="shopOrderTable" class="table table-striped table-bordered table-hover" width="100%">
                     </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 月报表弹窗 -->
+    <div class="modal fade" id="queryCriteriaModal" tabindex="-1" role="dialog" data-backdrop="static">
+        <div class="modal-dialog modal-full">
+            <div class="modal-content" style="width: 30em;margin: 15% auto;">
+                <div class="modal-header" style="border-bottom:initial;">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 align="center"><b>下载月报表</b></h4>
+                </div>
+                <div class="modal-body" align="center">
+                    <select style="padding: 5px 12px;" v-model="selectYear">
+                        <option :value="year" v-for="year in years">{{year}}</option>
+                    </select>
+                    <span style="font-size: 16px;margin-left: 15px;font-weight: bold;">年</span>
+                    <select style="padding: 5px 12px;" v-model="selectMonth">
+                        <option :value="month" v-for="month in months">{{month}}</option>
+                    </select>
+                    <span style="font-size: 16px;margin-left: 15px;font-weight: bold;">月</span>
+                </div>
+                <div class="modal-footer" style="border-top:initial;">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" style="float: left;margin-left: 5em;">取消</button>
+                    <button type="button" class="btn btn-primary" v-if="state == 1" @click="createMonthDto" style="float: right;margin-right: 5em;">生成并下载</button>
+                    <button type="button" class="btn btn-success" v-if="state == 2" disabled="disabled" style="float: right;margin-right: 5em;">生成中...</button>
                 </div>
             </div>
         </div>
@@ -107,7 +150,13 @@
                 beginDate : "",
                 endDate : "",
             },
-            shopOrderTable : {}
+            shopOrderTable : {},
+            years : [],
+            months : ["01","02","03","04","05","06","07","08","09","10","11","12"],
+            selectYear : new Date().format("yyyy"),
+            selectMonth : new Date().format("MM"),
+            type : 0,
+            state : 1
         },
         created : function() {
             var date = new Date().format("yyyy-MM-dd");
@@ -115,8 +164,22 @@
             this.searchDate.endDate = date;
             this.createShopOrderTable();
             this.searchInfo();
+            this.getYears();
         },
         methods:{
+            getYears : function() {
+                var years = new Array();
+                var year = 2016;
+                var nowYear = parseInt(new Date().format("yyyy"));
+                for (var i = 0;true;i++){
+                    years[i] = year;
+                    if (year == nowYear){
+                        break;
+                    }
+                    year++;
+                }
+                this.years = years;
+            },
             createShopOrderTable : function(){
                 //that代表 vue对象
                 var that = this;
@@ -126,32 +189,60 @@
                     order: [[ 1, "desc" ]],
                     columns : [
                         {
-                            title : "店铺名称",
-                            data : "name",
+                            title : "店铺",
+                            data : "shopName",
                             orderable : false
                         },
                         {
-                            title : "订单总额(元)",
-                            data : "orderMoney"
+                            title : "订单总数",
+                            data : "shop_orderCount"
                         },
                         {
-                            title : "订单总数(份)",
-                            data : "number"
+                            title : "订单总额",
+                            data : "shop_orderPrice"
                         },
                         {
-                            title : "订单平均金额(元)",
-                            data : "average"
+                            title : "单均",
+                            data : "shop_singlePrice"
                         },
                         {
-                            title : "营销撬动率",
-                            data : "marketPrize"
+                            title : "就餐人数",
+                            data : "shop_peopleCount"
+                        },
+                        {
+                            title : "人均",
+                            data : "shop_perPersonPrice"
+                        },
+                        {
+                            title : "堂吃订单数",
+                            data : "shop_tangshiCount"
+                        },
+                        {
+                            title : "堂吃订单额",
+                            data : "shop_tangshiPrice"
+                        },
+                        {
+                            title : "外带订单数",
+                            data : "shop_waidaiCount"
+                        },
+                        {
+                            title : "外带订单额",
+                            data : "shop_waidaiPrice"
+                        },
+                        {
+                            title : "R+外卖订单数",
+                            data : "shop_waimaiCount"
+                        },
+                        {
+                            title : "R+外卖订单额",
+                            data : "shop_waimaiPrice"
                         },
                         {
                             title: "操作",
                             data: "shopDetailId",
                             orderable : false,
                             createdCell: function (td, tdData, rowData) {
-                                var shopName = rowData.name;
+                                var shopName = rowData.shopName;
                                 var button = $("<a href='orderReport/show/shopReport?beginDate="+that.searchDate.beginDate+"&&endDate="+that.searchDate.endDate+"&&shopId="+tdData+"&&shopName="+shopName+"' class='btn green ajaxify '>查看详情</a>");
                                 $(td).html(button);
                             }
@@ -216,7 +307,7 @@
                     endDate : this.searchDate.endDate,
                     brandOrderDto : this.brandOrder,
                     shopOrderDtos : this.shopOrderList
-                }
+                };
                 try {
                     $.post("orderReport/create_brand_excel",object,function (result) {
                         if(result.success){
@@ -238,7 +329,6 @@
                 this.searchInfo();
             },
             yesterDay : function(){
-
                 this.searchDate.beginDate = GetDateStr(-1);
                 this.searchDate.endDate  = GetDateStr(-1);
                 this.searchInfo();
@@ -252,6 +342,45 @@
                 this.searchDate.beginDate  = getMonthStartDate();
                 this.searchDate.endDate  = new Date().format("yyyy-MM-dd")
                 this.searchInfo();
+            },
+            getDays:function (beginDate,endDate) {
+                var strSeparator = "-"; //日期分隔符
+                var oDate1;
+                var oDate2;
+                var iDays;
+                oDate1= beginDate.split(strSeparator);
+                oDate2= endDate.split(strSeparator);
+                var strDateS = new Date(oDate1[0], oDate1[1]-1, oDate1[2]);
+                var strDateE = new Date(oDate2[0], oDate2[1]-1, oDate2[2]);
+                iDays = parseInt(Math.abs(strDateS - strDateE ) / 1000 / 60 / 60 /24)//把相差的毫秒数转换为天数
+                return iDays ;
+            },
+            openModal : function (type) {
+                $("#queryCriteriaModal").modal();
+                this.type = type;
+            },
+            createMonthDto : function () {
+                toastr.clear();
+                toastr.success("生成中...");
+                var that = this;
+                that.state = 2;
+                try {
+                    $.post("orderReport/createMonthDto",{year : that.selectYear, month : that.selectMonth, type : that.type},function (result) {
+                        if (result.success){
+                            that.state = 1;
+                            window.location.href="orderReport/downloadBrandOrderExcel?path="+result.data+"";
+                        }else{
+                            that.state = 1;
+                            toastr.clear();
+                            toastr.error("生成月报表出错");
+                        }
+                    });
+                }catch (e){
+                    that.state = 1;
+                    toastr.clear();
+                    toastr.error("生成月报表出错");
+                    return;
+                }
             }
         }
     });

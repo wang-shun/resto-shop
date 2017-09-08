@@ -57,11 +57,11 @@
                         <h4 align="center"><b>下载月报表</b></h4>
                     </div>
                     <div class="modal-body" align="center">
-                        <select style="padding: 5px 12px;" :value="selectYear" v-model="selectYear">
+                        <select style="padding: 5px 12px;" v-model="selectYear">
                             <option :value="year" v-for="year in years">{{year}}</option>
                         </select>
                         <span style="font-size: 16px;margin-left: 15px;font-weight: bold;">年</span>
-                        <select style="padding: 5px 12px;" :value="selectMonth" v-model="selectMonth">
+                        <select style="padding: 5px 12px;" v-model="selectMonth">
                             <option :value="month" v-for="month in months">{{month}}</option>
                         </select>
                         <span style="font-size: 16px;margin-left: 15px;font-weight: bold;">月</span>
@@ -416,6 +416,20 @@
             }
         });
     }
+
+    function getDays(strDateStart,strDateEnd){
+        var strSeparator = "-"; //日期分隔符
+        var oDate1;
+        var oDate2;
+        var iDays;
+        oDate1= strDateStart.split(strSeparator);
+        oDate2= strDateEnd.split(strSeparator);
+        var strDateS = new Date(oDate1[0], oDate1[1]-1, oDate1[2]);
+        var strDateE = new Date(oDate2[0], oDate2[1]-1, oDate2[2]);
+        iDays = parseInt(Math.abs(strDateS - strDateE ) / 1000 / 60 / 60 /24)//把相差的毫秒数转换为天数
+        return iDays ;
+    }
+
 
     //导出品牌数据
     $("#brandreportExcel").click(function(){

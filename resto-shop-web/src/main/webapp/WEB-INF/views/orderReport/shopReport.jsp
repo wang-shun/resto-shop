@@ -192,10 +192,25 @@
                     lengthMenu : [ [ 50, 75, 100, -1 ], [ 50, 75, 100, "All" ] ],
                     order: [[ 1, 'desc' ]],
                     columns : [
-                        {
+                        /*{
                             title : "店铺",
                             data : "shopName",
                             orderable : false
+                        },*/
+                        {
+                            title : "订单类型",
+                            data : "distributionModeId",
+                            createdCell:function(td,tdData){
+                                var str = "未知"
+                                if(tdData == "1"){
+                                    str = "堂吃"
+                                }else if(tdData == "2"){
+                                    str = "R+外卖"
+                                }else if(tdData == "3"){
+                                    str = "外带"
+                                }
+                                $(td).html(str);
+                            }
                         },
                         {
                             title : "下单时间",
@@ -210,7 +225,12 @@
                             data : "orderState",
                             s_filter: true,
                             orderable : false
-                        }, {
+                        },
+                        {
+                            title : "桌号",
+                            data : "tableNumber",
+                        },
+                        {
                             title : "订单金额",
                             data : "orderMoney"
                         }, {
@@ -260,10 +280,11 @@
 //                            title : "找零",
 //                            data : "giveChangePayment"
 //                        },
-                        {
+                        /*{
                             title : "营销撬动率",
                             data : 'incomePrize'
-                        },{
+                        },*/
+                        {
                             title : "操作",
                             data : "orderId",
                             orderable : false,
@@ -354,6 +375,7 @@
                     that.shopOrderList = that.shopOrderDetails.sort(this.keysert('beginTime'));
                     if (that.shopOrderList.length <= 1000){
                         that.object.shopOrderList = that.shopOrderList;
+                        debugger
                         $.post("orderReport/create_shop_excel",that.object,function (result) {
                             if (result.success){
                                 window.location.href = "orderReport/downShopOrderExcel?path="+result.data+"";

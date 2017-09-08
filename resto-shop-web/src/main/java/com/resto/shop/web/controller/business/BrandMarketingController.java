@@ -381,7 +381,7 @@ public class BrandMarketingController extends GenericController{
     public void couponList(){}
 
     /**
-     * 查看优惠卷报表
+     * 查看优惠券报表
      * @param grantBeginDate
      * @param grantEndDate
      * @param useBeginDate
@@ -461,14 +461,14 @@ public class BrandMarketingController extends GenericController{
             brandCouponInfo.put("useCouponCountRatio",useCouponCountRatio);
             object.put("brandCouponInfo",brandCouponInfo);
         }catch (Exception e){
-            log.error(e.getMessage()+"查看优惠卷报表出错！");
-            return new Result("查看优惠卷报表出错！",false);
+            log.error(e.getMessage()+"查看优惠券报表出错！");
+            return new Result("查看优惠券报表出错！",false);
         }
         return getSuccessResult(object);
     }
 
     /**
-     * 生成优惠卷报表
+     * 生成优惠券报表
      * @param grantBeginDate
      * @param grantEndDate
      * @param useBeginDate
@@ -482,7 +482,7 @@ public class BrandMarketingController extends GenericController{
     public Result createCouponExcel(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, CouponDto couponDto,
                                        HttpServletRequest request){
         //导出文件名
-        String fileName = "优惠卷报表"+grantBeginDate+"至"+grantEndDate+".xls";
+        String fileName = "优惠券报表"+grantBeginDate+"至"+grantEndDate+".xls";
         //定义读取文件的路径
         String path = request.getSession().getServletContext().getRealPath(fileName);
         //定义列
@@ -529,13 +529,13 @@ public class BrandMarketingController extends GenericController{
         map.put("grantEndDate", grantEndDate);
         map.put("useBeginDate", useBeginDate);
         map.put("useEndDate", useEndDate);
-        map.put("reportType", "优惠卷报表");//表的头，第一行内容
+        map.put("reportType", "优惠券报表");//表的头，第一行内容
         map.put("num", "12");//显示的位置
-        map.put("reportTitle", "优惠卷报表");//表的名字
+        map.put("reportTitle", "优惠券报表");//表的名字
         map.put("timeType", "yyyy-MM-dd");
 
-        String[][] headers = {{"品牌名称","35"},{"优惠卷类型","35"},{"优惠卷所属","35"},{"所属店铺","35"},{"优惠卷名称","35"},{"发放总数","35"},{"发放总额","35"},{"使用总数","35"},
-                {"使用总额","35"},{"优惠卷使用占比","35"},{"拉动订单总数","35"},{"拉动订单总额","35"},{"拉动注册用户数","35"}};
+        String[][] headers = {{"品牌名称","35"},{"优惠券类型","35"},{"优惠券所属","35"},{"所属店铺","35"},{"优惠券名称","35"},{"发放总数","35"},{"发放总额","35"},{"使用总数","35"},
+                {"使用总额","35"},{"优惠券使用占比","35"},{"拉动订单总数","35"},{"拉动订单总额","35"},{"拉动注册用户数","35"}};
         //定义excel工具类对象
         ExcelUtil<CouponDto> excelUtil=new ExcelUtil<CouponDto>();
         try{
@@ -550,7 +550,7 @@ public class BrandMarketingController extends GenericController{
     }
 
     /**
-     * 下载优惠卷报表
+     * 下载优惠券报表
      * @param path
      * @param response
      */

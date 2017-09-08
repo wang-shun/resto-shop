@@ -9,6 +9,7 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
@@ -49,6 +50,21 @@ public class ShopInfoController extends GenericController{
     public Result list_one(){
         JSONObject object = new JSONObject();
         ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
+        if(shopDetail.getIsTurntable()==1){
+           if(shopDetail.getTurntablePrintType()==0){
+               shopDetail.setTurntablePrintKitchen(false);
+               shopDetail.setTurntablePrintReceipt(false);
+           }else if(shopDetail.getTurntablePrintType()==1){
+               shopDetail.setTurntablePrintKitchen(true);
+               shopDetail.setTurntablePrintReceipt(false);
+           }else if(shopDetail.getTurntablePrintType()==2){
+               shopDetail.setTurntablePrintKitchen(false);
+               shopDetail.setTurntablePrintReceipt(true);
+           }else{
+               shopDetail.setTurntablePrintKitchen(true);
+               shopDetail.setTurntablePrintReceipt(true);
+           }
+        }
         object.put("shop",shopDetail);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
         object.put("brand",brandSetting);
@@ -78,6 +94,19 @@ public class ShopInfoController extends GenericController{
                     break;
             }
         }
+        if(shopDetail.getIsTurntable()==1){
+            if(shopDetail.getTurntablePrintKitchen()==null&&shopDetail.getTurntablePrintReceipt()==null){
+                shopDetail.setTurntablePrintType(0);
+            }else if(shopDetail.getTurntablePrintReceipt()==null&&shopDetail.getTurntablePrintKitchen()==true){
+                shopDetail.setTurntablePrintType(1);
+            }else if(shopDetail.getTurntablePrintKitchen()==null&&shopDetail.getTurntablePrintReceipt()==true){
+                shopDetail.setTurntablePrintType(2);
+            }else {
+                shopDetail.setTurntablePrintType(3);
+            }
+        }else{
+            shopDetail.setTurntablePrintType(0);
+        }
         if(shopDetail.getPrintReceipt() == null){
             shopDetail.setPrintReceipt(0);
         }
@@ -90,11 +119,18 @@ public class ShopInfoController extends GenericController{
         if (shopDetail.getModifyOrderPrintKitchen() == null){
             shopDetail.setModifyOrderPrintKitchen(0);
         }
+        if (shopDetail.getBadAppraisePrintKitchen() == null){
+            shopDetail.setBadAppraisePrintKitchen(false);
+        }
+        if (shopDetail.getBadAppraisePrintReceipt() == null){
+            shopDetail.setBadAppraisePrintReceipt(false);
+        }
         if(shopDetail.getIsOpenSms()==0){//表示是关闭日短信通知
             shopDetail.setnoticeTelephone("");
         }else  if(shopDetail.getIsOpenSms()==1){
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
         }
+//        shopDetailService.updateWithDatong(shopDetail,getCurrentBrandId(),getBrandName());
         shopDetailService.update(shopDetail);
         ShopDetail shopDetail1 =(ShopDetail) RedisUtil.get(getCurrentShopId()+"info");
         if(shopDetail != null){

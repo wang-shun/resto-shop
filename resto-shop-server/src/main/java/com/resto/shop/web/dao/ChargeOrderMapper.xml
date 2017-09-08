@@ -19,6 +19,7 @@
     <result column="arrival_amount" property="arrivalAmount"/>
     <result column="end_amount" property="endAmount"/>
     <result column="type" property="type"/>
+    <result column="charge_setting_id" property="chargeSettingId"/>
   </resultMap>
 
   <!--店铺详细-->
@@ -40,7 +41,7 @@
 
   <sql id="Base_Column_List" >
     id, charge_money, reward_money, order_state, create_time, finish_time, customer_id,
-    brand_id, shop_detail_id, charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount, type
+    brand_id, shop_detail_id, charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount, type, charge_setting_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select
@@ -54,13 +55,13 @@
   </delete>
   <insert id="insert" parameterType="com.resto.shop.web.model.ChargeOrder" >
     insert into tb_charge_order (id, charge_money, reward_money, order_state, create_time, finish_time, customer_id, brand_id, shop_detail_id,
-    charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount, type
+    charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount, type, charge_setting_id
     )
     values (#{id,jdbcType=VARCHAR}, #{chargeMoney,jdbcType=DECIMAL}, #{rewardMoney,jdbcType=DECIMAL},
       #{orderState,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP},
       #{customerId,jdbcType=VARCHAR}, #{brandId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR},
       #{chargeBalance,jdbcType=DECIMAL}, #{rewardBalance,jdbcType=DECIMAL}, #{totalBalance,jdbcType=DECIMAL},
-      #{numberDayNow}, #{arrivalAmount}, #{endAmount}, #{type}
+      #{numberDayNow}, #{arrivalAmount}, #{endAmount}, #{type}, #{chargeSettingId}
       )
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.ChargeOrder" >
@@ -114,6 +115,9 @@
       <if test="type != null" >
         `type`,
       </if>
+      <if test="chargeSettingId != null" >
+        charge_setting_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -163,6 +167,9 @@
       </if>
       <if test="type != null" >
         #{type},
+      </if>
+      <if test="chargeSettingId != null" >
+        #{chargeSettingId},
       </if>
     </trim>
   </insert>
@@ -214,6 +221,9 @@
       <if test="type != null" >
         `type` = #{type},
       </if>
+      <if test="chargeSettingId != null" >
+          charge_setting_id = #{chargeSettingId},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -232,7 +242,8 @@
       total_balance = #{totalBalance,jdbcType=DECIMAL},
       number_day_now = #{numberDayNow},
       arrival_amount = #{arrivalAmount},
-      end_amount = #{endAmount},`type` = #{type}
+      end_amount = #{endAmount},`type` = #{type},
+      charge_setting_id = #{chargeSettingId}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   <select id="selectList" resultType="ChargeOrder">select * from tb_charge_order</select>
@@ -305,6 +316,15 @@
   	total_balance = charge_balance+reward_balance
   	where id=#{1}
   </update>
+
+    <update id="refundMoney">
+        update tb_charge_order
+        set charge_balance = charge_balance+#{0},
+        reward_balance = reward_balance+#{1},
+        total_balance = charge_balance+reward_balance
+        where id=#{2}
+    </update>
+
   <update id="refundReward">
   	update tb_charge_order
   	set reward_balance = reward_balance+#{0},
@@ -431,7 +451,7 @@ AND u.id =#{customerId}
     </select>
 
     <select id="selectMonthDto" parameterType="java.util.Map" resultMap="BaseResultMap">
-        select id, charge_money, reward_money, charge_balance, reward_balance, type, finish_time
+        select id, charge_money, reward_money, charge_balance, reward_balance, type, finish_time, customer_id
         from tb_charge_order
         where order_state = 1
         <if test="shopId != null">
@@ -529,7 +549,7 @@ AND u.id =#{customerId}
         IF (
         number_day_now > 0,
         SUM(
-        reward_money - (number_day_now - 1) * arrival_amount + end_amount
+        reward_money - (((number_day_now - 1) * arrival_amount) + end_amount + reward_balance)
         ),
         SUM(
         reward_money - reward_balance
@@ -546,4 +566,27 @@ AND u.id =#{customerId}
         shop_detail_id = #{shopId}
     </select>
 
+
+  <select id="getChargeSumInfo" parameterType="java.util.Map" resultType="java.util.Map">
+    select shop_detail_id shopId, COUNT(1) chargeCount, SUM(charge_money) chargeMoney from tb_charge_order where order_state = 1 and finish_time &gt;= CONCAT(#{beginDate}, ' 00:00:00') and finish_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
+    <if test="shopId != null">
+      and shop_detail_id = #{shopId}
+    </if>
+    <if test="chart != null">
+      GROUP BY shop_detail_id,customer_id
+    </if>
+    <if test="chart == null">
+      GROUP BY customer_id
+    </if>
+  </select>
+
+    <select id="selectCustomerChargeOrder" resultType="java.lang.String">
+        select customer_id from tb_charge_order where order_state = 1
+        <if test="list != null and list.size() > 0">
+            and customer_id in
+            <foreach collection="list" item="customerId" open="(" separator="," close=")">
+                #{customerId}
+            </foreach>
+        </if>
+    </select>
 </mapper>

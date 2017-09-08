@@ -91,6 +91,52 @@ public class Customer implements Serializable{
 
     private String shareLink;
 
+    private String orderId;
+
+    private String shopDetailId;
+
+    //表示该用户是否有订单
+    private Boolean useOrder;
+
+    private String cardId;
+
+    private String code;
+
+    public Boolean getUseOrder() {
+        return useOrder;
+    }
+
+    public void setUseOrder(Boolean useOrder) {
+        this.useOrder = useOrder;
+    }
+
+    //表示该用户是否有充值订单
+    private Boolean chargeOrder;
+
+    public Boolean getChargeOrder() {
+        return chargeOrder;
+    }
+
+    public void setChargeOrder(Boolean chargeOrder) {
+        this.chargeOrder = chargeOrder;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
+
+    public String getShopDetailId() {
+        return shopDetailId;
+    }
+
+    public void setShopDetailId(String shopDetailId) {
+        this.shopDetailId = shopDetailId;
+    }
+
     public String getShareLink() {
         return shareLink;
     }
@@ -385,6 +431,22 @@ public class Customer implements Serializable{
 
     public void setLastTableNumber(String lastTableNumber) {
         this.lastTableNumber = lastTableNumber;
+    }
+
+    public String getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     @Override

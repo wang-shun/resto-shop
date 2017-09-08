@@ -402,7 +402,7 @@ public class SyncDataController extends GenericController {
                         for(OrderPaymentItem oi : order.getOrderPaymentItems()){
                             temp=temp.add(oi.getPayValue());
                         }
-                        BigDecimal  orderMoney = OrderCountUtils.getOrderMoney(order.getOrderMode(),order.getPayType(), order.getOrderMoney(),order.getAmountWithChildren());
+                        BigDecimal  orderMoney = OrderCountUtils.getOrderMoney(order.getPayType(), order.getOrderMoney(),order.getAmountWithChildren());
 
                         if(orderMoney.compareTo(temp)!=0){
                             Order order2 = orderService.selectById(order.getId());

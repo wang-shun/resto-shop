@@ -5,16 +5,22 @@ import com.resto.brand.core.enums.PlatformKey;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.dto.MeiTuanOrderDto;
+import com.resto.brand.web.dto.PlatformReportDto;
 import com.resto.shop.web.dao.PlatformOrderMapper;
 import com.resto.shop.web.model.PlatformOrder;
 import com.resto.shop.web.service.PlatformOrderDetailService;
 import com.resto.shop.web.service.PlatformOrderExtraService;
 import com.resto.shop.web.service.PlatformOrderService;
+import org.apache.ibatis.session.SqlSession;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -38,6 +44,39 @@ public class PlatformOrderServiceImpl extends GenericServiceImpl<PlatformOrder, 
     @Override
     public PlatformOrder selectByPlatformOrderId(String platformOrderId,Integer type) {
         return platformorderMapper.selectByPlatformOrderId(platformOrderId,type);
+    }
+
+    @Override
+    public PlatformReportDto selectByshopDetailId(String beginDate, String endDate, String shopDetailId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        Map map=new HashMap();
+        map.put("beginDate",begin);
+        map.put("endDate",end);
+        map.put("shopDetailId",shopDetailId);
+        return platformorderMapper.selectByshopDetailId(map);
+    }
+
+    @Override
+    public PlatformReportDto proc_shopdetailId(String beginDate, String endDate, String shopDetailId){
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        return platformorderMapper.proc_shopdetailId(begin,end,shopDetailId);
+    }
+
+    @Override
+    public List<PlatformOrder> selectshopDetailIdList(String beginDate, String endDate, String shopDetailId) {
+        Date begin = DateUtil.getformatBeginDate(beginDate);
+        Date end = DateUtil.getformatEndDate(endDate);
+        Map map=new HashMap();
+        map.put("beginDate",begin);
+        map.put("endDate",end);
+        map.put("shopDetailId",shopDetailId);
+        return platformorderMapper.selectshopDetailIdList(map);
+    }
+    @Override
+    public List<PlatformOrder> getPlatformOrderDetailList(String platformOrderId) {
+        return platformorderMapper.getPlatformOrderDetailList(platformOrderId);
     }
 
     @Override

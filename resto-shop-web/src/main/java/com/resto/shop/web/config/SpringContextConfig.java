@@ -1,9 +1,11 @@
 package com.resto.shop.web.config;
 
 import cn.restoplus.rpc.client.RpcProxy;
+import com.resto.brand.web.model.AccountAddressInfo;
 import com.resto.brand.web.service.*;
 import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.service.*;
+import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.EmployeeService;
 import com.resto.shop.web.service.OrderRemarkService;
 import com.resto.shop.web.service.PermissionService;
@@ -90,6 +92,11 @@ public class SpringContextConfig {
         return getProxy(AccountLogService.class);
     }
 
+    /**
+     * 引用店铺端 -- 下面有一个会引用品牌端
+     * 2017-07-19
+     * @return
+     */
     @Bean
     public AccountService accountService() {
         return getProxy(AccountService.class);
@@ -430,13 +437,96 @@ public class SpringContextConfig {
     @Bean
     public WaitPictureService waitPictureService() {return  proxy.create(WaitPictureService.class);}
 
+    //天气
+    @Bean
+    public  WetherService wetherService(){
+        return proxy.create(WetherService.class);
+    }
+
+
+    @Bean
+    public  DayDataMessageService dayDataMessageService(){
+        return proxy.create(DayDataMessageService.class);
+    }
+
+    @Bean
+    public  DayAppraiseMessageService dayAppraiseMessageService(){
+        return  proxy.create(DayAppraiseMessageService.class);
+    }
+
+    @Bean
+    public com.resto.brand.web.service.OrderRemarkService boOrderRemarkService() {return  proxy.create(com.resto.brand.web.service.OrderRemarkService.class);}
+
+    @Bean
+    public CustomerAddressService customerAddressService() {return  proxy.create(CustomerAddressService.class);}
+
+    @Bean
+    public RecommendCategoryArticleService recommendCategoryArticleService() {return  proxy.create(RecommendCategoryArticleService.class);}
+
+    @Bean
+    public RecommendCategoryService recommendCategoryService() {return  proxy.create(RecommendCategoryService.class);}
+
+    @Bean
+    public BonusSettingService bonusSettingService() {return  proxy.create(BonusSettingService.class);}
+
+    @Bean
+    public BonusLogService bonusLogService() {return  proxy.create(BonusLogService.class);}
+
+    @Bean
+    public NewEmployeeService newEmployeeService() {return  proxy.create(NewEmployeeService.class);}
+
+    @Bean
+    public WxServerConfigService wxServerConfigService(){return  proxy.create(WxServerConfigService.class);}
+
+    @Bean
+    public PlatformOrderService platformOrderService(){return  proxy.create(PlatformOrderService.class);}
+
     @Bean
     public ShopTvConfigService shopTvConfigService() {return  proxy.create(ShopTvConfigService.class);}
 
+
+    //yz 2017-07-19-----------------
     @Bean
-	public WetherService wetherService(){
-    	return proxy.create(WetherService.class);
+    public BrandAccountService brandAccountService(){
+        return proxy.create(BrandAccountService.class);
+    }
+
+    @Bean
+    public AccountChargeOrderService accountChargeOrderService(){
+        return proxy.create(AccountChargeOrderService.class);
+    }
+
+	@Bean
+	public  BrandAccountLogService brandAccountLogService(){
+    	return proxy.create(BrandAccountLogService.class);
 	}
+
+
+	@Bean
+	public  AccountTicketService accountTicketService(){
+
+		return  proxy.create(AccountTicketService.class);
+	}
+
+
+	@Bean
+	public AccountAddressInfoService accountAddressInfoService(){
+
+		return proxy.create(AccountAddressInfoService.class);
+	}
+
+	@Bean
+	public AccountSettingService accountSettingService(){
+		return proxy.create(AccountSettingService.class);
+	}
+
+
+	@Bean
+	public AccountNoticeService accountNoticeService(){
+		return proxy.create(AccountNoticeService.class);
+	}
+
+	//-----------------------
 
 
     public <T> T getProxy(Class<T> clazz) {

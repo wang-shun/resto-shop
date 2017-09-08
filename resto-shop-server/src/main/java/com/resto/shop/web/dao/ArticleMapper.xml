@@ -47,15 +47,18 @@
         <result column="is_main_food" property="isMainFood"/>
         <result column="virtual_id" property="virtualId"></result>
         <result column="initials" property="initials"></result>
+        <result column="photo_type" property="photoType"></result>
+        <result column="photo_little" property="photoLittle"></result>
     </resultMap>
     <sql id="Base_Column_List">
-    id, name, name_alias, name_short, photo_big, photo_small, ingredients, description, 
-    is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time, 
-    create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price, 
-    fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc, 
-    is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,
-    recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id,initials
-  </sql>
+        id, name, name_alias, name_short, photo_big, photo_small, ingredients, description,
+        is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time,
+        create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price,
+        fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc,
+        is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,
+        recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id,initials,
+        photo_type,photo_little
+    </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
         <include refid="Base_Column_List"/>
@@ -63,37 +66,38 @@
         where id = #{id,jdbcType=VARCHAR}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
-    delete from tb_article
-    where id = #{id,jdbcType=VARCHAR}
-  </delete>
+        delete from tb_article
+        where id = #{id,jdbcType=VARCHAR}
+    </delete>
     <insert id="insert" parameterType="com.resto.shop.web.model.Article">
-    insert into tb_article (id, name, name_alias, 
-      name_short, photo_big, photo_small, 
-      ingredients, description, is_empty, 
-      sort, activated, state, 
-      remain_number, sale_number, show_sale_number, 
-      update_time, create_time, shop_detail_id, 
-      article_family_id, create_user_id, update_user_id, 
-      price, fans_price, has_mult_price, 
-      has_unit, peference, unit, 
-      show_big, control_color, show_desc, 
-      is_remind,article_type,stock_working_day,stock_weekend,
-      recommend_id,is_hidden,pId,eleme_name,photo_square,meal_fee_number,
-      is_main_food,virtual_id,initials)
-    values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR}, 
-      #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR}, 
-      #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT}, 
-      #{sort,jdbcType=INTEGER}, #{activated,jdbcType=BIT}, #{state,jdbcType=BIT}, 
-      #{remainNumber,jdbcType=INTEGER}, #{saleNumber,jdbcType=BIGINT}, #{showSaleNumber,jdbcType=BIGINT}, 
-      #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{shopDetailId,jdbcType=VARCHAR}, 
-      #{articleFamilyId,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR}, #{updateUserId,jdbcType=VARCHAR}, 
-      #{price,jdbcType=DECIMAL}, #{fansPrice,jdbcType=DECIMAL}, #{hasMultPrice,jdbcType=BIT}, 
-      #{hasUnit,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR}, 
-      #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT}, 
-      #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
-      #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT},#{pId},#{elemeName,jdbcType=VARCHAR},
-      #{photoSquare},#{mealFeeNumber},#{isMainFood},#{virtualId,jdbcType=INTEGER},#{initials})
-  </insert>
+        insert into tb_article (id, name, name_alias,
+        name_short, photo_big, photo_small,
+        ingredients, description, is_empty,
+        sort, activated, state,
+        remain_number, sale_number, show_sale_number,
+        update_time, create_time, shop_detail_id,
+        article_family_id, create_user_id, update_user_id,
+        price, fans_price, has_mult_price,
+        has_unit, peference, unit,
+        show_big, control_color, show_desc,
+        is_remind,article_type,stock_working_day,stock_weekend,
+        recommend_id,is_hidden,pId,eleme_name,photo_square,meal_fee_number,
+        is_main_food,virtual_id,initials,photo_type,photo_little)
+        values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR},
+        #{nameShort,jdbcType=VARCHAR}, #{photoBig,jdbcType=VARCHAR}, #{photoSmall,jdbcType=VARCHAR},
+        #{ingredients,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{isEmpty,jdbcType=BIT},
+        #{sort,jdbcType=INTEGER}, #{activated,jdbcType=BIT}, #{state,jdbcType=BIT},
+        #{remainNumber,jdbcType=INTEGER}, #{saleNumber,jdbcType=BIGINT}, #{showSaleNumber,jdbcType=BIGINT},
+        #{updateTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, #{shopDetailId,jdbcType=VARCHAR},
+        #{articleFamilyId,jdbcType=VARCHAR}, #{createUserId,jdbcType=VARCHAR}, #{updateUserId,jdbcType=VARCHAR},
+        #{price,jdbcType=DECIMAL}, #{fansPrice,jdbcType=DECIMAL}, #{hasMultPrice,jdbcType=BIT},
+        #{hasUnit,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR},
+        #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT},
+        #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
+        #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT},#{pId},#{elemeName,jdbcType=VARCHAR},
+        #{photoSquare},#{mealFeeNumber},#{isMainFood},#{virtualId,jdbcType=INTEGER},#{initials},
+        #{photoType},#{photoLittle})
+    </insert>
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.Article">
         insert into tb_article
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -223,6 +227,12 @@
             <if test="initials != null">
                 initials,
             </if>
+            <if test="photoType != null">
+                photo_type,
+            </if>
+            <if test="photoLittle != null">
+                photo_little,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -349,7 +359,13 @@
                 #{virtualId,jdbcType=INTEGER},
             </if>
             <if test="initials != null">
-                #{initials}
+                #{initials},
+            </if>
+            <if test="photoType != null">
+                #{photoType},
+            </if>
+            <if test="photoLittle != null">
+                #{photoLittle},
             </if>
         </trim>
     </insert>
@@ -478,55 +494,63 @@
             <if test="initials != null">
                 initials = #{initials},
             </if>
+            <if test="photoType != null">
+                photo_type = #{photoType},
+            </if>
+            <if test="photoLittle != null">
+                photo_little = #{photoLittle},
+            </if>
             photo_square = null
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Article">
-    update tb_article
-    set name = #{name,jdbcType=VARCHAR},
-      name_alias = #{nameAlias,jdbcType=VARCHAR},
-      name_short = #{nameShort,jdbcType=VARCHAR},
-      photo_big = #{photoBig,jdbcType=VARCHAR},
-      photo_small = #{photoSmall,jdbcType=VARCHAR},
-      ingredients = #{ingredients,jdbcType=VARCHAR},
-      description = #{description,jdbcType=VARCHAR},
-      is_empty = #{isEmpty,jdbcType=BIT},
-      sort = #{sort,jdbcType=INTEGER},
-      activated = #{activated,jdbcType=BIT},
-      state = #{state,jdbcType=BIT},
-      remain_number = #{remainNumber,jdbcType=INTEGER},
-      sale_number = #{saleNumber,jdbcType=BIGINT},
-      show_sale_number = #{showSaleNumber,jdbcType=BIGINT},
-      update_time = #{updateTime,jdbcType=TIMESTAMP},
-      create_time = #{createTime,jdbcType=TIMESTAMP},
-      shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},
-      article_family_id = #{articleFamilyId,jdbcType=VARCHAR},
-      create_user_id = #{createUserId,jdbcType=VARCHAR},
-      update_user_id = #{updateUserId,jdbcType=VARCHAR},
-      price = #{price,jdbcType=DECIMAL},
-      fans_price = #{fansPrice,jdbcType=DECIMAL},
-      has_mult_price = #{hasMultPrice,jdbcType=BIT},
-      has_unit = #{hasUnit,jdbcType=VARCHAR},
-      peference = #{peference,jdbcType=VARCHAR},
-      unit = #{unit,jdbcType=VARCHAR},
-      show_big = #{showBig,jdbcType=BIT},
-      control_color = #{controlColor,jdbcType=VARCHAR},
-      show_desc = #{showDesc,jdbcType=BIT},
-      is_remind = #{isRemind,jdbcType=BIT},
-      article_type = #{articleType},
-      stock_working_day = #{stockWorkingDay,jdbcType=INTEGER},
-      stock_weekend = #{stockWeekend,jdbcType=INTEGER},
-      current_working_stock = #{currentWorkingStock,jdbcType=INTEGER},
-      recommend_id = #{recommendId,jdbcType=VARCHAR},
-      is_hidden = #{isHidden,isRemind,jdbcType=BIT},
-      meal_fee_number = #{mealFeeNumber},
-      is_main_food = #{isMainFood},
-      virtual_id = #{virtualId},
-      initials = #{initials},
-      photo_square = null
-    where id = #{id,jdbcType=VARCHAR}
-  </update>
+        update tb_article
+        set name = #{name,jdbcType=VARCHAR},
+        name_alias = #{nameAlias,jdbcType=VARCHAR},
+        name_short = #{nameShort,jdbcType=VARCHAR},
+        photo_big = #{photoBig,jdbcType=VARCHAR},
+        photo_small = #{photoSmall,jdbcType=VARCHAR},
+        ingredients = #{ingredients,jdbcType=VARCHAR},
+        description = #{description,jdbcType=VARCHAR},
+        is_empty = #{isEmpty,jdbcType=BIT},
+        sort = #{sort,jdbcType=INTEGER},
+        activated = #{activated,jdbcType=BIT},
+        state = #{state,jdbcType=BIT},
+        remain_number = #{remainNumber,jdbcType=INTEGER},
+        sale_number = #{saleNumber,jdbcType=BIGINT},
+        show_sale_number = #{showSaleNumber,jdbcType=BIGINT},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},
+        article_family_id = #{articleFamilyId,jdbcType=VARCHAR},
+        create_user_id = #{createUserId,jdbcType=VARCHAR},
+        update_user_id = #{updateUserId,jdbcType=VARCHAR},
+        price = #{price,jdbcType=DECIMAL},
+        fans_price = #{fansPrice,jdbcType=DECIMAL},
+        has_mult_price = #{hasMultPrice,jdbcType=BIT},
+        has_unit = #{hasUnit,jdbcType=VARCHAR},
+        peference = #{peference,jdbcType=VARCHAR},
+        unit = #{unit,jdbcType=VARCHAR},
+        show_big = #{showBig,jdbcType=BIT},
+        control_color = #{controlColor,jdbcType=VARCHAR},
+        show_desc = #{showDesc,jdbcType=BIT},
+        is_remind = #{isRemind,jdbcType=BIT},
+        article_type = #{articleType},
+        stock_working_day = #{stockWorkingDay,jdbcType=INTEGER},
+        stock_weekend = #{stockWeekend,jdbcType=INTEGER},
+        current_working_stock = #{currentWorkingStock,jdbcType=INTEGER},
+        recommend_id = #{recommendId,jdbcType=VARCHAR},
+        is_hidden = #{isHidden,isRemind,jdbcType=BIT},
+        meal_fee_number = #{mealFeeNumber},
+        is_main_food = #{isMainFood},
+        virtual_id = #{virtualId},
+        initials = #{initials},
+        photo_type = #{photoType},
+        photo_little = #{photoLittle},
+        photo_square = null
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
 
     <resultMap type="com.resto.shop.web.model.Article" id="selectResultMap" autoMapping="true">
         <id column="id" jdbcType="VARCHAR" property="id"/>
@@ -544,17 +568,78 @@
         </if> order by ar.sort
     </select>
     <select id="selectListByShopIdAndDistributionId" resultType="Article">
-  	SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
-  	a.show_big,	a.description,a.photo_small,a.is_empty,a.meal_fee_number,
-  	a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,a.virtual_id,
-  	a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock,
-  	(select  count(1) from tb_article_unit_new where article_id = a.id) as newUnit,
-  	if(a.recommend_id is not null,1,0) as recommendCount
-	 FROM tb_article a,tb_article_family f
-	WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.activated=1
-	AND a.shop_detail_id=#{0}
-	ORDER BY sort
-  </select>
+        SELECT a.id,a.name,a.control_color,a.is_remind,a.show_desc,
+        a.show_big,	a.description,a.photo_small,a.is_empty,a.meal_fee_number,
+        a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,a.virtual_id,
+        a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock,
+        a.photo_type,a.photo_little,
+        (select  count(1) from tb_article_unit_new where article_id = a.id) as newUnit,
+        if(a.recommend_id is not null,1,0) as recommendCount
+        FROM tb_article a,tb_article_family f
+        WHERE a.article_family_id=f.id AND f.distribution_mode_id=#{1} AND a.state=1 AND a.activated=1
+        AND a.shop_detail_id=#{0}
+        ORDER BY photo_type, sort
+    </select>
+    <select id="selectListByShopIdRecommendCategory" resultType="Article">
+        SELECT
+            a.id,
+            a. NAME,
+            a.control_color,
+            a.is_remind,
+            a.show_desc,
+            a.show_big,
+            a.description,
+            a.photo_small,
+            a.is_empty,
+            a.meal_fee_number,
+            a.sort,
+            a.remain_number,
+            a.article_family_id,
+            a.price,
+            a.recommend_id,
+            a.is_hidden,
+            a.virtual_id,
+            a.fans_price,
+            a.has_unit,
+            a.unit,
+            a.article_type,
+            a.likes,
+            a.photo_type,
+            a.photo_little,
+            a.current_working_stock,
+          f.recommend_sort,
+            (
+                SELECT
+                    count(1)
+                FROM
+                    tb_article_unit_new
+                WHERE
+                    article_id = a.id
+            ) AS newUnit,
+
+        IF (
+            a.recommend_id IS NOT NULL,
+            1,
+            0
+        ) AS recommendCount
+        FROM
+            tb_recommend_category o,
+            tb_recommend_category_article f,
+            tb_article a
+        WHERE
+        o.id=f.recommend_category_id
+        AND a.id = f.article_id
+        AND a.shop_detail_id = #{0}
+        AND f.recommend_category_id = #{1}
+        AND a.state=1
+        AND a.activated=1
+        ORDER BY
+        -- IF(o.type = 0, a.likes, f.recommend_sort)
+        CASE
+        WHEN o.type = 0 THEN a.likes END DESC,
+        CASE
+        WHEN o.type = 1 THEN f.recommend_sort END
+    </select>
     <select id="selectBySupportTimeId" resultType="Article">
         select a.id,a.name,a.description,MAX(st.discount) discount from tb_article a
         LEFT JOIN tb_article_support_time ast on a.id = ast.article_id  and ast.support_time_id in
@@ -644,9 +729,9 @@ where t.id = t2.article_id
         and t.shop_detail_id = #{shopId}
         ) as r
         <!--<where>-->
-            <!--<if test="empty == 1">-->
-                <!--r.is_empty = 1-->
-            <!--</if>-->
+        <!--<if test="empty == 1">-->
+        <!--r.is_empty = 1-->
+        <!--</if>-->
 
         <!--</where>-->
         order by articleType DESC
@@ -731,6 +816,15 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
         and tb_article.id not in (SELECT article_id from tb_article_unit_new)
     </select>
 
+    <select id="getSingoArticleAll" resultType="Article">
+        select tb_article_family.name as articleFamilyName,
+        tb_article.id,tb_article.name,tb_article.sort,ifnull(fans_price,price) as  price
+        from tb_article
+        left join tb_article_family on tb_article.article_family_id = tb_article_family.id
+        where state =1
+        and tb_article.shop_detail_id = #{shopId}
+    </select>
+
 
     <update id="deleteRecommendId">
         update tb_article
@@ -803,9 +897,9 @@ GROUP BY article_id
 
     <select id="queryOrderArtcile" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
         CALL
-		<if test="shopDetailId != null">
+        <if test="shopDetailId != null">
             proc_order_artcile_shop(#{beginDate},#{endDate},#{shopDetailId},${type})
-		</if>
+        </if>
         <if test="shopDetailId == null">
             proc_order_artcile(#{beginDate},#{endDate},${type})
         </if>
@@ -833,11 +927,11 @@ GROUP BY article_id
 
     <select id="selectArticleByType" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
         select
-            ta.id articleId,
-            if(ta.article_type = 1,'单品','套餐') typeName,
-            IFNULL(taf.`name`,'其他')articleFamilyName,
-            ta.`name` articleName,
-            ta.likes likes
+        ta.id articleId,
+        if(ta.article_type = 1,'单品','套餐') typeName,
+        IFNULL(taf.`name`,'其他')articleFamilyName,
+        ta.`name` articleName,
+        ta.likes likes
         from tb_article ta
         left join tb_article_family taf
         on ta.article_family_id = taf.id
@@ -945,4 +1039,9 @@ GROUP BY article_id
         GROUP BY article_name
     </select>
 
+
+    <select id="selectSumByMonthlySales" resultType="java.lang.Integer">
+        select COALESCE(sum(count),0) from tb_order_item
+        where article_id like CONCAT(#{articleId},'%') and create_time like CONCAT('%',#{time},'%')
+    </select>
 </mapper>

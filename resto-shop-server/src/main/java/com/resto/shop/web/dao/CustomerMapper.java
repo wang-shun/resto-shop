@@ -73,7 +73,17 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 
     int registerCustomer(Customer customer);
 
+    int updateCustomerWechatId(Customer customer);
+
     Customer selectBySerialNumber(String number);
 
     Customer getCustomerLimitOne();
+
+    List<Customer> selectByTelePhones(List<String> telePhones);
+
+    List<Customer> getCommentCustomer(@Param("startTime") String startTime,@Param("time") Integer time,@Param("type") Integer type);
+
+    List<Customer> selectShareCustomerList(@Param("customerId")String customerId,@Param("currentPage") Integer currentPage,@Param("showCount") Integer showCount);
+
+    List<Customer> selectBySelectMap(Map<String, Object> selectMap);
 }

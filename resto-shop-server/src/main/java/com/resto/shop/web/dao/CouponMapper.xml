@@ -182,12 +182,13 @@
     <select id="selectCouponDto" resultType="com.resto.brand.web.dto.CouponDto" parameterType="java.util.Map">
         select
         CASE tc.coupon_type
-        WHEN -1 THEN '通用优惠卷'
-        WHEN 0 THEN '注册优惠卷'
-        WHEN 1 THEN '邀请优惠卷'
-        WHEN 2 THEN '生日优惠卷'
-        WHEN 3 THEN '分享优惠卷'
-        WHEN 4 THEN '实时优惠卷'
+        WHEN -1 THEN '通用优惠券'
+        WHEN 0 THEN '注册优惠券'
+        WHEN 1 THEN '邀请优惠券'
+        WHEN 2 THEN '生日优惠券'
+        WHEN 3 THEN '分享优惠券'
+        WHEN 4 THEN '实时优惠券'
+        WHEN 5 THEN '流失唤醒优惠券'
         END couponType,
         IF(tc.brand_id is not null,'品牌','店铺') couponSoure,
         tc.`name` couponName,
@@ -244,5 +245,24 @@
         <if test="type == 1">
             and shop_detail_id = #{shopId}
         </if>
+    </select>
+
+    <select id="listCouponUsed" parameterType="com.resto.shop.web.model.Coupon" resultType="com.resto.shop.web.model.Coupon">
+        SELECT
+	      c.id,c.name,c.value,c.min_amount,c.begin_date,c.end_date,c.begin_time,c.end_time,c.is_used,c.using_time,
+          c.coupon_source,c.use_with_account,c.remark,c.distribution_mode_id,c.customer_id,c.shop_detail_id,c.brand_id
+        FROM
+            tb_coupon c
+        WHERE
+            c.customer_id = #{customerId}
+        AND (
+            c.shop_detail_id = #{shopDetailId}
+            OR c.brand_id = #{brandId}
+        )
+        AND c.is_used=1
+        AND NOT ISNULL(c.using_time)
+        AND to_days(c.using_time) = to_days(now())
+        ORDER BY
+        c.using_time DESC
     </select>
 </mapper>

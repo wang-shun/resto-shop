@@ -5,9 +5,11 @@ import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.*;
+import com.resto.brand.web.model.AccountSetting;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
+import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.model.Order;
@@ -58,7 +60,9 @@ public interface OrderService extends GenericService<Order, String> {
 	
 	public List<Map<String,Object>> getPrintData(String order);
 	
-	public Order printSuccess(String orderId) throws AppException;
+	public Order printSuccess(String orderId, Boolean openBrandAccount, AccountSetting accountSetting) throws AppException;
+
+	public int printUpdate(String orderId);
 
 	Order getOrderAccount(String shopId);
 
@@ -85,8 +89,17 @@ public interface OrderService extends GenericService<Order, String> {
 	 */
 	public List<Map<String,Object>> printKitchen(Order order, List<OrderItem> articleList);
 
-	 
+    /**
+     * 打印换桌的小票
+     * @param order
+     * @return
+     */
+	public List<Map<String, Object>> printTurnTable(Order order,String oldtableNumber);
+
+
 	public Order confirmOrder(Order order);
+
+	public Order confirmWaiMaiOrder(Order order);
 
 	public Order confirmBossOrder(Order order);
 
@@ -415,7 +428,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 
 	/**
-	 * 根据订单状态和生产状态查询指定店铺的订单
+	 * 根据订单状态和生产状态查询指定店铺的订单(不包含外卖)
 	 * @param shopId
 	 * @param orderStates
 	 * @param productionStates
@@ -423,6 +436,14 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	 */
 	List<Order> selectByOrderSatesAndProductionStates(String shopId,String[] orderStates,String[] productionStates);
 
+	/**
+	 * 根据订单状态和生产状态查询指定店铺的订单(包含外卖)
+	 * @param shopId
+	 * @param orderStates
+	 * @param productionStates
+	 * @return
+	 */
+	List<Order> selectByOrderSatesAndProductionStatesTakeout(String shopId, String[] orderStates,String[] productionStates);
 	Order payOrderModeFive(String orderId);
 
 	Order payOrderWXModeFive(String orderId);
@@ -445,9 +466,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
     void updateOrderChild(String orderId);
 
-    void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, WechatConfig wechatConfig, Brand brand);
-
-    public boolean cancelExceptionOrder(String orderId);
+	public boolean cancelExceptionOrder(String orderId);
 
     /**
      * 查询所有已提交单位支付的订单
@@ -638,6 +657,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	void changeOrderMode(String orderId);
 
 
+
     Order posPayOrder(String orderId, Integer payMode, String couponId, BigDecimal payValue, BigDecimal giveChange, BigDecimal remainValue, BigDecimal couponValue);
 
     /**
@@ -649,7 +669,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	Order colseOrder(String orderId);
 
-    List<Map<String, Object>> reminder(String orderItemId);
+    List<Map<String, Object>> reminder(String orderItemIds, String orderId);
 
 	List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap);
 
@@ -658,7 +678,78 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
     //修复加菜时间过后 任然允许加菜的bug
     void fixErrorOrder();
 
+
+	Order customerByOrderForMyPage(String customerId, String shopId);
 	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate);
 
 	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
+
+	List<Map<String, Object>> badAppraisePrintOrder(String orderId);
+
+	/**
+	 * yz
+	 * 2017-07-27
+	 * 测试获取店铺 (用户消费笔数 -- 折扣比率 -- ==相关的数据
+	 * 本次获取店铺数据为 鲁肉范 -- 田林路店
+	 * )
+	 * @param beginDate
+	 * @param endDate
+	 * @param currentShopId
+	 * @return
+	 */
+	Summarry selctSummaryShopData(String beginDate, String endDate, String currentShopId);
+
+	/**
+	 *  * yz
+	 * 2017-07-28
+	 * 测试获取品牌 (用户消费笔数 -- 折扣比率 -- ==相关的数据
+	 * 本次获取品牌数据为 嫩绿茶
+	 * )
+	 * @param beginDate
+	 * @param endDate
+	 * @param currentBrandId
+	 * @return
+
+	 */
+	Summarry selctSummaryBrandData(String beginDate, String endDate, String currentBrandId);
+
+	List<Map<String, String>> selectCustomerOrderCount(List<String> customerIds);
+
+	Order afterPayShareBenefits(String orderId);
+
+	List<Order> selectHasPayNoChangeStatus(String shopId, Date dateBegin, Date dateEnd);
+
+	/**
+	 * yz 2017-08-15 范围内新增用户的订单
+	 * @param shopId
+	 * @param todayBegin
+	 * @param todayEnd
+	 * @return
+	 */
+	List<Order> selectNewCustomerOrderByShopIdAndTime(String shopId, Date todayBegin, Date todayEnd);
+
+	/**
+	 * yz 2017-08-15 范围内查询 回头用户的消费次数
+	 * @param shopId
+	 * @param todayBegin
+	 * @param todayEnd
+	 * @return
+	 */
+	List<BackCustomerDto> selectBackCustomerByShopIdAndTime(String shopId, Date todayBegin, Date todayEnd);
+
+	/**
+	 * yz 2017-08-15 查询店铺已完成订单
+	 * @param shopId
+	 * @param todayBegin
+	 * @param todayEnd
+	 * @return
+	 */
+	List<Order> selectCompleteByShopIdAndTime(String shopId, Date todayBegin, Date todayEnd);
+
+	/**
+	 * 用户最近一把有效订单
+	 * @param customerId
+	 * @return
+	 */
+	Order selectAfterValidOrderByCustomerId(String customerId);
 }

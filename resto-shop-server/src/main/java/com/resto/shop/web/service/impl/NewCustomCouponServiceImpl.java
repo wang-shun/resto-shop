@@ -90,14 +90,14 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 
 //	@Override
 //	public void giftCoupon(Customer cus,Integer couponType) {
-//		//根据 品牌id 查询该品牌的优惠卷配置 查询已经启用的优惠券
+//		//根据 品牌id 查询该品牌的优惠券配置 查询已经启用的优惠券
 //	    List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
 //	    //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
 //	    if(couponConfigs == null || couponConfigs.size()== 0 ){
 //	    	couponType = -1;
 //	    	couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(),couponType);
 //	    }
-//		//根据优惠卷配置，添加对应数量的优惠卷
+//		//根据优惠券配置，添加对应数量的优惠券
 //	    Date beginDate  = new Date();
 //	    for(NewCustomCoupon cfg: couponConfigs){
 //	        Coupon coupon = new Coupon();
@@ -132,7 +132,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         List<Coupon> coupons = new ArrayList<>();
         try {
             String shareCoupinIds = "";
-            //根据 店铺id 查询该店铺的优惠卷配置 查询已经启用的优惠券
+            //根据 店铺id 查询该店铺的优惠券配置 查询已经启用的优惠券
             List<NewCustomCoupon> couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(), couponType);
             //如果没有找到 对应类型的优惠券，则显示通用的优惠券。用于兼容老版本红包没有设置 优惠券类型问题
             if (couponConfigs == null || couponConfigs.size() == 0) {
@@ -140,7 +140,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 couponConfigs = newcustomcouponMapper.selectListByBrandIdAndIsActive(cus.getBrandId(), couponType);
             }
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
-            //根据优惠卷配置，添加对应数量的优惠卷
+            //根据优惠券配置，添加对应数量的优惠券
             Date beginDate = new Date();
             for (NewCustomCoupon cfg : couponConfigs) {
                 if (couponType.equals(3)) {
@@ -166,7 +166,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             if (StringUtils.isNotBlank(shareCoupinIds)) {
                 Customer customer = new Customer();
                 customer.setId(cus.getId());
-                //得到领取到的分享优惠卷Id
+                //得到领取到的分享优惠券Id
                 shareCoupinIds = shareCoupinIds.substring(0, shareCoupinIds.length() - 1);
                 if (StringUtils.isNotBlank(customer.getShareCouponIds())) {
                     shareCoupinIds = cus.getShareCouponIds().concat(",").concat(shareCoupinIds);
@@ -176,7 +176,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("发放优惠卷出错！");
+            log.error("发放优惠券出错！");
             return new ArrayList<>();
         }
         return coupons;
@@ -236,7 +236,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         ShopDetail shopDetail = shopDetailService.selectById(customer.getCustomerDetail().getShopDetailId());
         Coupon coupon = new Coupon();
         Date beginDate = new Date();
-        //判断优惠卷有效日期类型
+        //判断优惠券有效日期类型
         if (customCoupon.getTimeConsType().equals(TimeCons.MODELA)) {
             coupon.setBeginDate(beginDate);
             coupon.setEndDate(DateUtil.getAfterDayDate(beginDate, customCoupon.getCouponValiday()));
@@ -244,7 +244,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             coupon.setBeginDate(customCoupon.getBeginDateTime());
             coupon.setEndDate(customCoupon.getEndDateTime());
         }
-        //判断优惠卷所属 : 品牌优惠卷
+        //判断优惠券所属 : 品牌优惠券
         coupon.setBrandId(customCoupon.getBrandId());
         coupon.setShopDetailId(shopDetail.getId());
         if (customCoupon.getPushDay() != null) {
@@ -337,7 +337,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         param.put("price", price);
         param.put("name", name);
         param.put("day", day);
-        SMSUtils.sendMessage(customer.getTelephone(), new JSONObject(param).toString(), "餐加", "SMS_43790004", logMap);
+        SMSUtils.sendMessage(customer.getTelephone(), new com.alibaba.fastjson.JSONObject(param), "餐加", "SMS_43790004");
     }
 
     @Override

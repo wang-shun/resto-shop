@@ -142,7 +142,7 @@ public class ArticleController extends GenericController {
             }
             unitService.updateArticleRelation(id, article.getUnits());
         }
-        articleService.initStock();
+//        articleService.initStock();
         Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
         LogTemplateUtils.articleEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
@@ -196,6 +196,13 @@ public class ArticleController extends GenericController {
     @ResponseBody
     public List<Article> getSingoList() {
         List<Article> result = articleService.getSingoArticle(getCurrentShopId());
+        return result;
+    }
+
+    @RequestMapping("singo_article_all")
+    @ResponseBody
+    public List<Article> getSingoListAll() {
+        List<Article> result = articleService.getSingoArticleAll(getCurrentShopId());
         return result;
     }
 

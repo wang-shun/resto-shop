@@ -14,6 +14,7 @@ import com.resto.shop.web.model.Printer;
 import com.resto.shop.web.service.PrinterService;
 
 import cn.restoplus.rpc.server.RpcService;
+import sun.security.provider.SHA;
 
 /**
  *
@@ -104,5 +105,10 @@ public class PrinterServiceImpl extends GenericServiceImpl<Printer, Integer> imp
 		result.addAll(ticket);
 		result.addAll(label);
 		return result;
+	}
+
+	@Override
+	public List<Printer> selectPrintByType(String shopId, Integer type) {
+		return printerMapper.selectPrintByType(shopId, type);
 	}
 }

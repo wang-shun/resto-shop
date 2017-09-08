@@ -34,4 +34,6 @@ public interface AccountLogMapper  extends GenericDao<AccountLog,String> {
     List<String> selectBrandMarketing(Map<String, String> selectMap);
 
     BigDecimal selectByShareMoney(String accountId);
+
+    Integer selectByShareMoneyCount(String accountId);
 }

@@ -132,7 +132,22 @@ and shop_detail_id = #{shopId}
 and
  <![CDATA[
      create_time > #{beginDate} AND create_time <= #{endDate}
-        ]]>
+   ]]>
+    </select>
+
+    <select id="selectSumByTimeSourceAndShopId" resultType="OffLineOrder">
+        SELECT create_time,
+        sum(enter_total)enter_total,SUM(enter_count)enter_count,SUM(delivery_orders)delivery_orders,SUM(order_books)order_books
+        FROM
+        tb_off_line_order
+        WHERE
+        shop_detail_id = #{shopId}
+        AND state = 1
+        AND
+         <![CDATA[
+           create_time > #{beginDate} AND create_time <= #{endDate}
+         ]]>
+        AND resource = #{orderType}
     </select>
 
 </mapper>

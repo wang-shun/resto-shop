@@ -29,10 +29,8 @@ public class JdbcSmsUtils {
     private static final String PASSWORD = "123456";
     // 驱动信息
     private static final String DRIVER = "com.mysql.jdbc.Driver";
-    // 数据库地址 线上用内网ip
-    //private static final String URL = "jdbc:mysql://101.200.190.249:3306/test?useUnicode=true&characterEncoding=utf8";
-
-	private static final String URL = "jdbc:mysql://101.200.190.249:3306/test?useUnicode=true&characterEncoding=utf8";
+    // 数据库地址
+    private static final String URL = "jdbc:mysql://101.200.190.249:3306/test?useUnicode=true&characterEncoding=utf8";
 
     private static Connection connection;
     private static PreparedStatement pstmt;

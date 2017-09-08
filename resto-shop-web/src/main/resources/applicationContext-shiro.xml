@@ -22,6 +22,11 @@
                 /paynotify/alipay_notify=anon<!-- 支付宝通知 -->
                 /paynotify/alipay_return=anon<!-- 支付宝通知 -->
                 /paynotify/wxpay_notify=anon<!-- 微信通知 -->
+                <!-- yz2017/07/24  -->
+                /account_paynotify/alipay_notify=anon<!-- 账户充值支付宝通知 -->
+                /account_paynotify/alipay_return=anon<!-- 账户充值支付宝通知 -->
+				/account_paynotify/wxpay_notify=anon<!-- 账户充值微信通知 -->
+
                 /api/* =anon <!-- 对接第三方-->
                 <!-- 其他资源需要认证 -->
                 /** = authc

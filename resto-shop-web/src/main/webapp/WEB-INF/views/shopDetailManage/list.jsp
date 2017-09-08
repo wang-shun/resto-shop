@@ -32,6 +32,13 @@
 								关闭
 							</label>
 						</div>
+
+						<div class="form-group">
+							<label>等位红包失效时间：</label>
+							<div>
+								<input type="text" class="form-control" name="timeOut" v-model="m.timeOut" placeholder="单位为小时">
+							</div>
+						</div>
 						<%--<div  class="form-group">--%>
 							<%--<label>等位红包每秒增加价</label>--%>
 							<%--<input type="text" class="form-control" name="baseMoney" :value="m.baseMoney">--%>

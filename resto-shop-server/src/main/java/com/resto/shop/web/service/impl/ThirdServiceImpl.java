@@ -76,7 +76,16 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
     @Resource
+    OrderItemService orderItemService;
+
+    @Resource
     OrderPaymentItemService orderPaymentItemService;
+
+    @Resource
+    CustomerAddressService customerAddressService;
+
+    @Resource
+    OrderService orderService;
 
     @Resource
     private PlatformOrderMapper platformorderMapper;
@@ -133,6 +142,9 @@ public class ThirdServiceImpl implements ThirdService {
             case PlatformKey.MEITUAN:
                 result = printPlatformOrder(platformId, type);
                 break;
+            case PlatformKey.CANJIA:
+                result = printPlatformOrder(platformId, type);
+                break;
             default:
                 break;
         }
@@ -145,6 +157,40 @@ public class ThirdServiceImpl implements ThirdService {
     private List<Map<String, Object>> printPlatformOrder(String platformOrderId, int type) {
         List<Map<String, Object>> printTask = new ArrayList<>();
         PlatformOrder order = platformOrderService.selectByPlatformOrderId(platformOrderId, type);
+
+        if(order==null){
+            //R+外卖打印总单
+            Order oder = orderService.selectById(platformOrderId);
+            List<OrderItem> orderItems = orderItemService.listByOrderId(platformOrderId);
+            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(oder.getShopDetailId());
+            List<Printer> ticketPrinter = printerService.selectByShopAndType(oder.getShopDetailId(), PrinterType.RECEPTION);
+
+            for (Printer printer : ticketPrinter) {
+                Map<String, Object> ticket = new HashMap<>();
+                if (shopDetail.getIsPosNew() == Common.YES) {
+                    ticket = printPlatformOrderTicketNewNo(oder, orderItems, shopDetail, printer);
+                } else {
+                    ticket = printPlatformOrderTicketNo(oder, orderItems,shopDetail, printer);
+                }
+
+                if (ticket != null) {
+                    printTask.add(ticket);
+                }
+            }
+            //R+外卖厨打
+            List<Map<String, Object>> kitchenTicket = new ArrayList<Map<String, Object>>();
+            if (shopDetail.getIsPosNew() == Common.YES) {
+                kitchenTicket = printPlatformOrderKitchenNewNo(oder, orderItems, shopDetail);
+            } else {
+                kitchenTicket = printPlatformOrderKitchenNo(oder, orderItems, shopDetail);
+            }
+            if (!kitchenTicket.isEmpty()) {
+                printTask.addAll(kitchenTicket);
+            }
+
+            return printTask;
+        }
+
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(platformOrderId);
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(platformOrderId);
 
@@ -366,6 +412,251 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getPlatformOrderId() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, map);
+        RedisUtil.set(print_id, print);
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
+        if (printList == null) {
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
+        return print;
+    }
+
+    /**
+     * 餐加自己的外卖打印模板
+     * @param order
+     * @param orderDetailList
+     * @param shopDetail
+     * @param printer
+     * @return
+     */
+    private Map<String, Object> printPlatformOrderTicketNo(Order order, List<OrderItem> orderDetailList, ShopDetail shopDetail, Printer printer) {
+        if (printer == null) {
+            return null;
+        }
+        int sum = 0;
+        List<Map<String, Object>> items = new ArrayList<>();
+        if (orderDetailList != null) {
+            for (OrderItem orderDetail : orderDetailList) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("SUBTOTAL", orderDetail.getFinalPrice());
+                item.put("ARTICLE_NAME", orderDetail.getArticleName());
+                item.put("ARTICLE_COUNT", orderDetail.getCount());
+                sum += orderDetail.getCount();
+                items.add(item);
+            }
+        }
+
+       /* if (orderExtraList != null) {
+            for (PlatformOrderExtra orderExtra : orderExtraList) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("ARTICLE_NAME", orderExtra.getName());
+                item.put("ARTICLE_COUNT", orderExtra.getQuantity());
+                item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
+                items.add(item);
+            }
+        }*/
+
+        Map<String, Object> print = new HashMap<>();
+        print.put("TABLE_NO", "");
+        print.put("KITCHEN_NAME", printer.getName());
+        print.put("PORT", printer.getPort());
+        print.put("ORDER_ID", order.getSerialNumber());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID", print_id);
+        print.put("ADD_TIME", new Date().getTime());
+//
+        Map<String, Object> data = new HashMap<>();
+        data.put("ORDER_ID", order.getSerialNumber());
+        String orderNumber = (String) RedisUtil.get(order.getId() + "orderNumber");
+        Integer orderTotal = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
+        if (orderTotal == null) {
+            orderTotal = 1;
+        } else if (orderNumber == null) {
+            orderTotal++;
+        }
+        RedisUtil.set(order.getShopDetailId() + "orderCountNo", orderTotal);
+        //RedisUtil.get(order.getId() + "orderNumber");
+        Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
+        data.put("ORDER_NUMBER", "00"+orderT);
+//        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
+        data.put("ITEMS", items);
+//
+        data.put("DISTRIBUTION_MODE", "外卖   "+order.getVerCode());
+        data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+        data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
+        data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
+        data.put("RESTAURANT_TEL", shopDetail.getPhone());
+        data.put("TABLE_NUMBER", "111");
+        data.put("CUSTOMER_COUNT", 0);
+        data.put("PAYMENT_AMOUNT",  order.getOrderMoney());
+        data.put("RESTAURANT_NAME", shopDetail.getName());
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("ARTICLE_COUNT", sum);
+//
+        List<Map<String, Object>> paymentList = new ArrayList<>();
+        Map<String, Object> payment = new HashMap<>();
+        payment.put("PAYMENT_MODE", "222");
+        payment.put("SUBTOTAL", 0);
+        paymentList.add(payment);
+        data.put("PAYMENT_ITEMS", paymentList);
+        data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+        data.put("CUSTOMER_SATISFACTION", "");
+        data.put("CUSTOMER_PROPERTY", "");
+        data.put("ALREADY_PAYED", "已在线支付");
+        data.put("DELIVERY_SOURCE", "R+外卖");
+        CustomerAddress customerAddress=customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
+        data.put("DELIVERY_ADDRESS", customerAddress.getAddress()+customerAddress.getAddressReality() + "\n\n【备注】："+order.getRemark());
+
+        String phone = customerAddress.getMobileNo().replace("\"", "").replace("[", "").replace("]", "");
+
+        String sex="";
+        if(customerAddress.getSex()==0){
+            sex="先生";
+        }else if(customerAddress.getSex()==1){
+            sex="女士";
+        }
+        data.put("CONTACT_NAME", customerAddress.getName()+"("+sex+")");
+        data.put("CONTACT_TEL", phone);
+//
+        print.put("DATA", data);
+        print.put("STATUS", 0);
+//
+        print.put("TICKET_TYPE", TicketType.DeliveryReceipt);
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
+        JSONObject json = new JSONObject(print);
+//        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+//                , "订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
+        log.info("订单:" + order.getSerialNumber() + "返回打印总单模版" + json.toString());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, map);
+        RedisUtil.set(print_id, print);
+        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
+        if (printList == null) {
+            printList = new ArrayList<>();
+        }
+        printList.add(print_id);
+        RedisUtil.set(shopDetail.getId() + "printList", printList);
+        return print;
+    }
+
+    /**
+     * 餐加自己的外卖打印新模板
+     * @param order
+     * @param orderDetailList
+     * @param shopDetail
+     * @param printer
+     * @return
+     */
+    private Map<String, Object> printPlatformOrderTicketNewNo(Order order, List<OrderItem> orderDetailList,ShopDetail shopDetail, Printer printer) {
+        if (printer == null) {
+            return null;
+        }
+        int sum = 0;
+        List<Map<String, Object>> items = new ArrayList<>();
+        if (orderDetailList != null) {
+            for (OrderItem orderDetail : orderDetailList) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getCount());
+                item.put("ARTICLE_NAME", orderDetail.getArticleName());
+                item.put("ARTICLE_COUNT", orderDetail.getCount());
+                sum += orderDetail.getCount();
+                items.add(item);
+            }
+        }
+
+        /*if (orderExtraList != null) {
+            for (PlatformOrderExtra orderExtra : orderExtraList) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("ARTICLE_NAME", orderExtra.getName());
+                item.put("ARTICLE_COUNT", orderExtra.getQuantity());
+                item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
+                items.add(item);
+            }
+        }*/
+
+        Map<String, Object> print = new HashMap<>();
+        print.put("TABLE_NO", "");
+        print.put("KITCHEN_NAME", printer.getName());
+        print.put("PORT", printer.getPort());
+        print.put("ORDER_ID", order.getSerialNumber());
+        print.put("IP", printer.getIp());
+        String print_id = ApplicationUtils.randomUUID();
+        print.put("PRINT_TASK_ID", print_id);
+        print.put("ADD_TIME", new Date().getTime());
+//
+        Map<String, Object> data = new HashMap<>();
+        data.put("ORDER_ID", order.getSerialNumber());
+        String orderNumber = (String) RedisUtil.get(order.getId() + "orderNumber");
+        Integer orderTotal = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
+        if (orderTotal == null) {
+            orderTotal = 1;
+        } else if (orderNumber == null) {
+            orderTotal++;
+        }
+        RedisUtil.set(order.getShopDetailId() + "orderCountNo", orderTotal);
+
+        Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
+        data.put("ORDER_NUMBER", "00"+orderT);
+//        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
+        data.put("ITEMS", items);
+//
+        data.put("DISTRIBUTION_MODE", "外卖   "+order.getVerCode());
+        data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+        data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
+        data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
+        data.put("RESTAURANT_TEL", shopDetail.getPhone());
+        data.put("TABLE_NUMBER", "");
+        data.put("CUSTOMER_COUNT", 0);
+        data.put("PAYMENT_AMOUNT",  order.getOrderMoney());
+        data.put("RESTAURANT_NAME", shopDetail.getName());
+        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("ARTICLE_COUNT", sum);
+//
+        List<Map<String, Object>> paymentList = new ArrayList<>();
+        Map<String, Object> payment = new HashMap<>();
+        payment.put("PAYMENT_MODE", "222");
+        payment.put("SUBTOTAL", 0);
+        paymentList.add(payment);
+        data.put("PAYMENT_ITEMS", paymentList);
+        data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+        data.put("CUSTOMER_SATISFACTION", "");
+        data.put("CUSTOMER_PROPERTY", "");
+        data.put("ALREADY_PAYED", "已在线支付");
+        data.put("DELIVERY_SOURCE", "R+外卖");
+        CustomerAddress customerAddress=customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
+        data.put("DELIVERY_ADDRESS", customerAddress.getAddress()+customerAddress.getAddressReality()+ "\n\n【备注】："+order.getRemark());
+
+        String phone = customerAddress.getMobileNo().replace("\"", "").replace("[", "").replace("]", "");
+        String sex="";
+        if(customerAddress.getSex()==0){
+            sex="先生";
+        }else if(customerAddress.getSex()==1){
+            sex="女士";
+        }
+        data.put("CONTACT_NAME", customerAddress.getName()+"("+sex+")");
+        data.put("CONTACT_TEL", phone);
+//
+        print.put("DATA", data);
+        print.put("STATUS", 0);
+//
+        print.put("TICKET_TYPE", TicketType.DeliveryReceipt);
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
+        JSONObject json = new JSONObject(print);
+//        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+//                , "订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
+        log.info("订单:" + order.getSerialNumber() + "返回打印总单模版" + json.toString());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
         RedisUtil.set(print_id, print);
         List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
@@ -643,6 +934,282 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
         map.put("content", "外卖订单:" + order.getPlatformOrderId() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, map);
+        return printTask;
+    }
+
+    public List<Map<String, Object>> printPlatformOrderKitchenNo(Order order, List<OrderItem> orderDetailList, ShopDetail shopDetail) {
+        //每个厨房 所需制作的   菜品信息
+        Map<String, List<OrderItem>> kitchenArticleMap = new HashMap<String, List<OrderItem>>();
+        //厨房信息
+        Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
+        //遍历 订单集合
+        if (orderDetailList != null) {
+            for (OrderItem detail : orderDetailList) {
+                //得到当前菜品 所关联的厨房信息
+                String[] aId=detail.getArticleId().split("@");
+                Article article = articleMapper.selectByPrimaryKey(aId[0]);
+                if (article == null) {
+                    continue;
+                }
+                String articleId = article.getId();
+                List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
+
+                for (Kitchen kitchen : kitchenList) {
+                    String kitchenId = kitchen.getId().toString();
+                    kitchenMap.put(kitchenId, kitchen);//保存厨房信息
+                    //判断 厨房集合中 是否已经包含当前厨房信息
+                    if (!kitchenArticleMap.containsKey(kitchenId)) {
+                        //如果没有 则新建
+                        kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                    }
+                    kitchenArticleMap.get(kitchenId).add(detail);
+                }
+
+            }
+        }
+
+        //打印线程集合
+        List<Map<String, Object>> printTask = new ArrayList<Map<String, Object>>();
+
+        //编列 厨房菜品 集合
+        for (String kitchenId : kitchenArticleMap.keySet()) {
+            Kitchen kitchen = kitchenMap.get(kitchenId);//得到厨房 信息
+            Printer printer = printerService.selectById(kitchen.getPrinterId());//得到打印机信息
+            if (printer == null) {
+                continue;
+            }
+            //生成厨房小票
+            if (printer.getTicketType() == TicketType.PRINT_TICKET) {
+                for (OrderItem article : kitchenArticleMap.get(kitchenId)) {
+                    Map<String, Object> print = new HashMap<String, Object>();
+                    print.put("PORT", printer.getPort());
+                    print.put("IP", printer.getIp());
+                    String print_id = ApplicationUtils.randomUUID();
+                    print.put("PRINT_TASK_ID", print_id);
+                    Map<String, Object> data = new HashMap<String, Object>();
+                    data.put("ORDER_ID", order.getSerialNumber());
+                    data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                    data.put("DISTRIBUTION_MODE", "外卖");
+                    //data.put("TABLE_NUMBER", PlatformKey.getPlatformName(4));
+                    data.put("TABLE_NUMBER", order.getVerCode());
+                    Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
+                    data.put("ORDER_NUMBER", "00"+orderT);
+//                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+                    Map<String, Object> items = new HashMap<String, Object>();
+                    items.put("ARTICLE_COUNT", article.getCount());
+                    items.put("ARTICLE_NAME", article.getArticleName());
+                    data.put("ITEMS", items);
+                    data.put("CUSTOMER_SATISFACTION", "暂无信息");
+                    data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+                    data.put("MEMO", "备注：" + order.getRemark());
+                    data.put("CUSTOMER_PROPERTY", "");
+                    print.put("DATA", data);
+                    print.put("STATUS", "0");
+                    print.put("TICKET_TYPE", TicketType.KITCHEN);
+                    printTask.add(print);
+                    RedisUtil.set(print_id, print);
+                    List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
+                    if (printList == null) {
+                        printList = new ArrayList<>();
+                    }
+                    printList.add(print_id);
+                    RedisUtil.set(shopDetail.getId() + "printList", printList);
+                }
+            } else {
+                for (OrderItem article : kitchenArticleMap.get(kitchenId)) {
+                    for (int i = 0; i < article.getCount(); i++) {
+                        Map<String, Object> print = new HashMap<String, Object>();
+                        print.put("TABLE_NO", "");
+                        print.put("KITCHEN_NAME", printer.getName());
+                        print.put("PORT", printer.getPort());
+                        print.put("ORDER_ID", order.getSerialNumber());
+                        print.put("IP", printer.getIp());
+                        String print_id = ApplicationUtils.randomUUID();
+                        print.put("PRINT_TASK_ID", print_id);
+                        print.put("ADD_TIME", new Date());
+                        Map<String, Object> data = new HashMap<String, Object>();
+                        data.put("ORDER_ID", order.getSerialNumber());
+                        data.put("ARTICLE_NAME", article.getName());
+                        data.put("ARTICLE_NUMBER", i + "/" + article.getCount());
+                        data.put("DISTRIBUTION_MODE", PlatformKey.getPlatformName(4));
+                        data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+                        CustomerAddress customerAddress=customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
+                        data.put("CUSTOMER_ADDRESS", customerAddress.getAddressReality());
+                        data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
+                        data.put("CUSTOMER_TEL", customerAddress.getMobileNo());
+                        data.put("TABLE_NUMBER", "");
+                        data.put("PAYMENT_AMOUNT", order.getOrderMoney());
+                        data.put("RESTAURANT_NAME", shopDetail.getName());
+                        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                        data.put("ARTICLE_COUNT", 1);
+                        print.put("DATA", data);
+                        print.put("STATUS", 0);
+                        print.put("TICKET_TYPE", TicketType.DELIVERYLABEL);
+                        printTask.add(print);
+                        RedisUtil.set(print_id, print);
+                        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
+                        if (printList == null) {
+                            printList = new ArrayList<>();
+                        }
+                        printList.add(print_id);
+                        RedisUtil.set(shopDetail.getId() + "printList", printList);
+                    }
+
+                }
+
+            }
+
+        }
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
+        JSONArray json = new JSONArray(printTask);
+//        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+//                , "订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
+        log.info("订单:" + order.getSerialNumber() + "返回打印厨打模版" + json.toString());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, map);
+        return printTask;
+    }
+
+
+    public List<Map<String, Object>> printPlatformOrderKitchenNewNo(Order order, List<OrderItem> orderDetailList, ShopDetail shopDetail) {
+        //每个厨房 所需制作的   菜品信息
+        Map<String, List<OrderItem>> kitchenArticleMap = new HashMap<String, List<OrderItem>>();
+        //厨房信息
+        Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
+        //遍历 订单集合
+        if (orderDetailList != null) {
+            for (OrderItem detail : orderDetailList) {
+                //得到当前菜品 所关联的厨房信息
+                Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
+                if (article == null) {
+                    continue;
+                }
+                String articleId = article.getId();
+                List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
+
+                for (Kitchen kitchen : kitchenList) {
+                    String kitchenId = kitchen.getId().toString();
+                    kitchenMap.put(kitchenId, kitchen);//保存厨房信息
+                    //判断 厨房集合中 是否已经包含当前厨房信息
+                    if (!kitchenArticleMap.containsKey(kitchenId)) {
+                        //如果没有 则新建
+                        kitchenArticleMap.put(kitchenId, new ArrayList<OrderItem>());
+                    }
+                    kitchenArticleMap.get(kitchenId).add(detail);
+                }
+
+            }
+        }
+
+        //打印线程集合
+        List<Map<String, Object>> printTask = new ArrayList<Map<String, Object>>();
+
+        //编列 厨房菜品 集合
+        for (String kitchenId : kitchenArticleMap.keySet()) {
+            Kitchen kitchen = kitchenMap.get(kitchenId);//得到厨房 信息
+            Printer printer = printerService.selectById(kitchen.getPrinterId());//得到打印机信息
+            if (printer == null) {
+                continue;
+            }
+            //生成厨房小票
+            if (printer.getTicketType() == TicketType.PRINT_TICKET) {
+                for (OrderItem article : kitchenArticleMap.get(kitchenId)) {
+                    Map<String, Object> print = new HashMap<String, Object>();
+                    print.put("PORT", printer.getPort());
+                    print.put("IP", printer.getIp());
+                    String print_id = ApplicationUtils.randomUUID();
+                    print.put("PRINT_TASK_ID", print_id);
+                    Map<String, Object> data = new HashMap<String, Object>();
+                    data.put("ORDER_ID", order.getSerialNumber());
+                    data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                    data.put("DISTRIBUTION_MODE", "外卖");
+                    print.put("LINE_WIDTH", 42);
+                    //data.put("TABLE_NUMBER", PlatformKey.getPlatformName(4));
+                    data.put("TABLE_NUMBER", order.getVerCode());
+                    Integer orderT = (Integer) RedisUtil.get(order.getShopDetailId() + "orderCountNo");
+                    data.put("ORDER_NUMBER", "00"+orderT);
+//                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
+                    Map<String, Object> items = new HashMap<String, Object>();
+                    items.put("ARTICLE_COUNT", article.getCount());
+                    items.put("ARTICLE_NAME", article.getArticleName());
+                    data.put("ITEMS", items);
+                    data.put("CUSTOMER_SATISFACTION", "暂无信息");
+                    data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
+                    data.put("CUSTOMER_PROPERTY", "");
+                    data.put("MEMO", "备注：" + order.getRemark());
+                    print.put("DATA", data);
+                    print.put("STATUS", "0");
+                    print.put("TICKET_TYPE", TicketTypeNew.TICKET);
+                    print.put("TICKET_MODE", TicketTypeNew.KITCHEN_TICKET);
+                    printTask.add(print);
+                    RedisUtil.set(print_id, print);
+                    List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
+                    if (printList == null) {
+                        printList = new ArrayList<>();
+                    }
+                    printList.add(print_id);
+                    RedisUtil.set(shopDetail.getId() + "printList", printList);
+                }
+            } else {
+                for (OrderItem article : kitchenArticleMap.get(kitchenId)) {
+                    for (int i = 0; i < article.getCount(); i++) {
+                        Map<String, Object> print = new HashMap<String, Object>();
+                        print.put("TABLE_NO", "");
+                        print.put("KITCHEN_NAME", printer.getName());
+                        print.put("PORT", printer.getPort());
+                        print.put("ORDER_ID", order.getSerialNumber());
+                        print.put("IP", printer.getIp());
+                        String print_id = ApplicationUtils.randomUUID();
+                        print.put("PRINT_TASK_ID", print_id);
+                        print.put("ADD_TIME", new Date());
+                        Map<String, Object> data = new HashMap<String, Object>();
+                        data.put("ORDER_ID", order.getSerialNumber());
+                        data.put("ARTICLE_NAME", article.getName());
+                        data.put("ARTICLE_NUMBER", i + "/" + article.getCount());
+                        data.put("DISTRIBUTION_MODE", PlatformKey.getPlatformName(4));
+                        data.put("ORIGINAL_AMOUNT", order.getOriginalAmount());
+                        CustomerAddress customerAddress=customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
+                        data.put("CUSTOMER_ADDRESS", customerAddress.getAddressReality());
+                        data.put("REDUCTION_AMOUNT", order.getOriginalAmount().subtract(order.getAmountWithChildren().doubleValue() == 0.0 ? order.getOrderMoney() : order.getAmountWithChildren()));
+                        data.put("CUSTOMER_TEL", customerAddress.getMobileNo());
+                        data.put("TABLE_NUMBER", "");
+                        data.put("PAYMENT_AMOUNT", order.getOrderMoney());
+                        data.put("RESTAURANT_NAME", shopDetail.getName());
+                        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                        data.put("ARTICLE_COUNT", 1);
+                        print.put("DATA", data);
+                        print.put("STATUS", 0);
+                        print.put("TICKET_TYPE", TicketType.DELIVERYLABEL);
+                        printTask.add(print);
+                        RedisUtil.set(print_id, print);
+                        List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
+                        if (printList == null) {
+                            printList = new ArrayList<>();
+                        }
+                        printList.add(print_id);
+                        RedisUtil.set(shopDetail.getId() + "printList", printList);
+                    }
+
+                }
+
+            }
+
+        }
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
+        JSONArray json = new JSONArray(printTask);
+//        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
+//                , "订单:"+order.getOrderId()+"返回打印厨打模版"+json.toString());
+        log.info("订单:" + order.getSerialNumber() + "返回打印厨打模版" + json.toString());
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
         return printTask;
     }
@@ -1209,6 +1776,36 @@ public class ThirdServiceImpl implements ThirdService {
     public List<HungerOrder> getOutFoodList(String shopId) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         List<HungerOrder> hungerOrders = hungerOrderMapper.getOutFoodList(shopDetail.getId());
+        //查询餐加外卖订单
+        String[] orderStates = null;
+        String[] productionStates = null;
+        List<Order> orders = orderService.selectByOrderSatesAndProductionStatesTakeout(shopId, orderStates, productionStates);
+        if(orders!=null && !orders.isEmpty()){
+            for(Order order:orders){
+               CustomerAddress customerAddress = customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
+               if(customerAddress!=null){
+                   HungerOrder hungerOrder=new  HungerOrder();
+                   hungerOrder.setId(order.getId());
+                   hungerOrder.setAddress(customerAddress.getAddressReality());
+                   hungerOrder.setConsignee(customerAddress.getName());
+                   hungerOrder.setCreatedAt(order.getCreateTime());
+                   /*hungerOrder.setDeliverFee(null);
+                   hungerOrder.setDeliverTime(null);*/
+                   hungerOrder.setDescription(order.getRemark());
+                   hungerOrder.setInvoice(0);
+                   hungerOrder.setIsBook(1);
+                   hungerOrder.setIsOnlinePaid(1);
+                   hungerOrder.setOrderId(order.getId());
+                   hungerOrder.setPhoneList(customerAddress.getMobileNo());
+                   hungerOrder.setStatusCode(order.getOrderState());
+                   hungerOrder.setTotalPrice(order.getOrderMoney());
+                   hungerOrder.setOriginalPrice(order.getOrderMoney());
+                   hungerOrder.setSum(order.getArticleCount());
+                   hungerOrder.setType(4);
+                   hungerOrders.add(hungerOrder);
+               }
+            }
+        }
         return hungerOrders;
     }
 
@@ -1217,6 +1814,47 @@ public class ThirdServiceImpl implements ThirdService {
     public HungerOrder getOutFoodInfo(String id) {
 //        PlatformOrder order = platformorderMapper.selectOrderInfo(id);
         HungerOrder order = hungerOrderMapper.selectById(id);
+
+        //查询餐加外卖订单
+        Order o=orderService.selectOrderDetails(id);
+        HungerOrder hungerOrder = new HungerOrder();
+        if(o!=null){
+            CustomerAddress customerAddress = customerAddressService.selectByPrimaryKey(o.getCustomerAddressId());
+            hungerOrder.setId(o.getId());
+            hungerOrder.setAddress(customerAddress.getAddress()+customerAddress.getAddressReality());
+            hungerOrder.setConsignee(customerAddress.getName());
+            hungerOrder.setCreatedAt(o.getCreateTime());
+            hungerOrder.setDescription(o.getRemark());
+            hungerOrder.setInvoice(0);
+            hungerOrder.setIsBook(1);
+            hungerOrder.setIsOnlinePaid(1);
+            hungerOrder.setOrderId(o.getSerialNumber());
+            hungerOrder.setPhoneList(customerAddress.getMobileNo());
+            hungerOrder.setStatusCode(o.getOrderState());
+            hungerOrder.setTotalPrice(o.getOrderMoney());
+            hungerOrder.setOriginalPrice(o.getOrderMoney());
+            hungerOrder.setSum(o.getArticleCount());
+            hungerOrder.setType(4);
+            if (o.getShopDetailId() != null) {
+                hungerOrder.setShopName(shopDetailService.selectById(o.getShopDetailId()).getName());
+            }
+            List<HungerOrderDetail> orderDetail= new ArrayList<HungerOrderDetail>();
+            List<OrderItem> olist=orderItemService.listByOrderId(o.getId());
+            if(olist!=null && !olist.isEmpty()){
+                for(OrderItem orderItem:olist){
+                    HungerOrderDetail h=new HungerOrderDetail();
+                    //h.setId(Long.parseLong(orderItem.getId()));
+                    h.setOrderId(orderItem.getOrderId());
+                    h.setName(orderItem.getArticleName());
+                    h.setPrice(orderItem.getUnitPrice());
+                    h.setQuantity(orderItem.getCount());
+                    orderDetail.add(h) ;
+                }
+                hungerOrder.setDetails(orderDetail);
+            }
+
+            return hungerOrder;
+        }
 
 //        List<HungerOrderDetail> orderDetail = hungerOrderMapper.selectDetailsById(order.getOrderId());
 //        order.setDetails(orderDetail);
@@ -1231,6 +1869,33 @@ public class ThirdServiceImpl implements ThirdService {
 
 
         PlatformOrder order = platformOrderService.selectById(orderId);
+        if(order==null){
+           /* Map<String, Object> s=orderService.printReceipt(orderId,selectPrinterId);
+            return s;*/
+            Order oder = orderService.selectById(orderId);
+            List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
+            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(oder.getShopDetailId());
+
+            if (selectPrinterId == null) {
+                List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+                if (printer.size() > 0) {
+                    if (shopDetail.getIsPosNew() == Common.YES) {
+                        return printPlatformOrderTicketNewNo(oder, orderItems, shopDetail, printer.get(0));
+                    } else {
+                        return printPlatformOrderTicketNo(oder, orderItems, shopDetail, printer.get(0));
+                    }
+
+                }
+            } else {
+                Printer p = printerService.selectById(selectPrinterId);
+                if (shopDetail.getIsPosNew() == Common.YES) {
+                    return printPlatformOrderTicketNewNo(oder, orderItems, shopDetail, p);
+                } else {
+                    return printPlatformOrderTicketNo(oder, orderItems, shopDetail, p);
+                }
+
+            }
+        }
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(order.getPlatformOrderId());
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(order.getPlatformOrderId());
 
@@ -1264,6 +1929,26 @@ public class ThirdServiceImpl implements ThirdService {
     public List<Map<String, Object>> printKitchenReceipt(String oid) {
         List<Map<String, Object>> printTask = new ArrayList<>();
         PlatformOrder order = platformOrderService.selectById(oid);
+        if(order==null){
+           /* List<Map<String, Object>> list= orderService.printKitchenReceipt(oid);
+            return list;*/
+            Order oder = orderService.selectById(oid);
+            List<OrderItem> orderItems = orderItemService.listByOrderId(oid);
+            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(oder.getShopDetailId());
+
+            List<Map<String, Object>> kitchenTicket = new ArrayList<>();
+            if (shopDetail.getIsPosNew() == Common.YES) {
+                kitchenTicket = printPlatformOrderKitchenNewNo(oder, orderItems, shopDetail);
+            } else {
+                kitchenTicket = printPlatformOrderKitchenNo(oder, orderItems, shopDetail);
+            }
+
+            if (!kitchenTicket.isEmpty()) {
+                printTask.addAll(kitchenTicket);
+            }
+
+            return printTask;
+        }
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(order.getPlatformOrderId());
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());

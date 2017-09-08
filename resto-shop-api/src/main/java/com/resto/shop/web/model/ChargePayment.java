@@ -30,7 +30,17 @@ public class ChargePayment implements Serializable {
     
     //记录店铺的id
     private String shopDetailId;
-    
+
+    private Integer isUseBonus;
+
+    public Integer getIsUseBonus() {
+        return isUseBonus;
+    }
+
+    public void setIsUseBonus(Integer isUseBonus) {
+        this.isUseBonus = isUseBonus;
+    }
+
     public String getShopDetailId() {
 		return shopDetailId;
 	}

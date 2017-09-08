@@ -413,4 +413,11 @@ order by t.print_sort asc
         on toi.article_id = tor.article_id and toi.order_id = tor.order_id
         where toi.order_id = #{orderId} and toi.refund_count != 0
     </select>
+
+    <select id="selectByArticleIds" resultType="com.resto.shop.web.model.OrderItem">
+        select * from tb_order_item where id in
+        <foreach collection="array" item="articleId" open="(" separator="," close=")">
+            #{articleId}
+        </foreach>
+    </select>
 </mapper>

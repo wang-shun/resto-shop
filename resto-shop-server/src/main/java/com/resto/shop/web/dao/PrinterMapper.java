@@ -46,4 +46,6 @@ public interface PrinterMapper  extends GenericDao<Printer,Integer> {
     List<Printer> selectTicketNotSame(String shopId);
 
     List<Printer> selectLabelNotSame(String shopId);
+
+    List<Printer> selectPrintByType(@Param("shopId") String shopId, @Param("type") Integer type);
 }

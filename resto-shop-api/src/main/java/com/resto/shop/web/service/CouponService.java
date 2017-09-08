@@ -42,4 +42,6 @@ public interface CouponService extends GenericService<Coupon, String> {
     Coupon selectPosPayOrderCanUseCoupon(Map<String, Object> selectMap);
 
     List<Coupon> getCouponByShopId(String shopId,Integer day,Integer type);
+
+	List<Coupon> listCouponUsed(Coupon coupon);
 }

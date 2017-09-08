@@ -153,6 +153,9 @@
                                 <label class="radio-inline">
                                     <input type="radio" name="couponType" id="inlineRadio6" value="4" v-model="m.couponType">实&nbsp;时
                                 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="couponType" id="inlineRadio7" value="5" v-model="m.couponType">礼&nbsp;品
+                                </label>
                             </div>
 
                             <div class="form-group" v-if="m.couponType == 1">
@@ -165,7 +168,7 @@
                             </div>
 
                             <div class="form-group" v-if="m.couponType == 2">
-                                <label >生日优惠卷发放时间：（日）</label>
+                                <label >生日优惠券发放时间：（日）</label>
                                 <div class="input-group">
                                     距用户生日前
                                     <input type="number"
@@ -276,6 +279,8 @@
                             $(td).html("<span class='label label-warning'>分&nbsp;享</span>");
                         }else if(tdData == 4){
                             $(td).html("<span class='label label-danger'>实&nbsp;时</span>");
+                        }else if (tdData == 5){
+                            $(td).html("<span class='label label-default'>礼&nbsp;品</span>");
                         }
                     }
                 },
@@ -355,11 +360,17 @@
                             <s:hasPermission name="newcustomcoupon/edit">
                             C.createEditBtn(rowData),
                             </s:hasPermission>
+                            createGrantBtn(rowData)
                         ];
                         $(td).html(operator);
                     }
                 }],
         });
+        
+        function createGrantBtn(rowData) {
+            var button = (rowData.isActivty == 1 && rowData.couponType == 5) ? $("<a href='newcustomcoupon/goToGrant?couponId="+rowData.id+"' class='btn btn-xs btn-success ajaxify '>发放</a>") : "";
+            return button;
+        }
 
         C = new Controller(cid,tb);
         var option = {

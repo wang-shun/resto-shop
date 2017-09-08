@@ -1,8 +1,14 @@
 package com.resto.shop.web.dao;
 
+import com.resto.brand.web.dto.PlatformReportDto;
 import com.resto.shop.web.model.PlatformOrder;
 import com.resto.brand.core.generic.GenericDao;
+import com.resto.shop.web.model.RecommendCategory;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 public interface PlatformOrderMapper  extends GenericDao<PlatformOrder,String> {
     int deleteByPrimaryKey(String id);
@@ -20,4 +26,15 @@ public interface PlatformOrderMapper  extends GenericDao<PlatformOrder,String> {
     int updateByPrimaryKey(PlatformOrder record);
 
     PlatformOrder selectByPlatformOrderId(@Param("platformOrderId") String platformOrderId, @Param("type") Integer type);
+
+    //直接sql查询
+    PlatformReportDto selectByshopDetailId(Map map);
+    //调用存储过程查询
+    PlatformReportDto proc_shopdetailId(Date beginDate,Date endDate,String shopDetailId);
+
+    //根据店铺id，查询订单详情
+    List<PlatformOrder> selectshopDetailIdList(Map map);
+
+    //根据三方品台订单id查询该订单详细信息
+    List<PlatformOrder> getPlatformOrderDetailList(String platformOrderId);
 }
