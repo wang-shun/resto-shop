@@ -141,7 +141,7 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
         print.put("PRINT_TASK_ID", print_id);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", receiptPosOrder.getOrderNumber());
-        data.put("DATETIME", DateUtil.formatDate(receiptPosOrder.getPayTime(), "yyyy-MM-dd HH:mm"));
+        data.put("DATETIME", DateUtil.formatDate(receiptPosOrder.getPayTime(), "yyyy-MM-dd HH:mm:ss"));
         data.put("DISTRIBUTION_MODE", modeText+receiptPosOrder.getTableNumber());
         //data.put("TABLE_NUMBER", "");
         //添加当天打印订单的序号
