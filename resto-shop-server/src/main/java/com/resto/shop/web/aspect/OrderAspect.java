@@ -883,14 +883,14 @@ public class OrderAspect {
                         msg.append("桌号:" + order.getTableNumber() + "\n");
                         break;
                     default:
-                        msg.append("取餐码：" + order.getVerCode() + "\n");
+                        msg.append("消费码：" + order.getVerCode() + "\n");
                         break;
                 }
             }
             if (order.getShopName() == null || "".equals(order.getShopName())) {
                 order.setShopName(shopDetail.getName());
             }
-            msg.append("就餐店铺：" + order.getShopName() + "\n");
+            msg.append("店铺名：" + order.getShopName() + "\n");
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
 
