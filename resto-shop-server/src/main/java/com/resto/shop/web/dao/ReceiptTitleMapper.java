@@ -19,6 +19,8 @@ public interface ReceiptTitleMapper extends GenericDao<ReceiptTitle,String> {
 
     int updateByPrimaryKey(ReceiptTitle record);
 
+    int updateByState(ReceiptTitle record);
+
     List<ReceiptTitle> selectOneList(@Param("customerId")String customerId);
 
     List<ReceiptTitle> selectTypeList(@Param("customerId")String customerId, @Param("type")Integer type);

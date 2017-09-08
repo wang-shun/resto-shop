@@ -25,11 +25,21 @@ public class ReceiptTitleServiceImpl extends GenericServiceImpl<ReceiptTitle,Str
 
     @Override
     public int insertSelective(ReceiptTitle record){
+        if(record.getState()==1){
+            ReceiptTitle state=new ReceiptTitle();
+            state.setState(0);
+            receiptTitleMapper.updateByState(state);
+        }
         return receiptTitleMapper.insertSelective(record);
     }
 
     @Override
     public int updateByPrimaryKeySelective(ReceiptTitle record){
+        if(record.getState()==1){
+            ReceiptTitle state=new ReceiptTitle();
+            state.setState(0);
+            receiptTitleMapper.updateByState(state);
+        }
         return receiptTitleMapper.updateByPrimaryKeySelective(record);
     }
     @Override
