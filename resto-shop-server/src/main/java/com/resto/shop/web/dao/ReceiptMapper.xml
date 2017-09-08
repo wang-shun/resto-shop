@@ -13,7 +13,7 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, order_number, pay_time, "order_money", receipt_money, receipt_title_id, state, 
+    id, order_number, pay_time, order_money, receipt_money, receipt_title_id, state,
     create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
@@ -49,7 +49,7 @@
         pay_time,
       </if>
       <if test="orderMoney != null" >
-        "order_money",
+        order_money,
       </if>
       <if test="receiptMoney != null" >
         receipt_money,
