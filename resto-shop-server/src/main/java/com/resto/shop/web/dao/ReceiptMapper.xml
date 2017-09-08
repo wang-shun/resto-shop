@@ -192,9 +192,18 @@
     WHERE r.order_number = o.serial_number
     AND t.id=r.receipt_title_id
     AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
-    <if test="state != null" >
-      AND r.state=#{state,jdbcType=INTEGER}
-    </if>
+  </select>
+  <select id="getReceiptStateList" resultMap="posMap">
+    SELECT
+    r.id,r.state,t.name
+    FROM
+    tb_receipt r,
+    tb_order o,
+    tb_receipt_title t
+    WHERE r.order_number = o.serial_number
+    AND t.id=r.receipt_title_id
+    AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
+    AND r.state=#{state,jdbcType=INTEGER}
   </select>
   <resultMap id="posOrderMap" type="com.resto.shop.web.dto.ReceiptPosOrder">
     <result column="id" property="receiptId" jdbcType="VARCHAR"/>

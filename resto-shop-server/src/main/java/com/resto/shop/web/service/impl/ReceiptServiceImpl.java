@@ -100,9 +100,9 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     @Override
     public List<ReceiptPos> getReceiptList(String shopId,String state){
         if(state==null||state.equals("")){
-            return receiptMapper.getReceiptList(shopId,null);
+            return receiptMapper.getReceiptList(shopId);
         }else{
-            return receiptMapper.getReceiptList(shopId,Integer.parseInt(state));
+            return receiptMapper.getReceiptStateList(shopId,Integer.parseInt(state));
         }
     }
 
