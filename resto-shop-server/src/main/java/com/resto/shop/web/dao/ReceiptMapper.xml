@@ -127,6 +127,18 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <update id="updateState" parameterType="com.resto.shop.web.model.Receipt" >
+    update tb_receipt
+    <set >
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Receipt" >
     update tb_receipt
     set order_number = #{orderNumber,jdbcType=VARCHAR},
@@ -161,6 +173,51 @@
         AND o.customer_id=#{customerId,jdbcType=VARCHAR}
         ORDER BY pay_time DESC) t1
     WHERE t1.receipt_money!=0.00
+    <if test="state != null" >
         AND t1.state=#{state,jdbcType=INTEGER}
+    </if>
+  </select>
+  <resultMap id="posMap" type="com.resto.shop.web.dto.ReceiptPos">
+    <result column="id" property="receiptId" jdbcType="VARCHAR"/>
+    <result column="name" property="name" jdbcType="VARCHAR"/>
+    <result column="state" property="state" jdbcType="INTEGER"/>
+  </resultMap>
+  <select id="getReceiptList" resultMap="posMap">
+    SELECT
+        r.id,r.state,t.name
+    FROM
+            tb_receipt r,
+            tb_order o,
+            tb_receipt_title t
+    WHERE r.order_number = o.serial_number
+    AND t.id=r.receipt_title_id
+    AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
+    <if test="state != null" >
+      AND r.state=#{state,jdbcType=INTEGER}
+    </if>
+  </select>
+  <resultMap id="posOrderMap" type="com.resto.shop.web.dto.ReceiptPosOrder">
+    <result column="id" property="receiptId" jdbcType="VARCHAR"/>
+    <result column="order_number" property="orderNumber" jdbcType="VARCHAR"/>
+    <result column="pay_time" property="payTime" jdbcType="TIMESTAMP"/>
+    <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
+    <result column="receipt_money" property="receiptMoney" jdbcType="DECIMAL"/>
+    <result column="state" property="state" jdbcType="INTEGER"/>
+    <result column="table_number" property="tableNumber" jdbcType="VARCHAR"/>
+    <result column="receipt_title_id" property="receiptTitleId" jdbcType="VARCHAR"/>
+    <result column="mobile_no" property="mobileNo" jdbcType="VARCHAR"/>
+    <result column="name" property="name" jdbcType="VARCHAR"/>
+    <result column="duty_paragraph" property="dutyParagraph" jdbcType="VARCHAR"/>
+  </resultMap>
+  <select id="getReceiptOrderList" resultMap="posOrderMap">
+     SELECT
+	  r.id,r.order_number,r.pay_time,r.order_money,r.receipt_money,r.state,o.table_number,t.id receipt_title_id,t.mobile_no,t.name,t.duty_paragraph
+    FROM
+        tb_receipt r,
+        tb_order o,
+        tb_receipt_title t
+    WHERE r.order_number = o.serial_number
+	  AND t.id=r.receipt_title_id
+      AND r.id=#{receiptId,jdbcType=BIGINT}
   </select>
 </mapper>

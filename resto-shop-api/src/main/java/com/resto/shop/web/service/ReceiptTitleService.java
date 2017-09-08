@@ -14,6 +14,8 @@ public interface ReceiptTitleService extends GenericService<ReceiptTitle, String
 
     int updateByPrimaryKeySelective(ReceiptTitle record);
 
+    ReceiptTitle selectByPrimaryKey(String id);
+
     List<ReceiptTitle> selectOneList(String customerId);
 
     List<ReceiptTitle> selectTypeList(String customerId,String type);
