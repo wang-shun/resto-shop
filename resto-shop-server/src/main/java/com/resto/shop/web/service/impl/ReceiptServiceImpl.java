@@ -99,11 +99,24 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     }
     @Override
     public List<ReceiptPos> getReceiptList(String shopId,String state){
+        List<ReceiptPos> rlist=new ArrayList<>();
         if(state==null||state.equals("")){
-            return receiptMapper.getReceiptList(shopId);
-        }else{
-            return receiptMapper.getReceiptStateList(shopId,Integer.parseInt(state));
+            //查询当天的所有发票
+            List<ReceiptPos> now = receiptMapper.getNowReceiptList(shopId,null);
+            rlist.addAll(now);
+            //查询以前的所有发票
+            List<ReceiptPos> before = receiptMapper.getBeforeReceiptList(shopId);
+            rlist.addAll(before);
+        }else if(state.equals("0")){
+            List<ReceiptPos> now = receiptMapper.getNowReceiptList(shopId,Integer.parseInt(state));
+            rlist.addAll(now);
+            List<ReceiptPos> before = receiptMapper.getBeforeReceiptList(shopId);
+            rlist.addAll(before);
+        }else {
+            List<ReceiptPos> now = receiptMapper.getNowReceiptList(shopId,Integer.parseInt(state));
+            rlist.addAll(now);
         }
+        return rlist;
     }
 
     /**

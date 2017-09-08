@@ -133,8 +133,8 @@
       <if test="state != null" >
         state = #{state,jdbcType=INTEGER},
       </if>
-      <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -182,18 +182,8 @@
     <result column="name" property="name" jdbcType="VARCHAR"/>
     <result column="state" property="state" jdbcType="INTEGER"/>
   </resultMap>
-  <select id="getReceiptList" resultMap="posMap">
-    SELECT
-        r.id,r.state,t.name
-    FROM
-            tb_receipt r,
-            tb_order o,
-            tb_receipt_title t
-    WHERE r.order_number = o.serial_number
-    AND t.id=r.receipt_title_id
-    AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
-  </select>
-  <select id="getReceiptStateList" resultMap="posMap">
+  <!--查询当天的已开、未开发票-->
+  <select id="getNowReceiptList" resultMap="posMap">
     SELECT
     r.id,r.state,t.name
     FROM
@@ -202,8 +192,28 @@
     tb_receipt_title t
     WHERE r.order_number = o.serial_number
     AND t.id=r.receipt_title_id
+    AND r.create_time &gt;= CONCAT(curdate(),' 00:00:00')
+    AND r.create_time &lt;= CONCAT(curdate(),' 23:59:59')
     AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
-    AND r.state=#{state,jdbcType=INTEGER}
+    <if test="state != null" >
+      AND r.state=#{state,jdbcType=INTEGER}
+    </if>
+    ORDER BY r.create_time DESC
+  </select>
+  <!--查询不是当天的，以前所有未开的发票,-->
+  <select id="getBeforeReceiptList" resultMap="posMap">
+    SELECT
+    r.id,r.pay_time,r.state,t.name
+    FROM
+    tb_receipt r,
+    tb_order o,
+    tb_receipt_title t
+    WHERE r.order_number = o.serial_number
+    AND t.id=r.receipt_title_id
+    AND r.state=0
+    AND r.create_time &lt; CONCAT(curdate(),' 00:00:00')
+    AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
+    ORDER BY r.create_time DESC
   </select>
   <resultMap id="posOrderMap" type="com.resto.shop.web.dto.ReceiptPosOrder">
     <result column="id" property="receiptId" jdbcType="VARCHAR"/>

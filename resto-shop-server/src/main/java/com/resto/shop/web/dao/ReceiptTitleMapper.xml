@@ -186,4 +186,7 @@
       update_time = #{updateTime,jdbcType=TIMESTAMP}
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <update id="updateByState" parameterType="com.resto.shop.web.model.ReceiptTitle" >
+    update tb_receipt_title set state = #{state,jdbcType=INTEGER}
+  </update>
 </mapper>
