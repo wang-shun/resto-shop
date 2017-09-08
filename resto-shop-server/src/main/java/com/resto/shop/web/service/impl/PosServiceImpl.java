@@ -2,6 +2,7 @@ package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.AccountSetting;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
@@ -25,10 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.resto.shop.web.service.impl.OrderServiceImpl.generateString;
 
@@ -307,10 +305,14 @@ public class PosServiceImpl implements PosService {
         JSONObject json = new JSONObject(data);
         Order order = orderService.selectById(json.getString("orderId"));
         if(order != null && order.getOrderState() == OrderState.SUBMIT){
+
             List<OrderPaymentDto> orderPaymentDtos = JSON.parseArray(json.get("orderPayment").toString(), OrderPaymentDto.class);
             for(OrderPaymentDto orderPaymentDto : orderPaymentDtos){
                 OrderPaymentItem orderPaymentItem = new OrderPaymentItem(orderPaymentDto);
                 orderPaymentItemService.insert(orderPaymentItem);
+            }
+            if(order.getCustomerId() != null){
+                order.setIsPosPay(Common.YES);
             }
             order.setOrderState(OrderState.PAYMENT);
             order.setPaymentAmount(BigDecimal.valueOf(0));
@@ -366,6 +368,7 @@ public class PosServiceImpl implements PosService {
             }
 
         }else{
+
             orderService.refundItem(order);
             orderService.refundArticleMsg(order);
         }

@@ -7063,7 +7063,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectById(o.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         Customer customer = customerService.selectById(o.getCustomerId());
-        if(customer == null){
+        if(customer == null || o.getIsPosPay() == Common.YES){
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
             item.setPayValue(new BigDecimal(-1).multiply(order.getRefundMoney()));
@@ -7073,6 +7073,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderPaymentItemService.insert(item);
             return;
         }
+
 
         int refundMoney = order.getRefundMoney().multiply(new BigDecimal(100)).intValue();
 
