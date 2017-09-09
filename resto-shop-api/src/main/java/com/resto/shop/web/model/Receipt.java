@@ -1,5 +1,6 @@
 package com.resto.shop.web.model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class Receipt {
@@ -9,9 +10,9 @@ public class Receipt {
 
     private Date payTime;
 
-    private Long orderMoney;
+    private BigDecimal orderMoney;
 
-    private Long receiptMoney;
+    private BigDecimal receiptMoney;
 
     private Long receiptTitleId;
 
@@ -45,19 +46,19 @@ public class Receipt {
         this.payTime = payTime;
     }
 
-    public Long getOrderMoney() {
+    public BigDecimal getOrderMoney() {
         return orderMoney;
     }
 
-    public void setOrderMoney(Long orderMoney) {
+    public void setOrderMoney(BigDecimal orderMoney) {
         this.orderMoney = orderMoney;
     }
 
-    public Long getReceiptMoney() {
+    public BigDecimal getReceiptMoney() {
         return receiptMoney;
     }
 
-    public void setReceiptMoney(Long receiptMoney) {
+    public void setReceiptMoney(BigDecimal receiptMoney) {
         this.receiptMoney = receiptMoney;
     }
 
