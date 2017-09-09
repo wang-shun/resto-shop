@@ -26,6 +26,8 @@ public interface ReceiptMapper extends GenericDao<Receipt,String> {
 
     List<ReceiptOrder> selectReceiptOrderList(@Param("customerId")String customerId, @Param("state")Integer state);
 
+    List<ReceiptOrder> selectApplyReceiptOrderList(@Param("customerId")String customerId);
+
     ReceiptPosOrder getReceiptOrderList(@Param("receiptId")Integer receiptId);
 
     List<ReceiptPos> getNowReceiptList(@Param("shopId")String shopId,@Param("state")Integer state);
