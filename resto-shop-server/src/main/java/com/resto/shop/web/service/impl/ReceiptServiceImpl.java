@@ -90,7 +90,7 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
         if(state==null||state.equals("")){
             return receiptMapper.selectApplyReceiptOrderList(customerId);
         }else{
-            return receiptMapper.selectReceiptOrderList(customerId,Integer.parseInt(state));
+            return receiptMapper.selectReceiptOrderList(customerId);
         }
     }
     @Override
