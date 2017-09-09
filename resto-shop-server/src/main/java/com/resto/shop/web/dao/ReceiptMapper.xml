@@ -178,17 +178,17 @@
   </select>
   <!--查询申请发票订单-->
   <select id="selectApplyReceiptOrderList" resultMap="orderMap">
-    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,t1.receipt_money receipt_money,t1.state state FROM
+    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,t1.receipt_money receipt_money FROM
     (SELECT
     o.serial_number order_number,
     (SELECT p.pay_time FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16) ORDER BY p.pay_time DESC LIMIT 0,1) pay_time,
     o.order_money order_money,
-    (SELECT SUM(p.pay_value) FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16)) receipt_money,
-    (SELECT r.state FROM tb_receipt r WHERE r.order_number!=o.serial_number) state
+    (SELECT SUM(p.pay_value) FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16)) receipt_money
     FROM
     tb_order o
     WHERE o.production_status IN (2, 3, 4)
     AND o.order_state IN (2, 10, 11, 12)
+    AND o.serial_number NOT IN (SELECT r.order_number FROM tb_receipt r)
     AND o.customer_id=#{customerId,jdbcType=VARCHAR}
     ORDER BY pay_time DESC) t1
     WHERE t1.receipt_money!=0.00
