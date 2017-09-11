@@ -194,14 +194,14 @@ public class CloseShopServieImpl implements CloseShopService{
 						sb.append("桌号:" + (order.getTableNumber() != null ? order.getTableNumber() : "无") + "\n");
 						break;
 					default:
-						sb.append("取餐码：" + (order.getVerCode() != null ? order.getVerCode() : "无") + "\n");
+						sb.append("消费码：" + (order.getVerCode() != null ? order.getVerCode() : "无") + "\n");
 						break;
 				}
 			}
 			if (order.getShopName() == null || "".equals(order.getShopName())) {
 				order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
 			}
-			sb.append("就餐店铺：" + order.getShopName() + "\n");
+			sb.append("店铺名：" + order.getShopName() + "\n");
 			sb.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
 			sb.append("订单明细：\n");
 			List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());

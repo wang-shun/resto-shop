@@ -447,6 +447,23 @@ public class ThirdServiceImpl implements ThirdService {
                 items.add(item);
             }
         }
+        if (order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
+            Map<String, Object> item = new HashMap<>();
+            List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
+            BigDecimal mealCount = new BigDecimal(order.getBaseMealAllCount());
+            BigDecimal mealAllNumber = BigDecimal.valueOf(order.getMealAllNumber());
+            if (!CollectionUtils.isEmpty(childs)) {
+                for (String c : childs) {
+                    Order childOrder = orderMapper.selectByPrimaryKey(c);
+                    mealCount = mealCount.add(BigDecimal.valueOf(childOrder.getBaseMealAllCount()));
+                    mealAllNumber = mealAllNumber.add(BigDecimal.valueOf(childOrder.getMealAllNumber()));
+                }
+            }
+            item.put("SUBTOTAL", shopDetail.getMealFeePrice().multiply(mealCount));
+            item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
+            item.put("ARTICLE_COUNT", mealCount);
+            items.add(item);
+        }
 
        /* if (orderExtraList != null) {
             for (PlatformOrderExtra orderExtra : orderExtraList) {
@@ -570,7 +587,23 @@ public class ThirdServiceImpl implements ThirdService {
                 items.add(item);
             }
         }
-
+        if (order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
+            Map<String, Object> item = new HashMap<>();
+            List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
+            BigDecimal mealCount = new BigDecimal(order.getBaseMealAllCount());
+            BigDecimal mealAllNumber = BigDecimal.valueOf(order.getMealAllNumber());
+            if (!CollectionUtils.isEmpty(childs)) {
+                for (String c : childs) {
+                    Order childOrder = orderMapper.selectByPrimaryKey(c);
+                    mealCount = mealCount.add(BigDecimal.valueOf(childOrder.getBaseMealAllCount()));
+                    mealAllNumber = mealAllNumber.add(BigDecimal.valueOf(childOrder.getMealAllNumber()));
+                }
+            }
+            item.put("SUBTOTAL", shopDetail.getMealFeePrice().multiply(mealCount));
+            item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
+            item.put("ARTICLE_COUNT", mealCount);
+            items.add(item);
+        }
         /*if (orderExtraList != null) {
             for (PlatformOrderExtra orderExtra : orderExtraList) {
                 Map<String, Object> item = new HashMap<>();
