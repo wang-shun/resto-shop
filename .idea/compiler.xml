@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="resto-shop-api" />
+        <module name="resto-shop-server" />
+        <module name="resto-shop-web" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="resto-scm-api" target="1.7" />
+      <module name="resto-scm-server" target="1.7" />
+      <module name="resto-shop" target="1.7" />
+      <module name="resto-shop-api" target="1.7" />
+      <module name="resto-shop-server" target="1.7" />
+      <module name="resto-shop-web" target="1.7" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
