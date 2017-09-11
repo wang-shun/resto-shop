@@ -175,6 +175,7 @@
         <result column="service_price" property="servicePrice"/>
         <result column="pay_mode" property="payMode"/>
         <result column="base_money" property="baseMoney"/>
+        <result column="base_order_money" property="baseOrderMoney"/>
         <result column="base_customer_count" property="baseCustomerCount"/>
         <result column="meal_fee_price" property="mealFeePrice"/>
         <result column="meal_all_number" property="mealAllNumber"/>
@@ -385,7 +386,7 @@
         call_number_time, order_mode, brand_id, amount_with_children,
         parent_order_id, allow_continue_order,
         count_with_child,
-        last_order_time,customer_count,service_price,pay_mode,base_money,base_customer_count,meal_fee_price,meal_all_number
+        last_order_time,customer_count,service_price,pay_mode,base_money,base_order_money,base_customer_count,meal_fee_price,meal_all_number
         ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
         print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money
     </sql>
@@ -581,6 +582,9 @@
             <if test="orderMoney != null">
                 base_money,
             </if>
+            <if test="orderMoney != null">
+                base_order_money,
+            </if>
             <if test="customerCount != null">
                 base_customer_count,
             </if>
@@ -742,6 +746,9 @@
             </if>
             <if test="payMode != null">
                 #{payMode},
+            </if>
+            <if test="orderMoney != null">
+                #{orderMoney},
             </if>
             <if test="orderMoney != null">
                 #{orderMoney},
@@ -952,6 +959,9 @@
             </if>
             <if test="noDiscountMoney != null">
                 no_discount_money = #{noDiscountMoney},
+            </if>
+            <if test="baseOrderMoney != null">
+                base_order_money = #{baseOrderMoney},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
