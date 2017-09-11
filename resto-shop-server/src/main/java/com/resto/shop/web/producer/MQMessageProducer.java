@@ -322,6 +322,17 @@ public class MQMessageProducer {
 	}
 
 	/**
+	 * 发送发票管理消息队列
+	 * @param orderNumber
+	 */
+	public static void sendReceiptPrintSuccess(String orderNumber) {
+		JSONObject obj  = new JSONObject();
+		obj.put("orderNumber",orderNumber);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_RECEIPT_PRINT_SUCCESS,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
+	/**
 	 * 发送打印差评订单的消息队列
 	 * @param orderId
 	 */
