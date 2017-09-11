@@ -2,8 +2,11 @@ package com.resto.shop.web.config;
 
 import cn.restoplus.rpc.client.RpcProxy;
 import com.resto.brand.web.model.AccountAddressInfo;
+import com.resto.brand.web.model.City;
 import com.resto.brand.web.service.*;
 import com.resto.brand.web.service.TableQrcodeService;
+import com.resto.scm.web.service.*;
+import com.resto.shop.web.controller.scm.ScmUnitController;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.EmployeeService;
@@ -526,8 +529,77 @@ public class SpringContextConfig {
 		return proxy.create(AccountNoticeService.class);
 	}
 
-	//-----------------------
+    @Bean
+    public ProvinceService provinceService(){
+        return proxy.create(ProvinceService.class);
+    }
 
+    @Bean
+    public CityService cityService(){
+        return proxy.create(CityService.class);
+    }
+
+    @Bean
+    public DistrictService districtService(){
+        return proxy.create(DistrictService.class);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    //------------scm server config start-----------
+
+
+    @Bean
+    public ScmUnitService scmUnitService(){
+	    return proxy.create(ScmUnitService.class);
+    }
+    @Bean
+    public MaterialService materialService(){
+        return proxy.create(MaterialService.class);
+    }
+
+    @Bean
+    public CategoryService categoryService(){
+        return proxy.create(CategoryService.class);
+    }
+
+
+    @Bean
+    public ArticleBomHeadService articleBomHeadService(){
+        return proxy.create(ArticleBomHeadService.class);
+    }
+    @Bean
+    public StockCountCheckService stockCountCheckService(){
+        return proxy.create(StockCountCheckService.class);
+    }
+    @Bean
+    public StockInPlanService stockInPlanService(){
+        return proxy.create(StockInPlanService.class);
+    }
+    @Bean
+    public SupplierMaterialPriceService supplierMaterialPriceDetailService(){
+        return proxy.create(SupplierMaterialPriceService.class);
+    }
+
+    @Bean
+    public SupplierService supplierService(){
+        return proxy.create(SupplierService.class);
+    }
+
+
+
+    //------------scm server config end-----------
+
+    //-----------------------
 
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);

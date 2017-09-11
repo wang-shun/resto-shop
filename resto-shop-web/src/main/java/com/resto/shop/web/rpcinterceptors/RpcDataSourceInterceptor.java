@@ -18,7 +18,7 @@ public class RpcDataSourceInterceptor implements SendInterceptor{
 	@Override
     public void beforeSend(RpcRequest request) {
         String interfaceName = request.getInterfaceName();
-        if(interfaceName.matches("^com.resto.shop.web.service.*")){
+        if(interfaceName.matches("^com.resto.shop.web.service.*") || interfaceName.matches("^com.resto.scm.web.service.*")){
             HttpServletRequest httpRequest = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
             String brandId = (String) httpRequest.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
             request.setRequestHead(brandId);

@@ -28,6 +28,29 @@
     <!-- 指定自己定义的validator -->
     <mvc:annotation-driven validator="validator"/>
 
+    <mvc:annotation-driven>
+
+
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="objectMapper">
+                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                        <!-- 处理responseBody 里面日期类型 -->
+                        <property name="dateFormat">
+                            <bean class="java.text.SimpleDateFormat">
+                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />
+                            </bean>
+                        </property>
+                        <!-- 为null字段时不显示 -->
+                        <!--<property name="serializationInclusion">-->
+                            <!--<value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>-->
+                        <!--</property>-->
+                    </bean>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
     <!-- 以下 validator ConversionService 在使用 mvc:annotation-driven 会 自动注册 -->
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
         <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
@@ -84,6 +107,10 @@
             </list>
         </property>
     </bean>
+
+
+
+
     <!-- 支持返回json -->
 
     <!--默认视图级别设置低点 -->

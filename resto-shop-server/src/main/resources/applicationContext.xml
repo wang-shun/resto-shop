@@ -130,6 +130,7 @@
 			<!-- 对其他方法 使用默认的事务管理 -->
 			<tx:method name="*" />
 		</tx:attributes>
+
 	</tx:advice>
 
 	<!-- 事务 aop 配置 -->

@@ -16,11 +16,13 @@ public class OpenBrandAccountInterceptor  implements HandlerInterceptor {
 
 	@Override
 	public void postHandle(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Object o, ModelAndView modelAndView) throws Exception {
+		httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
 		HttpSession httpSession = httpServletRequest.getSession();
 		if(!(Boolean) httpSession.getAttribute(SessionKey.OPEN_BRAND_ACCOUNT)){//如果是false则认为品牌启动了计费系统并且账户余额小于 最小设置
 			//httpServletResponse.sendRedirect("/accountchargeorder/list");
 			modelAndView.setViewName("accountchargeorder/list");
 		}
+
 	}
 
 	@Override
