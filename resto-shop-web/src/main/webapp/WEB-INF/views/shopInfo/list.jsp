@@ -597,6 +597,13 @@
 						</div>
 					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label">R+外卖最大配送范围(单位km)：</label>
+						<div  class="col-md-6">
+							<input type="text" class="form-control" name="apart" :value="m.apart" >
+						</div>
+					</div>
+
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>
