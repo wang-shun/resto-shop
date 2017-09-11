@@ -243,6 +243,10 @@ public class Order implements Serializable{
 
     private BigDecimal posDiscount;
 
+    private BigDecimal eraseMoney;
+
+    private BigDecimal noDiscountMoney;
+
     public Integer getTag() {
         return tag;
     }
@@ -986,6 +990,22 @@ public class Order implements Serializable{
 
     public void setPosDiscount(BigDecimal posDiscount) {
         this.posDiscount = posDiscount;
+    }
+
+    public BigDecimal getEraseMoney() {
+        return eraseMoney;
+    }
+
+    public void setEraseMoney(BigDecimal eraseMoney) {
+        this.eraseMoney = eraseMoney;
+    }
+
+    public BigDecimal getNoDiscountMoney() {
+        return noDiscountMoney;
+    }
+
+    public void setNoDiscountMoney(BigDecimal noDiscountMoney) {
+        this.noDiscountMoney = noDiscountMoney;
     }
 
     @Override

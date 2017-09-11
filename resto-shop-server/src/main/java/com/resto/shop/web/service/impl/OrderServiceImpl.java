@@ -9003,16 +9003,28 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectAfterValidOrderByCustomerId(customerId);
     }
 
+    /**
+     *
+     * @param orderId
+     * @param discount    折扣的比例   (不包含 抹去的金额  跟  不需要折扣的金额)
+     * @param orderItems
+     * @param eraseMoney      抹去的金额
+     * @param noDiscountMoney     不需要折扣的金额
+     * @param type
+     * @return
+     */
     @Override
-    public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, Integer type) {
+    public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
+        BigDecimal orderMoney = order.getAmountWithChildren().doubleValue() > 0 ? order.getAmountWithChildren() : order.getOrderMoney();
+        BigDecimal posDiscount = ((orderMoney.subtract(eraseMoney).subtract(noDiscountMoney)).multiply(discount).add(noDiscountMoney)).divide(orderMoney);
         //整单折扣统计菜品项
         if(type == PosDiscount.ZHENGDAN){
             Map map = new HashMap();
             map.put("orderId", orderId);
             map.put("count", "1=1");
             List<OrderItem> oItems = orderItemService.selectOrderItemByOrderId(map);
-            order = posDiscountAction(oItems, discount, order);
+            order = posDiscountAction(oItems, posDiscount, order, eraseMoney, noDiscountMoney);
             List<Order> pOrder = orderMapper.selectListByParentId(orderId);
             if(pOrder.size() > 0){
                 BigDecimal sum = new BigDecimal(0);
@@ -9020,7 +9032,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     map.clear();
                     map.put("orderId", oP.getId());
                     map.put("count", "1=1");
-                    oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, oP);
+                    oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), posDiscount, oP, eraseMoney, noDiscountMoney);
                     sum = sum.add(oP.getOrderMoney());
                 }
                 //修改主订单
@@ -9032,7 +9044,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return null;
     }
 
-    public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, Order order){
+    public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, Order order, BigDecimal eraseMoney, BigDecimal noDiscountMoney){
         ShopDetail shop = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         BigDecimal sum = new BigDecimal(0);
@@ -9063,6 +9075,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             order.setOrderMoney(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
             order.setPaymentAmount(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
+            order.setEraseMoney(eraseMoney);
+            order.setNoDiscountMoney(noDiscountMoney);
             BigDecimal value = orderMapper.selectPayBefore(order.getId());
             if(value != null && value.doubleValue() > 0){
                 order.setPaymentAmount(sum.subtract(value));
