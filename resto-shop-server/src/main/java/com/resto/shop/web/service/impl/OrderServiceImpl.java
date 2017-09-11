@@ -9053,7 +9053,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //修改主订单
         if(order.getParentOrderId() == null || "".equals(order.getParentOrderId())){
             if(order.getServicePrice().doubleValue() > 0){
-                order.setServicePrice(discount.multiply(new BigDecimal(shop.getIsUseServicePrice() * order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
+                order.setServicePrice(discount.multiply(new BigDecimal(shop.getServicePrice() * order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
             if(order.getMealFeePrice().doubleValue() > 0){
                 order.setMealFeePrice(discount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
