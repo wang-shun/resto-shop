@@ -103,6 +103,10 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
         return receiptMapper.getReceiptOrderList(Integer.parseInt(receiptId));
     }
     @Override
+    public ReceiptPos getPosReceiptList(String orderNumber){
+        return receiptMapper.getPosReceiptList(orderNumber);
+    }
+    @Override
     public List<ReceiptPos> getReceiptList(String shopId,String state){
         List<ReceiptPos> rlist=new ArrayList<>();
         if(state==null||state.equals("")){
