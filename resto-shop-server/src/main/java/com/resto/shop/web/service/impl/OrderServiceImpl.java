@@ -9038,11 +9038,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal sum = new BigDecimal(0);
         //修改菜品项
         for(OrderItem oItem : orderItems){
-            oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
-            oItem.setPosDiscount(discount.multiply(new BigDecimal(100)) + "%");
-            oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
-            sum = sum.add(oItem.getFinalPrice());
-            orderItemService.update(oItem);
+            if(oItem.getType() != OrderItemType.MEALS_CHILDREN){
+                oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
+                oItem.setPosDiscount(discount.multiply(new BigDecimal(100)) + "%");
+                oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
+                sum = sum.add(oItem.getFinalPrice());
+                orderItemService.update(oItem);
+            }
         }
         //修改子订单
         if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
