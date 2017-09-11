@@ -20,4 +20,6 @@ public interface ReceiptTitleService extends GenericService<ReceiptTitle, String
 
     List<ReceiptTitle> selectTypeList(String customerId,String type);
 
+    List<ReceiptTitle> selectDefaultList(String customerId);
+
 }
