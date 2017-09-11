@@ -7686,7 +7686,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         msg.append("订单编号:\n");
         msg.append(o.getSerialNumber()).append("\n");
         msg.append("桌号:").append(o.getTableNumber()).append("\n");
-        msg.append("就餐店铺:").append(shopDetail.getName()).append("\n");
+        msg.append("店铺名:").append(shopDetail.getName()).append("\n");
         msg.append("订单时间:").append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("\n");
 //        msg.append("订单明细:").append("\n");
         BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
@@ -9034,6 +9034,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, Order order){
         ShopDetail shop = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         BigDecimal sum = new BigDecimal(0);
         //修改菜品项
         for(OrderItem oItem : orderItems){
@@ -9052,8 +9053,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         //修改主订单
         if(order.getParentOrderId() == null || "".equals(order.getParentOrderId())){
-            if(order.getServicePrice().doubleValue() > 0){
-                order.setServicePrice(discount.multiply(new BigDecimal(shop.getIsUseServicePrice() * order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
+            if(shop.getServicePrice().doubleValue() > 0 && shop.getIsUseServicePrice() == 1 && brandSetting.getIsUseServicePrice() == 1 && order.getCustomerCount() > 0){
+                order.setServicePrice(discount.multiply(shop.getServicePrice()).multiply(new BigDecimal(order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
             if(order.getMealFeePrice().doubleValue() > 0){
                 order.setMealFeePrice(discount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
