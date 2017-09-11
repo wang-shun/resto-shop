@@ -7686,7 +7686,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         msg.append("订单编号:\n");
         msg.append(o.getSerialNumber()).append("\n");
         msg.append("桌号:").append(o.getTableNumber()).append("\n");
-        msg.append("就餐店铺:").append(shopDetail.getName()).append("\n");
+        msg.append("店铺名:").append(shopDetail.getName()).append("\n");
         msg.append("订单时间:").append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("\n");
 //        msg.append("订单明细:").append("\n");
         BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
