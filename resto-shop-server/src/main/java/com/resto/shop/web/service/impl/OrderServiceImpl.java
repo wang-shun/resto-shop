@@ -9003,16 +9003,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectAfterValidOrderByCustomerId(customerId);
     }
 
+    /**
+     *
+     * @param orderId
+     * @param discount    折扣的比例   (不包含 抹去的金额  跟  不需要折扣的金额)
+     * @param orderItems
+     * @param eraseMoney      抹去的金额
+     * @param noDiscountMoney     不需要折扣的金额
+     * @param type
+     * @return
+     */
     @Override
-    public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, Integer type) {
+    public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
+        BigDecimal orderMoney = order.getAmountWithChildren().doubleValue() > 0 ? order.getAmountWithChildren() : order.getOrderMoney();
+        orderMoney = orderMoney.divide(order.getPosDiscount()).add(order.getEraseMoney()).add(order.getNoDiscountMoney());
+        BigDecimal posDiscount = ((orderMoney.subtract(eraseMoney).subtract(noDiscountMoney)).multiply(discount).add(noDiscountMoney)).divide(orderMoney);
         //整单折扣统计菜品项
         if(type == PosDiscount.ZHENGDAN){
             Map map = new HashMap();
             map.put("orderId", orderId);
             map.put("count", "1=1");
             List<OrderItem> oItems = orderItemService.selectOrderItemByOrderId(map);
-            order = posDiscountAction(oItems, discount, order);
+            order = posDiscountAction(oItems, discount, posDiscount, order, eraseMoney, noDiscountMoney);
             List<Order> pOrder = orderMapper.selectListByParentId(orderId);
             if(pOrder.size() > 0){
                 BigDecimal sum = new BigDecimal(0);
@@ -9020,7 +9033,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     map.clear();
                     map.put("orderId", oP.getId());
                     map.put("count", "1=1");
-                    oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, oP);
+                    oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, posDiscount, oP, eraseMoney, noDiscountMoney);
                     sum = sum.add(oP.getOrderMoney());
                 }
                 //修改主订单
@@ -9032,15 +9045,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return null;
     }
 
-    public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, Order order){
+    public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, BigDecimal posDiscount, Order order, BigDecimal eraseMoney, BigDecimal noDiscountMoney){
         ShopDetail shop = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         BigDecimal sum = new BigDecimal(0);
         //修改菜品项
         for(OrderItem oItem : orderItems){
             if(oItem.getType() != OrderItemType.MEALS_CHILDREN){
-                oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(discount).setScale(2,BigDecimal.ROUND_HALF_UP));
-                oItem.setPosDiscount(discount.multiply(new BigDecimal(100)) + "%");
+                oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(posDiscount).setScale(2,BigDecimal.ROUND_HALF_UP));
+                oItem.setPosDiscount(posDiscount.multiply(new BigDecimal(100)) + "%");
                 oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
                 sum = sum.add(oItem.getFinalPrice());
                 orderItemService.update(oItem);
@@ -9056,13 +9069,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //修改主订单
         if(order.getParentOrderId() == null || "".equals(order.getParentOrderId())){
             if(shop.getServicePrice().doubleValue() > 0 && shop.getIsUseServicePrice() == 1 && brandSetting.getIsUseServicePrice() == 1 && order.getCustomerCount() > 0){
-                order.setServicePrice(discount.multiply(shop.getServicePrice()).multiply(new BigDecimal(order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
+                order.setServicePrice(posDiscount.multiply(shop.getServicePrice()).multiply(new BigDecimal(order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
             if(order.getMealFeePrice().doubleValue() > 0){
-                order.setMealFeePrice(discount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
+                order.setMealFeePrice(posDiscount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
             order.setOrderMoney(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
             order.setPaymentAmount(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
+            order.setEraseMoney(eraseMoney);
+            order.setNoDiscountMoney(noDiscountMoney);
             BigDecimal value = orderMapper.selectPayBefore(order.getId());
             if(value != null && value.doubleValue() > 0){
                 order.setPaymentAmount(sum.subtract(value));
