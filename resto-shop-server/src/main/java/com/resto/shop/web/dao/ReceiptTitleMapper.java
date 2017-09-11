@@ -24,4 +24,6 @@ public interface ReceiptTitleMapper extends GenericDao<ReceiptTitle,String> {
     List<ReceiptTitle> selectOneList(@Param("customerId")String customerId);
 
     List<ReceiptTitle> selectTypeList(@Param("customerId")String customerId, @Param("type")Integer type);
+
+    List<ReceiptTitle> selectDefaultList(@Param("customerId")String customerId);
 }

@@ -57,4 +57,9 @@ public class ReceiptTitleServiceImpl extends GenericServiceImpl<ReceiptTitle,Str
         return receiptTitleMapper.selectTypeList(customerId,Integer.parseInt(type));
     }
 
+    @Override
+    public List<ReceiptTitle> selectDefaultList(String customerId){
+        return receiptTitleMapper.selectDefaultList(customerId);
+    }
+
 }
