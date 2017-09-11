@@ -9016,7 +9016,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
-        BigDecimal orderMoney = order.getAmountWithChildren().doubleValue() > 0 ? order.getAmountWithChildren() : order.getOrderMoney();
+        BigDecimal orderMoney = order.getBaseMoney();
         BigDecimal posDiscount = ((orderMoney.subtract(eraseMoney).subtract(noDiscountMoney)).multiply(discount).add(noDiscountMoney)).divide(orderMoney);
         //整单折扣统计菜品项
         if(type == PosDiscount.ZHENGDAN){
