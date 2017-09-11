@@ -30,4 +30,6 @@ public interface ReceiptService extends GenericService<Receipt, String> {
     List<Map<String, Object>> printReceiptOrder(String ShopId, String receiptId);
     //pos发票打印
     List<Map<String, Object>> printReceiptPosOrder(String orderNumber,String ShopId);
+    //根据订单号查询发票订单
+    ReceiptPos getPosReceiptList(String orderNumber);
 }

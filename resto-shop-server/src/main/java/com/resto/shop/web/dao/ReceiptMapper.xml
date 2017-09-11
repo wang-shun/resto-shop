@@ -231,6 +231,14 @@
     AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
     ORDER BY r.create_time DESC
   </select>
+  <!--订单numbe查询发票-->
+  <select id="getPosReceiptList" resultMap="posMap">
+    SELECT
+    r.id,r.state,t.name
+    FROM
+    tb_receipt r
+    WHERE r.order_number = #{orderNumber,jdbcType=VARCHAR}
+  </select>
   <resultMap id="posOrderMap" type="com.resto.shop.web.dto.ReceiptPosOrder">
     <result column="id" property="receiptId" jdbcType="VARCHAR"/>
     <result column="order_number" property="orderNumber" jdbcType="VARCHAR"/>
