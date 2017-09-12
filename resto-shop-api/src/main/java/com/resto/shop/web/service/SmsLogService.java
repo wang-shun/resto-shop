@@ -62,4 +62,5 @@ public interface SmsLogService extends GenericService<SmsLog, Long> {
 	 * @return
 	 */
 	JSONObject sendMessage(String brandId, String shopId,int smsType, String sign, String code_temp,String phone,JSONObject jsonObject);
+
 }
