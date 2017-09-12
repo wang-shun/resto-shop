@@ -246,7 +246,6 @@ public class BonusLogController extends GenericController{
             bonusLog.setEmployeeIssuingState(0);
             bonusLog.setState(2);
             bonusLogService.update(bonusLog);
-            return getSuccessResult();
         }catch (Exception ex){
             try {
                 if (isOneCustomer) {
@@ -292,6 +291,7 @@ public class BonusLogController extends GenericController{
             log.error("发放奖励出错");
             return new Result(ex.getMessage(),false);
         }
+        return getSuccessResult();
 	}
 
 	public void grantRewards(Customer customer, Integer bonusAmount, String wishing, WechatConfig wechatConfig, ShopDetail shopDetail) throws Exception{
@@ -329,15 +329,15 @@ public class BonusLogController extends GenericController{
             object.put("mch_id", wechatConfig.getMchid());//商户号
             object.put("wxappid", wechatConfig.getAppid());//公众号appId
             object.put("mch_key", wechatConfig.getMchkey());//商户支付密钥
-            object.put("cert_path", wechatConfig.getPayCertPath());//API证书地址
-//            object.put("cert_path", "F:/resto/75093c6a-eea2-443b-91a9-a5402bba3c4b.p12");
+//            object.put("cert_path", wechatConfig.getPayCertPath());//API证书地址
+            object.put("cert_path", "F:/resto/75093c6a-eea2-443b-91a9-a5402bba3c4b.p12");
         }else{
             WxServerConfig serverConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
             object.put("mch_id", serverConfig.getMchid());//服务商商户号
             object.put("wxappid", serverConfig.getAppid());//服务商公众号appId
             object.put("mch_key", serverConfig.getMchkey());//服务商商户支付密钥
-            object.put("cert_path", serverConfig.getPayCertPath());//服务商API证书
-//            object.put("cert_path", "F:/resto/6b6f99ff-642c-43b1-86e7-349b0f3548c1.p12");
+//            object.put("cert_path", serverConfig.getPayCertPath());//服务商API证书
+            object.put("cert_path", "F:/resto/6b6f99ff-642c-43b1-86e7-349b0f3548c1.p12");
             object.put("consume_mch_id", shopDetail.getMchid());//扣钱方的商户号
             object.put("msgappid", shopDetail.getAppid());//服务商下特约商户的公众号appId
             object.put("sub_mch_id", shopDetail.getMchid());//服务商下特约商户的商户号
