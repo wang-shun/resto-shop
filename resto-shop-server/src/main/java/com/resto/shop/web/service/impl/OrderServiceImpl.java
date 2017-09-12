@@ -9023,7 +9023,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setBaseOrderMoney(order.getAmountWithChildren().doubleValue() > 0 ? order.getAmountWithChildren() : order.getOrderMoney());
         }
         BigDecimal orderMoney = order.getBaseOrderMoney();
-        BigDecimal posDiscount = ((orderMoney.subtract(eraseMoney).subtract(noDiscountMoney)).multiply(discount).add(noDiscountMoney)).divide(orderMoney).setScale(2,BigDecimal.ROUND_HALF_UP);
+        BigDecimal posDiscount = ((orderMoney.subtract(eraseMoney).subtract(noDiscountMoney)).multiply(discount).add(noDiscountMoney)).divide(orderMoney, 2,BigDecimal.ROUND_HALF_UP);
         //整单折扣统计菜品项
         if(type == PosDiscount.ZHENGDAN){
             Map map = new HashMap();
