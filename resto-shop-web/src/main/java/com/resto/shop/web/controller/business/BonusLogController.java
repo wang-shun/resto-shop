@@ -246,6 +246,7 @@ public class BonusLogController extends GenericController{
             bonusLog.setEmployeeIssuingState(0);
             bonusLog.setState(2);
             bonusLogService.update(bonusLog);
+            return getSuccessResult();
         }catch (Exception ex){
             try {
                 if (isOneCustomer) {
@@ -291,7 +292,6 @@ public class BonusLogController extends GenericController{
             log.error("发放奖励出错");
             return new Result(ex.getMessage(),false);
         }
-        return getSuccessResult();
 	}
 
 	public void grantRewards(Customer customer, Integer bonusAmount, String wishing, WechatConfig wechatConfig, ShopDetail shopDetail) throws Exception{
