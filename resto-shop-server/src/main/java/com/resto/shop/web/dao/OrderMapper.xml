@@ -747,9 +747,6 @@
             <if test="orderMoney != null">
                 #{orderMoney},
             </if>
-            <if test="orderMoney != null">
-                #{orderMoney},
-            </if>
             <if test="customerCount != null">
                 #{customerCount},
             </if>
