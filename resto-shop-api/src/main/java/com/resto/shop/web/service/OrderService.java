@@ -753,5 +753,5 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	 */
 	Order selectAfterValidOrderByCustomerId(String customerId);
 
-	Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, Integer type);
+	Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type);
 }

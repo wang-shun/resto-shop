@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public interface ReceiptService extends GenericService<Receipt, String> {
 
-    int insertSelective(Receipt record);
+    Receipt insertSelective(Receipt record);
 
     int updateByPrimaryKeySelective(Receipt record);
 
@@ -28,4 +28,8 @@ public interface ReceiptService extends GenericService<Receipt, String> {
     List<ReceiptPos> getReceiptList(String shopId,String state);
     //发票打印
     List<Map<String, Object>> printReceiptOrder(String ShopId, String receiptId);
+    //pos发票打印
+    List<Map<String, Object>> printReceiptPosOrder(String orderNumber,String ShopId);
+    //根据订单号查询发票订单
+    ReceiptPos getPosReceiptList(String orderNumber);
 }

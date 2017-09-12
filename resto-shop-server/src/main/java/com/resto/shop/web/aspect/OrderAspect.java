@@ -165,7 +165,7 @@ public class OrderAspect {
                     msg.append("桌号:" + order.getTableNumber() + "\n");
                     break;
                 default:
-                    msg.append("取餐码：" + order.getVerCode() + "\n");
+                    msg.append("消费码：" + order.getVerCode() + "\n");
                     break;
             }
         }
@@ -174,7 +174,7 @@ public class OrderAspect {
         if (order.getShopName() == null || "".equals(order.getShopName())) {
             order.setShopName(shopDetail.getName());
         }
-        msg.append("就餐店铺：" + order.getShopName() + "\n");
+        msg.append("店铺名：" + order.getShopName() + "\n");
         msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
 
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -650,7 +650,7 @@ public class OrderAspect {
             }
             msg.append("订单编号:" + order.getSerialNumber() + "\n");
             msg.append("桌号：" + order.getTableNumber() + "\n");
-            msg.append("就餐店铺：" + shopDetail.getName() + "\n");
+            msg.append("店铺名：" + shopDetail.getName() + "\n");
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             if (setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
@@ -947,7 +947,7 @@ public class OrderAspect {
             Brand brand = brandService.selectById(order.getBrandId());
             StringBuffer msg = new StringBuffer();
             msg.append("交易码:" + order.getVerCode() + "\n");
-            msg.append("请留意餐厅叫号信息");
+            msg.append("请留意叫号信息");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "订单发送推送：" + msg.toString());
@@ -994,14 +994,14 @@ public class OrderAspect {
                     sb.append("桌号:" + (order.getTableNumber() != null ? order.getTableNumber() : "无") + "\n");
                     break;
                 default:
-                    sb.append("取餐码：" + (order.getVerCode() != null ? order.getVerCode() : "无") + "\n");
+                    sb.append("消费码：" + (order.getVerCode() != null ? order.getVerCode() : "无") + "\n");
                     break;
             }
         }
         if (order.getShopName() == null || "".equals(order.getShopName())) {
             order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
         }
-        sb.append("就餐店铺：" + order.getShopName() + "\n");
+        sb.append("店铺名：" + order.getShopName() + "\n");
         sb.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
         sb.append("订单明细：\n");
         List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());

@@ -71,8 +71,13 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     }
 
     @Override
-    public int insertSelective(Receipt record){
-        return receiptMapper.insertSelective(record);
+    public Receipt insertSelective(Receipt record){
+        int count =receiptMapper.insertSelective(record);
+        if(count==0){
+            return record;
+        }else{
+            return null;
+        }
     }
 
     @Override
@@ -96,6 +101,10 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     @Override
     public ReceiptPosOrder getReceiptOrderList(String receiptId){
         return receiptMapper.getReceiptOrderList(Integer.parseInt(receiptId));
+    }
+    @Override
+    public ReceiptPos getPosReceiptList(String orderNumber){
+        return receiptMapper.getPosReceiptList(orderNumber);
     }
     @Override
     public List<ReceiptPos> getReceiptList(String shopId,String state){
@@ -126,6 +135,31 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     @Override
     public List<Map<String, Object>> printReceiptOrder(String receiptId,String ShopId){
         ReceiptPosOrder receiptPosOrder = receiptMapper.getReceiptOrderList(Integer.parseInt(receiptId));
+        ShopDetail shopDetail = shopDetailService.selectById(ShopId);
+        List<Map<String, Object>> printTask = new ArrayList<>();
+        List<Printer> ticketPrinter=new ArrayList<>();
+        ticketPrinter.addAll(printerService.selectPrintByType(ShopId,PrinterType.RECEPTION));
+        for (Printer printer : ticketPrinter) {
+            getReceiptOrderModel(receiptPosOrder, printer,shopDetail, printTask);
+        }
+        Brand brand = brandService.selectById(shopDetail.getBrandId());
+        JSONArray json = new JSONArray(printTask);
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", shopDetail.getName());
+        map.put("type", "posAction");
+        map.put("content", "发票订单:" + receiptPosOrder.getOrderNumber() + "返回打印发票模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, map);
+        return printTask;
+    }
+
+    /**
+     * pos发票打印
+     * @return
+     */
+    @Override
+    public List<Map<String, Object>> printReceiptPosOrder(String orderNumber,String ShopId){
+        ReceiptPosOrder receiptPosOrder = receiptMapper.getReceiptOrderNumberList(orderNumber);
         ShopDetail shopDetail = shopDetailService.selectById(ShopId);
         List<Map<String, Object>> printTask = new ArrayList<>();
         List<Printer> ticketPrinter=new ArrayList<>();
