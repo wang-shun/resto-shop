@@ -596,7 +596,6 @@
 							</label>
 						</div>
 					</div>
-
 					<div class="form-group">
 						<label class="col-md-4 control-label">R+外卖最大配送范围(单位km)：</label>
 						<div  class="col-md-6">
