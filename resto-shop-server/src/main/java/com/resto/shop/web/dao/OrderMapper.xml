@@ -582,9 +582,6 @@
             <if test="orderMoney != null">
                 base_money,
             </if>
-            <if test="orderMoney != null">
-                base_order_money,
-            </if>
             <if test="customerCount != null">
                 base_customer_count,
             </if>
@@ -746,9 +743,6 @@
             </if>
             <if test="payMode != null">
                 #{payMode},
-            </if>
-            <if test="orderMoney != null">
-                #{orderMoney},
             </if>
             <if test="orderMoney != null">
                 #{orderMoney},

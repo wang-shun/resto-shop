@@ -9019,7 +9019,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal orderMoney = order.getAmountWithChildren().doubleValue() > 0 ? order.getAmountWithChildren() : order.getOrderMoney();
         orderMoney = orderMoney.divide(order.getPosDiscount()).add(order.getEraseMoney()).add(order.getNoDiscountMoney());
         order.setBaseOrderMoney(orderMoney);
-        BigDecimal posDiscount = ((orderMoney.subtract(eraseMoney).subtract(noDiscountMoney)).multiply(discount).add(noDiscountMoney)).divide(orderMoney);
+        BigDecimal posDiscount = ((orderMoney.subtract(eraseMoney).subtract(noDiscountMoney)).multiply(discount).add(noDiscountMoney)).divide(orderMoney).setScale(2,BigDecimal.ROUND_HALF_UP);
         //整单折扣统计菜品项
         if(type == PosDiscount.ZHENGDAN){
             Map map = new HashMap();
