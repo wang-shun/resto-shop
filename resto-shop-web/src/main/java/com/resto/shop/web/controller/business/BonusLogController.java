@@ -208,7 +208,7 @@ public class BonusLogController extends GenericController{
                         isTwoEmpliyee = false;//给标识赋值，标识为员工、店长是同一个人
                     }
                     //发放金额
-                    Integer amountOfPayment;
+                    Integer amountOfPayment = 0;
                     if (reissueAmount != 0){
                         //reissueAmount不为0说明有员工或店长发放失败重新补发
                         amountOfPayment = reissueAmount;
