@@ -528,6 +528,11 @@ public class SpringContextConfig {
 
 	//-----------------------
 
+    @Bean
+    public GoodTopService goodTopService(){
+	    return proxy.create(GoodTopService.class);
+    }
+
 
     @Bean
     public PosService posService() {return  proxy.create(PosService.class);}

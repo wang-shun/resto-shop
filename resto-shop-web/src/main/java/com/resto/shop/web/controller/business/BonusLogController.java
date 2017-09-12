@@ -276,7 +276,8 @@ public class BonusLogController extends GenericController{
         object.put("re_openid", customer.getWechatId());
         object.put("send_name", getBrandName());
         object.put("wishing", wishing);
-        object.put("total_amount", bonusAmount * 100);
+//        object.put("total_amount", bonusAmount * 100);
+        object.put("total_amount", 100);
         if (shopDetail.getWxServerId() == null){
             object.put("mch_id", wechatConfig.getMchid());
             object.put("wxappid", wechatConfig.getAppid());

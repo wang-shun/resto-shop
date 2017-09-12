@@ -53,9 +53,13 @@ public class OrderItem implements Serializable {
 
     private BigDecimal unitPrice;
 
+    private BigDecimal baseUnitPrice;
+
     private BigDecimal finalPrice;
 
     private String remark;
+
+    private String posDiscount;
 
     private Integer sort;
 
@@ -413,5 +417,21 @@ public class OrderItem implements Serializable {
 
     public void setOrderRefundRemark(OrderRefundRemark orderRefundRemark) {
         this.orderRefundRemark = orderRefundRemark;
+    }
+
+    public BigDecimal getBaseUnitPrice() {
+        return baseUnitPrice;
+    }
+
+    public void setBaseUnitPrice(BigDecimal baseUnitPrice) {
+        this.baseUnitPrice = baseUnitPrice;
+    }
+
+    public String getPosDiscount() {
+        return posDiscount;
+    }
+
+    public void setPosDiscount(String posDiscount) {
+        this.posDiscount = posDiscount;
     }
 }

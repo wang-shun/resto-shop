@@ -373,6 +373,18 @@
 						</div>
 					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label">是否开启pos折扣：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="openPosDiscount"v-model="m.openPosDiscount" value="1">开启
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="openPosDiscount" v-model="m.openPosDiscount" value="0">不启用
+							</label>
+						</div>
+					</div>
+
                     <div class="form-group" v-show="m.shopMode == 6 && m.allowAfterPay == 0">
                         <label class="col-md-4 control-label">开启POS端订单结算功能：</label>
                         <div  class="col-md-6 radio-list">
@@ -582,6 +594,12 @@
 							<label class="radio-inline">
 								<input type="radio" name="articlePhoto" v-model="m.articlePhoto" value="1">小图
 							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-4 control-label">R+外卖最大配送范围(单位km)：</label>
+						<div  class="col-md-6">
+							<input type="text" class="form-control" name="apart" :value="m.apart" >
 						</div>
 					</div>
 

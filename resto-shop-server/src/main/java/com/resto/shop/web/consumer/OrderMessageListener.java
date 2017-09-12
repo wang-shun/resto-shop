@@ -318,7 +318,7 @@ public class OrderMessageListener implements MessageListener {
                             sb.append("桌号:"+(order.getTableNumber()!=null?order.getTableNumber():"无")+"\n");
                             break;
                         default:
-                            sb.append("取餐码："+(order.getVerCode()!=null?order.getVerCode():"无")+"\n");
+                            sb.append("消费码："+(order.getVerCode()!=null?order.getVerCode():"无")+"\n");
                             break;
                     }
                 }

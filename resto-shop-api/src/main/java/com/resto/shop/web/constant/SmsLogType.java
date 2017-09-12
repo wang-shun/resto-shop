@@ -26,13 +26,23 @@ public class SmsLogType {
 
 
 	public static String getSmsLogTypeName(int state){
+	    String typeName = "";
 	    switch (state) {
             case AUTO_CODE:
-                return "验证码";
+                //return "验证码";
+                typeName = "验证码";
+                break;
+            case  DAYMESSGAGE:
+                typeName = "日结短信";
+                break;
+
+            case WAKELOSS:
+                typeName = "流失唤醒短信";
+                break;
             default:
                 return "未知";
             }
 	    
-	    
+	    return typeName;
 	}
 }
