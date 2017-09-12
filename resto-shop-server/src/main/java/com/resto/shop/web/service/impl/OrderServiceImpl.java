@@ -9037,6 +9037,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     sum = sum.add(oP.getOrderMoney());
                 }
                 //修改主订单
+                order.setBaseOrderMoney(order.getAmountWithChildren());
                 order.setAmountWithChildren(order.getOrderMoney().add(sum));
                 orderMapper.updateByPrimaryKeySelective(order);
             }
@@ -9074,6 +9075,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if(order.getMealFeePrice().doubleValue() > 0){
                 order.setMealFeePrice(posDiscount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
+            order.setBaseOrderMoney(order.getOrderMoney());
             order.setOrderMoney(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
             order.setPaymentAmount(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
             order.setEraseMoney(eraseMoney);
