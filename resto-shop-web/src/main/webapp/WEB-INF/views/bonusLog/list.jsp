@@ -299,7 +299,7 @@
                 try{
                     $.post("bonusLog/modify",{id : that.bonusLog.id, shopownerId : that.bonusLog.shopownerId, employeeId : that.bonusLog.employeeId},function (result) {
                         if (result.success){
-                            if (that.bonusLog.state == 1 || that.bonusLog.state == 3){
+                            if (that.bonusLog.state == 1){
                                 that.colseShowForm();
                             }else if (that.bonusLog.state == 0){
                                 that.colseShowEmployee(true);
