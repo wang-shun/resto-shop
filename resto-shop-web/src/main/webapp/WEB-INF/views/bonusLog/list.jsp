@@ -303,6 +303,9 @@
                                 that.colseShowForm();
                             }else if (that.bonusLog.state == 0){
                                 that.colseShowEmployee(true);
+                            }else if (that.bonusLog.state == 3){
+                                that.bonusLog.state = 2;
+                                that.bonusLog.stateValue = "已分红";
                             }
                             that.bonusLog.state = 2;
                             if (result.message){
