@@ -293,16 +293,16 @@ public class BonusLogController extends GenericController{
             object.put("msgappid", shopDetail.getAppid());
             object.put("sub_mch_id", shopDetail.getMchid());
         }
-        Map<String, String> result = WeChatPayUtils.sendredpack(object);
-        if (result.containsKey("ERROR")){
-            throw new RuntimeException(result.get("err_code_des"));
-        }
         if (isUseChargePay) {
             chargePayment.setIsUseBonus(1);
             chargePaymentService.update(chargePayment);
         }else{
             paymentItem.setIsUseBonus(1);
             orderPaymentItemService.update(paymentItem);
+        }
+        Map<String, String> result = WeChatPayUtils.sendredpack(object);
+        if (result.containsKey("ERROR")){
+            throw new RuntimeException(result.get("err_code_des"));
         }
     }
 }
