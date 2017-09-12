@@ -9018,6 +9018,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order order = orderMapper.selectByPrimaryKey(orderId);
         BigDecimal orderMoney = order.getAmountWithChildren().doubleValue() > 0 ? order.getAmountWithChildren() : order.getOrderMoney();
         orderMoney = orderMoney.divide(order.getPosDiscount()).add(order.getEraseMoney()).add(order.getNoDiscountMoney());
+        order.setBaseOrderMoney(orderMoney);
         BigDecimal posDiscount = ((orderMoney.subtract(eraseMoney).subtract(noDiscountMoney)).multiply(discount).add(noDiscountMoney)).divide(orderMoney);
         //整单折扣统计菜品项
         if(type == PosDiscount.ZHENGDAN){
@@ -9037,7 +9038,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     sum = sum.add(oP.getOrderMoney());
                 }
                 //修改主订单
-                order.setBaseOrderMoney(order.getAmountWithChildren());
                 order.setAmountWithChildren(order.getOrderMoney().add(sum));
                 orderMapper.updateByPrimaryKeySelective(order);
             }
@@ -9075,7 +9075,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if(order.getMealFeePrice().doubleValue() > 0){
                 order.setMealFeePrice(posDiscount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
             }
-            order.setBaseOrderMoney(order.getOrderMoney());
             order.setOrderMoney(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
             order.setPaymentAmount(sum.add(order.getServicePrice()).add(order.getMealFeePrice()));
             order.setEraseMoney(eraseMoney);
