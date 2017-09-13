@@ -9018,7 +9018,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order.getPosDiscount().compareTo(new BigDecimal(1)) == 0
                 && order.getEraseMoney().compareTo(new BigDecimal(0)) == 0
-                && order.getNoDiscountMoney().compareTo(new BigDecimal(0)) == 0){
+                && order.getNoDiscountMoney().compareTo(new BigDecimal(0)) == 0
+                && order.getBaseOrderMoney() == null){
             order.setBaseOrderMoney(order.getAmountWithChildren().doubleValue() > 0 ? order.getAmountWithChildren() : order.getOrderMoney());
         }
         BigDecimal orderMoney = order.getBaseOrderMoney();
