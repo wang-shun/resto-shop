@@ -417,27 +417,27 @@
 	        },
 	        searchInfo : function() {
 				var that = this;
-				var timeCha = new Date(that.searchDate.endDate).getTime() - new Date(that.searchDate.beginDate).getTime();
-				if(timeCha < 0){
-					toastr.clear();
-					toastr.error("开始时间应该少于结束时间！");
-					return false;
-				}else if(timeCha > 2678400000){
-					toastr.clear();
-					toastr.error("暂时未开放大于一月以内的查询！");
-					return false;
-				}
-                var nowDate = new Date().format("HH");
-                nowDate = parseInt(nowDate);
-                if (nowDate >= 11 && nowDate <= 13){
-                    toastr.clear();
-                    toastr.error("亲，报表查询功能正在维护中，请您多多谅解~维护时间段： 11:00-13:00 17:00-19:00");
-                    return false;
-                }else if (nowDate >= 17 && nowDate <= 20){
-                    toastr.clear();
-                    toastr.error("亲，报表查询功能正在维护中，请您多多谅解~维护时间段： 11:00-13:00 17:00-19:00");
-                    return false;
-                }
+//				var timeCha = new Date(that.searchDate.endDate).getTime() - new Date(that.searchDate.beginDate).getTime();
+//				if(timeCha < 0){
+//					toastr.clear();
+//					toastr.error("开始时间应该少于结束时间！");
+//					return false;
+//				}else if(timeCha > 2678400000){
+//					toastr.clear();
+//					toastr.error("暂时未开放大于一月以内的查询！");
+//					return false;
+//				}
+//                var nowDate = new Date().format("HH");
+//                nowDate = parseInt(nowDate);
+//                if (nowDate >= 11 && nowDate <= 13){
+//                    toastr.clear();
+//                    toastr.error("亲，报表查询功能正在维护中，请您多多谅解~维护时间段： 11:00-13:00 17:00-19:00");
+//                    return false;
+//                }else if (nowDate >= 17 && nowDate <= 20){
+//                    toastr.clear();
+//                    toastr.error("亲，报表查询功能正在维护中，请您多多谅解~维护时间段： 11:00-13:00 17:00-19:00");
+//                    return false;
+//                }
                 toastr.clear();
                 toastr.success("查询中...");
 	        	try{
