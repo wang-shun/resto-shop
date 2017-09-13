@@ -7633,7 +7633,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         o.setMealAllNumber(mealCount);
         o.setArticleCount(o.getArticleCount() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
-        o.setOriginalAmount(origin.add(shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount()))));
+        o.setOriginalAmount(origin.add(shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount() != null ? o.getCustomerCount() : 0))));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
@@ -9049,8 +9049,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 orderMapper.updateByPrimaryKeySelective(order);
             }
         }
-
-        return null;
+        return order;
     }
 
     public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, BigDecimal posDiscount, Order order, BigDecimal eraseMoney, BigDecimal noDiscountMoney, BigDecimal shijiMoney){
