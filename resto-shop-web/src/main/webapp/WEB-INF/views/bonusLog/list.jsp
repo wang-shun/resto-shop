@@ -304,6 +304,8 @@
                                 that.bonusLog.employeeIssuingState = 0;
                                 that.bonusLog.shopownerIssuingState = 0;
                                 that.bonusLog.stateValue = "已分红";
+                                toastr.clear();
+                                toastr.success("发放成功");
                             }else if (that.bonusLog.state == 0){
                                 that.colseShowEmployee(true);
                             }
