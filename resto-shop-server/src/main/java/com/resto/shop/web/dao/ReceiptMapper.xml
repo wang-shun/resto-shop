@@ -178,7 +178,7 @@
   </select>
   <!--查询申请发票订单-->
   <select id="selectApplyReceiptOrderList" resultMap="orderMap">
-    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,t1.receipt_money receipt_money FROM
+    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,ceil(t1.receipt_money) receipt_money FROM
     (SELECT
     o.serial_number order_number,
     (SELECT p.pay_time FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16) ORDER BY p.pay_time DESC LIMIT 0,1) pay_time,
