@@ -74,9 +74,9 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     public Receipt insertSelective(Receipt record){
         int count =receiptMapper.insertSelective(record);
         if(count==0){
-            return record;
-        }else{
             return null;
+        }else{
+            return record;
         }
     }
 
