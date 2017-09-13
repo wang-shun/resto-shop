@@ -322,8 +322,8 @@ public class BonusLogController extends GenericController{
         object.put("re_openid", customer.getWechatId());//发放目标的openId
         object.put("send_name", getBrandName());//商户名称
         object.put("wishing", wishing);//红包祝福语
-//        object.put("total_amount", bonusAmount * 100);
-        object.put("total_amount", 100);//发放金额(以分为单位)
+//        object.put("total_amount", bonusAmount * 100);//发放金额(以分为单位)
+        object.put("total_amount", 100);
         if (shopDetail.getWxServerId() == null){
             object.put("mch_id", wechatConfig.getMchid());//商户号
             object.put("wxappid", wechatConfig.getAppid());//公众号appId
