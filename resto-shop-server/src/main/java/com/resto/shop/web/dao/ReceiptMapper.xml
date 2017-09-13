@@ -273,6 +273,6 @@
     tb_receipt_title t
     WHERE r.order_number = o.serial_number
     AND t.id=r.receipt_title_id
-    AND r.order_number=#{order_number,jdbcType=VARCHAR}
+    AND r.order_number=#{orderNumber,jdbcType=VARCHAR}
   </select>
 </mapper>
