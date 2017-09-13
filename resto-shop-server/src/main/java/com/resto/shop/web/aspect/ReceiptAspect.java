@@ -38,7 +38,7 @@ public class ReceiptAspect {
     public void createReceipt(Receipt receipt) throws Throwable {
         log.info("进入发票自动出单切面");
         if (receipt!=null) {
-            MQMessageProducer.sendReceiptPrintSuccess(receipt.getOrderNumber());
+            MQMessageProducer.sendReceiptPrintSuccess(receipt.getShopId(),receipt.getOrderNumber());
         }
     }
 }
