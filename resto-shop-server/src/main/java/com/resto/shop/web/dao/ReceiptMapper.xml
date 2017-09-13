@@ -178,7 +178,7 @@
   </select>
   <!--查询申请发票订单-->
   <select id="selectApplyReceiptOrderList" resultMap="orderMap">
-    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,t1.receipt_money receipt_money FROM
+    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,ceil(t1.receipt_money) receipt_money FROM
     (SELECT
     o.serial_number order_number,
     (SELECT p.pay_time FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16) ORDER BY p.pay_time DESC LIMIT 0,1) pay_time,
@@ -236,8 +236,9 @@
     SELECT
     r.id,r.state,t.name
     FROM
-    tb_receipt r
-    WHERE r.order_number = #{orderNumber,jdbcType=VARCHAR}
+    tb_receipt r,tb_receipt_title t
+    WHERE t.id=r.receipt_title_id
+    AND r.order_number = #{orderNumber,jdbcType=VARCHAR}
   </select>
   <resultMap id="posOrderMap" type="com.resto.shop.web.dto.ReceiptPosOrder">
     <result column="id" property="receiptId" jdbcType="VARCHAR"/>
@@ -272,6 +273,6 @@
     tb_receipt_title t
     WHERE r.order_number = o.serial_number
     AND t.id=r.receipt_title_id
-    AND r.order_number=#{order_number,jdbcType=VARCHAR}
+    AND r.order_number=#{orderNumber,jdbcType=VARCHAR}
   </select>
 </mapper>
