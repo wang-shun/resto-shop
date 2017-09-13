@@ -36,7 +36,7 @@ public class ReceiptAspect {
 
     @AfterReturning(value = "createReceipt()", returning = "receipt")
     public void createReceipt(Receipt receipt) throws Throwable {
-        log.info("进入发票自动出单切面");
+        log.info("进入发票自动出单切面---"+"店铺id:"+receipt.getShopId());
         if (receipt!=null) {
             MQMessageProducer.sendReceiptPrintSuccess(receipt.getShopId(),receipt.getOrderNumber());
         }
