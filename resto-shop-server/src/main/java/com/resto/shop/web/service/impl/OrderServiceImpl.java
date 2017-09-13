@@ -641,6 +641,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         child.setStatus(1);
                         child.setSort(0);
                         child.setUnitPrice(mealItem.getPriceDif());
+                        child.setBaseUnitPrice(mealItem.getPriceDif());
                         child.setType(OrderItemType.MEALS_CHILDREN);
                         BigDecimal finalMoney = child.getUnitPrice().multiply(new BigDecimal(child.getCount())).setScale(2, BigDecimal.ROUND_HALF_UP);
                         if (finalMoney != null && finalMoney.doubleValue() > 0) {
@@ -9058,13 +9059,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal sum = new BigDecimal(0);
         //修改菜品项
         for(OrderItem oItem : orderItems){
-            if(oItem.getType() != OrderItemType.MEALS_CHILDREN){
-                oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(posDiscount).setScale(2,BigDecimal.ROUND_HALF_UP));
-                oItem.setPosDiscount(posDiscount.multiply(new BigDecimal(100)) + "%");
-                oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
-                sum = sum.add(oItem.getFinalPrice());
-                orderItemService.update(oItem);
-            }
+            oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(posDiscount).setScale(2,BigDecimal.ROUND_HALF_UP));
+            oItem.setPosDiscount(posDiscount.multiply(new BigDecimal(100)) + "%");
+            oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
+            sum = sum.add(oItem.getFinalPrice());
+            orderItemService.update(oItem);
         }
         //修改子订单
         if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
