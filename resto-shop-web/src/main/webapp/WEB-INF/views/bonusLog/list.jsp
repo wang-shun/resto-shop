@@ -299,11 +299,17 @@
                 try{
                     $.post("bonusLog/modify",{id : that.bonusLog.id, shopownerId : that.bonusLog.shopownerId, employeeId : that.bonusLog.employeeId},function (result) {
                         if (result.success){
-                            if (that.bonusLog.state == 1){
-                                that.colseShowForm();
+                            if (that.bonusLog.state == 1 || that.bonusLog.state == 3){
+                                that.bonusLog.state = 2;
+                                that.bonusLog.employeeIssuingState = 0;
+                                that.bonusLog.shopownerIssuingState = 0;
+                                that.bonusLog.stateValue = "已分红";
+                                toastr.clear();
+                                toastr.success("发放成功");
                             }else if (that.bonusLog.state == 0){
                                 that.colseShowEmployee(true);
                             }
+                            that.bonusLog.state = 2;
                             if (result.message){
                                 toastr.error(result.message);
                             }
