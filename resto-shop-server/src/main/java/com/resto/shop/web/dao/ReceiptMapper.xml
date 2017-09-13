@@ -234,7 +234,7 @@
   <!--订单numbe查询发票-->
   <select id="getPosReceiptList" resultMap="posMap">
     SELECT
-    r.id,r.state,t.name
+    r.id,r.state,r.name
     FROM
     tb_receipt r
     WHERE r.order_number = #{orderNumber,jdbcType=VARCHAR}
