@@ -3366,8 +3366,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<OrderItem> child = orderItemService.listByParentId(orderId);
         for (OrderItem orderItem : child) {
             order.setOriginalAmount(order.getOriginalAmount().add(orderItem.getOriginalPrice().multiply(BigDecimal.valueOf(orderItem.getCount()))));
-            order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
+//            order.setOrderMoney(order.getOrderMoney().add(orderItem.getFinalPrice()));
         }
+        order.setOrderMoney(order.getAmountWithChildren().doubleValue() > 0 ? order.getAmountWithChildren() : order.getOrderMoney());
         child.addAll(orderItems);
         Map logMap = new HashMap(4);
         Brand brand = brandService.selectById(order.getBrandId());
