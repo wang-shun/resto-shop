@@ -234,10 +234,11 @@
   <!--订单numbe查询发票-->
   <select id="getPosReceiptList" resultMap="posMap">
     SELECT
-    r.id,r.state,r.name
+    r.id,r.state,t.name
     FROM
-    tb_receipt r
-    WHERE r.order_number = #{orderNumber,jdbcType=VARCHAR}
+    tb_receipt r,tb_receipt_title t
+    WHERE t.id=r.receipt_title_id
+    AND r.order_number = #{orderNumber,jdbcType=VARCHAR}
   </select>
   <resultMap id="posOrderMap" type="com.resto.shop.web.dto.ReceiptPosOrder">
     <result column="id" property="receiptId" jdbcType="VARCHAR"/>
