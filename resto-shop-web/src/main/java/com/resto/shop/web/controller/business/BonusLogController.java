@@ -217,8 +217,7 @@ public class BonusLogController extends GenericController{
                         amountOfPayment = bonusLog.getBonusAmount();
                     }
                     //得到要发放的微信用户信息
-                    Customer customer = customers.get(0);
-                    grantRewards(customer, amountOfPayment, bonusLog.getWishing(), wechatConfig, shopDetail);
+                    grantRewards(customers.get(0), amountOfPayment, bonusLog.getWishing(), wechatConfig, shopDetail);
                 } else {
                     int i = 0;//标识是在第一次发的
                     for (Customer customer : customers) {
