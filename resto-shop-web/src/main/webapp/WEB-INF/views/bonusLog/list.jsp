@@ -57,6 +57,10 @@
                                     <span class="textRight">分红金额：</span>
                                     <span><font color="red">￥{{bonusLog.bonusMoney}}</font></span>
                                 </p>
+                                <p>
+                                    <span class="textRight">已发放金额：</span>
+                                    <span><font color="red">￥{{bonusLog.amountDisbursed}}</font></span>
+                                </p>
                             </div>
                             <div style="margin-top: 3%;padding-left: 10%;">
                                 <p>
@@ -70,12 +74,12 @@
                                 </p>
                                 <p v-if="(bonusLog.state == 1 || bonusLog.state == 2 || bonusLog.state == 3) && (bonusLog.employeeBonusAmount > 0 || bonusLog.bonusMoney == 0)">
                                     <span class="textRight">{{bonusLog.employeeName}}：</span>
-                                    <span v-if="bonusLog.employeeIssuingState == 1"><i style="color: #c69f07;font-style: normal;">发放异常</i></span>
+                                    <span v-if="bonusLog.employeeIssuingState == 1"><i style="color: #c69f07;font-style: normal;">未发放金额：{{bonusLog.employeeBonusAmount - bonusLog.employeeAmountDisbursed}}</i></span>
                                     <span v-else><i style="color: #228b22;font-style: normal;">￥{{bonusLog.employeeBonusAmount}}</i></span>
                                 </p>
                                 <p v-if="(bonusLog.state == 1 || bonusLog.state == 2 || bonusLog.state == 3) && (bonusLog.shopownerBonusAmount > 0 || bonusLog.bonusMoney == 0)">
                                     <span class="textRight">{{bonusLog.shopownerName}}：</span>
-                                    <span v-if="bonusLog.shopownerIssuingState == 1"><i style="color: #c69f07;font-style: normal;">发放异常</i></span>
+                                    <span v-if="bonusLog.shopownerIssuingState == 1"><i style="color: #c69f07;font-style: normal;">未发放金额：{{bonusLog.shopownerBonusAmount - bonusLog.shopownerAmountDisbursed}}</i></span>
                                     <span v-else><i style="color: #228b22;font-style: normal;">￥{{bonusLog.shopownerBonusAmount}}</i></span>
                                 </p>
                             </div>
@@ -220,6 +224,18 @@
                         {
                             title : "分红金额",
                             data : "bonusMoney"
+                        },
+                        {
+                            title : "已发放金额",
+                            data : "amountDisbursed"
+                        },
+                        {
+                            title : "店长已发放金额",
+                            data : "shopownerAmountDisbursed"
+                        },
+                        {
+                            title : "员工已发放金额",
+                            data : "employeeAmountDisbursed"
                         },
                         {
                             title : "状态",
