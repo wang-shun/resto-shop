@@ -111,7 +111,10 @@
             tbl.shopowner_id shopownerId,
             tbl.employee_id employeeId,
             tbl.shopowner_issuing_state shopownerIssuingState,
-            tbl.employee_issuing_state employeeIssuingState
+            tbl.employee_issuing_state employeeIssuingState,
+            tbl.amount_disbursed amountDisbursed,
+            tbl.shopowner_amount_disbursed shopownerAmountDisbursed,
+            tbl.employee_amount_disbursed employeeAmountDisbursed
         from tb_bonus_log tbl
         left join tb_charge_order tal
         on tbl.charge_order_id = tal.id
