@@ -222,6 +222,26 @@
                             data : "bonusMoney"
                         },
                         {
+                            title : "店长分红金额",
+                            data : "shopownerBonusAmount"
+                        },
+                        {
+                            title : "员工分红金额",
+                            data : "employeeBonusAmount"
+                        },
+                        {
+                            title : "已发放金额",
+                            data : "amountDisbursed"
+                        },
+                        {
+                            title : "店长已发放金额",
+                            data : "shopownerAmountDisbursed"
+                        },
+                        {
+                            title : "员工已发放金额",
+                            data : "employeeAmountDisbursed"
+                        },
+                        {
                             title : "状态",
                             data : "stateValue",
                             orderable : false,
@@ -299,16 +319,30 @@
                 try{
                     $.post("bonusLog/modify",{id : that.bonusLog.id, shopownerId : that.bonusLog.shopownerId, employeeId : that.bonusLog.employeeId},function (result) {
                         if (result.success){
-                            if (that.bonusLog.state == 1){
-                                that.colseShowForm();
+                            if (that.bonusLog.state == 1 || that.bonusLog.state == 3){
+                                that.bonusLog.state = 2;
+                                that.bonusLog.employeeIssuingState = 0;
+                                that.bonusLog.shopownerIssuingState = 0;
+                                that.bonusLog.stateValue = "已分红";
+                                toastr.clear();
+                                toastr.success("发放成功");
                             }else if (that.bonusLog.state == 0){
                                 that.colseShowEmployee(true);
                             }
+                            that.bonusLog.state = 2;
                             if (result.message){
                                 toastr.error(result.message);
                             }
                         } else{
                             that.disabled = false;
+                            that.bonusLog.state = 3;
+                            if (result.data.shopownerIssuingState == 1){
+                                that.bonusLog.shopownerIssuingState = 1;
+                            }
+                            if (result.data.employeeIssuingState == 1){
+                                that.bonusLog.employeeIssuingState = 1;
+                            }
+                            that.bonusLog.stateValue = "发放异常";
                             toastr.clear();
                             if (result.message != null && result.message != ""){
                                 toastr.error(result.message);
