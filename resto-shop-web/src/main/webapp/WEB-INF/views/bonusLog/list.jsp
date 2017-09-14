@@ -74,12 +74,12 @@
                                 </p>
                                 <p v-if="(bonusLog.state == 1 || bonusLog.state == 2 || bonusLog.state == 3) && (bonusLog.employeeBonusAmount > 0 || bonusLog.bonusMoney == 0)">
                                     <span class="textRight">{{bonusLog.employeeName}}：</span>
-                                    <span v-if="bonusLog.employeeIssuingState == 1"><i style="color: #c69f07;font-style: normal;">{{bonusLog.employeeBonusAmount - bonusLog.employeeAmountDisbursed}}未发放</i></span>
+                                    <span v-if="bonusLog.employeeIssuingState == 1"><i style="color: #c69f07;font-style: normal;">{{bonusLog.employeeBonusAmount - bonusLog.employeeAmountDisbursed}}元未发放</i></span>
                                     <span v-else><i style="color: #228b22;font-style: normal;">￥{{bonusLog.employeeBonusAmount}}</i></span>
                                 </p>
                                 <p v-if="(bonusLog.state == 1 || bonusLog.state == 2 || bonusLog.state == 3) && (bonusLog.shopownerBonusAmount > 0 || bonusLog.bonusMoney == 0)">
                                     <span class="textRight">{{bonusLog.shopownerName}}：</span>
-                                    <span v-if="bonusLog.shopownerIssuingState == 1"><i style="color: #c69f07;font-style: normal;">{{bonusLog.shopownerBonusAmount - bonusLog.shopownerAmountDisbursed}}未发放</i></span>
+                                    <span v-if="bonusLog.shopownerIssuingState == 1"><i style="color: #c69f07;font-style: normal;">{{bonusLog.shopownerBonusAmount - bonusLog.shopownerAmountDisbursed}}元未发放</i></span>
                                     <span v-else><i style="color: #228b22;font-style: normal;">￥{{bonusLog.shopownerBonusAmount}}</i></span>
                                 </p>
                             </div>
