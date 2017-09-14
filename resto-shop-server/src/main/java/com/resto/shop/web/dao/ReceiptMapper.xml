@@ -130,11 +130,29 @@
   <update id="updateState" parameterType="com.resto.shop.web.model.Receipt" >
     update tb_receipt
     <set >
+      <if test="orderNumber != null" >
+        order_number = #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null" >
+        pay_time = #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderMoney != null" >
+        "order_money" = #{orderMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="receiptMoney != null" >
+        receipt_money = #{receiptMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="receiptTitleId != null" >
+        receipt_title_id = #{receiptTitleId,jdbcType=BIGINT},
+      </if>
       <if test="state != null" >
         state = #{state,jdbcType=INTEGER},
       </if>
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
