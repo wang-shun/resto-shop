@@ -304,66 +304,6 @@ public class BonusLogController extends GenericController{
         }
 	}
 
-	public void grantRewards(Customer customer, Integer bonusAmount, String wishing, WechatConfig wechatConfig, ShopDetail shopDetail, boolean isEmployee, BonusLog bonusLog) throws Exception{
-	    //用来标识使用的是谁的微信订单 true：充值产生的微信支付订单  false：下单时产生的微信支付订单
-        boolean isUseChargePay = true;
-        //接收微信的订单信息
-        String resultData = "";
-        //查询充值时产生的微信支付订单
-	    ChargePayment chargePayment = chargePaymentService.selectPayData(shopDetail.getId());
-	    //查询下单时产生的微信支付订单
-        OrderPaymentItem paymentItem = orderPaymentItemService.selectWeChatPayResultData(shopDetail.getId());;
-        if (chargePayment != null){
-            //如果有充值的微信订单就用充值的微信订单
-            resultData = chargePayment.getPayData();
-        } else if (paymentItem != null){
-            //没有充值的微信订单的情况下使用下单是产生的微信订单
-            resultData = paymentItem.getResultData();
-            isUseChargePay = false;
-        }
-        if (StringUtils.isBlank(resultData)){
-            throw new RuntimeException("无微信支付订单作为载体发放现金红包");
-        }
-        JSONObject resultObject = JSON.parseObject(resultData);
-        //得到微信商户的订单号
-        Object mch_billno = resultObject.get("transaction_id");
-        //封装参数
-        JSONObject object = new JSONObject();
-        object.put("mch_billno", mch_billno);//商户订单号
-        object.put("re_openid", customer.getWechatId());//发放目标的openId
-        object.put("send_name", getBrandName());//商户名称
-        object.put("wishing", wishing);//红包祝福语
-//        object.put("total_amount", bonusAmount * 100);//发放金额(以分为单位)
-        object.put("total_amount", 100);
-        if (shopDetail.getWxServerId() == null){
-            object.put("mch_id", wechatConfig.getMchid());//商户号
-            object.put("wxappid", wechatConfig.getAppid());//公众号appId
-            object.put("mch_key", wechatConfig.getMchkey());//商户支付密钥
-//            object.put("cert_path", wechatConfig.getPayCertPath());//API证书地址
-            object.put("cert_path", "F:/resto/75093c6a-eea2-443b-91a9-a5402bba3c4b.p12");
-        }else{
-            WxServerConfig serverConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
-            object.put("mch_id", serverConfig.getMchid());//服务商商户号
-            object.put("wxappid", serverConfig.getAppid());//服务商公众号appId
-            object.put("mch_key", serverConfig.getMchkey());//服务商商户支付密钥
-//            object.put("cert_path", serverConfig.getPayCertPath());//服务商API证书
-            object.put("cert_path", "F:/resto/6b6f99ff-642c-43b1-86e7-349b0f3548c1.p12");
-            object.put("consume_mch_id", shopDetail.getMchid());//扣钱方的商户号
-            object.put("msgappid", shopDetail.getAppid());//服务商下特约商户的公众号appId
-            object.put("sub_mch_id", shopDetail.getMchid());//服务商下特约商户的商户号
-        }
-        //将用于分红的微信订单变成已用于分红
-        useChargePay(paymentItem, chargePayment, isUseChargePay);
-        //执行发放红包操作
-        Map<String, String> result = WeChatPayUtils.sendredpack(object);
-        //判断是否发放失败，如失败则抛出异常
-        if (result.containsKey("ERROR")){
-            throw new RuntimeException(result.get("err_code_des"));
-        }
-        //本次分红发放成功，修改店长或员工以及总分红金额已发放的金额
-        updateAmount(isEmployee, bonusLog, bonusAmount);
-    }
-
      /**
       * 将使用过的微信支付订单变成已用于分红
       * @param paymentItem
@@ -454,4 +394,76 @@ public class BonusLogController extends GenericController{
         }
         bonusLog.setAmountDisbursed(bonusLog.getAmountDisbursed() + bonusAmount);
     }
-}
+
+     /**
+      * 执行发放操作
+      * @param customer
+      * @param bonusAmount
+      * @param wishing
+      * @param wechatConfig
+      * @param shopDetail
+      * @param isEmployee
+      * @param bonusLog
+      * @throws Exception
+      */
+     public void grantRewards(Customer customer, Integer bonusAmount, String wishing, WechatConfig wechatConfig, ShopDetail shopDetail, boolean isEmployee, BonusLog bonusLog) throws Exception{
+         //用来标识使用的是谁的微信订单 true：充值产生的微信支付订单  false：下单时产生的微信支付订单
+         boolean isUseChargePay = true;
+         //接收微信的订单信息
+         String resultData = "";
+         //查询充值时产生的微信支付订单
+         ChargePayment chargePayment = chargePaymentService.selectPayData(shopDetail.getId());
+         //查询下单时产生的微信支付订单
+         OrderPaymentItem paymentItem = orderPaymentItemService.selectWeChatPayResultData(shopDetail.getId());;
+         if (chargePayment != null){
+             //如果有充值的微信订单就用充值的微信订单
+             resultData = chargePayment.getPayData();
+         } else if (paymentItem != null){
+             //没有充值的微信订单的情况下使用下单是产生的微信订单
+             resultData = paymentItem.getResultData();
+             isUseChargePay = false;
+         }
+         if (StringUtils.isBlank(resultData)){
+             throw new RuntimeException("无微信支付订单作为载体发放现金红包");
+         }
+         JSONObject resultObject = JSON.parseObject(resultData);
+         //得到微信商户的订单号
+         Object mch_billno = resultObject.get("transaction_id");
+         //封装参数
+         JSONObject object = new JSONObject();
+         object.put("mch_billno", mch_billno);//商户订单号
+         object.put("re_openid", customer.getWechatId());//发放目标的openId
+         object.put("send_name", getBrandName());//商户名称
+         object.put("wishing", wishing);//红包祝福语
+    //        object.put("total_amount", bonusAmount * 100);//发放金额(以分为单位)
+         object.put("total_amount", 100);
+         if (shopDetail.getWxServerId() == null){
+             object.put("mch_id", wechatConfig.getMchid());//商户号
+             object.put("wxappid", wechatConfig.getAppid());//公众号appId
+             object.put("mch_key", wechatConfig.getMchkey());//商户支付密钥
+    //            object.put("cert_path", wechatConfig.getPayCertPath());//API证书地址
+             object.put("cert_path", "F:/resto/75093c6a-eea2-443b-91a9-a5402bba3c4b.p12");
+         }else{
+             WxServerConfig serverConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+             object.put("mch_id", serverConfig.getMchid());//服务商商户号
+             object.put("wxappid", serverConfig.getAppid());//服务商公众号appId
+             object.put("mch_key", serverConfig.getMchkey());//服务商商户支付密钥
+    //            object.put("cert_path", serverConfig.getPayCertPath());//服务商API证书
+             object.put("cert_path", "F:/resto/6b6f99ff-642c-43b1-86e7-349b0f3548c1.p12");
+             object.put("consume_mch_id", shopDetail.getMchid());//扣钱方的商户号
+             object.put("msgappid", shopDetail.getAppid());//服务商下特约商户的公众号appId
+             object.put("sub_mch_id", shopDetail.getMchid());//服务商下特约商户的商户号
+         }
+         //将用于分红的微信订单变成已用于分红
+         useChargePay(paymentItem, chargePayment, isUseChargePay);
+         //执行发放红包操作
+         Map<String, String> result = WeChatPayUtils.sendredpack(object);
+         //判断是否发放失败，如失败则抛出异常
+         if (result.containsKey("ERROR")){
+             throw new RuntimeException(result.get("err_code_des"));
+         }
+         //本次分红发放成功，修改店长或员工以及总分红金额已发放的金额
+         updateAmount(isEmployee, bonusLog, bonusAmount);
+     }
+
+ }
