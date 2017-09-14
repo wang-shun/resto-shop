@@ -182,7 +182,7 @@
     (SELECT
     o.serial_number order_number,
     (SELECT p.pay_time FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16) ORDER BY p.pay_time DESC LIMIT 0,1) pay_time,
-    o.order_money order_money,
+    (CASE WHEN o.amount_with_children>0.00 THEN o.amount_with_children ELSE o.order_money END) order_money,
     (SELECT SUM(p.pay_value) FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16)) receipt_money
     FROM
     tb_order o
