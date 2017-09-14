@@ -130,11 +130,29 @@
   <update id="updateState" parameterType="com.resto.shop.web.model.Receipt" >
     update tb_receipt
     <set >
+      <if test="orderNumber != null" >
+        order_number = #{orderNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="payTime != null" >
+        pay_time = #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderMoney != null" >
+        "order_money" = #{orderMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="receiptMoney != null" >
+        receipt_money = #{receiptMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="receiptTitleId != null" >
+        receipt_title_id = #{receiptTitleId,jdbcType=BIGINT},
+      </if>
       <if test="state != null" >
         state = #{state,jdbcType=INTEGER},
       </if>
       <if test="createTime != null" >
         create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
       </if>
     </set>
     where id = #{id,jdbcType=BIGINT}
@@ -160,11 +178,11 @@
   </resultMap>
   <!--查询发票历史记录-->
   <select id="selectReceiptOrderList" resultMap="orderMap">
-    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,t1.receipt_money receipt_money,t1.state state FROM
+    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,ceil(t1.receipt_money) receipt_money,t1.state state FROM
       (SELECT
           o.serial_number order_number,
           (SELECT p.pay_time FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16) ORDER BY p.pay_time DESC LIMIT 0,1) pay_time,
-          o.order_money order_money,
+          (CASE WHEN o.amount_with_children>0.00 THEN o.amount_with_children ELSE o.order_money END) order_money,
           (SELECT SUM(p.pay_value) FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16)) receipt_money,
           r.state state
       FROM
@@ -182,7 +200,7 @@
     (SELECT
     o.serial_number order_number,
     (SELECT p.pay_time FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16) ORDER BY p.pay_time DESC LIMIT 0,1) pay_time,
-    o.order_money order_money,
+    (CASE WHEN o.amount_with_children>0.00 THEN o.amount_with_children ELSE o.order_money END) order_money,
     (SELECT SUM(p.pay_value) FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16)) receipt_money
     FROM
     tb_order o
