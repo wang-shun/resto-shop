@@ -335,6 +335,14 @@
                             }
                         } else{
                             that.disabled = false;
+                            that.bonusLog.state = 3;
+                            if (result.data.shopownerIssuingState == 1){
+                                that.bonusLog.shopownerIssuingState = 1;
+                            }
+                            if (result.data.employeeIssuingState == 1){
+                                that.bonusLog.employeeIssuingState = 1;
+                            }
+                            that.bonusLog.stateValue = "发放异常";
                             toastr.clear();
                             if (result.message != null && result.message != ""){
                                 toastr.error(result.message);
