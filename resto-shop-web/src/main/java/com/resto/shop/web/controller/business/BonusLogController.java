@@ -247,7 +247,7 @@ public class BonusLogController extends GenericController{
             bonusLog.setEmployeeIssuingState(0);
             bonusLog.setState(2);
             bonusLogService.update(bonusLog);
-            return getSuccessResult();
+            return getSuccessResult(bonusLog);
         }catch (Exception ex){
             try {
                 if (isOneCustomer) {
