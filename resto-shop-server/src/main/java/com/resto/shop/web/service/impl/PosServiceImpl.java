@@ -457,4 +457,11 @@ public class PosServiceImpl implements PosService {
     public List<ArticleSupport> syncArticleSupport() {
         return posMapper.selectArticleSupport();
     }
+
+    @Override
+    public void syncChangeTable(String orderId, String tableNumber) {
+        Order order = orderService.selectById(orderId);
+        order.setTableNumber(tableNumber);
+        orderService.update(order);
+    }
 }

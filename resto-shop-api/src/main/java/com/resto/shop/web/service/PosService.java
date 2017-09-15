@@ -104,5 +104,8 @@ public interface PosService {
      */
     List<ArticleSupport>  syncArticleSupport();
 
+    void syncChangeTable(String orderId,String tableNumber);
+
+
     void test();
 }
