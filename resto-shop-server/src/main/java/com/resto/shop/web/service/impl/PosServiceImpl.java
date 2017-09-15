@@ -461,6 +461,9 @@ public class PosServiceImpl implements PosService {
     @Override
     public void syncChangeTable(String orderId, String tableNumber) {
         Order order = orderService.selectById(orderId);
+        if(order == null){
+            return;
+        }
         order.setTableNumber(tableNumber);
         orderService.update(order);
     }
