@@ -91,11 +91,11 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     }
 
     @Override
-    public List<ReceiptOrder> selectReceiptOrderList(String customerId,String state){
+    public List<ReceiptOrder> selectReceiptOrderList(String customerId,String state,String shopId){
         if(state==null||state.equals("")){
-            return receiptMapper.selectApplyReceiptOrderList(customerId);
+            return receiptMapper.selectApplyReceiptOrderList(customerId,shopId);
         }else{
-            return receiptMapper.selectReceiptOrderList(customerId);
+            return receiptMapper.selectReceiptOrderList(customerId,shopId);
         }
     }
     @Override
@@ -219,7 +219,7 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
         itemMoney.put("ARTICLE_NAME",receiptPosOrder.getOrderMoney()+"元");
         items.add(itemMoney);
         Map<String, Object> itemName = new HashMap<String, Object>();
-        itemName.put("ARTICLE_COUNT","公司抬头:");
+        itemName.put("ARTICLE_COUNT","    抬头:");
         itemName.put("ARTICLE_NAME",receiptPosOrder.getName());
         items.add(itemName);
         Map<String, Object> itemDutyParagraph = new HashMap<String, Object>();

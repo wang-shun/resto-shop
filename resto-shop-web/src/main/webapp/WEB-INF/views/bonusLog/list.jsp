@@ -222,6 +222,26 @@
                             data : "bonusMoney"
                         },
                         {
+                            title : "店长分红金额",
+                            data : "shopownerBonusAmount"
+                        },
+                        {
+                            title : "员工分红金额",
+                            data : "employeeBonusAmount"
+                        },
+                        {
+                            title : "已发放金额",
+                            data : "amountDisbursed"
+                        },
+                        {
+                            title : "店长已发放金额",
+                            data : "shopownerAmountDisbursed"
+                        },
+                        {
+                            title : "员工已发放金额",
+                            data : "employeeAmountDisbursed"
+                        },
+                        {
                             title : "状态",
                             data : "stateValue",
                             orderable : false,
@@ -315,6 +335,14 @@
                             }
                         } else{
                             that.disabled = false;
+                            that.bonusLog.state = 3;
+                            if (result.data.shopownerIssuingState == 1){
+                                that.bonusLog.shopownerIssuingState = 1;
+                            }
+                            if (result.data.employeeIssuingState == 1){
+                                that.bonusLog.employeeIssuingState = 1;
+                            }
+                            that.bonusLog.stateValue = "发放异常";
                             toastr.clear();
                             if (result.message != null && result.message != ""){
                                 toastr.error(result.message);

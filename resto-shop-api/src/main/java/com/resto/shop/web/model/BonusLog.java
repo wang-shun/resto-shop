@@ -29,6 +29,36 @@ public class BonusLog {
 
     private Integer employeeIssuingState;
 
+    private Integer amountDisbursed;
+
+    private Integer employeeAmountDisbursed;
+
+    private Integer shopownerAmountDisbursed;
+
+    public Integer getAmountDisbursed() {
+        return amountDisbursed;
+    }
+
+    public void setAmountDisbursed(Integer amountDisbursed) {
+        this.amountDisbursed = amountDisbursed;
+    }
+
+    public Integer getEmployeeAmountDisbursed() {
+        return employeeAmountDisbursed;
+    }
+
+    public void setEmployeeAmountDisbursed(Integer employeeAmountDisbursed) {
+        this.employeeAmountDisbursed = employeeAmountDisbursed;
+    }
+
+    public Integer getShopownerAmountDisbursed() {
+        return shopownerAmountDisbursed;
+    }
+
+    public void setShopownerAmountDisbursed(Integer shopownerAmountDisbursed) {
+        this.shopownerAmountDisbursed = shopownerAmountDisbursed;
+    }
+
     public Integer getEmployeeIssuingState() {
         return employeeIssuingState;
     }
