@@ -191,6 +191,7 @@
         AND o.production_status IN (2, 3, 4)
         AND o.order_state IN (2, 10, 11, 12)
         AND o.customer_id=#{customerId,jdbcType=VARCHAR}
+        AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
         ORDER BY pay_time DESC) t1
     WHERE t1.receipt_money!=0.00
   </select>
@@ -208,6 +209,7 @@
     AND o.order_state IN (2, 10, 11, 12)
     AND o.serial_number NOT IN (SELECT r.order_number FROM tb_receipt r)
     AND o.customer_id=#{customerId,jdbcType=VARCHAR}
+    AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
     ORDER BY pay_time DESC) t1
     WHERE t1.receipt_money!=0.00
   </select>
