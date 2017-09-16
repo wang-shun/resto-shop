@@ -91,7 +91,7 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     }
 
     @Override
-    public List<ReceiptOrder> selectReceiptOrderList(String customerId,String state,String shopId){
+    public List<ReceiptOrder> selectReceiptOrderList(String customerId,String shopId,String state){
         if(state==null||state.equals("")){
             return receiptMapper.selectApplyReceiptOrderList(customerId,shopId);
         }else{
