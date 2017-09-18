@@ -102,7 +102,7 @@ public interface PosService {
      * 同步菜品供应时间
      * @return
      */
-    List<ArticleSupport>  syncArticleSupport();
+    List<ArticleSupport>  syncArticleSupport(String shopId);
 
     void syncChangeTable(String orderId,String tableNumber);
 

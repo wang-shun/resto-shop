@@ -454,8 +454,9 @@ public class PosServiceImpl implements PosService {
     }
 
     @Override
-    public List<ArticleSupport> syncArticleSupport() {
-        return posMapper.selectArticleSupport();
+    public List<ArticleSupport> syncArticleSupport(String shopId) {
+        List<Article> articleList = articleService.selectList(shopId);
+        return posMapper.selectArticleSupport(articleList);
     }
 
     @Override
