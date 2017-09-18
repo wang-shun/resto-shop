@@ -14,6 +14,7 @@ import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticlePrice;
 import com.resto.shop.web.model.ArticleRecommendPrice;
+import com.resto.shop.web.model.MealItem;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -57,6 +58,9 @@ public class ArticleController extends GenericController {
 
     @Autowired
     private ArticleRecommendService articleRecommendService;
+
+    @Resource
+    private MealItemService mealItemService;
 
     @Autowired
     private PlatformService platformService;
@@ -110,6 +114,14 @@ public class ArticleController extends GenericController {
                 List<ArticleRecommendPrice> articleRecommendPrice = articleRecommendService.selectByRecommendArticleInfo(article.getId());
                 for (ArticleRecommendPrice ar : articleRecommendPrice) {
                     articleRecommendService.updatePriceById(article.getFansPrice() != null ? article.getFansPrice() : article.getPrice(), ar.getId());
+                }
+                //联动修改套餐子品名称
+                List<MealItem> mealItemList = mealItemService.selectByArticleId(article.getId());
+                if(mealItemList.size() > 0){
+                    for(MealItem mealItem : mealItemList){
+                        mealItem.setArticleName(article.getName());
+                        mealItemService.updateArticleNameById(article.getName(), mealItem.getId());
+                    }
                 }
             }
 
