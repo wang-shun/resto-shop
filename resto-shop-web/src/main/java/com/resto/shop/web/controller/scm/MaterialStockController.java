@@ -13,7 +13,7 @@ import java.util.List;
 
 
 @Controller
-@RequestMapping("materialstock")
+@RequestMapping("scmMaterialStock")
 public class MaterialStockController extends GenericController {
 
     @Resource

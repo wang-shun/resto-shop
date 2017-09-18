@@ -13,7 +13,7 @@
  import javax.validation.Valid;
 
 @Controller
-@RequestMapping("articlebom")
+@RequestMapping("scmBom")
 public class ArticleBomController extends GenericController{
 
 	@Resource

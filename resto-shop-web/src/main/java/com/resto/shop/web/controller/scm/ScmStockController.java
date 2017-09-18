@@ -8,6 +8,7 @@ import com.resto.scm.web.model.DocStockCountHeader;
 import com.resto.scm.web.service.StockCountCheckService;
 import com.resto.shop.web.controller.GenericController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -16,6 +17,10 @@ import java.util.List;
 /**
  * Created by bruce on 2017-09-18 13:41
  */
+
+
+@Controller
+@RequestMapping("scmStockCount")
 public class ScmStockController extends GenericController{
 
 
