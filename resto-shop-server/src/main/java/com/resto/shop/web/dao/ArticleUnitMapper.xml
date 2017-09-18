@@ -104,7 +104,8 @@ insert into tb_article_unit (name, sort,
 
   <select id="selectByShopId" resultType="ArticleUnit">
     SELECT au.id,au.`name`,au.sort,au.tb_article_attr_id,au.state from tb_article_unit au LEFT JOIN
-     tb_article_attr aa on au.tb_article_attr_id = aa.shop_detail_id = #{shopId}
+     tb_article_attr aa on au.tb_article_attr_id = aa.id
+where aa.shop_detail_id =  #{shopId}
   </select>
   
   <select id="selectArticleUnitDetailByShopId" resultType="ArticleUnitDetail">
