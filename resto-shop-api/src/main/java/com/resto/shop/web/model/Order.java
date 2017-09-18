@@ -164,8 +164,10 @@ public class Order implements Serializable{
     //加菜次数
     private int childCount;
 
-    //订单原始金额（退菜前）
+    //订单原始金额（退菜 编辑菜 前）
     private BigDecimal baseMoney;
+
+    private BigDecimal baseOrderMoney;
 
     //支付状态（0 未支付 1支付中 2已支付）
     private Integer isPay;
@@ -240,6 +242,12 @@ public class Order implements Serializable{
     private String remarkSupply;
 
     private Integer type;
+
+    private BigDecimal posDiscount;
+
+    private BigDecimal eraseMoney;
+
+    private BigDecimal noDiscountMoney;
 
     public Integer getTag() {
         return tag;
@@ -976,6 +984,38 @@ public class Order implements Serializable{
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public BigDecimal getPosDiscount() {
+        return posDiscount;
+    }
+
+    public void setPosDiscount(BigDecimal posDiscount) {
+        this.posDiscount = posDiscount;
+    }
+
+    public BigDecimal getEraseMoney() {
+        return eraseMoney;
+    }
+
+    public void setEraseMoney(BigDecimal eraseMoney) {
+        this.eraseMoney = eraseMoney;
+    }
+
+    public BigDecimal getNoDiscountMoney() {
+        return noDiscountMoney;
+    }
+
+    public void setNoDiscountMoney(BigDecimal noDiscountMoney) {
+        this.noDiscountMoney = noDiscountMoney;
+    }
+
+    public BigDecimal getBaseOrderMoney() {
+        return baseOrderMoney;
+    }
+
+    public void setBaseOrderMoney(BigDecimal baseOrderMoney) {
+        this.baseOrderMoney = baseOrderMoney;
     }
 
     @Override

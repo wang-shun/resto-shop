@@ -191,10 +191,13 @@ public class SendMessageAspect {
 		smsLog.setSmsResult(JSONObject.toJSONString(aliResult));
 		smsLog.setIsSuccess(false);
 
+		log.info("短信发送结果:"+ JSONObject.toJSONString(aliResult));
+
 		//后置通知
 		if(aliResult.getBoolean("success")){//如果发短发送成功
 			smsLog.setIsSuccess(true);
-
+			//成功时记录一条记录
+			smsLogService.insert(smsLog);
 			BrandSetting brandSetting = brandSettingService.selectByBrandId(brandId);
 			if (brandSetting != null && brandSetting.getOpenBrandAccount() == 1) {//如果开启了
 				//获取品牌账户设置
@@ -254,10 +257,13 @@ public class SendMessageAspect {
 				smsAcountService.updateByBrandId(brandId);
 			}
 
+		}else {
+			//失败时记录一条记录
+			smsLogService.insert(smsLog);
+
 		}
-		log.info("短信发送结果:"+ JSONObject.toJSONString(aliResult));
-		//不管成功还是失败都需要一条记录
-		smsLogService.insert(smsLog);
+
+
 
 	}
 

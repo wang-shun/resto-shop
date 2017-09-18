@@ -1,14 +1,10 @@
 package com.resto.shop.web.config;
 
 import cn.restoplus.rpc.client.RpcProxy;
-import com.resto.brand.web.model.AccountAddressInfo;
-import com.resto.brand.web.model.City;
 import com.resto.brand.web.service.*;
 import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.scm.web.service.*;
-import com.resto.shop.web.controller.scm.ScmUnitController;
 import com.resto.shop.web.service.*;
-import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.EmployeeService;
 import com.resto.shop.web.service.OrderRemarkService;
 import com.resto.shop.web.service.PermissionService;
@@ -595,11 +591,24 @@ public class SpringContextConfig {
         return proxy.create(SupplierService.class);
     }
 
+    @Bean
+    public MaterialStockService materialStockService(){
+        return proxy.create(MaterialStockService.class);
+    }
+
 
 
     //------------scm server config end-----------
 
+
     //-----------------------
+
+    @Bean
+    public GoodTopService goodTopService(){
+	    return proxy.create(GoodTopService.class);
+    }
+
+
 
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);

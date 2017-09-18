@@ -140,6 +140,7 @@ public class MQMessageProducer {
 
 
 	public static void sendMessageASync(final Message message) {
+
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -322,6 +323,19 @@ public class MQMessageProducer {
 	}
 
 	/**
+	 * 发送发票管理消息队列
+	 * @param shopId orderNumber
+	 */
+	public static void sendReceiptPrintSuccess(String shopId,String orderNumber) {
+		JSONObject obj  = new JSONObject();
+        obj.put("shopId",shopId);
+        obj.put("orderNumber",orderNumber);
+		//Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_RECEIPT_PRINT_SUCCESS,obj.toJSONString().getBytes());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,"",obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
+	/**
 	 * 发送打印差评订单的消息队列
 	 * @param orderId
 	 */
@@ -343,6 +357,8 @@ public class MQMessageProducer {
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
 	}
+
+
 
 
 

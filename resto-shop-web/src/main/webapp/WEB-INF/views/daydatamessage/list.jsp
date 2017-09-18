@@ -7,7 +7,7 @@
         <div class="col-md-12">
             <form class="form-inline">
                 <div class="form-group" style="margin-right: 50px;">
-                    <label for="beginDate">选择日期{{type}}：</label>
+                    <label for="beginDate">选择日期</label>
                     <input type="text" class="form-control form_datetime" id="beginDate" v-model="date"  readonly="readonly" >
                 </div>
                 <button type="button" class="btn btn-primary" @click="today"> 日结报表</button>
@@ -68,19 +68,28 @@
         watch:{
             date : function (newValue, oldValue) {
                 this.key=1;//初始化
-                //判断是否要显示 旬或者月
-                var t1 =newValue.substring(5,7);//今日月份
-                console.log("当前选择日期的月份:"+t1)
-                var t2=newValue.substring(8,10);
-                console.log("当前选择日期的日份:"+t2);
+                console.log("date日期为："+newValue);
+                //要显示旬则必须是月末 或者 日期是10和20
+                //先判断本日的月份
+                var todayMonth = newValue.substring(5,7);
+                console.log("当前选择的月份："+todayMonth);
+
+                var todayDay = newValue.substring(8,10);
+                console.log("当前选择日期的日份:"+todayDay);
+
                 //获取明日
-                var t3 = this.getDateStr(1).substring(5,7)
-                console.log("当前选择日期第二天的月份:"+t3);
-                if(t1!=t3){//
+                var tomorrow = this.getDateStr(newValue,1);
+                console.log("第二天日期为："+tomorrow)
+                //获取明日的月份
+                var tomorrowMonth = tomorrow.substring(5,7);
+                console.log("第二天的月份是："+tomorrowMonth);
+                if(todayMonth!=tomorrowMonth){//
                     this.key=3
-                }else if(t2==10||t2==20){//说明是旬
+                }else if(todayDay==10||todayDay==20){//说明是旬
                     this.key=2
                 }
+
+
                 console.log("key值为:"+this.key);
             }
         },
@@ -199,8 +208,7 @@
                 this.searchInfo();
             },
             yesterDay : function(){
-                this.date =this.getDateStr(-1);
-                console.log("获取昨天的日期为："+this.date)
+                this.date =this.getDateStrDay(-1);
                 this.type=1
                 this.searchInfo();
             },
@@ -212,93 +220,30 @@
                this.type=3
                 this.searchInfo();
             },
-            getDateStr:function (AddDayCount) {
-                var dd = new Date()
-                dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+            getDateStr:function (day,AddDayCount) {
+                var dd = new Date(day);
+                dd.setDate(dd.getDate()+AddDayCount+1);//获取AddDayCount天后的日期
                 var y = dd.getFullYear();
                 var m = dd.getMonth()+1;//获取当前月份的日期
                 var d = dd.getDate();
                 var r = y+"-"+m+"-"+d;
                 r=new Date(r).format("yyyy-MM-dd");
                 return r
+            },
+            getDateStrDay:function (AddDayCount) {
+                var dd = new Date();
+                dd.setDate(dd.getDate()+AddDayCount);//获取AddDayCount天后的日期
+                var y = dd.getFullYear();
+                var m = dd.getMonth()+1;//获取当前月份的日期
+                var d = dd.getDate();
+                var r = y+"-"+m+"-"+d;
+                return new Date(r).format("yyyy-MM-dd");
+
             }
 
         }
 
     });
-
-//    //文本框默认值
-//    $('.form_datetime').val(new Date().format("yyyy-MM-dd"));
-//    var beginDate = $("#beginDate").val();
-//    var dataSource;
-//    toastr.success('查询中...');
-//    $.ajax( {
-//        url:'daydatamessage/getShopData',
-//        async:false,
-//        data:{
-//            'date':beginDate,
-//            "type":1
-//        },
-//        success:function(data) {
-//            dataSource=data;
-//            toastr.clear();
-//            toastr.success('查询成功');
-//        },
-//        error : function() {
-//            toastr.clear();
-//            toastr.error("系统异常,请刷新重试");
-//        }
-//    });
-//
-//
-//    //查询
-//    $("#searchReport").click(function(){
-//        beginDate = $("#beginDate").val();
-//        searchInfo(date);
-//    })
-//
-//    //今日
-//
-//    $("#today").click(function(){
-//        beginDate = new Date().format("yyyy-MM-dd");
-//        searchInfo(beginDate);
-//    });
-//
-//    //昨日
-//    $("#yesterDay").click(function(){
-//        beginDate = GetDateStr(-1);
-//        searchInfo(beginDate);
-//    });
-//
-//    //本月
-//    $("#month").click(function(){
-//        endDate = new Date().format("yyyy-MM-dd");
-//        $("#beginDate").val(beginDate);
-//        searchInfo(beginDate,endDate);
-//    });
-//
-//    function searchInfo(beginDate){
-//        toastr.clear();
-//        toastr.success('查询中...');
-//        //更新数据源
-//        $.ajax( {
-//            url:'daydatamessage/getShopData',
-//            data:{
-//                'date':beginDate
-//            },
-//            success:function(result) {
-//                dataSource=result;
-//                tb.clear().draw();
-//                tb.rows.add(result.data).draw();
-//                toastr.clear();
-//                toastr.success('查询成功');
-//            },
-//            error : function() {
-//                toastr.clear();
-//                toastr.error("系统异常，请刷新重试");
-//            }
-//        });
-//    }
 
 
 

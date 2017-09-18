@@ -98,6 +98,10 @@ public class Customer implements Serializable{
     //表示该用户是否有订单
     private Boolean useOrder;
 
+    private String cardId;
+
+    private String code;
+
     public Boolean getUseOrder() {
         return useOrder;
     }
@@ -427,6 +431,22 @@ public class Customer implements Serializable{
 
     public void setLastTableNumber(String lastTableNumber) {
         this.lastTableNumber = lastTableNumber;
+    }
+
+    public String getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(String cardId) {
+        this.cardId = cardId;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     @Override

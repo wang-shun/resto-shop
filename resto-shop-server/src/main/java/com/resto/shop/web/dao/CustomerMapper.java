@@ -73,6 +73,8 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 
     int registerCustomer(Customer customer);
 
+    int updateCustomerWechatId(Customer customer);
+
     Customer selectBySerialNumber(String number);
 
     Customer getCustomerLimitOne();

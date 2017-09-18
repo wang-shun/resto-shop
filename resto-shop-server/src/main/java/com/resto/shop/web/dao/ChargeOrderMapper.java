@@ -34,6 +34,9 @@ public interface ChargeOrderMapper  extends GenericDao<ChargeOrder,String> {
 
 	void refundCharge(BigDecimal payValue, String id);
 
+    void refundMoney(BigDecimal charge,BigDecimal reward, String id);
+
+
 	void refundReward(BigDecimal payValue, String id);
 
     List<ChargeOrder> selectByDateAndShopId(@Param("beginDate") Date begin,@Param("endDate") Date end, @Param("shopId") String shopId);
