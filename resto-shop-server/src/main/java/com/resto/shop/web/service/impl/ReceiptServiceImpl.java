@@ -91,6 +91,16 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     }
 
     @Override
+    public int updateReceiptOrderNumber(Receipt record){
+        return receiptMapper.updateReceiptOrderNumber(record);
+    }
+
+    @Override
+    public int getReceiptOrderNumberCount(String orderNumber){
+        return receiptMapper.getReceiptOrderNumberCount(orderNumber);
+    }
+
+    @Override
     public List<ReceiptOrder> selectReceiptOrderList(String customerId,String shopId,String state){
         if(state==null||state.equals("")){
             List<ReceiptOrder> rlist=receiptMapper.selectApplyReceiptOrderList(customerId,shopId);
@@ -108,6 +118,10 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     @Override
     public ReceiptPosOrder getReceiptOrderList(String receiptId){
         return receiptMapper.getReceiptOrderList(Integer.parseInt(receiptId));
+    }
+    @Override
+    public ReceiptOrder selectReceiptMoney(String orderNumber){
+        return receiptMapper.selectReceiptMoney(orderNumber);
     }
     @Override
     public ReceiptPos getPosReceiptList(String orderNumber){
