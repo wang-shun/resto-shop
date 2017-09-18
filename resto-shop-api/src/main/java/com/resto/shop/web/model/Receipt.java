@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class Receipt {
+
     private Long id;
 
     private String orderNumber;
@@ -21,6 +22,8 @@ public class Receipt {
     private Date createTime;
 
     private Date updateTime;
+
+    private String shopId;//店铺id
 
     public Long getId() {
         return id;
@@ -92,5 +95,13 @@ public class Receipt {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getShopId() {
+        return shopId;
+    }
+
+    public void setShopId(String shopId) {
+        this.shopId = shopId;
     }
 }

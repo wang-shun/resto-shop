@@ -1,21 +1,46 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <div id="controller">
-    <a class="btn btn-info ajaxify" href="newcustomcoupon/list">
-        <span class="glyphicon glyphicon-circle-arrow-left"></span>
-        返回
-    </a>
-    <br/><br/>
+    <c:if test="${intoType eq 2}">
+        <a class="btn btn-info ajaxify" href="newcustomcoupon/list">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
+    <c:if test="${intoType eq 1}">
+        <a class="btn btn-info ajaxify" href="member/myList">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
+    <c:if test="${intoType eq 1}">
+    <h2 class="text-center">
+        <strong>
+            会员筛选
+        </strong>
+    </h2>
+    </c:if>
+    <c:if test="${intoType eq 2}"><br/><br/></c:if>
     <ul class="nav nav-tabs" role="tablist" id="ulTab">
         <li role="presentation" class="active" @click="chooseType(1)">
             <a href="#groupRelease" aria-controls="groupRelease" role="tab" data-toggle="tab">
-                <strong>群体发放</strong>
+                <strong>
+                    <c:if test="${intoType eq 2}">
+                        群体发放
+                    </c:if>
+                    <c:if test="${intoType eq 1}">
+                        会员筛选
+                    </c:if>
+                </strong>
             </a>
         </li>
-        <li role="presentation" @click="chooseType(2)">
-            <a href="#personalLoans" aria-controls="personalLoans" role="tab" data-toggle="tab">
-                <strong>个人发放</strong>
-            </a>
-        </li>
+        <c:if test="${intoType eq 2}">
+            <li role="presentation" @click="chooseType(2)">
+                <a href="#personalLoans" aria-controls="personalLoans" role="tab" data-toggle="tab">
+                    <strong>个人发放</strong>
+                </a>
+            </li>
+        </c:if>
     </ul>
     <br/>
     <div class="tab-content">
@@ -23,32 +48,71 @@
         <div role="tabpanel" class="tab-pane active" id="groupRelease">
             <form class="form-inline">
                 <div class="form-group">
-                    <label>消费次数&nbsp;大于</label>&nbsp;&nbsp;
-                    <input type="number" class="form-control" v-model="selectObject.orderCount" placeholder="请录入消费次数">&nbsp;&nbsp;次
+                    <label>消费次数&nbsp;
+                        <select v-model="selectObject.orderCountType">
+                            <option value="1">大于</option>
+                            <option value="2">小于</option>
+                            <option value="3">介于</option>
+                            <option value="4">不介于</option>
+                        </select>
+                    </label>&nbsp;&nbsp;
+                    <input type="number" v-show="selectObject.orderCountType == 0 || selectObject.orderCountType == 1 || selectObject.orderCountType == 2" class="form-control" v-model="selectObject.orderCount" placeholder="请录入消费次数">&nbsp;
                 </div>
-                <%--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;--%>
-                <%--<div class="form-group">--%>
-                    <%--<label>消费次数<select></select>大于</label>&nbsp;&nbsp;--%>
-                    <%--<input type="text" class="form-control" placeholder="请录入消费次数">&nbsp;&nbsp;次--%>
-                <%--</div>--%>
+                <div class="form-group" v-show="selectObject.orderCountType == 3 || selectObject.orderCountType == 4">
+                    <input type="text" class="form-control" v-model="selectObject.orderCountBegin" placeholder="请录入消费次数">&nbsp;&nbsp;至&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.orderCountEnd" placeholder="请录入消费次数">&nbsp;&nbsp;
+                </div>次
             </form>
             <br/>
             <form class="form-inline">
                 <div class="form-group">
-                    <label>消费总额&nbsp;大于</label>&nbsp;&nbsp;
-                    <input type="text" class="form-control" v-model="selectObject.orderTotal" placeholder="请录入消费总额">&nbsp;&nbsp;元
-                </div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <div class="form-group">
-                    <label>平均消费金额&nbsp;大于</label>&nbsp;&nbsp;
-                    <input type="text" class="form-control" v-model="selectObject.avgOrderMoney" placeholder="请录入消费总额">&nbsp;&nbsp;元
+                    <label>消费总额&nbsp;
+                        <select v-model="selectObject.orderTotalType">
+                            <option value="1">大于</option>
+                            <option value="2">小于</option>
+                            <option value="3">介于</option>
+                            <option value="4">不介于</option>
+                        </select>
+                    </label>&nbsp;&nbsp;
+                    <input type="number" v-show="selectObject.orderTotalType == 0 || selectObject.orderTotalType == 1 || selectObject.orderTotalType == 2" class="form-control" v-model="selectObject.orderTotal" placeholder="请录入消费总额">&nbsp;
                 </div>
+                <div class="form-group" v-show="selectObject.orderTotalType == 3 || selectObject.orderTotalType == 4">
+                    <input type="text" class="form-control" v-model="selectObject.orderTotalBegin" placeholder="请录入消费总额">&nbsp;&nbsp;至&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.orderTotalEnd" placeholder="请录入消费总额">&nbsp;&nbsp;
+                </div>元&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <div class="form-group">
+                    <label>平均消费金额&nbsp;
+                        <select v-model="selectObject.avgOrderMoneyType">
+                            <option value="1">大于</option>
+                            <option value="2">小于</option>
+                            <option value="3">介于</option>
+                            <option value="4">不介于</option>
+                        </select>
+                    </label>&nbsp;&nbsp;
+                    <input type="number" v-show="selectObject.avgOrderMoneyType == 0 || selectObject.avgOrderMoneyType == 1 || selectObject.avgOrderMoneyType == 2" class="form-control" v-model="selectObject.avgOrderMoney" placeholder="请录入平均消费总额">&nbsp;
+                </div>
+                <div class="form-group" v-show="selectObject.avgOrderMoneyType == 3 || selectObject.avgOrderMoneyType == 4">
+                    <input type="text" class="form-control" v-model="selectObject.avgOrderMoneyBegin" placeholder="请录入平均消费总额">&nbsp;&nbsp;至&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.avgOrderMoneyEnd" placeholder="请录入平均消费总额">&nbsp;&nbsp;
+                </div>元
             </form>
             <br/>
             <form class="form-inline">
                 <div class="form-group">
-                    <label>最后消费日期距今&nbsp;超过</label>&nbsp;&nbsp;
-                    <input type="number" class="form-control" v-model="selectObject.lastOrderDay" placeholder="请录入天数">&nbsp;&nbsp;天
+                    <label>最后消费日期距今&nbsp;
+                        <select v-model="selectObject.lastOrderDayType">
+                            <option value="1">大于</option>
+                            <option value="2">小于</option>
+                            <option value="3">介于</option>
+                            <option value="4">不介于</option>
+                        </select>
+                    </label>&nbsp;&nbsp;
+                    <input type="number" v-show="selectObject.lastOrderDayType == 0 || selectObject.lastOrderDayType == 1 || selectObject.lastOrderDayType == 2" class="form-control" class="form-control" v-model="selectObject.lastOrderDay" placeholder="请录入天数">&nbsp;
                 </div>
+                <div class="form-group" v-show="selectObject.lastOrderDayType == 3 || selectObject.lastOrderDayType == 4">
+                    <input type="text" class="form-control" v-model="selectObject.lastOrderDayBegin" placeholder="请录入天数">&nbsp;&nbsp;至&nbsp;
+                    <input type="text" class="form-control" v-model="selectObject.lastOrderDayEnd" placeholder="请录入天数">&nbsp;&nbsp;
+                </div>天
             </form>
             <br/>
             <form class="form-inline">
@@ -100,13 +164,18 @@
             </form>
             <br/>&nbsp;&nbsp;
             <button type="button" class="btn btn-success" @click="searchInfo">查询</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <c:if test="${intoType eq 2}">
             <button type="button" class="btn btn-primary" @click="grantCoupon">发放</button>
+            </c:if>
+            <c:if test="${intoType eq 1}">
+                <button type="button" class="btn btn-primary" @click="createExcel">下载</button>
+            </c:if>
             <br/><br/>
             <table id="groupReleaseTable" class="table table-striped table-bordered table-hover"
                    style="width: 100%;">
             </table>
         </div>
-
+        <c:if test="${intoType eq 2}">
         <!-- 个人发放 -->
         <div role="tabpanel" class="tab-pane" id="personalLoans">
             <form class="form-inline">
@@ -122,6 +191,7 @@
                    style="width: 100%;">
             </table>
         </div>
+        </c:if>
     </div>
 </div>
 <script src="assets/customer/date.js" type="text/javascript"></script>
@@ -142,7 +212,8 @@
         language:"zh-CN"
     });
     //得到当前流失唤醒优惠券的Id
-    var couponId = ${couponId};
+    var couponId = "${couponId}";
+    var intoType = ${intoType};
     var groupReleaseTableAPI;
     var personalLoansTableAPI;
     new Vue({
@@ -150,14 +221,55 @@
         data : {
             groupReleaseTable : {}, //群体发放datatables对象
             personalLoansTable : {}, //个人发放datatables对象
-            selectObject : null, //群体发放查询对象
+            selectObject : {
+                orderCountType : 1,
+                lastOrderDayType : 1,
+                orderTotalType : 1,
+                avgOrderMoneyType : 1
+            }, //群体发放查询对象
             personalLoanSelectObject : null, //个人发放查询对象
             currentType : 1, //当前所在模块位置 1：群体发放 2：个人发放
             groupReleaseCustomerIds : "", //群体发放用户的Id
-            personalLoansCustomerIds : "" //个人发放用户的Id
+            personalLoansCustomerIds : "", //个人发放用户的Id
+            memberUserDtos : [],
+            memberList : []
         },
         created : function() {
             this.initDataTables();
+        },
+        watch : {
+            "selectObject.orderCountType" : function (newValue, oldValue) {
+                if ((newValue == 1 || newValue == 2) && (oldValue == 3 || oldValue == 4)){
+                    this.selectObject.orderCountBegin = "";
+                    this.selectObject.orderCountEnd = "";
+                }else if ((newValue == 3 || newValue == 4) && (oldValue == 1 || oldValue == 2)){
+                    this.selectObject.orderCount = "";
+                }
+            },
+            "selectObject.lastOrderDayType" : function (newValue, oldValue) {
+                if ((newValue == 1 || newValue == 2) && (oldValue == 3 || oldValue == 4)){
+                    this.selectObject.lastOrderDayBegin = "";
+                    this.selectObject.lastOrderDayEnd = "";
+                }else if ((newValue == 3 || newValue == 4) && (oldValue == 1 || oldValue == 2)){
+                    this.selectObject.lastOrderDay = "";
+                }
+            },
+            "selectObject.orderTotalType" : function (newValue, oldValue) {
+                if ((newValue == 1 || newValue == 2) && (oldValue == 3 || oldValue == 4)){
+                    this.selectObject.orderTotalBegin = "";
+                    this.selectObject.orderTotalEnd = "";
+                }else if ((newValue == 3 || newValue == 4) && (oldValue == 1 || oldValue == 2)){
+                    this.selectObject.orderTotal = "";
+                }
+            },
+            "selectObject.avgOrderMoneyType" : function (newValue, oldValue) {
+                if ((newValue == 1 || newValue == 2) && (oldValue == 3 || oldValue == 4)){
+                    this.selectObject.avgOrderMoneyBegin = "";
+                    this.selectObject.avgOrderMoneyEnd = "";
+                }else if ((newValue == 3 || newValue == 4) && (oldValue == 1 || oldValue == 2)){
+                    this.selectObject.avgOrderMoney = "";
+                }
+            }
         },
         methods : {
             initDataTables:function () {
@@ -209,7 +321,7 @@
                         },
                         {
                             title:"平均消费金额" ,
-                            data:"AVGOrderMoney"
+                            data:"avgOrderMoney"
                         }
                     ],
                     initComplete: function () {
@@ -217,60 +329,62 @@
                         that.groupReleaseTables();
                     }
                 });
-                that.personalLoansTable=$("#personalLoansTable").DataTable({
-                    lengthMenu: [ [100, 50, 10], [100, 50, 10] ],
-                    order: [[ 6, "desc" ]],
-                    columns : [
-                        {
-                            title : "用户类型",
-                            data : "customerType",
-                            orderable : false,
-                            s_filter: true
-                        },
-                        {
-                            title : "储值",
-                            data : "isValue",
-                            orderable : false,
-                            s_filter: true
-                        },
-                        {
-                            title : "昵称",
-                            data : "nickname",
-                            orderable : false
-                        },
-                        {
-                            title : "性别",
-                            data : "sex",
-                            orderable : false,
-                            s_filter: true
-                        },
-                        {
-                            title : "手机号",
-                            data : "telephone",
-                            orderable : false
-                        },
-                        {
-                            title : "生日",
-                            data : "birthday"
-                        },
-                        {
-                            title : "订单总数",
-                            data : "orderCount"
-                        },
-                        {
-                            title:"订单总额" ,
-                            data:"orderMoney"
-                        },
-                        {
-                            title:"平均消费金额" ,
-                            data:"AVGOrderMoney"
+                if (intoType == 2){
+                    that.personalLoansTable=$("#personalLoansTable").DataTable({
+                        lengthMenu: [ [100, 50, 10], [100, 50, 10] ],
+                        order: [[ 6, "desc" ]],
+                        columns : [
+                            {
+                                title : "用户类型",
+                                data : "customerType",
+                                orderable : false,
+                                s_filter: true
+                            },
+                            {
+                                title : "储值",
+                                data : "isValue",
+                                orderable : false,
+                                s_filter: true
+                            },
+                            {
+                                title : "昵称",
+                                data : "nickname",
+                                orderable : false
+                            },
+                            {
+                                title : "性别",
+                                data : "sex",
+                                orderable : false,
+                                s_filter: true
+                            },
+                            {
+                                title : "手机号",
+                                data : "telephone",
+                                orderable : false
+                            },
+                            {
+                                title : "生日",
+                                data : "birthday"
+                            },
+                            {
+                                title : "订单总数",
+                                data : "orderCount"
+                            },
+                            {
+                                title:"订单总额" ,
+                                data:"orderMoney"
+                            },
+                            {
+                                title:"平均消费金额" ,
+                                data:"avgOrderMoney"
+                            }
+                        ],
+                        initComplete: function () {
+                            personalLoansTableAPI = this.api();
+                            that.personalLoansTables();
                         }
-                    ],
-                    initComplete: function () {
-                        personalLoansTableAPI = this.api();
-                        that.personalLoansTables();
-                    }
-                });
+                    });
+                }
             },
             //切换单品、套餐 type 1:单品 2:套餐 3:类别
             chooseType:function (type) {
@@ -279,22 +393,7 @@
             searchInfo : function() {
                 var that = this;
                 if (that.currentType == 1) {
-                    if (that.selectObject == null || ((that.selectObject.orderCount == null || that.selectObject.orderCount.trim() == "")
-                        && (that.selectObject.orderTotal == null || that.selectObject.orderTotal.trim() == "")
-                        && (that.selectObject.avgOrderMoney == null || that.selectObject.avgOrderMoney.trim() == "")
-                        && (that.selectObject.lastOrderDay == null || that.selectObject.lastOrderDay.trim() == "")
-                        && (that.selectObject.registerBeginDate == null || that.selectObject.registerBeginDate.trim() == "")
-                        && (that.selectObject.registerEndDate == null || that.selectObject.registerEndDate.trim() == "")
-                        && (that.selectObject.register == null || that.selectObject.register.trim() == "")
-                        && (that.selectObject.isValue == null || that.selectObject.isValue.trim() == "")
-                        && (that.selectObject.sex == null || that.selectObject.sex.trim() == "")
-                        )) {
-                        that.showDialog(function () {
-                            that.selectFunction();
-                        });
-                    }else {
-                        that.selectFunction();
-                    }
+                    that.selectFunction();
                 }else {
                     if (that.personalLoanSelectObject == null || that.personalLoanSelectObject.text == null || that.personalLoanSelectObject.text.trim() == "") {
                         that.showDialog(function () {
@@ -353,7 +452,9 @@
                                     //重绘搜索列
                                     that.groupReleaseTables();
                                     toastr.success("查询成功");
-                                    console.log(that.groupReleaseCustomerIds);
+                                    if (intoType == 1){
+                                        that.memberUserDtos = result.data;
+                                    }
                                 }else {
                                     toastr.error("查询失败");
                                 }
@@ -382,7 +483,6 @@
                                     //重绘搜索列
                                     that.personalLoansTables();
                                     toastr.success("查询成功");
-                                    console.log(that.personalLoansCustomerIds);
                                 }else {
                                     toastr.error("查询失败");
                                 }
@@ -477,6 +577,32 @@
                         });
                     }
                 });
+            },
+            createExcel　: function () {
+                var that = this;
+                try {
+                    that.object = {};
+                    that.memberList = that.memberUserDtos;
+                    that.object = that.memberList;
+                    $.ajax({
+                        type: "POST",
+                        url: "member/createMemberSelectionDto",
+                        data: JSON.stringify(that.object),
+                        contentType : "application/json",
+                        dataType : "JSON",
+                        success : function (result) {
+                            if (result.success){
+                                window.location.href = "member/downloadExcel?path="+result.data+"";
+                            }else{
+                                toastr.clear();
+                                toastr.error("下载报表出错");
+                            }
+                        }
+                    });
+                } catch (e){
+                    toastr.clear();
+                    toastr.error("系统异常，请刷新重试")
+                }
             }
         }
     });

@@ -350,11 +350,12 @@ public class MQMessageProducer {
 
 	/**
 	 * 发送发票管理消息队列
-	 * @param orderNumber
+	 * @param shopId orderNumber
 	 */
-	public static void sendReceiptPrintSuccess(String orderNumber) {
+	public static void sendReceiptPrintSuccess(String shopId,String orderNumber) {
 		JSONObject obj  = new JSONObject();
-		obj.put("orderNumber",orderNumber);
+        obj.put("shopId",shopId);
+        obj.put("orderNumber",orderNumber);
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_RECEIPT_PRINT_SUCCESS,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
