@@ -157,6 +157,40 @@
     </set>
     where id = #{id,jdbcType=BIGINT}
   </update>
+  <!--根据订单number更新发票订单信息-->
+  <update id="updateReceiptOrderNumber" parameterType="com.resto.shop.web.model.Receipt" >
+    update tb_receipt
+    <set >
+      <!--<if test="orderNumber != null" >
+        order_number = #{orderNumber,jdbcType=VARCHAR},
+      </if>-->
+      <if test="id != null" >
+        id =  #{id,jdbcType=BIGINT},
+      </if>
+      <if test="payTime != null" >
+        pay_time = #{payTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="orderMoney != null" >
+        "order_money" = #{orderMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="receiptMoney != null" >
+        receipt_money = #{receiptMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="receiptTitleId != null" >
+        receipt_title_id = #{receiptTitleId,jdbcType=BIGINT},
+      </if>
+      <if test="state != null" >
+        state = #{state,jdbcType=INTEGER},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where order_number = #{orderNumber,jdbcType=VARCHAR}
+  </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Receipt" >
     update tb_receipt
     set order_number = #{orderNumber,jdbcType=VARCHAR},
@@ -191,8 +225,19 @@
         AND o.production_status IN (2, 3, 4)
         AND o.order_state IN (2, 10, 11, 12)
         AND o.customer_id=#{customerId,jdbcType=VARCHAR}
+        AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
         ORDER BY pay_time DESC) t1
     WHERE t1.receipt_money!=0.00
+  </select>
+  <!--查询单笔订单所有支付金额-->
+  <select id="selectReceiptMoney" resultMap="orderMap">
+    SELECT
+	 ceil(SUM(p.pay_value)) receipt_money
+    FROM
+        tb_order o,
+        tb_order_payment_item p
+    WHERE p.order_id = o.id
+      AND o.serial_number = #{orderNumber,jdbcType=VARCHAR}
   </select>
   <!--查询申请发票订单-->
   <select id="selectApplyReceiptOrderList" resultMap="orderMap">
@@ -208,6 +253,7 @@
     AND o.order_state IN (2, 10, 11, 12)
     AND o.serial_number NOT IN (SELECT r.order_number FROM tb_receipt r)
     AND o.customer_id=#{customerId,jdbcType=VARCHAR}
+    AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
     ORDER BY pay_time DESC) t1
     WHERE t1.receipt_money!=0.00
   </select>
@@ -292,5 +338,14 @@
     WHERE r.order_number = o.serial_number
     AND t.id=r.receipt_title_id
     AND r.order_number=#{orderNumber,jdbcType=VARCHAR}
+  </select>
+  <!--根据订单number查询发票列表是否存在该订单-->
+  <select id="getReceiptOrderNumberCount" resultType="Integer">
+    SELECT
+	  COUNT(order_number)
+    FROM
+	  tb_receipt r
+    WHERE
+	  r.order_number=#{orderNumber,jdbcType=VARCHAR}
   </select>
 </mapper>

@@ -91,16 +91,37 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
     }
 
     @Override
-    public List<ReceiptOrder> selectReceiptOrderList(String customerId,String state){
+    public int updateReceiptOrderNumber(Receipt record){
+        return receiptMapper.updateReceiptOrderNumber(record);
+    }
+
+    @Override
+    public int getReceiptOrderNumberCount(String orderNumber){
+        return receiptMapper.getReceiptOrderNumberCount(orderNumber);
+    }
+
+    @Override
+    public List<ReceiptOrder> selectReceiptOrderList(String customerId,String shopId,String state){
         if(state==null||state.equals("")){
-            return receiptMapper.selectApplyReceiptOrderList(customerId);
+            List<ReceiptOrder> rlist=receiptMapper.selectApplyReceiptOrderList(customerId,shopId);
+            if(rlist!=null && !rlist.isEmpty()){
+                for(ReceiptOrder receiptOrder:rlist){
+                    ReceiptOrder r=receiptMapper.selectReceiptMoney(receiptOrder.getOrderNumber());
+                    receiptOrder.setReceiptMoney(receiptOrder.getReceiptMoney().intValue() <= r.getReceiptMoney().intValue()? receiptOrder.getReceiptMoney() : r.getReceiptMoney());
+                }
+            }
+            return rlist;
         }else{
-            return receiptMapper.selectReceiptOrderList(customerId);
+            return receiptMapper.selectReceiptOrderList(customerId,shopId);
         }
     }
     @Override
     public ReceiptPosOrder getReceiptOrderList(String receiptId){
         return receiptMapper.getReceiptOrderList(Integer.parseInt(receiptId));
+    }
+    @Override
+    public ReceiptOrder selectReceiptMoney(String orderNumber){
+        return receiptMapper.selectReceiptMoney(orderNumber);
     }
     @Override
     public ReceiptPos getPosReceiptList(String orderNumber){
@@ -219,7 +240,7 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
         itemMoney.put("ARTICLE_NAME",receiptPosOrder.getOrderMoney()+"元");
         items.add(itemMoney);
         Map<String, Object> itemName = new HashMap<String, Object>();
-        itemName.put("ARTICLE_COUNT","公司抬头:");
+        itemName.put("ARTICLE_COUNT","    抬头:");
         itemName.put("ARTICLE_NAME",receiptPosOrder.getName());
         items.add(itemName);
         Map<String, Object> itemDutyParagraph = new HashMap<String, Object>();
