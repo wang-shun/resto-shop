@@ -7,7 +7,7 @@
         where article_id in
         <foreach collection="articleList" item="article" open="("
                  separator="," close=")">
-            #{article}
+            #{article.id}
         </foreach>
     </select>
 </mapper>
