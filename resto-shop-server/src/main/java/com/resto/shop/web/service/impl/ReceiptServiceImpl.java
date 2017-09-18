@@ -92,6 +92,8 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
 
     @Override
     public int updateReceiptOrderNumber(Receipt record){
+        ReceiptOrder r=receiptMapper.selectReceiptOrderOneMoney(record.getOrderNumber());
+        record.setReceiptMoney(record.getReceiptMoney().intValue() <= r.getReceiptMoney().intValue()? record.getReceiptMoney() : r.getReceiptMoney());
         return receiptMapper.updateReceiptOrderNumber(record);
     }
 
