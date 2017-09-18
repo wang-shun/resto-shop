@@ -140,6 +140,7 @@ public class MQMessageProducer {
 
 
 	public static void sendMessageASync(final Message message) {
+
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -343,6 +344,8 @@ public class MQMessageProducer {
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
 	}
+
+
 
 
 

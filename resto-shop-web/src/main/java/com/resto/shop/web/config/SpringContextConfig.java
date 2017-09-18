@@ -595,6 +595,11 @@ public class SpringContextConfig {
         return proxy.create(SupplierService.class);
     }
 
+    @Bean
+    public MaterialStockService materialStockService(){
+        return proxy.create(MaterialStockService.class);
+    }
+
 
 
     //------------scm server config end-----------
