@@ -23,7 +23,6 @@ import java.util.List;
 @RequestMapping("scmStockCount")
 public class ScmStockController extends GenericController{
 
-
     @Autowired
     private StockCountCheckService stockCountCheckService;
 
@@ -53,6 +52,11 @@ public class ScmStockController extends GenericController{
     public Result create(DocStockInput docStockInput){
         docStockInput.setShopId(this.getCurrentShopId());
         docStockInput.setCreateId(this.getCurrentUserId());
+        try {
+
+        }catch (Exception e){
+
+        }
         boolean isTrue = stockCountCheckService.saveStock(docStockInput);
         if(isTrue){
             return Result.getSuccess();
