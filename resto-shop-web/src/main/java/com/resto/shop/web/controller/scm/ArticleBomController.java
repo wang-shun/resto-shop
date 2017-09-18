@@ -39,8 +39,13 @@ public class ArticleBomController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid MdRulArticleBomHeadDo articlebom){
-		articlebomService.addArticleBomHead(articlebom);
-		return Result.getSuccess();
+		try {
+			articlebomService.addArticleBomHead(articlebom);
+			return Result.getSuccess();
+		}catch (Exception e){
+			return getSuccessResult("500");
+		}
+
 	}
 
 	@RequestMapping("modify")
