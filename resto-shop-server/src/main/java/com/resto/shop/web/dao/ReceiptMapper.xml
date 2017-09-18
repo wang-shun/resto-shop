@@ -232,6 +232,7 @@
   <!--查询单笔订单所有支付金额-->
   <select id="selectReceiptMoney" resultMap="orderMap">
     SELECT
+     (CASE WHEN o.amount_with_children>0.00 THEN o.amount_with_children ELSE o.order_money END) order_money,
 	 ceil(SUM(p.pay_value)) receipt_money
     FROM
         tb_order o,
