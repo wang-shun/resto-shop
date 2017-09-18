@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="58a210dc-1097-443d-939b-387746b002f0" name="Default" comment="">
+    <list default="true" id="58a210dc-1097-443d-939b-387746b002f0" name="Default" comment="Merge branch 'master' of gitee.com:diamond/resto-shop into resto-shop-scm&#10;&#10;# Conflicts:&#10;#&#9;resto-shop-web/src/main/java/com/resto/shop/web/config/SpringContextConfig.java">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resto-shop-api/src/main/java/com/resto/shop/web/CodeGenerateFromJavaTemp.java" afterPath="$PROJECT_DIR$/resto-shop-api/src/main/java/com/resto/shop/web/CodeGenerateFromJavaTemp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resto-shop-server/src/main/java/com/resto/shop/web/producer/MQMessageProducer.java" afterPath="$PROJECT_DIR$/resto-shop-server/src/main/java/com/resto/shop/web/producer/MQMessageProducer.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resto-shop-web/src/main/java/com/resto/shop/web/config/SpringContextConfig.java" afterPath="$PROJECT_DIR$/resto-shop-web/src/main/java/com/resto/shop/web/config/SpringContextConfig.java" />
     </list>
     <ignored path="$PROJECT_DIR$/resto-shop-server/target/" />
     <ignored path="$PROJECT_DIR$/../resto-scm/resto-scm-api/target/" />
@@ -88,19 +85,17 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="MaterialStockController.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="MaterialStockController.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/resto-shop-web/src/main/java/com/resto/shop/web/controller/scm/MaterialStockController.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="726">
-              <caret line="64" column="0" lean-forward="true" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#1649#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="327">
+              <caret line="43" column="29" lean-forward="false" selection-start-line="43" selection-start-column="29" selection-end-line="43" selection-end-column="29" />
+              <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ArticleBomController.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="ArticleBomController.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/resto-shop-web/src/main/java/com/resto/shop/web/controller/scm/ArticleBomController.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="1045">
@@ -272,7 +267,7 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="216" />
+    <option name="x" value="-40" />
     <option name="width" value="1936" />
     <option name="height" value="1056" />
   </component>
@@ -320,57 +315,6 @@
               <item name="resto-shop" type="462c0819:PsiDirectoryNode" />
               <item name="resto-shop-web" type="462c0819:PsiDirectoryNode" />
             </path>
-            <path>
-              <item name="resto-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="resto-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="resto-shop-web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="resto-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="resto-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="resto-shop-web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="resto-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="resto-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="resto-shop-web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="resto-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="resto-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="resto-shop-web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="resto-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="resto-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="resto-shop-web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="controller" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="resto-shop" type="b2602c69:ProjectViewProjectNode" />
-              <item name="resto-shop" type="462c0819:PsiDirectoryNode" />
-              <item name="resto-shop-web" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
-              <item name="main" type="462c0819:PsiDirectoryNode" />
-              <item name="java" type="462c0819:PsiDirectoryNode" />
-              <item name="web" type="462c0819:PsiDirectoryNode" />
-              <item name="controller" type="462c0819:PsiDirectoryNode" />
-              <item name="scm" type="462c0819:PsiDirectoryNode" />
-            </path>
           </expand>
           <select />
         </subPane>
@@ -389,6 +333,7 @@
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.0" />
     <property name="SearchEverywhereHistoryKey" value="ArticleBomHead&#9;FILE&#9;jar://C:/Users/Administrator/.m2/repository/cn/restoplus/resto-scm-api/1.0.1/resto-scm-api-1.0.1.jar!/com/resto/scm/web/dto/MdRulArticleBomHeadDtailDo.class&#10;ArticleBomService&#9;PSI&#9;JAVA://com.resto.scm.web.service.ArticleBomHeadService&#10;SupplierPriceDo&#9;PSI&#9;JAVA://com.resto.scm.web.dto.MdSupplierPriceHeadDo&#10;SupplierPriceService&#9;FILE&#9;jar://C:/Users/Administrator/.m2/repository/cn/restoplus/resto-scm-api/1.0.1/resto-scm-api-1.0.1.jar!/com/resto/scm/web/service/SupplierMaterialPriceService.class&#10;MaterialStock&#9;FILE&#9;jar://C:/Users/Administrator/.m2/repository/cn/restoplus/resto-scm-api/1.0.1/resto-scm-api-1.0.1.jar!/com/resto/scm/web/dto/MaterialStockDo.class&#10;material&#9;FILE&#9;jar://C:/Users/Administrator/.m2/repository/cn/restoplus/resto-scm-api/1.0.1/resto-scm-api-1.0.1.jar!/com/resto/scm/web/dto/MaterialStockDo.class&#10;MaterialStockD&#9;PSI&#9;JAVA://com.resto.scm.web.dto.MaterialStockDo&#10;DoOperateLog&#9;PSI&#9;JAVA://com.resto.scm.web.model.DoOperateLog&#10;Md&#9;FILE&#9;jar://C:/Users/Administrator/.m2/repository/cn/restoplus/resto-scm-api/1.0.1/resto-scm-api-1.0.1.jar!/com/resto/scm/web/dto/MaterialDo.class&#10;unitService&#9;PSI&#9;JAVA://com.resto.shop.web.service.UnitService&#10;Mat&#9;FILE&#9;jar://C:/Users/Administrator/.m2/repository/cn/restoplus/resto-scm-api/1.0.1/resto-scm-api-1.0.1.jar!/com/resto/scm/web/dto/MaterialDo.class&#10;MaterialDo&#9;PSI&#9;JAVA://com.resto.scm.web.dto.MaterialDo" />
+    <property name="Git.Branch.Popup.ShowAllRemotes" value="true" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -628,7 +573,7 @@
       <workItem from="1505351033688" duration="1944000" />
       <workItem from="1505365377223" duration="1816000" />
       <workItem from="1505439953601" duration="6053000" />
-      <workItem from="1505696287161" duration="2520000" />
+      <workItem from="1505696287161" duration="2939000" />
     </task>
     <task id="LOCAL-00001" summary="scm分支提交">
       <created>1505093032526</created>
@@ -648,11 +593,10 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="115205000" />
+    <option name="totallyTimeSpent" value="115624000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="216" y="0" width="1936" height="1056" extended-state="0" />
-    <editor active="true" />
+    <frame x="-40" y="0" width="1936" height="1056" extended-state="0" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.13043478" sideWeight="0.5021322" order="11" side_tool="true" content_ui="tabs" />
@@ -676,7 +620,7 @@
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.26279318" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Bean Validation" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Web" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.32934782" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.6880435" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -1158,6 +1102,14 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/resto-shop-web/src/main/java/com/resto/shop/web/controller/scm/MaterialStockController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="327">
+          <caret line="43" column="29" lean-forward="false" selection-start-line="43" selection-start-column="29" selection-end-line="43" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/resto-shop-web/src/main/java/com/resto/shop/web/controller/scm/ArticleBomController.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1045">
@@ -1166,16 +1118,6 @@
             <element signature="imports" expanded="true" />
             <element signature="e#840#841#0" expanded="true" />
             <element signature="e#925#926#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resto-shop-web/src/main/java/com/resto/shop/web/controller/scm/MaterialStockController.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="726">
-          <caret line="64" column="0" lean-forward="true" selection-start-line="64" selection-start-column="0" selection-end-line="64" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#1649#0" expanded="true" />
           </folding>
         </state>
       </provider>
