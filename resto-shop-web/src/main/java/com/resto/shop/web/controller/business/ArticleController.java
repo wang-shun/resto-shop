@@ -59,7 +59,7 @@ public class ArticleController extends GenericController {
     @Autowired
     private ArticleRecommendService articleRecommendService;
 
-    @Resource
+    @Autowired
     private MealItemService mealItemService;
 
     @Autowired
