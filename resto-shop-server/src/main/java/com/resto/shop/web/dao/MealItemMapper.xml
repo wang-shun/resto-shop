@@ -175,4 +175,10 @@
     <select id="selectByAttrId" resultType="MealItem">
         select * from tb_meal_item where meal_attr_id = #{attrId}
     </select>
+
+    <update id="updateArticleNameById" parameterType="com.resto.shop.web.model.MealItem">
+        update tb_meal_item
+        set article_name = #{articleName,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
 </mapper>
