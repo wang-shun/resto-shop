@@ -43,7 +43,7 @@ public class ArticleBomController extends GenericController{
 			articlebomService.addArticleBomHead(articlebom);
 			return Result.getSuccess();
 		}catch (Exception e){
-			return getSuccessResult("500");
+			return new Result("保存失败", 5000,false);
 		}
 
 	}
