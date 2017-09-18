@@ -604,7 +604,15 @@ public class SpringContextConfig {
 
     //------------scm server config end-----------
 
+<<<<<<< HEAD
     //-----------------------
+=======
+    @Bean
+    public GoodTopService goodTopService(){
+	    return proxy.create(GoodTopService.class);
+    }
+
+>>>>>>> fbd53ace22bcb69f9c4d3ba7290c54317fb28802
 
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);

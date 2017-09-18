@@ -745,4 +745,13 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	 * @return
 	 */
 	List<Order> selectCompleteByShopIdAndTime(String shopId, Date todayBegin, Date todayEnd);
+
+	/**
+	 * 用户最近一把有效订单
+	 * @param customerId
+	 * @return
+	 */
+	Order selectAfterValidOrderByCustomerId(String customerId);
+
+	Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type);
 }
