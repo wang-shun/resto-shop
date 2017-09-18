@@ -148,7 +148,7 @@
         </foreach>
     </delete>
     <select id="selectByAttrIds" resultType="MealItem">
-        select it.*, a.name article_name,a.photo_small from tb_meal_item it
+        select it.*,a.photo_small from tb_meal_item it
         left join tb_article a on it.article_id=a.id
 		where meal_attr_id in
         <foreach collection="mealAttrIds" open="(" separator="," close=")" item="attrId">
@@ -173,8 +173,6 @@
     </select>
 
     <select id="selectByAttrId" resultType="MealItem">
-        select it.*, a.name article_name from tb_meal_item it
-        left join tb_article a on it.article_id=a.id
-         where it.meal_attr_id = #{attrId}
+        select * from tb_meal_item where meal_attr_id = #{attrId}
     </select>
 </mapper>
