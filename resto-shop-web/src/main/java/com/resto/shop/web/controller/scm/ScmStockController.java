@@ -28,15 +28,15 @@ public class ScmStockController extends GenericController{
 
     @RequestMapping("/list_default")
     @ResponseBody
-    public Result list(String shopId){
-        List<MaterialStockDo> list = stockCountCheckService.findDefaultStock(shopId);
+    public Result list(){
+        List<MaterialStockDo> list = stockCountCheckService.findDefaultStock(getCurrentShopId());
         return getSuccessResult(list);
     }
 
     @RequestMapping("/list_all")
     @ResponseBody
-    public Result listData(String shopId){
-        List<DocStockCountHeader> list = stockCountCheckService.findStockList(shopId);
+    public Result listData(){
+        List<DocStockCountHeader> list = stockCountCheckService.findStockList(getCurrentShopId());
         return getSuccessResult(list);
     }
 
@@ -53,15 +53,11 @@ public class ScmStockController extends GenericController{
         docStockInput.setShopId(this.getCurrentShopId());
         docStockInput.setCreateId(this.getCurrentUserId());
         try {
-
-        }catch (Exception e){
-
-        }
-        boolean isTrue = stockCountCheckService.saveStock(docStockInput);
-        if(isTrue){
+            stockCountCheckService.saveStock(docStockInput);
             return Result.getSuccess();
+        }catch (Exception e){
+            return new Result("保存失败", 5000,false);
         }
-        return new Result("保存失败", 5000,false);
     }
 
 }
