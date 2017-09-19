@@ -30,6 +30,7 @@ import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,8 +93,12 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
 
     @Override
     public int updateReceiptOrderNumber(Receipt record){
-        ReceiptOrder r=receiptMapper.selectReceiptOrderOneMoney(record.getOrderNumber());
-        record.setReceiptMoney(record.getReceiptMoney().intValue() <= r.getReceiptMoney().intValue()? record.getReceiptMoney() : r.getReceiptMoney());
+        if(!record.getOrderMoney().equals(BigDecimal.ZERO)){
+            ReceiptOrder r=receiptMapper.selectReceiptOrderOneMoney(record.getOrderNumber());
+            record.setReceiptMoney(record.getReceiptMoney().intValue() <= r.getReceiptMoney().intValue()? record.getReceiptMoney() : r.getReceiptMoney());
+            return receiptMapper.updateReceiptOrderNumber(record);
+        }
+        record.setReceiptMoney(record.getOrderMoney());
         return receiptMapper.updateReceiptOrderNumber(record);
     }
 
