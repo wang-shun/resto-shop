@@ -10,12 +10,11 @@ import javax.validation.Valid;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.core.util.WeChatUtils;
-import com.resto.brand.web.model.BrandSetting;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.constant.SmsLogType;
@@ -28,10 +27,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.web.model.DistributionMode;
 import com.resto.shop.web.constant.TimeConsType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.NewCustomCoupon;
+
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
+import static com.resto.brand.core.util.LogUtils.url;
 
 @Controller
 @RequestMapping("newcustomcoupon")
@@ -390,6 +391,12 @@ public class NewCustomCouponController extends GenericController{
                             SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsParam);
                     log.info("短信发送结果：" + jsonObject.toJSONString());
                 }
+                Map logMap = new HashMap(4);
+                logMap.put("brandName", getBrandName());
+                logMap.put("fileName", getCurrentBrandUser().getShopName());
+                logMap.put("type", "shopAction");
+                logMap.put("content", "品牌："+getBrandName()+"向用户："+customer.getNickname()+"发放礼品优惠券，请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(url,logMap);
             }
             return getSuccessResult();
         }catch (Exception e){
