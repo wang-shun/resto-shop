@@ -291,6 +291,7 @@
     AND t.id=r.receipt_title_id
     AND r.create_time &gt;= CONCAT(curdate(),' 00:00:00')
     AND r.create_time &lt;= CONCAT(curdate(),' 23:59:59')
+    AND r.receipt_money != 0.00
     AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
     <if test="state != null" >
       AND r.state=#{state,jdbcType=INTEGER}
@@ -309,6 +310,7 @@
     AND t.id=r.receipt_title_id
     AND r.state=0
     AND r.create_time &lt; CONCAT(curdate(),' 00:00:00')
+    AND r.receipt_money != 0.00
     AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
     ORDER BY r.create_time DESC
   </select>
