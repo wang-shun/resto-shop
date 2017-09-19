@@ -44,4 +44,6 @@ public interface CouponService extends GenericService<Coupon, String> {
     List<Coupon> getCouponByShopId(String shopId,Integer day,Integer type);
 
 	List<Coupon> listCouponUsed(Coupon coupon);
+
+	void addCoupon(NewCustomCoupon newCustomCoupon, Customer customer);
 }

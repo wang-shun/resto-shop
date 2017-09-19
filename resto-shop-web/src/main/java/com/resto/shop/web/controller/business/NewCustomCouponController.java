@@ -337,9 +337,7 @@ public class NewCustomCouponController extends GenericController{
             objectMap.put("customerIds", customerIds);
             List<Customer> customerList = customerService.selectBySelectMap(objectMap);
             //得到要发放的优惠券信息
-            List<NewCustomCoupon> newCustomCoupons = new ArrayList<>();
             NewCustomCoupon newCustomCoupon = newcustomcouponService.selectById(Long.valueOf(couponId));
-            newCustomCoupons.add(newCustomCoupon);
             //得到相应的品牌信息
             ShopDetail shopDetail = new ShopDetail();
             BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
@@ -378,7 +376,7 @@ public class NewCustomCouponController extends GenericController{
                     substitutor = new StrSubstitutor(valueMap);
                     text = substitutor.replace(text);
                 }
-                couponService.addRealTimeCoupon(newCustomCoupons, customer);
+                couponService.addCoupon(newCustomCoupon, customer);
                 //判断是否开启微信推送
                 if (brandSetting.getWechatPushGiftCoupons().equals(Common.YES)) {
                     WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
