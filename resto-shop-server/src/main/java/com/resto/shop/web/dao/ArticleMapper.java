@@ -3,6 +3,7 @@ package com.resto.shop.web.dao;
 import java.util.List;
 import java.util.Map;
 
+import com.resto.shop.web.dto.ArticleSellCountDto;
 import com.resto.shop.web.model.ArticleStock;
 import org.apache.ibatis.annotations.Param;
 import com.resto.brand.core.generic.GenericDao;
@@ -189,4 +190,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
      * @return
      */
 	Integer selectSumByMonthlySales(@Param("articleId") String articleId, @Param("time") String time);
+
+    List<ArticleSellCountDto> findArticleByLastCountTime(@Param("shopId")String shopId ,@Param("lastCountTime") String lastCountTime);
 }

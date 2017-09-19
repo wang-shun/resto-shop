@@ -1044,4 +1044,23 @@ GROUP BY article_id
         select COALESCE(sum(count),0) from tb_order_item
         where article_id like CONCAT(#{articleId},'%') and create_time like CONCAT('%',#{time},'%')
     </select>
+
+
+    <select id="findArticleByLastCountTime" parameterType="java.lang.String" resultType="com.resto.shop.web.dto.ArticleSellCountDto">
+        SELECT
+        item.article_id AS `articleId`,
+        item.article_name AS `articleName`,
+        item.create_time AS `createTime`,
+        item.orgin_count as 'orginCount',
+        item.refund_count as 'refundCount',
+        item.meal_fee_number AS `mealFeeNumber`
+        FROM
+        tb_order o INNER JOIN
+	    tb_order_item item ON o.id =item.order_id
+        WHERE  o.shop_detail_id =#{shopId} AND item.create_time>date_format(#{lastCountTime}, '%Y-%m-%d %H-%i-%s');
+    </select>
+
+
+
+
 </mapper>
