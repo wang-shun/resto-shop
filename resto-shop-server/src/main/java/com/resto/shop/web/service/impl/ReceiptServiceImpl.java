@@ -176,7 +176,7 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "发票订单:" + receiptPosOrder.getOrderNumber() + "返回打印发票模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "发票订单:" + receiptPosOrder.getOrderNumber() + "返回(手动)打印发票模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
         return printTask;
     }
@@ -201,7 +201,7 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "发票订单:" + receiptPosOrder.getOrderNumber() + "返回打印发票模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "发票订单:" + receiptPosOrder.getOrderNumber() + "返回(自动)打印发票模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
         return printTask;
     }
