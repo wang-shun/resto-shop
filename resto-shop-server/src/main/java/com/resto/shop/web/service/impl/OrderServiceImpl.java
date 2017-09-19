@@ -7076,18 +7076,20 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             back.setRemark("线下现金退款:" + order.getRefundMoney());
             back.setResultData("线下现金退款" + order.getRefundMoney());
             orderPaymentItemService.insert(back);
-            Map map = new HashMap(4);
-            map.put("brandName", brand.getBrandName());
-            map.put("fileName", shopDetail.getName());
-            map.put("type", "posAction");
-            map.put("content", "订单:" + order.getId() + "在pos端执行退菜线下退款现金" + order.getRefundMoney() + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPostAnsc(url, map);
-            Map orderMap = new HashMap(4);
-            orderMap.put("brandName", brand.getBrandName());
-            orderMap.put("fileName", order.getId());
-            orderMap.put("type", "orderAction");
-            orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜线下退款现金" + order.getRefundMoney() + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPostAnsc(url, orderMap);
+            if(customer != null){
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", shopDetail.getName());
+                map.put("type", "posAction");
+                map.put("content", "订单:" + order.getId() + "在pos端执行退菜线下退款现金" + order.getRefundMoney() + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(url, map);
+                Map orderMap = new HashMap(4);
+                orderMap.put("brandName", brand.getBrandName());
+                orderMap.put("fileName", order.getId());
+                orderMap.put("type", "orderAction");
+                orderMap.put("content", "订单:" + order.getId() + "在pos端执行退菜线下退款现金" + order.getRefundMoney() + "元,返还用户Id:" + customer.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(url, orderMap);
+            }
         }else if (maxWxRefund.doubleValue() > 0) { //如果微信支付或者支付宝还有钱可以退
             for (OrderPaymentItem item : payItemsList) {
                 String newPayItemId = ApplicationUtils.randomUUID();
