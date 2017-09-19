@@ -171,7 +171,7 @@
         pay_time = #{payTime,jdbcType=TIMESTAMP},
       </if>
       <if test="orderMoney != null" >
-        "order_money" = #{orderMoney,jdbcType=DECIMAL},
+        order_money = #{orderMoney,jdbcType=DECIMAL},
       </if>
       <if test="receiptMoney != null" >
         receipt_money = #{receiptMoney,jdbcType=DECIMAL},
