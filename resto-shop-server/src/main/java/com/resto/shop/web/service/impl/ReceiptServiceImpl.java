@@ -93,7 +93,7 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
 
     @Override
     public int updateReceiptOrderNumber(Receipt record){
-        if(!record.getOrderMoney().equals(BigDecimal.ZERO)){
+        if(!record.getOrderMoney().equals(new BigDecimal("0.00"))){
             ReceiptOrder r=receiptMapper.selectReceiptOrderOneMoney(record.getOrderNumber());
             record.setReceiptMoney(record.getReceiptMoney().intValue() <= r.getReceiptMoney().intValue()? record.getReceiptMoney() : r.getReceiptMoney());
             return receiptMapper.updateReceiptOrderNumber(record);
