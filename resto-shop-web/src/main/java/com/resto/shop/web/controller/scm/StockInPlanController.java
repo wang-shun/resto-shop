@@ -14,7 +14,7 @@
 
 
 @Controller
-@RequestMapping("stockinplan")
+@RequestMapping("scmStockPlan")
 public class StockInPlanController extends GenericController{
 
 	@Resource

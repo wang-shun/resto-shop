@@ -16,7 +16,7 @@
  import java.util.List;
 
 @Controller
-@RequestMapping("upplier")
+@RequestMapping("scmSupplier")
 public class SupplierController extends GenericController{
 
 	@Resource

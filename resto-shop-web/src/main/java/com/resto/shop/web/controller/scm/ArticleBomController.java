@@ -13,7 +13,7 @@
  import javax.validation.Valid;
 
 @Controller
-@RequestMapping("articlebom")
+@RequestMapping("scmBom")
 public class ArticleBomController extends GenericController{
 
 	@Resource
@@ -39,8 +39,13 @@ public class ArticleBomController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid MdRulArticleBomHeadDo articlebom){
-		articlebomService.addArticleBomHead(articlebom);
-		return Result.getSuccess();
+		try {
+			articlebomService.addArticleBomHead(articlebom);
+			return Result.getSuccess();
+		}catch (Exception e){
+			return new Result("保存失败", 5000,false);
+		}
+
 	}
 
 	@RequestMapping("modify")
