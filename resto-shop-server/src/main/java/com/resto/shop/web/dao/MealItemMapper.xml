@@ -182,7 +182,7 @@
         where id = #{id,jdbcType=INTEGER}
     </update>
 
-    <select id="selectByAttrId" resultType="MealItem">
+    <select id="selectByArticleId" resultType="MealItem">
         select * from tb_meal_item where article_id = #{articleId}
     </select>
 </mapper>
