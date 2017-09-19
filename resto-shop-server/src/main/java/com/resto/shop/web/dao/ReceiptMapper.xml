@@ -212,7 +212,7 @@
   </resultMap>
   <!--查询发票历史记录-->
   <select id="selectReceiptOrderList" resultMap="orderMap">
-    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,ceil(t1.receipt_money) receipt_money,t1.state state FROM
+    /*SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,ceil(t1.receipt_money) receipt_money,t1.state state FROM
       (SELECT
           o.serial_number order_number,
           (SELECT p.pay_time FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16) ORDER BY p.pay_time DESC LIMIT 0,1) pay_time,
@@ -227,11 +227,26 @@
         AND o.customer_id=#{customerId,jdbcType=VARCHAR}
         AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
         ORDER BY pay_time DESC) t1
+    WHERE t1.receipt_money!=0.00*/
+    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,ceil(t1.receipt_money) receipt_money,t1.state state FROM
+      (SELECT
+          r.order_number order_number,
+          r.pay_time pay_time,
+          r.order_money order_money,
+          r.receipt_money receipt_money,
+          r.state state
+      FROM
+          tb_order o,tb_receipt r
+      WHERE r.order_number=o.serial_number
+        AND o.customer_id=#{customerId,jdbcType=VARCHAR}
+        AND o.shop_detail_id=#{shopId,jdbcType=VARCHAR}
+        ORDER BY pay_time DESC) t1
     WHERE t1.receipt_money!=0.00
   </select>
   <!--查询单笔订单所有支付金额-->
   <select id="selectReceiptMoney" resultMap="orderMap">
     SELECT
+     (CASE WHEN o.amount_with_children>0.00 THEN o.amount_with_children ELSE o.order_money END) order_money,
 	 ceil(SUM(p.pay_value)) receipt_money
     FROM
         tb_order o,
@@ -239,6 +254,25 @@
     WHERE p.order_id = o.id
       AND o.serial_number = #{orderNumber,jdbcType=VARCHAR}
   </select>
+  <!--查询单笔订单可开发票金额-->
+  <select id="selectReceiptOrderOneMoney" resultMap="orderMap">
+    SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,ceil(t1.receipt_money) receipt_money,t1.state state FROM
+    (SELECT
+    o.serial_number order_number,
+    (SELECT p.pay_time FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16) ORDER BY p.pay_time DESC LIMIT 0,1) pay_time,
+    (CASE WHEN o.amount_with_children>0.00 THEN o.amount_with_children ELSE o.order_money END) order_money,
+    (SELECT SUM(p.pay_value) FROM tb_order_payment_item p WHERE p.order_id=o.id AND p.payment_mode_id IN (1, 5, 6, 10, 12, 16)) receipt_money,
+    r.state state
+    FROM
+    tb_order o,tb_receipt r
+    WHERE r.order_number=o.serial_number
+    AND o.production_status IN (2, 3, 4)
+    AND o.order_state IN (2, 10, 11, 12)
+    AND o.serial_number = #{orderNumber,jdbcType=VARCHAR}
+    ORDER BY pay_time DESC) t1
+    WHERE t1.receipt_money!=0.00
+  </select>
+
   <!--查询申请发票订单-->
   <select id="selectApplyReceiptOrderList" resultMap="orderMap">
     SELECT t1.order_number order_number,t1.pay_time pay_time,t1.order_money order_money,ceil(t1.receipt_money) receipt_money FROM
