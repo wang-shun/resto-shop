@@ -12,7 +12,11 @@
  import javax.validation.Valid;
  import java.util.List;
 
-
+ /***
+  *
+  * 库存入库
+  *
+  */
 @Controller
 @RequestMapping("scmStockPlan")
 public class StockInPlanController extends GenericController{

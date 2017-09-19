@@ -1048,16 +1048,16 @@ GROUP BY article_id
 
     <select id="findArticleByLastCountTime" parameterType="java.lang.String" resultType="com.resto.shop.web.dto.ArticleSellCountDto">
         SELECT
-        item.article_id AS `articleId`,
-        item.article_name AS `articleName`,
-        item.create_time AS `createTime`,
-        item.orgin_count as 'orginCount',
-        item.refund_count as 'refundCount',
-        item.meal_fee_number AS `mealFeeNumber`
+            item.article_id AS `articleId`,
+            item.article_name AS `articleName`,
+            (sum(item.orgin_count) - sum(item.refund_count)) AS `totalCount`,
+            sum(item.meal_fee_number) AS `mealFeeNumber`
         FROM
-        tb_order o INNER JOIN
-	    tb_order_item item ON o.id =item.order_id
-        WHERE  o.shop_detail_id =#{shopId} AND item.create_time>date_format(#{lastCountTime}, '%Y-%m-%d %H-%i-%s');
+            tb_order o
+        INNER JOIN tb_order_item item ON o.id = item.order_id
+        WHERE  o.shop_detail_id =#{shopId} AND item.create_time > date_format(#{lastCountTime},'%Y-%m-%d %H-%i-%s')
+        GROUP BY
+            articleId
     </select>
 
 

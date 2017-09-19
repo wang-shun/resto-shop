@@ -11,7 +11,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.annotation.Resource;
 import java.util.List;
 
-
+/**
+ *
+ * 原料库存
+ *
+ *
+ */
 @Controller
 @RequestMapping("scmMaterialStock")
 public class MaterialStockController extends GenericController {

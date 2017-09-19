@@ -6,10 +6,9 @@ package com.resto.shop.web.dto;
 public class ArticleSellCountDto {
     private String articleId;
     private String articleName;
-    private String createTime;
-    private int orginCount;
-    private int refundCount;
-    private int  mealFeeNumber;
+
+    private int totalCount;
+    private int mealFeeNumber;
 
 
     public String getArticleId() {
@@ -28,29 +27,6 @@ public class ArticleSellCountDto {
         this.articleName = articleName;
     }
 
-    public String getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(String createTime) {
-        this.createTime = createTime;
-    }
-
-    public int getOrginCount() {
-        return orginCount;
-    }
-
-    public void setOrginCount(int orginCount) {
-        this.orginCount = orginCount;
-    }
-
-    public int getRefundCount() {
-        return refundCount;
-    }
-
-    public void setRefundCount(int refundCount) {
-        this.refundCount = refundCount;
-    }
 
     public int getMealFeeNumber() {
         return mealFeeNumber;
@@ -60,15 +36,21 @@ public class ArticleSellCountDto {
         this.mealFeeNumber = mealFeeNumber;
     }
 
+    public int getTotalCount() {
+        return totalCount;
+    }
+
+    public void setTotalCount(int totalCount) {
+        this.totalCount = totalCount;
+    }
+
     @Override
     public String toString() {
         return "ArticleSellCountDto{" +
                 "articleId='" + articleId + '\'' +
                 ", articleName='" + articleName + '\'' +
-                ", createTime='" + createTime + '\'' +
-                ", orginCount='" + orginCount + '\'' +
-                ", refundCount='" + refundCount + '\'' +
-                ", mealFeeNumber='" + mealFeeNumber + '\'' +
+                ", totalCount=" + totalCount +
+                ", mealFeeNumber=" + mealFeeNumber +
                 '}';
     }
 }

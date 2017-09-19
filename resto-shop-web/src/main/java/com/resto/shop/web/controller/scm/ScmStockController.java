@@ -16,6 +16,7 @@ import java.util.List;
 
 /**
  * Created by bruce on 2017-09-18 13:41
+ * 库存盘点
  */
 
 
