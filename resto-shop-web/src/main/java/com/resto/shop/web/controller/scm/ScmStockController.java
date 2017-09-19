@@ -17,8 +17,6 @@ import java.util.List;
 /**
  * Created by bruce on 2017-09-18 13:41
  */
-
-
 @Controller
 @RequestMapping("scmStockCount")
 public class ScmStockController extends GenericController{
