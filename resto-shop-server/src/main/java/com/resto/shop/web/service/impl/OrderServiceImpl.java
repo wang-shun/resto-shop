@@ -8072,25 +8072,27 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("ARTICLE_COUNT", -articleCount.intValue());
         data.put("CUSTOMER_SATISFACTION", star.toString());
         data.put("CUSTOMER_SATISFACTION_DEGREE", level);
-        Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
-        StringBuffer customerStr = new StringBuffer();
-        if (account != null) {
-            customerStr.append("余额：" + account.getRemain() + " ");
-        } else {
-            customerStr.append("余额：0 ");
-        }
-        customerStr.append("" + gao.toString() + " ");
-        Customer customer = customerService.selectById(order.getCustomerId());
-        CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-        if (customerDetail != null) {
-            if (customerDetail.getBirthDate() != null) {
-                if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
-                        .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
-                    customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+        if(!"0".equals(order.getCustomerId())){
+            Account account = accountService.selectAccountAndLogByCustomerId(order.getCustomerId());
+            StringBuffer customerStr = new StringBuffer();
+            if (account != null) {
+                customerStr.append("余额：" + account.getRemain() + " ");
+            } else {
+                customerStr.append("余额：0 ");
+            }
+            customerStr.append("" + gao.toString() + " ");
+            Customer customer = customerService.selectById(order.getCustomerId());
+            CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+            if (customerDetail != null) {
+                if (customerDetail.getBirthDate() != null) {
+                    if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                            .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
+                        customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+                    }
                 }
             }
+            data.put("CUSTOMER_PROPERTY", customerStr.toString());
         }
-        data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);
         print.put("STATUS", 0);
         print.put("TICKET_TYPE", TicketType.RECEIPT);
