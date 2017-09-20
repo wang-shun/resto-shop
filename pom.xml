@@ -41,7 +41,6 @@
 <!-- 		<module>resto-shop-web</module> -->
 		<module>resto-shop-server</module>
 		<module>resto-shop-api</module>
-		<!--<module>../resto-scm/resto-scm-server</module>-->
-		<!--<module>../resto-scm/resto-scm-api</module>-->
+		
 	</modules>
 </project>
