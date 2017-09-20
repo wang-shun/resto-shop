@@ -269,6 +269,11 @@
                                 短信推送
                             </label>
                         </div>
+                        <div class="form-group">
+                            <div class="control-label">分享推送图片文本内容：</div>
+							<textarea id="shareText" name="shareText" style="height:300px;" v-model="m.shareText">
+							</textarea>
+                        </div>
                     </div>
                     <input type="hidden" name="id" v-model="m.id"/>
                     <input class="btn green" type="submit" value="保存"/>
@@ -309,6 +314,9 @@
                 'm.autoConfirmTime': 'timeTips',
                 'm.closeContinueTime': 'timeTips'
 
+            },
+            created : function () {
+                this.initEditor();
             },
             methods: {
                 timeTips: function () {
@@ -355,6 +363,13 @@
                 },
                 uploadError: function (msg) {
                     toastr.error("上传失败");
+                },
+                initEditor : function () {
+                    Vue.nextTick(function(){
+                        var editor = new wangEditor('shareText');
+                        editor.config.menus = [];
+                        editor.create();
+                    });
                 }
             }
         });
