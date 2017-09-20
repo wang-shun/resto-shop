@@ -177,7 +177,6 @@
 	(function(){
 		var cid="#control";
 		var $table = $(".table-body>table");
-
 		var tb = $table.DataTable({
 			ajax : {
 				url : "scmMaterial/list_all",
@@ -191,16 +190,10 @@
 				{
 					title : "一级类别",
 					data : "categoryOneName",
-//					createdCell : function(td,tdData){
-//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
-//					}
 				},
                 {
                     title : "二级类别",
                     data : "categoryTwoName",
-//					createdCell : function(td,tdData){
-//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
-//					}
                 }
                 ,
                 {
@@ -210,7 +203,7 @@
 //						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
 //					}
                 },
-				{                 
+				{
 					title : "材料名",
 					data : "materialName",
 				},
@@ -281,7 +274,8 @@
 					}
 				}],
 		});
-		debugger
+		//debugger
+		console.log(tb);
 		var C = new Controller(null,tb);
 		var vueObj = new Vue({
 			mixins:[C.formVueMix],
@@ -296,7 +290,6 @@
                 provinceNameLists:[],
                 cityNameLists:[],
                 districtNameLists:[],
-
                 materialTypes: [
                     {
                       code:"INGREDIENTS" ,
@@ -309,10 +302,7 @@
                         code:"SEASONING" ,
                         name:"调料"
 				   }],
-
-
 			},
-
 			methods:{
 				closeForm:function(){
 					this.m={};
