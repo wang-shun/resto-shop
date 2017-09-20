@@ -395,7 +395,7 @@ public class NewCustomCouponController extends GenericController{
                 logMap.put("brandName", getBrandName());
                 logMap.put("fileName", getCurrentBrandUser().getShopName());
                 logMap.put("type", "shopAction");
-                logMap.put("content", "品牌："+getBrandName()+"向用户："+customer.getNickname()+"发放礼品优惠券，请求服务器地址为:" + MQSetting.getLocalIP());
+                logMap.put("content", "向用户Id为："+customer.getId()+"的微信用户'"+customer.getNickname()+"'发放礼品优惠券，请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(url,logMap);
             }
             return getSuccessResult();
