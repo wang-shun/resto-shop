@@ -367,23 +367,7 @@
                 initEditor : function () {
                     Vue.nextTick(function(){
                         var editor = new wangEditor('shareText');
-                        editor.config.menus = [
-                            'bold',
-                            'underline',
-                            'italic',
-                            'strikethrough',
-                            'eraser',
-                            'forecolor',
-                            'bgcolor',
-                            '|',
-                            'fontsize',
-                            'alignleft',
-                            'aligncenter',
-                            'alignright',
-                            '|',
-                            'undo',
-                            'redo'
-                        ];
+                        editor.config.menus = [];
                         editor.create();
                     });
                 }
