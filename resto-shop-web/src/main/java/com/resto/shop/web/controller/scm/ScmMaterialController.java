@@ -41,6 +41,7 @@
 	 @RequestMapping("create")
 	 @ResponseBody
 	 public Result create(@Valid MdMaterial mdMaterial){
+		 mdMaterial.setShopDetailId(getCurrentShopId());
 		 int i = materialService.addMaterial(mdMaterial);
 		 if(i>0){
 			 return Result.getSuccess();
