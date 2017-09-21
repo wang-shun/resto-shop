@@ -10,6 +10,7 @@ import javax.validation.Valid;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.core.util.WeChatUtils;
@@ -32,6 +33,9 @@ import com.resto.brand.web.model.DistributionMode;
 import com.resto.shop.web.constant.TimeConsType;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.NewCustomCoupon;
+
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
+import static com.resto.brand.core.util.LogUtils.url;
 
 @Controller
 @RequestMapping("newcustomcoupon")
@@ -647,6 +651,12 @@ public class NewCustomCouponController extends GenericController{
                             SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsParam);
                     log.info("短信发送结果：" + jsonObject.toJSONString());
                 }
+                Map logMap = new HashMap(4);
+                logMap.put("brandName", getBrandName());
+                logMap.put("fileName", getCurrentBrandUser().getShopName());
+                logMap.put("type", "shopAction");
+                logMap.put("content", "向用户Id为："+customer.getId()+"的微信用户'"+customer.getNickname()+"'发放礼品优惠券名称为：'"+newCustomCoupon.getCouponName()+"'优惠卷金额为："+newCustomCoupon.getCouponValue()+"数量为："+newCustomCoupon.getCouponNumber()+"，请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(url,logMap);
             }
             return getSuccessResult();
         }catch (Exception e){
