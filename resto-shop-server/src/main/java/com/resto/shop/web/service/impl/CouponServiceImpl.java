@@ -205,6 +205,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 
     @Override
     public List<Coupon> addRealTimeCoupon(List<NewCustomCoupon> newCustomCoupons, Customer customer) {
+        //记录发放成功的优惠卷用以判断是否有领取到实时优惠卷 不为空：领取过试
         List<Coupon> coupons = new ArrayList<>();
         try{
             String realTimeCouponIds = "";
@@ -248,15 +249,18 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
                     insertCoupon(coupon);
                     coupons.add(coupon);
                 }
+                //如果发放的是实时优惠卷
                 if (coupon.getCouponSource().equalsIgnoreCase(CouponSource.REAL_TIME_COUPON)) {
                     realTimeCouponIds = realTimeCouponIds.concat(customCoupon.getId().toString()).concat(",");
                 }
             }
+            //记录下用户新领取过的实时优惠卷Id
             if (org.apache.commons.lang3.StringUtils.isNotBlank(realTimeCouponIds)){
                 Customer newCustomer = new Customer();
                 newCustomer.setId(customer.getId());
                 //得到用户领取过的实时优惠券Id
                 realTimeCouponIds = realTimeCouponIds.substring(0,realTimeCouponIds.length() - 1);
+                //如果用户有领取过实时优惠卷则在它之后追加最新领取的
                 if (customer.getRealTimeCouponIds() != null){
                     realTimeCouponIds = customer.getRealTimeCouponIds().concat(",").concat(realTimeCouponIds);
                 }
@@ -279,5 +283,50 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     @Override
     public List<Coupon> getCouponByShopId(String shopId, Integer day, Integer type) {
         return couponMapper.getCouponByShopId(shopId,day,type);
+    }
+
+    /**
+     * 根据所设置的优惠卷以及用户发放优惠卷
+     * @param newCustomCoupon
+     * @param customer
+     */
+    @Override
+    public void addCoupon(NewCustomCoupon newCustomCoupon, Customer customer) {
+        Coupon coupon = new Coupon();
+        Date beginDate = new Date();
+        //判断优惠券有效日期类型
+        if (newCustomCoupon.getTimeConsType().equals(TimeCons.MODELA)){ //按天
+            coupon.setBeginDate(beginDate);
+            coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,newCustomCoupon.getCouponValiday()));
+        }else if (newCustomCoupon.getTimeConsType()==TimeCons.MODELB){ //按日期
+            coupon.setBeginDate(newCustomCoupon.getBeginDateTime());
+            coupon.setEndDate(newCustomCoupon.getEndDateTime());
+        }
+        //判断是店铺优惠券还是品牌优惠券
+        if(newCustomCoupon.getIsBrand() == 1 && newCustomCoupon.getBrandId() != null){
+            coupon.setBrandId(newCustomCoupon.getBrandId());
+        }else{
+            coupon.setShopDetailId(newCustomCoupon.getShopDetailId());
+        }
+        //如果没有设置优惠券推送时间，那么，默认为3天
+        if(newCustomCoupon.getPushDay() != null){
+            coupon.setPushDay(newCustomCoupon.getPushDay());
+        }else{
+            coupon.setPushDay(3);
+        }
+        coupon.setName(newCustomCoupon.getCouponName());
+        coupon.setValue(newCustomCoupon.getCouponValue());
+        coupon.setMinAmount(newCustomCoupon.getCouponMinMoney());
+        coupon.setCouponType(newCustomCoupon.getCouponType());
+        coupon.setBeginTime(newCustomCoupon.getBeginTime());
+        coupon.setEndTime(newCustomCoupon.getEndTime());
+        coupon.setUseWithAccount(newCustomCoupon.getUseWithAccount());
+        coupon.setDistributionModeId(newCustomCoupon.getDistributionModeId());
+        coupon.setCouponSource(CouponSource.getCouponSourceByType(coupon.getCouponType()));
+        coupon.setCustomerId(customer.getId());
+        coupon.setRecommendDelayTime(0);
+        for(int i = 0; i < newCustomCoupon.getCouponNumber(); i++){
+            insertCoupon(coupon);
+        }
     }
 }
