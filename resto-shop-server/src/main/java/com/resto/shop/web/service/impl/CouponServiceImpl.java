@@ -280,4 +280,49 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     public List<Coupon> getCouponByShopId(String shopId, Integer day, Integer type) {
         return couponMapper.getCouponByShopId(shopId,day,type);
     }
+
+    /**
+     * 根据所设置的优惠卷以及用户发放优惠卷
+     * @param newCustomCoupon
+     * @param customer
+     */
+    @Override
+    public void addCoupon(NewCustomCoupon newCustomCoupon, Customer customer) {
+        Coupon coupon = new Coupon();
+        Date beginDate = new Date();
+        //判断优惠券有效日期类型
+        if (newCustomCoupon.getTimeConsType().equals(TimeCons.MODELA)){ //按天
+            coupon.setBeginDate(beginDate);
+            coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,newCustomCoupon.getCouponValiday()));
+        }else if (newCustomCoupon.getTimeConsType()==TimeCons.MODELB){ //按日期
+            coupon.setBeginDate(newCustomCoupon.getBeginDateTime());
+            coupon.setEndDate(newCustomCoupon.getEndDateTime());
+        }
+        //判断是店铺优惠券还是品牌优惠券
+        if(newCustomCoupon.getIsBrand() == 1 && newCustomCoupon.getBrandId() != null){
+            coupon.setBrandId(newCustomCoupon.getBrandId());
+        }else{
+            coupon.setShopDetailId(newCustomCoupon.getShopDetailId());
+        }
+        //如果没有设置优惠券推送时间，那么，默认为3天
+        if(newCustomCoupon.getPushDay() != null){
+            coupon.setPushDay(newCustomCoupon.getPushDay());
+        }else{
+            coupon.setPushDay(3);
+        }
+        coupon.setName(newCustomCoupon.getCouponName());
+        coupon.setValue(newCustomCoupon.getCouponValue());
+        coupon.setMinAmount(newCustomCoupon.getCouponMinMoney());
+        coupon.setCouponType(newCustomCoupon.getCouponType());
+        coupon.setBeginTime(newCustomCoupon.getBeginTime());
+        coupon.setEndTime(newCustomCoupon.getEndTime());
+        coupon.setUseWithAccount(newCustomCoupon.getUseWithAccount());
+        coupon.setDistributionModeId(newCustomCoupon.getDistributionModeId());
+        coupon.setCouponSource(CouponSource.getCouponSourceByType(coupon.getCouponType()));
+        coupon.setCustomerId(customer.getId());
+        coupon.setRecommendDelayTime(0);
+        for(int i = 0; i < newCustomCoupon.getCouponNumber(); i++){
+            insertCoupon(coupon);
+        }
+    }
 }

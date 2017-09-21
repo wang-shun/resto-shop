@@ -637,7 +637,7 @@ public class NewCustomCouponController extends GenericController{
                     substitutor = new StrSubstitutor(valueMap);
                     text = substitutor.replace(text);
                 }
-                couponService.addRealTimeCoupon(newCustomCoupons, customer);
+                couponService.addCoupon(newCustomCoupon, customer);
                 //判断是否开启微信推送
                 if (brandSetting.getWechatPushGiftCoupons().equals(Common.YES)) {
                     WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
