@@ -454,7 +454,18 @@ public class PosServiceImpl implements PosService {
     }
 
     @Override
-    public List<ArticleSupport> syncArticleSupport() {
-        return posMapper.selectArticleSupport();
+    public List<ArticleSupport> syncArticleSupport(String shopId) {
+        List<Article> articleList = articleService.selectList(shopId);
+        return posMapper.selectArticleSupport(articleList);
+    }
+
+    @Override
+    public void syncChangeTable(String orderId, String tableNumber) {
+        Order order = orderService.selectById(orderId);
+        if(order == null){
+            return;
+        }
+        order.setTableNumber(tableNumber);
+        orderService.update(order);
     }
 }

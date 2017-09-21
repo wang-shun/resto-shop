@@ -1046,6 +1046,7 @@ GROUP BY article_id
     </select>
     <select id="selectArticleByShopId" resultType="Article">
         SELECT * from tb_article where shop_detail_id = #{shopId}
+        and state = 1
     </select>
 
 </mapper>

@@ -4,5 +4,10 @@
 <mapper namespace="com.resto.shop.web.dao.PosMapper">
     <select id="selectArticleSupport" resultType="com.resto.shop.web.posDto.ArticleSupport">
         select article_id as articleId, support_time_id as supportTimeId from tb_article_support_time
+        where article_id in
+        <foreach collection="articleList" item="article" open="("
+                 separator="," close=")">
+            #{article.id}
+        </foreach>
     </select>
 </mapper>
