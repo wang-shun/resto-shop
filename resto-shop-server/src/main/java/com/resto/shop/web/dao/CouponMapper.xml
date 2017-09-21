@@ -220,11 +220,10 @@
 
     <select id="selectPosPayOrderCanUseCoupon" parameterType="java.util.Map" resultMap="BaseResultMap">
         select * from tb_coupon where
-        DATE_FORMAT(NOW(),'%Y-%m-%d') between DATE_FORMAT(begin_date,'%Y-%m-%d') and DATE_ADD(DATE_FORMAT(end_date,'%Y-%m-%d'),interval 1 day)
+        NOW() between begin_date and DATE_ADD(end_date,interval 1 day)
         and IF(recommend_delay_time > 0,
-        NOW() >= DATE_ADD(add_time,INTERVAL (recommend_delay_time/3600) HOUR)
-        and (DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(begin_time,'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s')),
-        DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(begin_time,'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s'))
+        NOW() >= DATE_ADD(add_time,INTERVAL (recommend_delay_time/3600) HOUR),true)
+        and DATE_FORMAT(NOW(),'%H:%i:%s') between begin_time and end_time
         and is_used = 0
         <if test="useWithAccount != null and useWithAccount == 1">
           and use_with_account = 1
