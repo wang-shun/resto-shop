@@ -18,10 +18,6 @@
 				<form role="form" action="{{'shopDetailManage/modify'}}" @submit.prevent="save">
 					<div class="form-body">
 						<div class="form-group">
-							<label>店铺名称</label> 
-							<input type="text" class="form-control" name="name" :value="m.name" placeholder="必填" required="required">
-						</div>
-						<div class="form-group">
 							<div class="control-label">等位红包</div>
 							<label >
 								<input type="radio" name="waitRedEnvelope" v-model="m.waitRedEnvelope" value="1">
@@ -32,7 +28,12 @@
 								关闭
 							</label>
 						</div>
-
+						<div class="form-group" v-if="m.waitRedEnvelope == 1">
+							<label>下载店铺等位二维码：</label>
+							<div>
+								<button class="btn green pull-right" @click="downloadQRcode">下载</button>
+							</div>
+						</div>
 						<div class="form-group">
 							<label>等位红包失效时间：</label>
 							<div>
@@ -320,8 +321,15 @@
 				uploadError: function (msg) {
 					C.errorMsg(msg);
 				},
+				downloadQRcode: function () {
+					var that = this;
+					$.post("shopDetailManage/download", {id: that.m.id}, function (data) {
+						if (data.success) {
+							window.location.href = "shopDetailManage/downloadFile?fileName=" + data.message;
+						}
+					})
+				},
 			}
-
 		});
 		
 		function initContent(){
@@ -350,8 +358,6 @@
 				}
 			})
 		}
-		
-		
 	}());
 	
 </script>
