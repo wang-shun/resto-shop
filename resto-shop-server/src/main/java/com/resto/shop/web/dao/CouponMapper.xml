@@ -222,7 +222,7 @@
         select * from tb_coupon where
         DATE_FORMAT(NOW(),'%Y-%m-%d') between DATE_FORMAT(begin_date,'%Y-%m-%d') and DATE_ADD(DATE_FORMAT(end_date,'%Y-%m-%d'),interval 1 day)
         and IF(recommend_delay_time > 0,
-        (DATE_FORMAT(NOW(),'%H:%i:%s') >= DATE_FORMAT(DATE_ADD(add_time,INTERVAL (recommend_delay_time/3600) HOUR),'%H:%i:%s'))
+        NOW() >= DATE_ADD(add_time,INTERVAL (recommend_delay_time/3600) HOUR)
         and (DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(begin_time,'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s')),
         DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(begin_time,'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s'))
         and is_used = 0
