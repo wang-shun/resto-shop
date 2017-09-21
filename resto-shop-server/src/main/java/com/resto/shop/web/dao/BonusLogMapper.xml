@@ -16,8 +16,12 @@
     <result column="wishing" property="wishing"/>
     <result column="shopowner_issuing_state" property="shopownerIssuingState"/>
     <result column="employee_issuing_state" property="employeeIssuingState"/>
+    <result column="amount_disbursed" property="amountDisbursed"/>
+    <result column="employee_amount_disbursed" property="employeeAmountDisbursed"/>
+    <result column="shopowner_amount_disbursed" property="shopownerAmountDisbursed"/>
   </resultMap>
-  <sql id="Base_Column_List">id, charge_order_id, bonus_setting_id, bonus_amount, state, shopowner_bonus_amount, employee_bonus_amount, shopowner_id, employee_id, create_time, wishing, shopowner_issuing_state, employee_issuing_state</sql>
+  <sql id="Base_Column_List">id, charge_order_id, bonus_setting_id, bonus_amount, state, shopowner_bonus_amount, employee_bonus_amount, shopowner_id, employee_id, create_time, wishing, shopowner_issuing_state, employee_issuing_state, amount_disbursed, employee_amount_disbursed, shopowner_amount_disbursed
+  </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_bonus_log where id = #{id,jdbcType=VARCHAR}
   </select>
@@ -38,6 +42,9 @@
       <if test="wishing != null">wishing,</if>
       <if test="shopownerIssuingState != null">shopowner_issuing_state,</if>
       <if test="employeeIssuingState != null">employee_issuing_state,</if>
+        <if test="amountDisbursed != null">amount_disbursed,</if>
+        <if test="employeeAmountDisbursed != null">employee_amount_disbursed,</if>
+        <if test="shopownerAmountDisbursed != null">shopowner_amount_disbursed,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -53,6 +60,9 @@
       <if test="wishing != null">#{wishing},</if>
       <if test="shopownerIssuingState != null">#{shopownerIssuingState},</if>
       <if test="employeeIssuingState != null">#{employeeIssuingState},</if>
+        <if test="amountDisbursed != null">#{amountDisbursed},</if>
+        <if test="employeeAmountDisbursed != null">#{employeeAmountDisbursed},</if>
+        <if test="shopownerAmountDisbursed != null">#{shopownerAmountDisbursed},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.BonusLog">update tb_bonus_log 
@@ -69,6 +79,9 @@
       <if test="wishing != null">wishing = #{wishing},</if>
       <if test="shopownerIssuingState != null">shopowner_issuing_state = #{shopownerIssuingState},</if>
       <if test="employeeIssuingState != null">employee_issuing_state = #{employeeIssuingState},</if>
+        <if test="amountDisbursed != null">amount_disbursed = #{amountDisbursed},</if>
+        <if test="employeeAmountDisbursed != null">employee_amount_disbursed = #{employeeAmountDisbursed},</if>
+        <if test="shopownerAmountDisbursed != null">shopowner_amount_disbursed = #{shopownerAmountDisbursed},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.BonusLog">update tb_bonus_log set charge_order_id = #{chargeOrderId,jdbcType=VARCHAR}, bonus_setting_id = #{bonusSettingId,jdbcType=VARCHAR}, bonus_amount = #{bonusAmount,jdbcType=INTEGER}, state = #{state,jdbcType=INTEGER}, shopowner_bonus_amount = #{shopownerBonusAmount,jdbcType=INTEGER}, employee_bonus_amount = #{employeeBonusAmount,jdbcType=INTEGER}, shopowner_id = #{shopownerId,jdbcType=VARCHAR}, employee_id = #{employeeId,jdbcType=VARCHAR}, create_time = #{createTime,jdbcType=TIMESTAMP}, wishing = #{wishing}, shopowner_issuing_state = #{shopownerIssuingState}, employee_issuing_state = #{employeeIssuingState} where id = #{id,jdbcType=VARCHAR}</update>
@@ -98,7 +111,10 @@
             tbl.shopowner_id shopownerId,
             tbl.employee_id employeeId,
             tbl.shopowner_issuing_state shopownerIssuingState,
-            tbl.employee_issuing_state employeeIssuingState
+            tbl.employee_issuing_state employeeIssuingState,
+            tbl.amount_disbursed amountDisbursed,
+            tbl.shopowner_amount_disbursed shopownerAmountDisbursed,
+            tbl.employee_amount_disbursed employeeAmountDisbursed
         from tb_bonus_log tbl
         left join tb_charge_order tal
         on tbl.charge_order_id = tal.id

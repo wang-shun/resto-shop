@@ -64,7 +64,7 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
     void refundArticle(@Param("id") String id,@Param("count") Integer count);
 
     List<OrderItem> selectOrderItemByOrderIds(Map<String, Object> map);
-    
+
     List<OrderItem> selectOrderItemByOrderId(Map<String, Object> map);
     
     List<OrderItem> selectRefundOrderItem(Map<String, Object> map);

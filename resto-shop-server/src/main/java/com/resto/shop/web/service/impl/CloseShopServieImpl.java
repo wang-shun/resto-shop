@@ -78,13 +78,20 @@ public class CloseShopServieImpl implements CloseShopService{
 	@Resource
 	private SmsLogService smsLogService;
 
+
+	@Resource
+	private GoodTopService goodTopService;
+
+	@Resource
+	private  BadTopService badTopService;
+
 	Logger log = LoggerFactory.getLogger(getClass());
 
 	@Override
 	public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand) {
 
 		//1.结店退款
-		refundShopDetailOrder(shopDetail);
+	//	refundShopDetailOrder(shopDetail);
 		//2查询天气
 		Wether wether = wetherService.selectDateAndShopId(shopDetail.getId(), DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
 		if(wether==null){//说明没有调用定时任务 ---
@@ -187,14 +194,14 @@ public class CloseShopServieImpl implements CloseShopService{
 						sb.append("桌号:" + (order.getTableNumber() != null ? order.getTableNumber() : "无") + "\n");
 						break;
 					default:
-						sb.append("取餐码：" + (order.getVerCode() != null ? order.getVerCode() : "无") + "\n");
+						sb.append("消费码：" + (order.getVerCode() != null ? order.getVerCode() : "无") + "\n");
 						break;
 				}
 			}
 			if (order.getShopName() == null || "".equals(order.getShopName())) {
 				order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
 			}
-			sb.append("就餐店铺：" + order.getShopName() + "\n");
+			sb.append("店铺名：" + order.getShopName() + "\n");
 			sb.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
 			sb.append("订单明细：\n");
 			List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
@@ -627,8 +634,6 @@ public class CloseShopServieImpl implements CloseShopService{
 			//截取电话号码
 			String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
 			String[] tels = telephones.split(",");
-			//List<String> tels = new ArrayList<>();
-			//tels.add("13317182430");
 			for (String telephone : tels) {
 				//String brandId, String shopId,int smsType, String sign, String code_temp,String phone,JSONObject jsonObject
 
@@ -1566,13 +1571,15 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		//查本日
 		List<Appraise> todayAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), todayBegin, todayEnd);
-		//存评论数据
-		if(!todayAppraises.isEmpty()){
-			for(Appraise a:todayAppraises){
-				JdbcSmsUtils.saveTodayAppraise(a,brand.getId(),shopDetail.getId());
-			}
 
-		}
+		// 不存 z
+//		//存评论数据
+//		if(!todayAppraises.isEmpty()){
+//			for(Appraise a:todayAppraises){
+//				JdbcSmsUtils.saveTodayAppraise(a,brand.getId(),shopDetail.getId());
+//			}
+//
+//		}
 
 
 		if (!todayAppraises.isEmpty()) {
@@ -1645,7 +1652,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		}
 
 		//存满意度
-		JdbcSmsUtils.saveStations(todaySatisfaction,xunSatisfaction,monthSatisfaction,brand.getId(),shopDetail.getId());
+		//JdbcSmsUtils.saveStations(todaySatisfaction,xunSatisfaction,monthSatisfaction,brand.getId(),shopDetail.getId());
 
 
 		//查询菜品今日top10
@@ -1664,7 +1671,7 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		//yz 2017-07-25 dayDataMessage 被merge了
 		//存储结店数据
-		int times=1;//默认是今天第一次结店  次数存redis中 之后++
+
 		DayDataMessage ds = new DayDataMessage();
 		ds.setId(ApplicationUtils.randomUUID());
 		ds.setShopId(shopDetail.getId());
@@ -1672,7 +1679,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		ds.setShopName(shopDetail.getName());
 		ds.setWeekDay(wether.getWeekady());
 		ds.setDate(new Date());
-		ds.setTimes(times);//当日结店次数
 		ds.setWether(wether.getDayWeather());
 		ds.setTemperature(wether.getDayTemperature());
 		ds.setOrderNumber(todayEnterCount + todayRestoCount);//到店总笔数
@@ -1703,13 +1709,29 @@ public class CloseShopServieImpl implements CloseShopService{
 		ds.setBussinessTotal(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks));//本日营业总额
 		ds.setMonthTotal(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal));//本月营业总额
 		dayDataMessageService.insert(ds);
-		JdbcSmsUtils.saveDayDataMessage(ds,shopDetail.getId());
+		//JdbcSmsUtils.saveDayDataMessage(ds,shopDetail.getId());
 
+
+		//删除今日top10数据
+		goodTopService.deleteByTodayAndShopId(brand.getId(),shopDetail.getId(),MessageType.DAY_MESSAGE,new Date());
+
+		//存查询出来的今日数据
 
 		//存今日goodTop10
 		if(todayGoodList!=null&&!todayGoodList.isEmpty()){
 			for(int i=0;i<todayGoodList.size();i++){
-				JdbcSmsUtils.saveGoodTop(todayGoodList.get(i),brand,shopDetail,MessageType.DAY_MESSAGE,todayGoodNum,(i+1));
+
+				GoodTop goodTop = new GoodTop();
+				goodTop.setName(todayGoodList.get(i).getName());
+				goodTop.setPrecent(NumberUtil.getFormat(todayGoodList.get(i).getNum(),todayGoodNum));
+				goodTop.setSort(i+1);
+				goodTop.setShopId(shopDetail.getId());
+				goodTop.setBrandId(brand.getId());
+				goodTop.setBrandName(brand.getBrandName());
+				goodTop.setShopName(shopDetail.getName());
+				goodTop.setDate(new Date());
+				goodTop.setType(MessageType.DAY_MESSAGE);
+				goodTopService.insert(goodTop);
 			}
 
 		}
@@ -1717,7 +1739,18 @@ public class CloseShopServieImpl implements CloseShopService{
 		//存今日BadTop10
 		if(todayBadList!=null&&!todayBadList.isEmpty()){
 			for(int i=0;i<todayBadList.size();i++){
-				JdbcSmsUtils.saveBadTop(todayBadList.get(i),brand,shopDetail,MessageType.DAY_MESSAGE,todayBadNum,(i+1));
+				//JdbcSmsUtils.saveBadTop(todayBadList.get(i),brand,shopDetail,MessageType.DAY_MESSAGE,todayBadNum,(i+1));
+				BadTop badTop = new BadTop();
+				badTop.setName(todayBadList.get(i).getName());
+				badTop.setPrecent(NumberUtil.getFormat(todayBadList.get(i).getNum(),todayBadNum));
+				badTop.setSort(i+1);
+				badTop.setShopId(shopDetail.getId());
+				badTop.setBrandId(brand.getId());
+				badTop.setBrandName(brand.getBrandName());
+				badTop.setShopName(shopDetail.getName());
+				badTop.setDate(new Date());
+				badTop.setType(MessageType.DAY_MESSAGE);
+				badTopService.insert(badTop);
 			}
 
 		}
@@ -1729,7 +1762,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		//查询差评总数
 		int xunBadNum = 0;
 		xunBadNum = articleTopService.selectSumBadByTime(xunBegin, xunEnd, shopDetail.getId());
-
 		//查询好评top10
 		List<ArticleTopDto> xunGoodList = articleTopService.selectListByTimeAndGoodType(xunBegin, xunEnd, shopDetail.getId());
 
@@ -1739,7 +1771,18 @@ public class CloseShopServieImpl implements CloseShopService{
 		//存本旬goodTop10
 		if(xunGoodList!=null&&!xunGoodList.isEmpty()){
 			for(int i=0;i<xunGoodList.size();i++){
-				JdbcSmsUtils.saveGoodTop(xunGoodList.get(i),brand,shopDetail,MessageType.XUN_MESSAGE,xunGoodNum,(i+1));
+				//JdbcSmsUtils.saveGoodTop(xunGoodList.get(i),brand,shopDetail,MessageType.XUN_MESSAGE,xunGoodNum,(i+1));
+				GoodTop goodTop = new GoodTop();
+				goodTop.setName(xunGoodList.get(i).getName());
+				goodTop.setPrecent(NumberUtil.getFormat(xunGoodList.get(i).getNum(),xunGoodNum));
+				goodTop.setSort(i+1);
+				goodTop.setShopId(shopDetail.getId());
+				goodTop.setBrandId(brand.getId());
+				goodTop.setBrandName(brand.getBrandName());
+				goodTop.setShopName(shopDetail.getName());
+				goodTop.setDate(new Date());
+				goodTop.setType(MessageType.XUN_MESSAGE);
+				goodTopService.insert(goodTop);
 			}
 
 		}
@@ -1747,7 +1790,18 @@ public class CloseShopServieImpl implements CloseShopService{
 		//存本旬BadTop10
 		if(xunBadList!=null&&!xunBadList.isEmpty()){
 			for(int i=0;i<xunBadList.size();i++){
-				JdbcSmsUtils.saveBadTop(xunBadList.get(i),brand,shopDetail,MessageType.XUN_MESSAGE,xunBadNum,(i+1));
+				//JdbcSmsUtils.saveBadTop(xunBadList.get(i),brand,shopDetail,MessageType.XUN_MESSAGE,xunBadNum,(i+1));
+				BadTop badTop = new BadTop();
+				badTop.setName(xunBadList.get(i).getName());
+				badTop.setPrecent(NumberUtil.getFormat(xunBadList.get(i).getNum(),xunBadNum));
+				badTop.setSort(i+1);
+				badTop.setShopId(shopDetail.getId());
+				badTop.setBrandId(brand.getId());
+				badTop.setBrandName(brand.getBrandName());
+				badTop.setShopName(shopDetail.getName());
+				badTop.setDate(new Date());
+				badTop.setType(MessageType.XUN_MESSAGE);
+				badTopService.insert(badTop);
 			}
 
 		}
@@ -1770,7 +1824,19 @@ public class CloseShopServieImpl implements CloseShopService{
 		//存本月goodTop10
 		if(monthGoodList!=null&&!monthGoodList.isEmpty()){
 			for(int i=0;i<monthGoodList.size();i++){
-				JdbcSmsUtils.saveGoodTop(monthGoodList.get(i),brand,shopDetail,MessageType.MONTH_MESSAGE,monthGoodNum,(i+1));
+				//JdbcSmsUtils.saveGoodTop(monthGoodList.get(i),brand,shopDetail,MessageType.MONTH_MESSAGE,monthGoodNum,(i+1));
+				GoodTop goodTop = new GoodTop();
+				goodTop.setName(monthGoodList.get(i).getName());
+				goodTop.setPrecent(NumberUtil.getFormat(monthGoodList.get(i).getNum(),monthGoodNum));
+				goodTop.setSort(i+1);
+				goodTop.setShopId(shopDetail.getId());
+				goodTop.setBrandId(brand.getId());
+				goodTop.setBrandName(brand.getBrandName());
+				goodTop.setShopName(shopDetail.getName());
+				goodTop.setDate(new Date());
+				goodTop.setType(MessageType.MONTH_MESSAGE);
+				goodTopService.insert(goodTop);
+
 			}
 
 		}
@@ -1778,7 +1844,17 @@ public class CloseShopServieImpl implements CloseShopService{
 		//存本月BadTop10
 		if(monthBadList!=null&&!monthBadList.isEmpty()){
 			for(int i=0;i<monthBadList.size();i++){
-				JdbcSmsUtils.saveBadTop(monthBadList.get(i),brand,shopDetail,MessageType.MONTH_MESSAGE,monthBadNum,(i+1));
+				BadTop badTop = new BadTop();
+				badTop.setName(monthBadList.get(i).getName());
+				badTop.setPrecent(NumberUtil.getFormat(monthBadList.get(i).getNum(),monthBadNum));
+				badTop.setSort(i+1);
+				badTop.setShopId(shopDetail.getId());
+				badTop.setBrandId(brand.getId());
+				badTop.setBrandName(brand.getBrandName());
+				badTop.setShopName(shopDetail.getName());
+				badTop.setDate(new Date());
+				badTop.setType(MessageType.MONTH_MESSAGE);
+				badTopService.insert(badTop);
 			}
 
 		}
