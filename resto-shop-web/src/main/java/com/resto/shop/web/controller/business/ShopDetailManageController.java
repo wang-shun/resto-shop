@@ -153,7 +153,7 @@
              byte[] btImg = outStream.toByteArray();
 
              if (null != btImg && btImg.length > 0) {
-                 String fileName = "qrcode.jpg";
+                 String fileName = shopName + "等位二维码.jpg";
                  File filePath = new File(systemPath);
                  if (!filePath.exists()) {
                      filePath.mkdirs();
