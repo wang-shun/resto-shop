@@ -30,9 +30,7 @@
 						</div>
 						<div class="form-group" v-if="m.waitRedEnvelope == 1">
 							<label>下载店铺等位二维码：</label>
-							<div>
-								<button class="btn green pull-right" @click="downloadQRcode">下载</button>
-							</div>
+								<button class="btn green " @click="downloadQRcode">下载</button>
 						</div>
 						<div class="form-group">
 							<label>等位红包失效时间：</label>
