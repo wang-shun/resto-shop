@@ -323,9 +323,9 @@ public class PosServiceImpl implements PosService {
                 updateParent(order);
             }
             updateChild(order);
-
-
+            orderService.confirmBossOrder(order);
         }
+
     }
 
     private void updateParent(Order order){
