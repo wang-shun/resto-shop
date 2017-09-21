@@ -1,31 +1,34 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
-import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.CouponDto;
-import com.resto.shop.web.constant.CouponSource;
-import com.resto.shop.web.constant.PayMode;
-import com.resto.shop.web.constant.TimeCons;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.WechatConfig;
+import com.resto.shop.web.constant.*;
 import com.resto.shop.web.dao.CouponMapper;
 import com.resto.shop.web.dao.NewCustomCouponMapper;
 import com.resto.shop.web.dao.OrderMapper;
+import com.resto.shop.web.datasource.DynamicDataSource;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
-import com.resto.shop.web.service.CouponService;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.OrderPaymentItemService;
-import com.resto.shop.web.service.OrderService;
+import com.resto.shop.web.service.*;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.sql.SQLException;
+import java.util.*;
+
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
+import static com.resto.brand.core.util.LogUtils.url;
 
 /**
  *
@@ -52,6 +55,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 
     @Autowired
     CustomerService customerService;
+
+    @Autowired
+    SmsLogService smsLogService;
 
     @Override
     public List<Coupon> listCoupon(Coupon coupon,String brandId,String shopId) {
@@ -288,45 +294,85 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     /**
      * 根据所设置的优惠卷以及用户发放优惠卷
      * @param newCustomCoupon
-     * @param customer
+     * @param customerList
      */
     @Override
-    public void addCoupon(NewCustomCoupon newCustomCoupon, Customer customer) {
-        Coupon coupon = new Coupon();
-        Date beginDate = new Date();
-        //判断优惠券有效日期类型
-        if (newCustomCoupon.getTimeConsType().equals(TimeCons.MODELA)){ //按天
-            coupon.setBeginDate(beginDate);
-            coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,newCustomCoupon.getCouponValiday()));
-        }else if (newCustomCoupon.getTimeConsType()==TimeCons.MODELB){ //按日期
-            coupon.setBeginDate(newCustomCoupon.getBeginDateTime());
-            coupon.setEndDate(newCustomCoupon.getEndDateTime());
+    public void addCoupon(NewCustomCoupon newCustomCoupon, List<Customer> customerList, ShopDetail shopDetail, Brand brand, BrandSetting brandSetting, WechatConfig wechatConfig) throws SQLException {
+        //封装推送文案的信息
+        Map<String, Object> valueMap = new HashMap<>();
+        valueMap.put("name", newCustomCoupon.getIsBrand() == 0 ? shopDetail.getName() : brand.getBrandName());
+        valueMap.put("value", newCustomCoupon.getCouponValue().multiply(new BigDecimal(newCustomCoupon.getCouponNumber())));
+        valueMap.put("url", newCustomCoupon.getIsBrand() == 0 ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId="+shopDetail.getId()+""
+                : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=${lastShopId}");
+        String text = "好久不见I Miss U，你最近好吗？${name}给您寄来价值${value}元的“回归礼券”，<a href='${url}'>赶紧来尝尝我们的新品吧！~</a>";
+        StrSubstitutor substitutor = new StrSubstitutor(valueMap);
+        text = substitutor.replace(text);
+        //获取到阿里的数据源
+        DruidDataSource druidDataSource = (DruidDataSource) DynamicDataSource.dataSourceMap.get(brand.getId());
+        druidDataSource.getConnection().setAutoCommit(false);
+        for (Customer customer : customerList) {
+            Coupon coupon = new Coupon();
+            Date beginDate = new Date();
+            //判断优惠券有效日期类型
+            if (newCustomCoupon.getTimeConsType().equals(TimeCons.MODELA)) { //按天
+                coupon.setBeginDate(beginDate);
+                coupon.setEndDate(DateUtil.getAfterDayDate(beginDate, newCustomCoupon.getCouponValiday()));
+            } else if (newCustomCoupon.getTimeConsType() == TimeCons.MODELB) { //按日期
+                coupon.setBeginDate(newCustomCoupon.getBeginDateTime());
+                coupon.setEndDate(newCustomCoupon.getEndDateTime());
+            }
+            //判断是店铺优惠券还是品牌优惠券
+            if (newCustomCoupon.getIsBrand() == 1 && newCustomCoupon.getBrandId() != null) {
+                coupon.setBrandId(newCustomCoupon.getBrandId());
+            } else {
+                coupon.setShopDetailId(newCustomCoupon.getShopDetailId());
+            }
+            //如果没有设置优惠券推送时间，那么，默认为3天
+            if (newCustomCoupon.getPushDay() != null) {
+                coupon.setPushDay(newCustomCoupon.getPushDay());
+            } else {
+                coupon.setPushDay(3);
+            }
+            coupon.setName(newCustomCoupon.getCouponName());
+            coupon.setValue(newCustomCoupon.getCouponValue());
+            coupon.setMinAmount(newCustomCoupon.getCouponMinMoney());
+            coupon.setCouponType(newCustomCoupon.getCouponType());
+            coupon.setBeginTime(newCustomCoupon.getBeginTime());
+            coupon.setEndTime(newCustomCoupon.getEndTime());
+            coupon.setUseWithAccount(newCustomCoupon.getUseWithAccount());
+            coupon.setDistributionModeId(newCustomCoupon.getDistributionModeId());
+            coupon.setCouponSource(CouponSource.getCouponSourceByType(coupon.getCouponType()));
+            coupon.setCustomerId(customer.getId());
+            coupon.setRecommendDelayTime(0);
+            for (int i = 0; i < newCustomCoupon.getCouponNumber(); i++) {
+                insertCoupon(coupon);
+            }
+            //如果是品牌优惠券则进入到用户最后一次下单的店铺，如无订单则进入到当前品牌中排最后的品牌
+            if (newCustomCoupon.getIsBrand().equals(Common.YES)){
+                valueMap.put("lastShopId", customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop());
+                substitutor = new StrSubstitutor(valueMap);
+                text = substitutor.replace(text);
+            }
+            //判断是否开启微信推送
+            if (brandSetting.getWechatPushGiftCoupons().equals(Common.YES)) {
+                WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
+            }
+            //有手机号则发送短信
+            if (StringUtils.isNotBlank(customer.getTelephone()) && brandSetting.getSmsPushGiftCoupons().equals(Common.YES)) {
+                JSONObject smsParam = new JSONObject();
+                smsParam.put("name", valueMap.get("name").toString());
+                smsParam.put("value", valueMap.get("value").toString());
+                JSONObject jsonObject = smsLogService.sendMessage(brand.getId(), customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop(),
+                        SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsParam);
+                log.info("短信发送结果：" + jsonObject.toJSONString());
+            }
+            Map logMap = new HashMap(4);
+            logMap.put("brandName", brand.getBrandName());
+            logMap.put("fileName", shopDetail.getName());
+            logMap.put("type", "shopAction");
+            logMap.put("content", "向用户Id为："+customer.getId()+"的微信用户'"+customer.getNickname()+"'发放礼品优惠券，请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(url,logMap);
         }
-        //判断是店铺优惠券还是品牌优惠券
-        if(newCustomCoupon.getIsBrand() == 1 && newCustomCoupon.getBrandId() != null){
-            coupon.setBrandId(newCustomCoupon.getBrandId());
-        }else{
-            coupon.setShopDetailId(newCustomCoupon.getShopDetailId());
-        }
-        //如果没有设置优惠券推送时间，那么，默认为3天
-        if(newCustomCoupon.getPushDay() != null){
-            coupon.setPushDay(newCustomCoupon.getPushDay());
-        }else{
-            coupon.setPushDay(3);
-        }
-        coupon.setName(newCustomCoupon.getCouponName());
-        coupon.setValue(newCustomCoupon.getCouponValue());
-        coupon.setMinAmount(newCustomCoupon.getCouponMinMoney());
-        coupon.setCouponType(newCustomCoupon.getCouponType());
-        coupon.setBeginTime(newCustomCoupon.getBeginTime());
-        coupon.setEndTime(newCustomCoupon.getEndTime());
-        coupon.setUseWithAccount(newCustomCoupon.getUseWithAccount());
-        coupon.setDistributionModeId(newCustomCoupon.getDistributionModeId());
-        coupon.setCouponSource(CouponSource.getCouponSourceByType(coupon.getCouponType()));
-        coupon.setCustomerId(customer.getId());
-        coupon.setRecommendDelayTime(0);
-        for(int i = 0; i < newCustomCoupon.getCouponNumber(); i++){
-            insertCoupon(coupon);
-        }
+        druidDataSource.getConnection().setAutoCommit(true);
     }
 }
