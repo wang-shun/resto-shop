@@ -287,7 +287,6 @@
 <script>
     $(document).ready(function () {
 
-        initcontent();
 
         toastr.options = {
             "closeButton": true,
@@ -316,7 +315,15 @@
 
             },
             created : function () {
-                this.initEditor();
+                var that = this;
+                $.ajax({
+                    url: "brandSetting/list_one",
+                    success: function (result) {
+                        console.log(result.data);
+                        vueObj.m = result.data;
+                        that.initEditor();
+                    }
+                });
             },
             methods: {
                 timeTips: function () {
@@ -351,7 +358,15 @@
                 },
 
                 cancel: function () {
-                    initcontent();
+                    var that = this;
+                    $.ajax({
+                        url: "brandSetting/list_one",
+                        success: function (result) {
+                            console.log(result.data);
+                            vueObj.m = result.data;
+                            that.initEditor();
+                        }
+                    });
                 },
                 uploadSuccess: function (url) {
                     $("[name='wechatWelcomeImg']").val(url).trigger("change");
@@ -373,17 +388,6 @@
                 }
             }
         });
-
-        function initcontent() {
-            $.ajax({
-                url: "brandSetting/list_one",
-                success: function (result) {
-                    console.log(result.data);
-                    vueObj.m = result.data;
-                }
-            })
-        }
-
     }());
 
 </script>
