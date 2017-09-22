@@ -422,24 +422,24 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         for (Customer customer : customerList) {
             coupons.addAll(insertCouponBatch(newCustomCoupon,customer));
             //判断是否开启微信推送
-//            if (brandSetting.getWechatPushGiftCoupons().equals(Common.YES)) {
-//                WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
-//            }
+            if (brandSetting.getWechatPushGiftCoupons().equals(Common.YES)) {
+                WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            }
             //有手机号则发送短信
-//            if (StringUtils.isNotBlank(customer.getTelephone()) && brandSetting.getSmsPushGiftCoupons().equals(Common.YES)) {
-//                JSONObject smsParam = new JSONObject();
-//                smsParam.put("name", valueMap.get("name").toString());
-//                smsParam.put("value", valueMap.get("value").toString());
-//                JSONObject jsonObject = smsLogService.sendMessage(brandId, customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop(),
-//                        SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsParam);
-//                log.info("短信发送结果：" + jsonObject.toJSONString());
-//            }
-//            Map logMap = new HashMap(4);
-//            logMap.put("brandName", brand.getBrandName());
-//            logMap.put("fileName", shopDetail.getName());
-//            logMap.put("type", "shopAction");
-//            logMap.put("content", "向用户Id为：" + customer.getId() + "的微信用户'" + customer.getNickname() + "'发放礼品优惠券名称为：'" + newCustomCoupon.getCouponName() + "'优惠卷金额为：" + newCustomCoupon.getCouponValue() + "数量为：" + newCustomCoupon.getCouponNumber() + "，请求服务器地址为:" + MQSetting.getLocalIP());
-//            doPostAnsc(url, logMap);
+            if (StringUtils.isNotBlank(customer.getTelephone()) && brandSetting.getSmsPushGiftCoupons().equals(Common.YES)) {
+                JSONObject smsParam = new JSONObject();
+                smsParam.put("name", valueMap.get("name").toString());
+                smsParam.put("value", valueMap.get("value").toString());
+                JSONObject jsonObject = smsLogService.sendMessage(brandId, customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop(),
+                        SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsParam);
+                log.info("短信发送结果：" + jsonObject.toJSONString());
+            }
+            Map logMap = new HashMap(4);
+            logMap.put("brandName", brand.getBrandName());
+            logMap.put("fileName", shopDetail.getName());
+            logMap.put("type", "shopAction");
+            logMap.put("content", "向用户Id为：" + customer.getId() + "的微信用户'" + customer.getNickname() + "'发放礼品优惠券名称为：'" + newCustomCoupon.getCouponName() + "'优惠卷金额为：" + newCustomCoupon.getCouponValue() + "数量为：" + newCustomCoupon.getCouponNumber() + "，请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(url, logMap);
         }
 
         couponMapper.insertCouponBatch(coupons);
