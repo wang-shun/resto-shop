@@ -3,11 +3,11 @@
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <style>
     #tableBodyList table tr th:first-of-type,#tableBodyList table tr td:first-of-type{display: none;}
-    #tableBodyList table tr th,#tableBodyList table tr td{text-align: center;}
-    #tableBodyLists th,#tableBodyLists td{text-align: center;line-height:2.5;}
+    th,td{text-align: center;}
+    #tableBodyLists th,#tableBodyLists td{line-height:2.5;}
 </style>
 <div id="control">
-    <div class="row form-div" v-if="showform">
+    <div class="row form-div" v-show="showform">
         <div class="col-md-offset-3 col-md-6" >
             <div class="portlet light bordered">
                 <div class="portlet-title">
@@ -67,7 +67,7 @@
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">产品原料</label>
                                 <div class="col-md-3">
-                                    <input class="btn btn-default"  type="button"  value="添加原料"/>
+                                    <input class="btn btn-default" type="button" value="添加原料" @click="closeTreeView"/>
                                 </div>
                             </div>
                         </div>
@@ -95,7 +95,28 @@
             </div>
         </div>
     </div>
+    <!--树状图-->
+    <div class="row form-div" v-show="treeView">
+        <div class="col-md-offset-4 col-md-4">
+            <div class="portlet light bordered form-horizontal">
+            <div class="text-center">
+                    <span class="caption-subject bold font-blue-hoki">添加原材料</span>
+            </div>
+                <div class="modal-body">
+                    <input type="input" class="form-control" id="input-check-node" placeholder="请输入原材料名称" value="">
+                </div>
+            <div id="treeview-checkable" class=""></div>
 
+        <div class="col-sm-4">
+            <div id="checkable-output"></div>
+        </div>
+        <div class="form-group text-center">
+            <input class="btn green"  type="submit"  value="保存"/>&nbsp;&nbsp;&nbsp;
+            <a class="btn default" @click="cancelTreeView" >取消</a>
+        </div>
+        </div>
+        </div>
+    </div>
     <div class="table-div">
         <div class="table-operator">
             <s:hasPermission name="scmMaterial/add">
@@ -192,6 +213,7 @@
             data:{
                 tableBodyListsShow:false,//列表详情页
                 showform:false,//弹出框
+                treeView:false,//树状图
 
                 articleFamilyId:[],//菜品类别id
                 productName:[],//菜品名称
@@ -218,9 +240,15 @@
                         that.cancel();
                         tb.ajax.reload();
                     });
-                }
+                },
+                closeTreeView:function () {
+                    this.treeView=true;
+                },
+                cancelTreeView:function () {
+                    this.treeView=false;
+                },
             },
-            ready:function(){//钩子
+            ready:function(){//钩子加载后
                 var that = this;
                 $('#tableBodyList').on('click','table tbody tr',function () {//显示详情
                     that.tableBodyListsShow=true;
@@ -231,5 +259,88 @@
         });
         C.vue=vueObj;
     }());
+</script>
+<!--树状图-->
+<%--<link href="assets/treeview/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+<script src="assets/treeview/bower_components/jquery/dist/jquery.js"></script>--%>
+<script src="assets/treeview/js/bootstrap-treeview.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.get('scmCategory/query',function (jsonData) {
+            console.log(jsonData)
+            var data=JSON.stringify(jsonData).data;
+            var defaultData=[];
+            for (var i=0;i<data.length;i++){
+                defaultData[i]=data[i]
+            }
+        })
 
+        var defaultData = [
+            {
+                text: '一',
+                href: '一',
+                tags: ['4'],
+                nodes: [
+                    {
+                        text: 'Child 1',
+                        href: '#child1',
+                        tags: ['2'],
+                        nodes: [
+                            {
+                                text: '序号1',
+                                href: '#grandchild1',
+                                tags: ['0']
+                            },
+                            {
+                                text: '序号2',
+                                href: '#grandchild2',
+                                tags: ['0']
+                            }
+                        ]
+                    },
+                    {
+                        text: 'Child 2',
+                        href: '#child2',
+                        tags: ['0']
+                    }
+                ]
+            },
+            {
+                text: 'Parent 3',
+                href: '#parent3',
+                tags: ['0']
+            },
+            {
+                text: 'Parent 4',
+                href: '#parent4',
+                tags: ['0']
+            },
+            {
+                text: 'Parent 5',
+                href: '#parent5'  ,
+                tags: ['0']
+            }
+        ];
+        var $checkableTree = $('#treeview-checkable').treeview({
+            data: defaultData,
+            showIcon: true,
+            showCheckbox: true,
+            onNodeChecked: function(event, node) {
+                $('#checkable-output').prepend('<p>' + node.text + ' was checked</p>');
+            },
+            onNodeUnchecked: function (event, node) {
+                $('#checkable-output').prepend('<p>' + node.text + ' was unchecked</p>');
+            }
+        });
+        var findCheckableNodess = function() {
+            return $checkableTree.treeview('search', [ $('#input-check-node').val(), { ignoreCase: false, exactMatch: false } ]);
+        };
+        var checkableNodes = findCheckableNodess();
+        // Check/uncheck/toggle nodes
+        $('#input-check-node').on('keyup', function (e) {
+            checkableNodes = findCheckableNodess();
+            $('.check-node').prop('disabled', !(checkableNodes.length >= 1));
+        });
+        //
+    });
 </script>
