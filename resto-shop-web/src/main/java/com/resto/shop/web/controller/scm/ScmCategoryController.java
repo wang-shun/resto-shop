@@ -2,6 +2,7 @@
 
  import com.resto.brand.core.entity.Result;
  import com.resto.common.dao.domain.PageResult;
+ import com.resto.scm.web.dto.CategoryOne;
  import com.resto.scm.web.model.MdCategory;
  import com.resto.scm.web.model.MdUnit;
  import com.resto.scm.web.service.CategoryService;
@@ -24,6 +25,13 @@
 
 	 @RequestMapping("/list")
 	 public void list(){
+	 }
+
+	 @RequestMapping("/query")
+	 @ResponseBody
+	 public Result queryAll(){
+		 List<CategoryOne> list = categoryService.queryAll(this.getCurrentShopId());
+		 return getSuccessResult(list);
 	 }
 
 	 @RequestMapping("/list_all")
