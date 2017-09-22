@@ -562,13 +562,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //判断折扣是否匹配，如果不匹配则不允许买单
                     a = articleMap.get(item.getArticleId());
                     item.setArticleName(item.getName());
-                    if(a.getDiscount() != 100){
-                        org_price = a.getPrice();
-                    }else if (a.getFansPrice() != null) {
-                        org_price = item.getPrice().subtract(a.getFansPrice()).add(a.getPrice());
-                    } else {
-                        org_price = item.getPrice();
-                    }
+//                    if(a.getDiscount() != 100){
+//                        org_price = a.getPrice();
+//                    }else if (a.getFansPrice() != null) {
+//                        org_price = item.getPrice().subtract(a.getFansPrice()).add(a.getPrice());
+//                    } else {
+//                        org_price = item.getPrice();
+//                    }
+                    org_price = item.getOriginalPrice();
                     price = item.getPrice();
                     fans_price = item.getPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
