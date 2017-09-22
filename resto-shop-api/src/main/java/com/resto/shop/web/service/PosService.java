@@ -106,7 +106,7 @@ public interface PosService {
 
     void syncChangeTable(String orderId,String tableNumber);
 
-    void syncOpenTable(String tableNumber);
+    void syncOpenTable(String shopId,String tableNumber);
 
 
 

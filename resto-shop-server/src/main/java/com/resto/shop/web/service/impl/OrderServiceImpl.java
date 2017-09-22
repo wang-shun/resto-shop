@@ -404,7 +404,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 jsonResult.setMessage("当前店铺暂未开启在线点餐，请联系服务员详询，谢谢");
                 return jsonResult;
             }
-            Boolean checkTable = (Boolean) RedisUtil.get(order.getTableNumber()+"status");
+            Boolean checkTable = (Boolean) RedisUtil.get(order.getShopDetailId()+order.getTableNumber()+"status");
             if(checkTable != null && !checkTable){
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("当前桌位已被占用");

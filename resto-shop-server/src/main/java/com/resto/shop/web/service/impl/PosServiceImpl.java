@@ -324,7 +324,7 @@ public class PosServiceImpl implements PosService {
             }
             updateChild(order);
 
-            RedisUtil.set(order.getTableNumber()+"status",true);
+            RedisUtil.set(order.getShopDetailId()+order.getTableNumber()+"status",true);
             orderService.confirmBossOrder(order);
         }
     }
@@ -471,7 +471,7 @@ public class PosServiceImpl implements PosService {
     }
 
     @Override
-    public void syncOpenTable(String tableNumber) {
-        RedisUtil.set(tableNumber+"status",false);
+    public void syncOpenTable(String shopId,String tableNumber) {
+        RedisUtil.set(shopId+tableNumber+"status",false);
     }
 }
