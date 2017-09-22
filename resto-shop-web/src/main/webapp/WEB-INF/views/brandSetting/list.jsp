@@ -58,6 +58,11 @@
                                    v-model="m.wechatWelcomeUrl">
                         </div>
                         <div class="form-group">
+                            <label>领取会员卡地址</label>
+                            <input type="text" class="form-control" name="memberCardUrl"
+                                   v-model="m.memberCardUrl">
+                        </div>
+                        <div class="form-group">
                             <label>微信欢迎文本</label>
                             <input type="text" class="form-control" name="wechatWelcomeContent"
                                    v-model="m.wechatWelcomeContent">
