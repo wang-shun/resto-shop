@@ -9,6 +9,7 @@ import com.resto.scm.web.service.StockCountCheckService;
 import com.resto.shop.web.controller.GenericController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -41,7 +42,7 @@ public class ScmStockController extends GenericController{
 
     @RequestMapping("create")
     @ResponseBody
-    public Result create(DocStockInput docStockInput){
+    public Result create(@RequestBody DocStockInput docStockInput){
         docStockInput.setShopId(getCurrentShopId());
         docStockInput.setCreateId(getCurrentUserId());
         docStockInput.setCreateName(getCurrentBrandUser().getUsername());
