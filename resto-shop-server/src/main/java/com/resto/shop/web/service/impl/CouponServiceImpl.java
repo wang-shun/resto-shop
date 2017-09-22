@@ -1,31 +1,39 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
+import com.alibaba.druid.pool.DruidDataSource;
+import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
-import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.dto.CouponDto;
-import com.resto.shop.web.constant.CouponSource;
-import com.resto.shop.web.constant.PayMode;
-import com.resto.shop.web.constant.TimeCons;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.ShopDetailService;
+import com.resto.brand.web.service.WechatConfigService;
+import com.resto.shop.web.constant.*;
 import com.resto.shop.web.dao.CouponMapper;
 import com.resto.shop.web.dao.NewCustomCouponMapper;
 import com.resto.shop.web.dao.OrderMapper;
+import com.resto.shop.web.datasource.DynamicDataSource;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
-import com.resto.shop.web.service.CouponService;
-import com.resto.shop.web.service.CustomerService;
-import com.resto.shop.web.service.OrderPaymentItemService;
-import com.resto.shop.web.service.OrderService;
+import com.resto.shop.web.service.*;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.*;
+
+import static com.resto.brand.core.util.HttpClient.doPostAnsc;
+import static com.resto.brand.core.util.LogUtils.url;
 
 /**
  *
@@ -52,6 +60,23 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 
     @Autowired
     CustomerService customerService;
+
+    @Autowired
+    private BrandSettingService brandSettingService;
+
+    @Autowired
+    private ShopDetailService shopDetailService;
+
+
+    @Autowired
+    private WechatConfigService wechatConfigService;
+
+    @Autowired
+    private BrandService brandService;
+
+
+    @Autowired
+    SmsLogService smsLogService;
 
     @Override
     public List<Coupon> listCoupon(Coupon coupon,String brandId,String shopId) {
@@ -324,5 +349,101 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         for(int i = 0; i < newCustomCoupon.getCouponNumber(); i++){
             insertCoupon(coupon);
         }
+    }
+
+
+    private List<Coupon> insertCouponBatch(NewCustomCoupon newCustomCoupon, Customer customer){
+
+        List<Coupon> coupons = new ArrayList<>();
+
+        for(int i = 0; i < newCustomCoupon.getCouponNumber(); i++){
+            Coupon coupon = new Coupon();
+            Date beginDate = new Date();
+            //判断优惠券有效日期类型
+            if (newCustomCoupon.getTimeConsType().equals(TimeCons.MODELA)){ //按天
+                coupon.setBeginDate(beginDate);
+                coupon.setEndDate(DateUtil.getAfterDayDate(beginDate,newCustomCoupon.getCouponValiday()));
+            }else if (newCustomCoupon.getTimeConsType()==TimeCons.MODELB){ //按日期
+                coupon.setBeginDate(newCustomCoupon.getBeginDateTime());
+                coupon.setEndDate(newCustomCoupon.getEndDateTime());
+            }
+            //判断是店铺优惠券还是品牌优惠券
+            if(newCustomCoupon.getIsBrand() == 1 && newCustomCoupon.getBrandId() != null){
+                coupon.setBrandId(newCustomCoupon.getBrandId());
+            }else{
+                coupon.setShopDetailId(newCustomCoupon.getShopDetailId());
+            }
+            //如果没有设置优惠券推送时间，那么，默认为3天
+            if(newCustomCoupon.getPushDay() != null){
+                coupon.setPushDay(newCustomCoupon.getPushDay());
+            }else{
+                coupon.setPushDay(3);
+            }
+            coupon.setName(newCustomCoupon.getCouponName());
+            coupon.setValue(newCustomCoupon.getCouponValue());
+            coupon.setMinAmount(newCustomCoupon.getCouponMinMoney());
+            coupon.setCouponType(newCustomCoupon.getCouponType());
+            coupon.setBeginTime(newCustomCoupon.getBeginTime());
+            coupon.setAddTime(new Date());
+            coupon.setEndTime(newCustomCoupon.getEndTime());
+            coupon.setUseWithAccount(newCustomCoupon.getUseWithAccount());
+            coupon.setDistributionModeId(newCustomCoupon.getDistributionModeId());
+            coupon.setCouponSource(CouponSource.getCouponSourceByType(coupon.getCouponType()));
+            coupon.setCustomerId(customer.getId());
+            coupon.setRecommendDelayTime(0);
+            coupon.setId(ApplicationUtils.randomUUID());
+            coupon.setUsingTime(null);
+            coupon.setIsUsed(false);
+            coupons.add(coupon);
+        }
+        return coupons;
+    }
+
+    @Override
+    public void addCouponBatch(List<Customer> customerList, NewCustomCoupon newCustomCoupon,String brandId) throws SQLException {
+        //得到相应的品牌信息
+        ShopDetail shopDetail = new ShopDetail();
+        Brand brand = brandService.selectById(brandId);
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(brandId);
+        WechatConfig config = wechatConfigService.selectByBrandId(brandId);
+        if (newCustomCoupon.getIsBrand().equals(Common.NO)) {
+            shopDetail = shopDetailService.selectById(newCustomCoupon.getShopDetailId());
+        }
+        //封装推送文案的信息
+        Map<String, Object> valueMap = new HashMap<>();
+        valueMap.put("name", newCustomCoupon.getIsBrand() == 0 ? shopDetail.getName() : brand.getBrandName());
+        valueMap.put("value", newCustomCoupon.getCouponValue().multiply(new BigDecimal(newCustomCoupon.getCouponNumber())));
+        valueMap.put("url", newCustomCoupon.getIsBrand() == 0 ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + ""
+                : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my");
+        String text = "I Miss U ，好久不见，你最近好吗？${name}给您寄来价值${value}元的“回归礼券”，<a href='${url}'>赶紧来尝尝我们的新品吧！~</a>";
+        StrSubstitutor substitutor = new StrSubstitutor(valueMap);
+        text = substitutor.replace(text);
+        List<Coupon> coupons = new ArrayList<>();
+        for (Customer customer : customerList) {
+            coupons.addAll(insertCouponBatch(newCustomCoupon,customer));
+            //判断是否开启微信推送
+//            if (brandSetting.getWechatPushGiftCoupons().equals(Common.YES)) {
+//                WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
+//            }
+            //有手机号则发送短信
+//            if (StringUtils.isNotBlank(customer.getTelephone()) && brandSetting.getSmsPushGiftCoupons().equals(Common.YES)) {
+//                JSONObject smsParam = new JSONObject();
+//                smsParam.put("name", valueMap.get("name").toString());
+//                smsParam.put("value", valueMap.get("value").toString());
+//                JSONObject jsonObject = smsLogService.sendMessage(brandId, customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop(),
+//                        SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsParam);
+//                log.info("短信发送结果：" + jsonObject.toJSONString());
+//            }
+//            Map logMap = new HashMap(4);
+//            logMap.put("brandName", brand.getBrandName());
+//            logMap.put("fileName", shopDetail.getName());
+//            logMap.put("type", "shopAction");
+//            logMap.put("content", "向用户Id为：" + customer.getId() + "的微信用户'" + customer.getNickname() + "'发放礼品优惠券名称为：'" + newCustomCoupon.getCouponName() + "'优惠卷金额为：" + newCustomCoupon.getCouponValue() + "数量为：" + newCustomCoupon.getCouponNumber() + "，请求服务器地址为:" + MQSetting.getLocalIP());
+//            doPostAnsc(url, logMap);
+        }
+
+        couponMapper.insertCouponBatch(coupons);
+
+
     }
 }

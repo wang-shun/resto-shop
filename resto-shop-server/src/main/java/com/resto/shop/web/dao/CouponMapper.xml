@@ -265,4 +265,19 @@
         ORDER BY
         c.using_time DESC
     </select>
+
+
+    <insert id="insertCouponBatch">
+        insert into tb_coupon
+        (id,name,value,min_amount,begin_date,end_date,begin_time,end_time,coupon_source,use_with_account,remark,distribution_mode_id,customer_id,
+        add_time,shop_detail_id,brand_id,coupon_type,push_day,recommend_delay_time)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id},#{item.name},#{item.value},#{item.minAmount},#{item.beginDate},#{item.endDate},#{item.beginTime},#{item.endTime},
+            #{item.couponSource},#{item.useWithAccount},#{item.remark},#{item.distributionModeId},#{item.customerId},#{item.addTime},
+            #{item.shopDetailId},#{item.brandId},#{item.couponType},#{item.pushDay},#{item.recommendDelayTime}
+            )
+        </foreach>
+    </insert>
 </mapper>

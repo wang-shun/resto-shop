@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -46,4 +47,6 @@ public interface CouponService extends GenericService<Coupon, String> {
 	List<Coupon> listCouponUsed(Coupon coupon);
 
 	void addCoupon(NewCustomCoupon newCustomCoupon, Customer customer);
+
+	void addCouponBatch(List<Customer> customerList,NewCustomCoupon newCustomCoupon,String brandId) throws SQLException;
 }

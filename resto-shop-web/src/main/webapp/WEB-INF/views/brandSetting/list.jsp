@@ -226,6 +226,17 @@
                                    v-model="m.couponCD" required="required" min="0">
                         </div>
                         <div class="form-group">
+                            <div class="control-label">礼品优惠券提醒方式：</div>
+                            <label>
+                                <input type="checkbox" name="wechatPushGiftCoupons" v-model="m.wechatPushGiftCoupons" value="1" >
+                                微信推送
+                            </label>
+                            <label>
+                                <input type="checkbox" name="smsPushGiftCoupons" v-model="m.smsPushGiftCoupons" value="1">
+                                短信推送
+                            </label>
+                        </div>
+                        <div class="form-group">
                             <div class="control-label">是否启动评论红包提醒：</div>
 
                             <label>
@@ -258,17 +269,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <div class="control-label">礼品优惠券提醒方式：</div>
-                            <label>
-                                <input type="checkbox" name="wechatPushGiftCoupons" v-model="m.wechatPushGiftCoupons" value="1">
-                                微信推送
-                            </label>
-                            <label>
-                                <input type="checkbox" name="smsPushGiftCoupons" v-model="m.smsPushGiftCoupons" value="1">
-                                短信推送
-                            </label>
-                        </div>
+
                     </div>
                     <input type="hidden" name="id" v-model="m.id"/>
                     <input class="btn green" type="submit" value="保存"/>
