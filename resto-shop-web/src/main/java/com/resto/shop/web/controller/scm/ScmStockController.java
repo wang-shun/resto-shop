@@ -39,13 +39,6 @@ public class ScmStockController extends GenericController{
         return getSuccessResult(list);
     }
 
-    @RequestMapping("list_detail")
-    @ResponseBody
-    public Result listDeatil(Long stockId){
-        List<DocStockCountDetailDo> list = stockCountCheckService.findStockDetailListById(stockId);
-        return getSuccessResult(list);
-    }
-
     @RequestMapping("create")
     @ResponseBody
     public Result create(DocStockInput docStockInput){
