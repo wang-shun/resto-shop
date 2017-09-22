@@ -157,7 +157,7 @@
 	        </div>
 		</div>
 	</div>
-	
+
 	<div class="table-div">
 		<div class="table-operator">
 			<s:hasPermission name="scmMaterial/add">

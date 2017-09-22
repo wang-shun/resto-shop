@@ -70,9 +70,22 @@
                                     <input class="btn btn-default"  type="button"  value="添加原料"/>
                                 </div>
                             </div>
-
                         </div>
-
+                        <div>
+                            <table class="table table-bordered">
+                                <thead><tr>
+                                    <th>行号</th><th>原料编码</th><th>原料类型</th>
+                                    <th>原料名称</th><th>规格</th><th>最小单位</th>
+                                    <th>所需最小单位数量</th><th>操作</th>
+                                </tr></thead>
+                                <tbody>
+                                <tr>
+                                    <td>Tanmay</td><td>Bangalore</td><td>560001</td><td>Tanmay</td>
+                                    <td>Tanmay</td><td>Bangalore</td><td>560001</td><td>Tanmay</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                         <div class="form-group text-center">
                             <input class="btn green"  type="submit"  value="保存"/>&nbsp;&nbsp;&nbsp;
                             <a class="btn default" @click="cancel" >取消</a>
@@ -108,7 +121,7 @@
             ajax : {
                 url : "scmBom/list_all",
                 dataSrc : "data",
-                type : "GET",
+                type : "post",
                 data : function(data) {
                     return data;
                 },

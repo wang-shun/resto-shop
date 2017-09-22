@@ -69,7 +69,7 @@
     <div class="table-div">
         <div class="table-operator">
             <s:hasPermission name="scmMaterial/add">
-                <button class="btn green pull-right" @click="create">新建供应商</button>
+                <button class="btn green pull-right" @click="create">新建报价单</button>
             </s:hasPermission>
         </div>
         <div class="clearfix"></div>
