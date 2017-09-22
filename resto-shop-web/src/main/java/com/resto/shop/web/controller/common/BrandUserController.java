@@ -69,7 +69,7 @@ public class BrandUserController extends GenericController{
 
     /**
      * 用户登录
-     * 
+     *
      * @param brandUser
      * @param result
      * @return
@@ -94,8 +94,11 @@ public class BrandUserController extends GenericController{
         	// 身份验证
             subject.login(new UsernamePasswordToken(brandUser.getUsername(),ApplicationUtils.pwd( brandUser.getPassword())));
 
+            log.info("tttttt");
+
             // 验证成功在Session中保存用户信息
             final BrandUser authUserInfo = brandUserService.selectByUsername(brandUser.getUsername());
+            log.info("tttttt2222");
             HttpSession session = request.getSession();
             session.setAttribute(SessionKey.USER_INFO, authUserInfo);
             session.setAttribute(SessionKey.CURRENT_BRAND_ID,authUserInfo.getBrandId());

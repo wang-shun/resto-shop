@@ -1,11 +1,16 @@
 package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.CouponDto;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.WechatConfig;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.Coupon;
 import com.resto.shop.web.model.Customer;
@@ -45,5 +50,5 @@ public interface CouponService extends GenericService<Coupon, String> {
 
 	List<Coupon> listCouponUsed(Coupon coupon);
 
-	void addCoupon(NewCustomCoupon newCustomCoupon, Customer customer);
+	void addCoupon(NewCustomCoupon newCustomCoupon, List<Customer> customerList, ShopDetail shopDetail, Brand brand, BrandSetting brandSetting, WechatConfig wechatConfig) throws SQLException;
 }
