@@ -24,9 +24,6 @@ public class RpcDataSourceInterceptor implements SendInterceptor{
             HttpServletRequest httpRequest = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
             String brandId = (String) httpRequest.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
             request.setRequestHead(brandId);
-            //生成接口文档 以后前后端分离从redis里面取出  模拟
-            //request.setRequestHead("31946c940e194311b117e3fff5327215");
-            //httpRequest.getSession().setAttribute(SessionKey.CURRENT_SHOP_ID,"31164cebcc4b422685e8d9a32db12ab8");
             if(log.isInfoEnabled()){
                 log.info(request.getInterfaceName()+" add head:"+request.getRequestHead());
             }
