@@ -342,6 +342,7 @@ public class NewCustomCouponController extends GenericController{
             //得到相应的品牌信息
             ShopDetail shopDetail = new ShopDetail();
             BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+            Brand brand = brandService.selectById(getCurrentBrandId());
             WechatConfig config = wechatConfigService.selectByBrandId(getCurrentBrandId());
             if (newCustomCoupon.getIsBrand().equals(Common.NO)){
                 shopDetail = shopDetailService.selectById(newCustomCoupon.getShopDetailId());
@@ -361,43 +362,8 @@ public class NewCustomCouponController extends GenericController{
                     shopDetail = shopDetailList.get(0);
                 }
             }
-            //封装推送文案的信息
-            Map<String, Object> valueMap = new HashMap<>();
-            valueMap.put("name", newCustomCoupon.getIsBrand() == 0 ? shopDetail.getName() : getBrandName());
-            valueMap.put("value", newCustomCoupon.getCouponValue().multiply(new BigDecimal(newCustomCoupon.getCouponNumber())));
-            valueMap.put("url", newCustomCoupon.getIsBrand() == 0 ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId="+shopDetail.getId()+""
-                    : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=${lastShopId}");
-            String text = "好久不见，你最近好吗？${name}给您寄来价值${value}元的“回归礼券”，<a href='${url}'>赶紧来尝尝我们的新品吧！~</a>";
-            StrSubstitutor substitutor = new StrSubstitutor(valueMap);
-            text = substitutor.replace(text);
-            for (Customer customer : customerList){
-                //如果是品牌优惠券则进入到用户最后一次下单的店铺，如无订单则进入到当前品牌中排最后的品牌
-                if (newCustomCoupon.getIsBrand().equals(Common.YES)){
-                    valueMap.put("lastShopId", customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop());
-                    substitutor = new StrSubstitutor(valueMap);
-                    text = substitutor.replace(text);
-                }
-                couponService.addCoupon(newCustomCoupon, customer);
-                //判断是否开启微信推送
-                if (brandSetting.getWechatPushGiftCoupons().equals(Common.YES)) {
-                    WeChatUtils.sendCustomerMsg(text, customer.getWechatId(), config.getAppid(), config.getAppsecret());
-                }
-                //有手机号则发送短信
-                if (StringUtils.isNotBlank(customer.getTelephone()) && brandSetting.getSmsPushGiftCoupons().equals(Common.YES)) {
-                    JSONObject smsParam = new JSONObject();
-                    smsParam.put("name", valueMap.get("name").toString());
-                    smsParam.put("value", valueMap.get("value").toString());
-                    JSONObject jsonObject = smsLogService.sendMessage(getCurrentBrandId(), customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop(),
-                            SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsParam);
-                    log.info("短信发送结果：" + jsonObject.toJSONString());
-                }
-                Map logMap = new HashMap(4);
-                logMap.put("brandName", getBrandName());
-                logMap.put("fileName", getCurrentBrandUser().getShopName());
-                logMap.put("type", "shopAction");
-                logMap.put("content", "向用户Id为："+customer.getId()+"的微信用户'"+customer.getNickname()+"'发放礼品优惠券，请求服务器地址为:" + MQSetting.getLocalIP());
-                doPostAnsc(url,logMap);
-            }
+            //发放优惠卷
+            couponService.addCoupon(newCustomCoupon, customerList, shopDetail, brand, brandSetting, config);
             return getSuccessResult();
         }catch (Exception e){
             e.printStackTrace();
