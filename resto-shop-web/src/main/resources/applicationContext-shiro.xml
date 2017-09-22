@@ -30,7 +30,8 @@
 
                 /api/* =anon <!-- 对接第三方-->
                 <!-- 其他资源需要认证 -->
-                /** = authc
+                /** = anon
+                <!--/** = authc-->
             </value>
         </property>
     </bean>
