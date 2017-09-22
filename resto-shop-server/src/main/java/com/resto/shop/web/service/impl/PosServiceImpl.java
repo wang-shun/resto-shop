@@ -324,7 +324,7 @@ public class PosServiceImpl implements PosService {
             }
             updateChild(order);
 
-
+            RedisUtil.set(order.getTableNumber()+"status",true);
         }
     }
 
@@ -467,5 +467,10 @@ public class PosServiceImpl implements PosService {
         }
         order.setTableNumber(tableNumber);
         orderService.update(order);
+    }
+
+    @Override
+    public void syncOpenTable(String tableNumber) {
+        RedisUtil.set(tableNumber+"status",false);
     }
 }
