@@ -325,6 +325,7 @@ public class PosServiceImpl implements PosService {
             updateChild(order);
 
             RedisUtil.set(order.getTableNumber()+"status",true);
+            orderService.confirmBossOrder(order);
         }
     }
 
