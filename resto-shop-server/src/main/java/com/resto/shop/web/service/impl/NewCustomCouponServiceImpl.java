@@ -161,12 +161,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                     addCoupon(cfg, shopId, couponType, cus, beginDate, shopDetail, coupons);
                     shareCoupinIds = shareCoupinIds.concat(cfg.getId().toString()).concat(",");
                 } else {
-                    try{
-                        addCoupon(cfg, shopId, couponType, cus, beginDate, shopDetail, coupons);
-                    }catch (Exception e) {
-                        e.printStackTrace();
-                        log.info(e.getMessage());
-                    }
+                    addCoupon(cfg, shopId, couponType, cus, beginDate, shopDetail, coupons);
                 }
             }
             if (StringUtils.isNotBlank(shareCoupinIds)) {
@@ -228,7 +223,11 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 coupon.setPushDay(3);
             }
             for (int i = 0; i < cfg.getCouponNumber(); i++) {
-                couponService.insertCoupon(coupon);
+                try {
+                    couponService.insertCoupon(coupon);
+                }catch (Exception e){
+                    log.info("错误信息："+e.getMessage());
+                }
                 coupons.add(coupon);
             }
             long begin = coupon.getBeginDate().getTime();
