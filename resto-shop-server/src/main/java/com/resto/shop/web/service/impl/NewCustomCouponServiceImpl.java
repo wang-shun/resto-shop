@@ -129,6 +129,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 //	}
 
     public List<Coupon> giftCoupon(Customer cus, Integer couponType, String shopId) {
+        log.info("brandId"+cus.getBrandId()+"couponType:"+couponType+"couponType"+couponType);
         List<Coupon> coupons = new ArrayList<>();
         try {
             String shareCoupinIds = "";
