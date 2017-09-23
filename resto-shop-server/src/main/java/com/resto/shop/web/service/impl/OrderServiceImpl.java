@@ -7042,15 +7042,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         customerStr.append("" + gao.toString() + " ");
         Customer customer = customerService.selectById(order.getCustomerId());
-        CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
-        if (customerDetail != null) {
-            if (customerDetail.getBirthDate() != null) {
-                if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
-                        .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
-                    customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+        if(customer != null){
+            CustomerDetail customerDetail = customerDetailMapper.selectByPrimaryKey(customer.getCustomerDetailId());
+            if (customerDetail != null) {
+                if (customerDetail.getBirthDate() != null) {
+                    if (DateUtil.formatDate(customerDetail.getBirthDate(), "MM-dd")
+                            .equals(DateUtil.formatDate(new Date(), "MM-dd"))) {
+                        customerStr.append("★" + DateUtil.formatDate(customerDetail.getBirthDate(), "yyyy-MM-dd") + "★");
+                    }
                 }
             }
         }
+
         data.put("CUSTOMER_PROPERTY", customerStr.toString());
         print.put("DATA", data);
         print.put("STATUS", 0);
