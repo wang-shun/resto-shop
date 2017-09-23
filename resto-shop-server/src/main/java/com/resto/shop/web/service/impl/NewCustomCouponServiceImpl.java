@@ -129,7 +129,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 //	}
 
     public List<Coupon> giftCoupon(Customer cus, Integer couponType, String shopId) {
-        log.info("brandId"+cus.getBrandId()+"couponType:"+couponType+"couponType"+couponType);
+        log.info("brandId:"+cus.getBrandId()+"couponType:"+couponType+"shopId:"+shopId);
         List<Coupon> coupons = new ArrayList<>();
         try {
             String shareCoupinIds = "";
@@ -177,7 +177,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("发放优惠券出错！");
+            log.error("发放优惠券出错！"+e.getMessage());
             return new ArrayList<>();
         }
         return coupons;
