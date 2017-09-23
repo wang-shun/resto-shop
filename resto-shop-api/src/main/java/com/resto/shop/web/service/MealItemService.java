@@ -24,5 +24,9 @@ public interface MealItemService extends GenericService<MealItem, Integer> {
 	 * @return
 	 */
 	List<MealItem> selectMealItemByShopId(String shopId);
-    
+
+	List<MealItem> selectByArticleId(String articleId);
+
+	int updateArticleNameById(String articleName, Integer id);
+
 }

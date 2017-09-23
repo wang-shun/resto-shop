@@ -225,12 +225,13 @@
                 orderCountType : 1,
                 lastOrderDayType : 1,
                 orderTotalType : 1,
-                avgOrderMoneyType : 1
+                avgOrderMoneyType : 1,
+                couponId:couponId
             }, //群体发放查询对象
             personalLoanSelectObject : null, //个人发放查询对象
             currentType : 1, //当前所在模块位置 1：群体发放 2：个人发放
-            groupReleaseCustomerIds : "", //群体发放用户的Id
-            personalLoansCustomerIds : "", //个人发放用户的Id
+            groupReleaseCustomerIds : false, //群体发放用户的Id
+            personalLoansCustomerIds : false, //个人发放用户的Id
             memberUserDtos : [],
             memberList : []
         },
@@ -434,7 +435,7 @@
                             $.post("newcustomcoupon/selectCustomer", that.selectObject, function (result) {
                                 toastr.clear();
                                 if (result.success) {
-                                    that.groupReleaseCustomerIds = "";
+                                    that.groupReleaseCustomerIds = false;
                                     api1.search('');
                                     var column1 = api1.column(1);
                                     column1.search('', true, false);
@@ -442,11 +443,10 @@
                                     column2.search('', true, false);
                                     var column4 = api1.column(4);
                                     column4.search('', true, false);
-                                    for (var index in result.data){
-                                        that.groupReleaseCustomerIds = that.groupReleaseCustomerIds + result.data[index].customerId + ",";
-                                    }
-                                    that.groupReleaseCustomerIds = that.groupReleaseCustomerIds.substring(0,that.groupReleaseCustomerIds.length-1);
                                     //清空表格
+                                    if(result.data != null){
+                                        that.groupReleaseCustomerIds = true;
+                                    }
                                     that.groupReleaseTable.clear();
                                     that.groupReleaseTable.rows.add(result.data).draw();
                                     //重绘搜索列
@@ -465,7 +465,7 @@
                             $.post("newcustomcoupon/selectCustomer", that.personalLoanSelectObject, function (result) {
                                 toastr.clear();
                                 if (result.success) {
-                                    that.personalLoansCustomerIds = "";
+                                    that.personalLoansCustomerIds = false;
                                     api2.search('');
                                     var column1 = api2.column(1);
                                     column1.search('', true, false);
@@ -473,10 +473,9 @@
                                     column2.search('', true, false);
                                     var column4 = api2.column(4);
                                     column4.search('', true, false);
-                                    for (var index in result.data){
-                                        that.personalLoansCustomerIds = that.personalLoansCustomerIds + result.data[index].customerId + ",";
+                                    if(result.data != null){
+                                        that.personalLoansCustomerIds = true;
                                     }
-                                    that.personalLoansCustomerIds = that.personalLoansCustomerIds.substring(0,that.personalLoansCustomerIds.length-1);
                                     //清空表格
                                     that.personalLoansTable.clear();
                                     that.personalLoansTable.rows.add(result.data).draw();
@@ -499,14 +498,14 @@
                 try{
                     switch (that.currentType){
                         case 1:
-                            if (that.groupReleaseCustomerIds.trim() == ""){
+                            if (!that.groupReleaseCustomerIds){
                                 toastr.clear();
                                 toastr.error("暂无发放用户");
                                 return;
                             }
                             toastr.clear();
                             toastr.success("发放中，请稍后");
-                            $.post("newcustomcoupon/grantCoupon",{customerId : that.groupReleaseCustomerIds, couponId : couponId} , function (result) {
+                            $.post("newcustomcoupon/grantCoupon",that.selectObject , function (result) {
                                 if (result.success){
                                     toastr.clear();
                                     toastr.success("发放成功");
@@ -517,14 +516,19 @@
                             });
                             break;
                         case 2:
-                            if (that.personalLoansCustomerIds.trim() == ""){
+                            if (!that.personalLoansCustomerIds){
+                                toastr.clear();
+                                toastr.error("暂无发放用户");
+                                return;
+                            }
+                            if (that.personalLoanSelectObject == null || that.personalLoanSelectObject.text == null || that.personalLoanSelectObject.text.trim() == "") {
                                 toastr.clear();
                                 toastr.error("暂无发放用户");
                                 return;
                             }
                             toastr.clear();
                             toastr.success("发放中，请稍后");
-                            $.post("newcustomcoupon/grantCoupon",{customerId : that.personalLoansCustomerIds, couponId : couponId} , function (result) {
+                            $.post("newcustomcoupon/grantCoupon",{txt:that.personalLoanSelectObject.text,couponId:couponId} , function (result) {
                                 if (result.success){
                                     toastr.clear();
                                     toastr.success("发放成功");

@@ -156,26 +156,31 @@
                     };
                     this.openForm();
                 },
-                checkNull: function () {
-                    if (this.m.kitchenList.length <= 0) {//出餐厨房 非空验证
-                        if(!confirm("是否不选择出餐厨房！")){
-                            return true;
-                        }
-                    }
-                    return false;
-                },
+//                checkNull: function () {
+//                    if (this.m.kitchenList.length <= 0) {//出餐厨房 非空验证
+//                        if(!confirm("是否不选择出餐厨房！")){
+//                            return true;
+//                        }
+//                    }
+//                    return false;
+//                },
                 save:function(e){
                     var that = this;
                     var formDom = e.target;
                     var isUsed = e.isUsed;
 
-                    if (this.checkNull()) {//验证必选项(出参厨房)
-                        return;
+//                    if (this.checkNull()) {//验证必选项(出参厨房)
+//                        return;
+//                    }
+                    if (this.m.kitchenList.length <= 0) {//出餐厨房 非空验证
+                        toastr.clear();
+                        toastr.error("必须选择出餐厨房！");
+                    }else{
+                        C.ajaxFormEx(formDom,function(){
+                            that.cancel();
+                            tb.ajax.reload();
+                        });
                     }
-                    C.ajaxFormEx(formDom,function(){
-                        that.cancel();
-                        tb.ajax.reload();
-                    });
                 },
                 edit: function (model) {
                     var that = this;

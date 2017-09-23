@@ -585,17 +585,43 @@
 						</div>
 					</div>
 
-					<div class="form-group">
-						<label class="col-md-4 control-label" >菜品图片展现：</label>
-						<div  class="col-md-6 radio-list">
-							<label class="radio-inline">
-								<input type="radio" name="articlePhoto"v-model="m.articlePhoto" value="0">大图
-							</label>
-							<label class="radio-inline">
-								<input type="radio" name="articlePhoto" v-model="m.articlePhoto" value="1">小图
-							</label>
-						</div>
-					</div>
+					<%--<div class="form-group">--%>
+						<%--<label class="col-md-4 control-label" :class="{ formBox : m.openConsumerRebate == 1}">消费返利功能：</label>--%>
+						<%--<div  class="col-md-6 radio-list">--%>
+							<%--<label class="radio-inline">--%>
+								<%--<input type="radio" name="openConsumerRebate"v-model="m.openConsumerRebate" value="1">开启--%>
+							<%--</label>--%>
+							<%--<label class="radio-inline">--%>
+								<%--<input type="radio" name="openConsumerRebate" v-model="m.openConsumerRebate" value="0">关闭--%>
+							<%--</label>--%>
+						<%--</div>--%>
+					<%--</div>--%>
+
+					<%--<div class="form-group" v-show="m.openConsumerRebate == 1">--%>
+						<%--<label class="col-md-4 control-label" :class="{ formBox : m.openConsumerRebate == 1}">用户参与次数：</label>--%>
+						<%--<div class="col-sm-6">--%>
+							<%--<input type="number"  name="rebateParticipation"  class="form-control"  v-model="m.rebateParticipation" required="required" min="0">--%>
+						<%--</div>--%>
+					<%--</div>--%>
+
+					<%--<div class="form-group" v-show="m.openConsumerRebate == 1">--%>
+						<%--<label class="col-md-4 control-label" :class="{ formBox : m.openConsumerRebate == 1}">返利延迟发放时间：</label>--%>
+						<%--<div class="col-sm-6">--%>
+							<%--<input type="number"  name="rebateDelayDeliveryTime"  class="form-control"  v-model="m.rebateDelayDeliveryTime" required="required" min="0">--%>
+						<%--</div>--%>
+					<%--</div>--%>
+
+					<%--<div class="form-group">--%>
+						<%--<label class="col-md-4 control-label" >菜品图片展现：</label>--%>
+						<%--<div  class="col-md-6 radio-list">--%>
+							<%--<label class="radio-inline">--%>
+								<%--<input type="radio" name="articlePhoto"v-model="m.articlePhoto" value="0">大图--%>
+							<%--</label>--%>
+							<%--<label class="radio-inline">--%>
+								<%--<input type="radio" name="articlePhoto" v-model="m.articlePhoto" value="1">小图--%>
+							<%--</label>--%>
+						<%--</div>--%>
+					<%--</div>--%>
 					<div class="form-group">
 						<label class="col-md-4 control-label">R+外卖最大配送范围(单位km)：</label>
 						<div  class="col-md-6">

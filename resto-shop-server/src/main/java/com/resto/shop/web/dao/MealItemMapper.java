@@ -37,4 +37,8 @@ public interface MealItemMapper  extends GenericDao<MealItem,Integer> {
      * @return
      */
     List<MealItem> selectMealItemByShopId(@Param("shopId") String shopId);
+
+    List<MealItem> selectByArticleId(String articleId);
+
+    int updateArticleNameById(@Param("articleName") String articleName, @Param("id") Integer id);
 }

@@ -888,57 +888,60 @@ public class OrderAspect {
     public void cancelOrderPosAfter(Order order) throws Throwable {
         if (order != null) {
             Customer customer = customerService.selectById(order.getCustomerId());
-            WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-            Brand brand = brandService.selectById(order.getBrandId());
-            StringBuffer msg = new StringBuffer();
-            msg.append("您好，您 " + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm") + " 的订单" + "已被商家取消\n");
-            msg.append("订单编号:\n" + order.getSerialNumber() + "\n");
-            if (order.getOrderMode() != null) {
-                switch (order.getOrderMode()) {
-                    case ShopMode.TABLE_MODE:
-                        msg.append("桌号:" + order.getTableNumber() + "\n");
-                        break;
-                    case ShopMode.BOSS_ORDER:
-                        msg.append("桌号:" + order.getTableNumber() + "\n");
-                        break;
-                    default:
-                        msg.append("消费码：" + order.getVerCode() + "\n");
-                        break;
+            if(customer != null){
+                WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+                ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+                Brand brand = brandService.selectById(order.getBrandId());
+                StringBuffer msg = new StringBuffer();
+                msg.append("您好，您 " + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm") + " 的订单" + "已被商家取消\n");
+                msg.append("订单编号:\n" + order.getSerialNumber() + "\n");
+                if (order.getOrderMode() != null) {
+                    switch (order.getOrderMode()) {
+                        case ShopMode.TABLE_MODE:
+                            msg.append("桌号:" + order.getTableNumber() + "\n");
+                            break;
+                        case ShopMode.BOSS_ORDER:
+                            msg.append("桌号:" + order.getTableNumber() + "\n");
+                            break;
+                        default:
+                            msg.append("消费码：" + order.getVerCode() + "\n");
+                            break;
+                    }
                 }
-            }
-            if (order.getShopName() == null || "".equals(order.getShopName())) {
-                order.setShopName(shopDetail.getName());
-            }
-            msg.append("店铺名：" + order.getShopName() + "\n");
-            msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
-            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-
-            if (setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
-                msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
-            }
-            if (setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1) {
-                msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
-            }
-            msg.append("订单明细：\n");
-            List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
-            for (OrderItem item : orderItem) {
-                if (item.getCount() > 0) {
-                    msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
+                if (order.getShopName() == null || "".equals(order.getShopName())) {
+                    order.setShopName(shopDetail.getName());
                 }
-            }
-            msg.append("订单金额：" + order.getOrderMoney() + "\n");
+                msg.append("店铺名：" + order.getShopName() + "\n");
+                msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
+                BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
 
-            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                if (setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
+                    msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
+                }
+                if (setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1) {
+                    msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
+                }
+                msg.append("订单明细：\n");
+                List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                for (OrderItem item : orderItem) {
+                    if (item.getCount() > 0) {
+                        msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
+                    }
+                }
+                msg.append("订单金额：" + order.getOrderMoney() + "\n");
+
+                String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //            log.info("发送订单取消通知成功:" + msg + result);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单发送推送：" + msg.toString());
-            Map map = new HashMap(4);
-            map.put("brandName", brand.getBrandName());
-            map.put("fileName", customer.getId());
-            map.put("type", "UserAction");
-            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPostAnsc(LogUtils.url, map);
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(LogUtils.url, map);
+            }
+
             MQMessageProducer.sendNoticeOrderMessage(order);
 
             if (order.getParentOrderId() != null) {  //子订单

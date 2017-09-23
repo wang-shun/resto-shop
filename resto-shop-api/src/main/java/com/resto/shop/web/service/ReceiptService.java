@@ -20,8 +20,12 @@ public interface ReceiptService extends GenericService<Receipt, String> {
 
     int updateState(Receipt record);
 
+    int updateReceiptOrderNumber(Receipt record);
+
+    int getReceiptOrderNumberCount(String orderNumber);
+
     //根据状态查询发票订单
-    List<ReceiptOrder> selectReceiptOrderList(String customerId, String state);
+    List<ReceiptOrder> selectReceiptOrderList(String customerId,String shopId,String state);
     //根据店铺id，查询该店铺下的发票
     ReceiptPosOrder getReceiptOrderList(String receiptId);
     //根据发票id，查询发票详情
@@ -32,4 +36,6 @@ public interface ReceiptService extends GenericService<Receipt, String> {
     List<Map<String, Object>> printReceiptPosOrder(String orderNumber,String ShopId);
     //根据订单号查询发票订单
     ReceiptPos getPosReceiptList(String orderNumber);
+    //根据订单number查询发票金额
+    ReceiptOrder selectReceiptMoney(String orderNumber);
 }
