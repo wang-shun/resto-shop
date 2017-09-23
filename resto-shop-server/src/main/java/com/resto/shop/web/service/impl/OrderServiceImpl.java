@@ -6808,13 +6808,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             order.setArticleCount(order.getArticleCount() - orderItem.getCount());
 
-            if (order.getParentOrderId() == null) {
-                if (order.getArticleCount() == 0 && count == 0) {
-                    result.setSuccess(false);
-                    result.setMessage("菜品数量不可为空");
-                    return result;
-                }
-            }
+//            if (order.getParentOrderId() == null) {
+//                if (order.getArticleCount() == 0 && count == 0) {
+//                    result.setSuccess(false);
+//                    result.setMessage("菜品数量不可为空");
+//                    return result;
+//                }
+//            }
 
             order.setOrderMoney(order.getOrderMoney().subtract(orderItem.getFinalPrice()));
             order.setOriginalAmount(order.getOriginalAmount().subtract(new BigDecimal(orderItem.getCount()).multiply(orderItem.getOriginalPrice())));
