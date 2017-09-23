@@ -569,7 +569,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    } else {
 //                        org_price = item.getPrice();
 //                    }
-                    org_price = item.getPrice();
+                    org_price = item.getPrice().divide(new BigDecimal(item.getDiscount())).multiply(new BigDecimal(100));
                     price = item.getPrice();
                     fans_price = item.getPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
