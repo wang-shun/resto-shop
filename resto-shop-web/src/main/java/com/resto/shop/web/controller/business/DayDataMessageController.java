@@ -2,10 +2,7 @@
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -85,10 +82,28 @@ public class DayDataMessageController extends GenericController{
     }
 
      //根据状态(正常/删除) 时间 类型(1,2,3日/旬/月)
-     private  List<DayDataMessage> getData(String date, Integer type) {
+     private   List<DayDataMessage> getData(String date, Integer type) {
          List<DayDataMessage> dayDataMessageList = daydatamessageService.selectListByTime(MessageType.NORMAL,date,type);
-         if(!dayDataMessageList.isEmpty()){
-             for(DayDataMessage dm:dayDataMessageList){
+
+         //结店时候 如果存在 当日（旬/月） 当前shopId 有多条数据的时候取最新的一条
+         Map<String,DayDataMessage> map = new HashMap<>();
+
+         if(dayDataMessageList!=null&&!dayDataMessageList.isEmpty()){
+            for(DayDataMessage dayDataMessage:dayDataMessageList){
+                map.put(dayDataMessage.getShopId(),dayDataMessage);
+            }
+         }
+         Collection<DayDataMessage> list =  map.values();
+         List<DayDataMessage> dayDataMessages = new ArrayList<>();
+
+         if(list!=null&&!list.isEmpty()){
+             for(DayDataMessage dm:list){
+                 dayDataMessages.add(dm);
+             }
+         }
+
+         if(dayDataMessages!=null&&!dayDataMessages.isEmpty()){
+             for(DayDataMessage dm:dayDataMessages){
                  dm.setNewCustomerOrder(dm.getNewCuostomerOrderNum()+"笔/"+dm.getNewCustomerOrderSum()+"元");//新用户消费
                  dm.setNewNormalCustomerOrder(dm.getNewNormalCustomerOrderNum()+"笔/"+dm.getNewNormalCustomerOrderSum()+"元");//自然户消费
                  dm.setNewShareCutomerOrder(dm.getNewShareCustomerOrderNum()+"笔/"+dm.getNewShareCustomerOrderSum()+"元");//分享用户消费
@@ -97,7 +112,14 @@ public class DayDataMessageController extends GenericController{
                  dm.setBackTwoMoreCustomerOrder(dm.getBackTwoMoreCustomerOrderNum()+"笔/"+dm.getBackTwoMoreCustomerOrderSum()+"元");//多次回头用户消费
              }
          }
-        return  dayDataMessageList;
+
+
+
+
+        return dayDataMessages;
+
+
+
      }
 
 
