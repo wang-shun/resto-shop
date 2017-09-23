@@ -51,7 +51,7 @@ public class RedConfigServiceImpl extends GenericServiceImpl<RedConfig, Long> im
 			
 			Random r = new Random();
 			//新增需求要返全单，如果最小范围=最大范围说明想要返全单所以直接赋个0  2017/09/23 wtl修改
-			double finalRatio = 0;
+			double finalRatio = 100;
 			if (maxRatio > minRatio ){
 				finalRatio = r.nextInt(maxRatio-minRatio)+minRatio;
 			}
@@ -74,9 +74,9 @@ public class RedConfigServiceImpl extends GenericServiceImpl<RedConfig, Long> im
 	}
 
 
-	public static void main(String[] args) {
-		Random r = new Random();
-		double finalRatio = r.nextInt(0-0);
-		System.out.println(finalRatio);
-	}
+//	public static void main(String[] args) {
+//		Random r = new Random();
+//		double finalRatio = r.nextInt(0-0);
+//		System.out.println(finalRatio);
+//	}
 }
