@@ -226,6 +226,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 couponService.insertCoupon(coupon);
                 coupons.add(coupon);
             }
+            log.info("返回发送的优惠券："+coupons.toString());
             long begin = coupon.getBeginDate().getTime();
             long end = coupon.getEndDate().getTime();
 //            timedPush(begin, end, coupon.getCustomerId(), coupon.getName(), coupon.getValue(), shopDetail, null);
