@@ -185,6 +185,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 
     public void addCoupon(NewCustomCoupon cfg, String shopId, Integer couponType, Customer cus, Date beginDate, ShopDetail shopDetail, List<Coupon> coupons) {
         //如果是品牌优惠券设置或者是当前店铺的优惠券设置
+       try{
         if (cfg.getIsBrand() == 1 || shopId.equals(cfg.getShopDetailId())) {
             Coupon coupon = new Coupon();
             coupon.setName(cfg.getCouponName());
@@ -223,17 +224,17 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
                 coupon.setPushDay(3);
             }
             for (int i = 0; i < cfg.getCouponNumber(); i++) {
-                try {
-                    couponService.insertCoupon(coupon);
-                }catch (Exception e){
-                    log.info("错误信息："+e.getMessage());
-                }
+                couponService.insertCoupon(coupon);
                 coupons.add(coupon);
             }
             long begin = coupon.getBeginDate().getTime();
             long end = coupon.getEndDate().getTime();
 //            timedPush(begin, end, coupon.getCustomerId(), coupon.getName(), coupon.getValue(), shopDetail, null);
         }
+       } catch (Exception e) {
+           e.printStackTrace();
+           log.error(e.getMessage());
+       }
     }
 
     @Override
