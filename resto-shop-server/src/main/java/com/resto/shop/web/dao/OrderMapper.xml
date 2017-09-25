@@ -3339,11 +3339,4 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <select id="selectAfterValidOrderByCustomerId" resultType="Order">
         select * from tb_order where customer_id = #{customerId} and order_state in (2,10,11,12) and production_status != 6 order by create_time desc limit 1
     </select>
-
-    <select id="selectList" resultType="Order">
-        select * from tb_order t
-        left join tb_participant t2 on t.id = t2.order_id  and t2.customer_id = #{customerId}
-        where t.customer_id != #{customerId}
-    </select>
-
 </mapper>
