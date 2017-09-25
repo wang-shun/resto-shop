@@ -24,6 +24,10 @@ public class MaterialStockController extends GenericController {
     @Resource
     private MaterialStockService materialstockService;
 
+    @RequestMapping("/list")
+    public void list(){
+    }
+
     @RequestMapping("/list_all")
     @ResponseBody
     public Result listData() {

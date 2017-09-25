@@ -26,9 +26,14 @@ public class ScmStockController extends GenericController{
     @Autowired
     private StockCountCheckService stockCountCheckService;
 
+
+    @RequestMapping("/list")
+    public void list(){
+    }
+
     @RequestMapping("/list_default")
     @ResponseBody
-    public Result list(){
+    public Result list_(){
         List<MaterialStockDo> list = stockCountCheckService.findDefaultStock(getCurrentShopId());
         return getSuccessResult(list);
     }
