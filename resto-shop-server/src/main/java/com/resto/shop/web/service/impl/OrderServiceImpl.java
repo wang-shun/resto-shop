@@ -171,7 +171,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     private DayDataMessageService dayDataMessageService;
 
-
     @Resource
 	private BrandAccountLogService brandAccountLogService;
 
@@ -210,10 +209,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     private DayAppraiseMessageService dayAppraiseMessageService;
 
-
     @Resource
 	private  AccountSettingService accountSettingService;
-
 
     @Resource
 	private BrandAccountService brandAccountService;
@@ -221,6 +218,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
 	private AccountNoticeService accountNoticeService;
 
+    @Resource
+    private ParticipantService participantService;
 
 
     Logger log = LoggerFactory.getLogger(getClass());
@@ -7742,27 +7741,39 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         msg.append("退菜金额:").append(order.getRefundMoney()).append("\n");
-        WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
-//                "订单发送推送：" + msg.toString());
-        Map customerMap = new HashMap(4);
-        customerMap.put("brandName", brand.getBrandName());
-        customerMap.put("fileName", customer.getId());
-        customerMap.put("type", "UserAction");
-        customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPostAnsc(LogUtils.url, customerMap);
-        Map map = new HashMap(4);
-        map.put("brandName", brand.getBrandName());
-        map.put("fileName", shopDetail.getName());
-        map.put("type", "posAction");
-        map.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPostAnsc(url, map);
-        Map orderMap = new HashMap(4);
-        orderMap.put("brandName", brand.getBrandName());
-        orderMap.put("fileName", order.getId());
-        orderMap.put("type", "orderAction");
-        orderMap.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPostAnsc(url, orderMap);
+        if(o.getGroupId() == null || "".equals(o.getGroupId())){
+            WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            Map customerMap = new HashMap(4);
+            customerMap.put("brandName", brand.getBrandName());
+            customerMap.put("fileName", customer.getId());
+            customerMap.put("type", "UserAction");
+            customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(LogUtils.url, customerMap);
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", shopDetail.getName());
+            map.put("type", "posAction");
+            map.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(url, map);
+            Map orderMap = new HashMap(4);
+            orderMap.put("brandName", brand.getBrandName());
+            orderMap.put("fileName", order.getId());
+            orderMap.put("type", "orderAction");
+            orderMap.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(url, orderMap);
+        }else{
+            List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+            for(Participant p : participants){
+                Customer c = customerService.selectById(p.getCustomerId());
+                String result = WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", c.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(LogUtils.url, map);
+            }
+        }
     }
 
     @Override
