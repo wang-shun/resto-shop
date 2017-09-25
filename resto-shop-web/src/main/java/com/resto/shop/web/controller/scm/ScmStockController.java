@@ -43,7 +43,7 @@ public class ScmStockController extends GenericController{
     @RequestMapping("create")
     @ResponseBody
 
-    public Result create(@Valid @RequestBody DocStockInput docStockInput){
+    public Result create(@Valid DocStockInput docStockInput){
         docStockInput.setShopId(getCurrentShopId());
         docStockInput.setCreateId(getCurrentUserId());
         docStockInput.setCreateName(getCurrentBrandUser().getUsername());
