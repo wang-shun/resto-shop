@@ -42,9 +42,9 @@
                             </bean>
                         </property>
                         <!-- 为null字段时不显示 -->
-                        <property name="serializationInclusion">
-                            <value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>
-                        </property>
+                        <!--<property name="serializationInclusion">-->
+                            <!--<value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>-->
+                        <!--</property>-->
                     </bean>
                 </property>
             </bean>
