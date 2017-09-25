@@ -1,6 +1,9 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
+<style>
+	th,td{text-align: center;}
+</style>
 <div id="control">
 	<div class="row form-div" v-if="showform">
 		<div class="col-md-offset-3 col-md-6" >
@@ -19,38 +22,45 @@
 
 							<div class="form-group row">
 								<label class="col-md-2 control-label">类型</label>
-								<select name="materialType" v-model="m.materialType" class="col-md-3 border-radius" >
+								<div class="col-md-3">
+								<select name="materialType" v-model="m.materialType" class="bs-select form-control" >
 										<option  v-for="materialType in materialTypes" value="{{materialType.code}}">
 												{{materialType.name}}
 										</option>
 								</select>
-
+								</div>
 
 								<label class="col-md-2 control-label">一级类别</label>
-								<select name="categoryOneId" v-model="m.categoryOneId" class="col-md-3 border-radius" >
+								<div class="col-md-3">
+								<select name="categoryOneId" v-model="m.categoryOneId" class="bs-select form-control" >
 									<option  v-for="categoryOne in categoryOnes" value="{{categoryOne.id}}">
 										{{categoryOne.categoryName}}
 									</option>
 								</select>
+								</div>
 							</div>
 
 							<div class="form-group row" >
 
 								<label class="col-md-2 control-label">二级类别</label>
-								<select name="categoryTwoId" v-model="m.categoryTwoId" class="col-md-3 border-radius" >
+								<div class="col-md-3">
+								<select name="categoryTwoId" v-model="m.categoryTwoId" class="bs-select form-control" >
 									<option  v-for="categoryTwo in categoryTwos" value="{{categoryTwo.id}}" v-if="m.categoryOneId == categoryTwo.parentId">
 										{{categoryTwo.categoryName}}
 									</option>
 								</select>
+								</div>
 
 								<label class="col-md-2 control-label">品牌</label>
-								<select name="categoryThirdId" v-model="m.categoryThirdId" class="col-md-3 border-radius" >
+								<div class="col-md-3">
+								<select name="categoryThirdId" v-model="m.categoryThirdId" class="bs-select form-control" >
 									<%--<option  v-for="categoryThird in categoryThirds | filterBy m.categoryTwoId in 'parentId'" value="{{categoryThird.id}}">--%>
 										<%--{{categoryThird.categoryName}} </option>--%>
 									<option  v-for="categoryThird in categoryThirds" value="{{categoryThird.id}}" v-if="m.categoryTwoId == categoryThird.parentId">
 										{{categoryThird.categoryName}}
 									</option>
 								</select>
+								</div>
 							</div>
 
 
@@ -78,27 +88,34 @@
 								</div>
 
 								<label class="col-md-2 control-label">规格</label>
-								<select name="specId" v-model="m.specId" class="col-md-3 border-radius" >
+								<div class="col-md-3">
+								<select name="specId" v-model="m.specId" class="bs-select form-control" >
 									<option  v-for="spec in specLists" value="{{spec.id}}">
 										{{spec.unitName}}
 									</option>
 								</select>
+								</div>
 							</div>
 
 
 							<div class="form-group row">
 								<label class="col-md-2 control-label">标准单位</label>
-								<select name="unitId" v-model="m.unitId" class="col-md-3 border-radius" >
+								<div class="col-md-3">
+								<select name="unitId" v-model="m.unitId" class="bs-select form-control" >
 									<option  v-for="unit in unitLists" value="{{unit.id}}">
 										{{unit.unitName}}
 									</option>
 								</select>
+								</div>
+
 								<label class="col-md-2 control-label">转换单位</label>
-								<select name="convertUnitId" v-model="m.convertUnitId" class="col-md-3 border-radius" >
+								<div class="col-md-3">
+								<select name="convertUnitId" v-model="m.convertUnitId" class="bs-select form-control" >
 									<option  v-for="unit in unitLists" value="{{unit.id}}">
 										{{unit.unitName}}
 									</option>
 								</select>
+								</div>
 							</div>
 							<div class="form-group row">
 								<label class="col-md-2 control-label">最小单位</label>
@@ -116,29 +133,34 @@
 
 							<div class="form-group row">
 								<label class="col-md-2 control-label">省份</label>
-								<select name="provinceId" v-model="m.provinceId" class="col-md-3 border-radius" >
+								<div class="col-md-3">
+								<select name="provinceId" v-model="m.provinceId" class="bs-select form-control" >
 									<option  v-for="province in provinceNameLists" value="{{province.id}}">
 										{{province.provinceName}}
 									</option>
 								</select>
-								<label class="col-md-2 control-label">城市</label>
+								</div>
 
-								<select name="cityId" v-model="m.cityId" class=" col-md-3 border-radius" >
+								<label class="col-md-2 control-label">城市</label>
+								<div class="col-md-3">
+								<select name="cityId" v-model="m.cityId" class="bs-select form-control" >
 										<option  v-for="city in cityNameLists" value="{{city.id}}" v-if="city.provinceId == m.provinceId">
 											{{city.cityName}}
 										</option>
 								</select>
-
+								</div>
 							</div>
 
 							<div class="form-group row">
 
 								<label class="col-md-2 control-label">区（县）</label>
-								<select name="districtId" v-model="m.districtId" class="col-md-3 border-radius" >
+								<div class="col-md-3">
+								<select name="districtId" v-model="m.districtId" class="bs-select form-control" >
 									<option  v-for="district in districtNameLists" value="{{district.id}}" v-if="district.cityId == m.cityId">
 										{{district.districtName}}
 									</option>
 								</select>
+								</div>
 
 								<label  class="col-md-2 control-label">描述</label>
 								<div class="col-sm-3">
@@ -157,7 +179,7 @@
 	        </div>
 		</div>
 	</div>
-	
+
 	<div class="table-div">
 		<div class="table-operator">
 			<s:hasPermission name="scmMaterial/add">

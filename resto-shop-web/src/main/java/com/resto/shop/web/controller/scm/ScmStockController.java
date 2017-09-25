@@ -1,10 +1,9 @@
 package com.resto.shop.web.controller.scm;
 
 import com.resto.brand.core.entity.Result;
-import com.resto.scm.web.dto.DocStockCountDetailDo;
+import com.resto.scm.web.dto.DocStockCountHeaderDo;
 import com.resto.scm.web.dto.DocStockInput;
 import com.resto.scm.web.dto.MaterialStockDo;
-import com.resto.scm.web.model.DocStockCountHeader;
 import com.resto.scm.web.service.StockCountCheckService;
 import com.resto.shop.web.controller.GenericController;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,19 +36,13 @@ public class ScmStockController extends GenericController{
     @RequestMapping("/list_all")
     @ResponseBody
     public Result listData(){
-        List<DocStockCountHeader> list = stockCountCheckService.findStockList(getCurrentShopId());
-        return getSuccessResult(list);
-    }
-
-    @RequestMapping("list_detail")
-    @ResponseBody
-    public Result listDeatil(Long stockId){
-        List<DocStockCountDetailDo> list = stockCountCheckService.findStockDetailListById(stockId);
+        List<DocStockCountHeaderDo> list = stockCountCheckService.findStockList(getCurrentShopId());
         return getSuccessResult(list);
     }
 
     @RequestMapping("create")
     @ResponseBody
+
     public Result create(@Valid @RequestBody DocStockInput docStockInput){
         docStockInput.setShopId(getCurrentShopId());
         docStockInput.setCreateId(getCurrentUserId());
