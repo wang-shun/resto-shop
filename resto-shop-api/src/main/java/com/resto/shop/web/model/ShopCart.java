@@ -36,6 +36,8 @@ public class ShopCart implements Serializable {
 
     private String uuid;
 
+    private String groupId;
+
     public String getUuid() {
         return uuid;
     }
@@ -146,5 +148,13 @@ public class ShopCart implements Serializable {
 
     public void setDistributionModeId(Integer distributionModeId) {
         this.distributionModeId = distributionModeId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 }

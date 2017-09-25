@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.resto.shop.web.dao.CustomerGroupMapper">
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.CustomerGroup">
+    <id column="id" property="id"/>
+    <result column="group_id" property="groupId"/>
+    <result column="customner_id" property="customerId"/>
+    <result column="customer_name" property="customerName"/>
+    <result column="head_photo" property="headPhoto"/>
+    <result column="is_leader" property="isLeader"/>
+    <result column="table_number" property="tableNumber"/>
+    <result column="create_time" property="createTime"/>
+    <result column="shop_detail_id" property="shopDetailId"/>
+    <result column="brand_id" property="brandId"/>
+  </resultMap>
+
+  <sql id="Base_Column_List">id, group_id, customner_id, customer_name, head_photo, is_leader, table_number, create_time, shop_detail_id, brand_id</sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select
+    <include refid="Base_Column_List"/> from tb_customer_group where id = #{id}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_customer_group where id = #{id}</delete>
+
+  <insert id="insert" parameterType="com.resto.shop.web.model.CustomerGroup">
+    insert into tb_customer_group
+    (id, group_id, customner_id, customer_name, head_photo, is_leader, table_number, create_time, shop_detail_id, brand_id)
+    values (#{id}, #{groupId}, #{customerId}, #{customerName},#{headPhoto}, #{isLeader},
+    #{tableNumber}, #{createTime}, #{shopDetailId}, #{brandId})
+  </insert>
+
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.CustomerGroup">insert into tb_customer_group
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">id,</if>
+      <if test="groupId != null">group_id,</if>
+      <if test="customerId != null">customner_id,</if>
+      <if test="customerName != null">customer_name,</if>
+      <if test="headPhoto != null">head_photo,</if>
+      <if test="isLeader != null">is_leader,</if>
+      <if test="tableNumber != null">table_number,</if>
+      <if test="createTime != null">create_time,</if>
+      <if test="shopDetailId != null">shop_detail_id,</if>
+      <if test="brandId != null">brand_id,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">#{id},</if>
+      <if test="groupId != null">#{groupId},</if>
+      <if test="customerId != null">#{customerId},</if>
+      <if test="customerName != null">#{customerName},</if>
+      <if test="headPhoto != null">#{headPhoto},</if>
+      <if test="isLeader != null">#{isLeader},</if>
+      <if test="tableNumber != null">#{tableNumber},</if>
+      <if test="createTime != null">#{createTime},</if>
+      <if test="shopDetailId != null">#{shopDetailId},</if>
+      <if test="brandId != null">#{brandId},</if>
+    </trim>
+  </insert>
+
+  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.CustomerGroup">update tb_customer_group
+    <set>
+      <if test="groupId != null">group_id = #{groupId},</if>
+      <if test="customerId != null">customner_id = #{customerId},</if>
+      <if test="customerName != null">customer_name = #{customerName},</if>
+      <if test="headPhoto != null">head_photo = #{headPhoto},</if>
+      <if test="isLeader != null">is_leader = #{isLeader},</if>
+      <if test="tableNumber != null">table_number = #{tableNumber},</if>
+      <if test="createTime != null">create_time = #{createTime},</if>
+      <if test="shopDetailId != null">shop_detail_id = #{shopDetailId},</if>
+      <if test="brandId != null">brand_id = #{brandId},</if>
+    </set> where id = #{id}
+  </update>
+
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.CustomerGroup">
+    update tb_customer_group set
+    group_id = #{groupId}, customner_id = #{customerId},customer_name = #{customerName}, head_photo = #{headPhoto},
+    is_leader = #{isLeader}, table_number = #{tableNumber}, create_time = #{createTime}, shop_detail_id = #{shopDetailId},
+    brand_id = #{brandId}
+    where id = #{id}
+  </update>
+
+  <select id="selectList" resultType="CustomerGroup">select * from tb_customer_group </select>
+</mapper>

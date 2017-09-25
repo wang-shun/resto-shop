@@ -249,6 +249,8 @@ public class Order implements Serializable{
 
     private BigDecimal noDiscountMoney;
 
+    private String groupId;
+
     public Integer getTag() {
         return tag;
     }
@@ -1016,6 +1018,14 @@ public class Order implements Serializable{
 
     public void setBaseOrderMoney(BigDecimal baseOrderMoney) {
         this.baseOrderMoney = baseOrderMoney;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
     }
 
     @Override

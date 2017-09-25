@@ -15,7 +15,7 @@
 
   <sql id="Base_Column_List">id, table_number, group_id, create_time, state, create_customner_id, order_id, shop_detail_id, brand_id</sql>
 
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select
     <include refid="Base_Column_List"/> from tb_table_group where id = #{id}
   </select>
 
