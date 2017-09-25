@@ -26,8 +26,8 @@ public class SupplierPriceController extends GenericController{
 
 	@RequestMapping("/list_all")
 	@ResponseBody
-	public Result listData(String contactId){
-		List<MdSupplierPriceHeadDo> mdSupplierPriceHeadDos = supplierpriceService.queryJoin4Page(getCurrentShopId(), contactId);
+	public Result listData(){
+		List<MdSupplierPriceHeadDo> mdSupplierPriceHeadDos = supplierpriceService.queryJoin4Page(getCurrentShopId());
 		return getSuccessResult(mdSupplierPriceHeadDos);
 	}
 	
@@ -41,6 +41,7 @@ public class SupplierPriceController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid @RequestBody MdSupplierPriceHeadDo supplierprice){
+		supplierprice.setShopDetailId(getCurrentShopId());
 		supplierpriceService.addMdSupplierPrice(supplierprice);
 		return Result.getSuccess();
 	}
@@ -56,6 +57,13 @@ public class SupplierPriceController extends GenericController{
 	@ResponseBody
 	public Result delete(Long id){
 		supplierpriceService.deleteById(id);
+		return Result.getSuccess();
+	}
+
+	@RequestMapping("approve")
+	@ResponseBody
+	public Result approve(Long id,String supStatus){
+		supplierpriceService.updateMdSupplierPriceStatus(id,supStatus);
 		return Result.getSuccess();
 	}
 }
