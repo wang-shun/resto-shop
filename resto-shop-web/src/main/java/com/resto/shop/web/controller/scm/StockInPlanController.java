@@ -5,6 +5,7 @@
  import com.resto.scm.web.service.StockInPlanService;
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -30,28 +31,27 @@ public class StockInPlanController extends GenericController{
 
 	@RequestMapping("/list_all")
 	@ResponseBody
-	public List<DocStkInPlanHeaderDo> listData(){
-
-    	return stockinplanService.queryJoin4Page(getCurrentShopId());
+	public Result listData(){
+    	return getSuccessResult(stockinplanService.queryJoin4Page(getCurrentShopId()));
 	}
 	
 	@RequestMapping("list_one")
 	@ResponseBody
 	public Result list_one(Long id){
-	//	DocStkInPlanHeaderDo stockinplan = stockinplanService.queryByStkInPlanHeaderId();
+	      //DocStkInPlanHeaderDo stockinplan = stockinplanService.queryByStkInPlanHeaderId();
 		return getSuccessResult(null);
 	}
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid DocStkInPlanHeaderDo stockinplan){
+	public Result create(@Valid @RequestBody DocStkInPlanHeaderDo stockinplan){
 		stockinplanService.addDocStkInPlanHeaderDo(stockinplan);
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid DocStkInPlanHeaderDo stockinplan){
+	public Result modify(@Valid @RequestBody DocStkInPlanHeaderDo stockinplan){
 		stockinplanService.updateDocStkInPlanHeaderDo(stockinplan);
 		return Result.getSuccess();
 	}
