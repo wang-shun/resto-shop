@@ -19,7 +19,9 @@
     <include refid="Base_Column_List"/> from tb_table_group where id = #{id}
   </select>
 
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_table_group where id = #{id}</delete>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    update tb_table_group set state =2 where id = #{id}
+  </delete>
 
   <insert id="insert" parameterType="com.resto.shop.web.model.TableGroup">
     insert into tb_table_group
@@ -75,4 +77,25 @@
   </update>
 
   <select id="selectList" resultType="TableGroup">select * from tb_table_group </select>
+
+  <select id="getTableGroupByShopId" resultType="TableGroup">
+      select * from tb_table_group where shop_detail_id = #{shopId} and table_number = #{tableNumber}
+      and state = 0
+  </select>
+
+
+  <select id="getTableGroupByState" resultType="TableGroup">
+       select * from tb_table_group t
+       left join tb_customer_group t2 on t2.group_id = t.group_id
+       where t2.customer_id = #{customerId} and t2.table_number = #{tableNumber}
+       and t2.shop_detail_id = #{shopId} and t.state = #{state}
+  </select>
+
+
+
+  <select id="getTableGroupByCustomer" resultType="TableGroup">
+     select * from tb_table_group
+     where customer_id = #{customerId} and shop_detail_id = #{shopId}
+     and table_number = #{tableNumber}
+  </select>
 </mapper>
