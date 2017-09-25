@@ -6,6 +6,7 @@
  import com.resto.scm.web.service.ArticleBomHeadService;
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -38,7 +39,7 @@ public class ArticleBomController extends GenericController{
 
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid MdRulArticleBomHeadDo articlebom){
+	public Result create(@Valid @RequestBody MdRulArticleBomHeadDo articlebom){
 		try {
 			articlebomService.addArticleBomHead(articlebom);
 			return Result.getSuccess();
@@ -50,7 +51,7 @@ public class ArticleBomController extends GenericController{
 
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid MdRulArticleBomHeadDo articlebom){
+	public Result modify(@Valid @RequestBody MdRulArticleBomHeadDo articlebom){
 		articlebomService.updateRulArticleBomHead(articlebom);
 		return Result.getSuccess();
 	}

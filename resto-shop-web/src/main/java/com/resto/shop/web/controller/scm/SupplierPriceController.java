@@ -5,6 +5,7 @@
  import com.resto.scm.web.service.SupplierMaterialPriceService;
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -39,14 +40,14 @@ public class SupplierPriceController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid MdSupplierPriceHeadDo supplierprice){
+	public Result create(@Valid @RequestBody MdSupplierPriceHeadDo supplierprice){
 		supplierpriceService.addMdSupplierPrice(supplierprice);
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid MdSupplierPriceHeadDo supplierprice){
+	public Result modify(@Valid @RequestBody MdSupplierPriceHeadDo supplierprice){
 		supplierpriceService.updateMdSupplierPrice(supplierprice);
 		return Result.getSuccess();
 	}

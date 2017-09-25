@@ -9,6 +9,7 @@
  import com.resto.shop.web.controller.GenericController;
  import org.apache.shiro.session.Session;
  import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -30,8 +31,8 @@ public class SupplierController extends GenericController{
 
 	@RequestMapping("/list_all")
 	@ResponseBody
-	public List<MdSupplierAndContactDo> listData(HttpServletRequest request){
-		return supplierService.queryJoin4Page(getCurrentShopId());
+	public Result listData(HttpServletRequest request){
+		return  getSuccessResult(supplierService.queryJoin4Page(getCurrentShopId()));
 	}
 	
 	@RequestMapping("list_one")
@@ -43,14 +44,20 @@ public class SupplierController extends GenericController{
 
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid MdSupplierDo supplier){
+	public Result create(@Valid @RequestBody  MdSupplierDo supplier){
+		supplier.setShopDetailId(getCurrentShopId());
+		supplier.setCreaterId(getCurrentUserId());
+		supplier.setCreaterName(getCurrentBrandUser().getName());
 		supplierService.addMdSupplier(supplier);
 		return Result.getSuccess();
 	}
 
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid MdSupplierDo supplier){
+	public Result modify(@Valid @RequestBody MdSupplierDo supplier){
+		supplier.setShopDetailId(getCurrentShopId());
+		supplier.setUpdaterId(getCurrentUserId());
+		supplier.setUpdaterName(getCurrentBrandUser().getName());
 		supplierService.updateMdSupplier(supplier);
 		return Result.getSuccess();
 	}
