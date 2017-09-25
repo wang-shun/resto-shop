@@ -79,4 +79,20 @@
   </update>
 
   <select id="selectList" resultType="CustomerGroup">select * from tb_customer_group </select>
+
+
+  <delete id="removeGroupByCustomerId">
+    delete from tb_customer_group where customer_id = #{customerId} and table_number = #{tableNumber}
+     and shop_detail_id = #{shopId}
+  </delete>
+
+
+  <select id="getGroupByGroupId" resultType="CustomerGroup">
+      select * from tb_customer_group where group_id = #{groupId} order by create_time asc
+  </select>
+
+  <select id="getGroupByCustomerId" resultType="CustomerGroup">
+    select * from tb_customer_group where customer_id = #{customerId}
+    and table_number  = #{tableNumber} and shop_detail_id = #{shopId}
+  </select>
 </mapper>
