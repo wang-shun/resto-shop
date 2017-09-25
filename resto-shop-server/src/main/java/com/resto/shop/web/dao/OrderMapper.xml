@@ -1030,10 +1030,9 @@
             </foreach>
         </if>
         UNION ALL
-        select * from tb_order t
-        left join tb_participant t2 on t.id = t2.order_id  and t2.customer_id = #{customerId}
-        where t.customer_id != #{customerId}
-
+        select * from tb_order where id in (
+          select order_id from tb_participant where t.customer_id != #{customerId} and is_pay = 0
+        )
         ORDER BY create_time DESC LIMIT
         #{start},#{datalength}
     </select>
