@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.ParticipantMapper;
@@ -12,6 +13,7 @@ import java.util.List;
 /**
  * Created by carl on 2017/9/25.
  */
+@RpcService
 public class ParticipantServiceImpl extends GenericServiceImpl<Participant, Long> implements ParticipantService {
 
     @Resource
