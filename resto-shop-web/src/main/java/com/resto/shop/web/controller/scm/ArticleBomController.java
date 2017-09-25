@@ -41,6 +41,8 @@ public class ArticleBomController extends GenericController{
 	@ResponseBody
 	public Result create(@Valid @RequestBody MdRulArticleBomHeadDo articlebom){
 		try {
+			articlebom.setShopDetailId(this.getCurrentShopId());
+			articlebom.setCreaterId(this.getCurrentUserId());
 			articlebomService.addArticleBomHead(articlebom);
 			return Result.getSuccess();
 		}catch (Exception e){
