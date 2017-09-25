@@ -571,8 +571,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                    }
                     if(item.getDiscount() < 100){
                         org_price = item.getPrice().divide(new BigDecimal(item.getDiscount())).multiply(new BigDecimal(100));
-                    }else{
+                    }else if(a.getFansPrice() != null && a.getFansPrice().doubleValue() > 0){
                         org_price = item.getPrice().subtract(a.getFansPrice()).add(a.getPrice());
+                    }else{
+                        org_price = item.getPrice();
                     }
                     price = item.getPrice();
                     fans_price = item.getPrice();
