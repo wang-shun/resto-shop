@@ -54,6 +54,8 @@ public class ArticleBomController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid @RequestBody MdRulArticleBomHeadDo articlebom){
+		articlebom.setShopDetailId(this.getCurrentShopId());
+		articlebom.setCreaterId(this.getCurrentUserId());
 		articlebomService.updateRulArticleBomHead(articlebom);
 		return Result.getSuccess();
 	}
