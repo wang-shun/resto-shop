@@ -641,6 +641,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         child.setUnitPrice(mealItem.getPriceDif());
                         child.setBaseUnitPrice(mealItem.getPriceDif());
                         child.setType(OrderItemType.MEALS_CHILDREN);
+                        child.setCustomerId(item.getCustomerId());
                         BigDecimal finalMoney = child.getUnitPrice().multiply(new BigDecimal(child.getCount())).setScale(2, BigDecimal.ROUND_HALF_UP);
                         if (finalMoney != null && finalMoney.doubleValue() > 0) {
                             extraMoney = extraMoney.add(finalMoney);
