@@ -44,7 +44,7 @@ public class CustomerGroupServiceImpl extends GenericServiceImpl<CustomerGroup, 
             List<CustomerGroup> customerGroupList = getGroupByGroupId(tableGroup.getGroupId());
             if(!CollectionUtils.isEmpty(customerGroupList)){
                 //如果这个组还有别的人，那么选取最早加入的一位 成为新的组长
-                tableGroup.setcreateCustomerId(customerGroupList.get(0).getCustomerId());
+                tableGroup.setCreateCustomerId(customerGroupList.get(0).getCustomerId());
                 tableGroupService.update(tableGroup);
                 CustomerGroup customerGroup = customerGroupList.get(0);
                 customerGroup.setIsLeader(Common.YES);
