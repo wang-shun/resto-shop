@@ -18,8 +18,6 @@
 		            <form role="form" class="form-horizontal" action="{{m.id?'scmMaterial/modify':'scmMaterial/create'}}" @submit.prevent="save">
 						<input type="hidden" name="id" v-model="m.id" />
 						<div class="form-body">
-
-
 							<div class="form-group row">
 								<label class="col-md-2 control-label">类型</label>
 								<div class="col-md-3">

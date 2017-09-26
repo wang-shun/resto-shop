@@ -17,50 +17,48 @@
                 </div>
 
                 <div class="portlet-body">
-                    <form role="form" class="form-horizontal" action="{{id?'scmMaterial/modify':'scmMaterial/create'}}" @submit.prevent="save">
-                        <input type="hidden" name="id" v-model="id" />
+                    <form role="form" class="form-horizontal" action="{{parameter.id?'scmBom/modify':'scmBom/create'}}" @submit.prevent="save">
+                        <input type="hidden" name="id" v-model="parameter.id" />
                         <div class="form-body">
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">菜品类别</label>
                                 <div class="col-md-3">
-                                    <select name="materialType" v-model="articleFamilyId" class="bs-select form-control" >
-                                        <option  v-for="materialType in materialTypes" value="{{materialType.code}}">
-                                            {{materialType.name}}
+                                    <select name="materialType" v-model="parameter.familyName" class="bs-select form-control" >
+                                        <option  v-for="articleFamily in articleFamilyIdArr" value="{{parameter.familyName}}">
+                                            {{articleFamily.name}}
                                         </option>
                                     </select>
                                 </div>
 
-                                <label class="col-md-2 control-label">菜品</label>
+                                <label class="col-md-2 control-label">菜品名称</label>
                                 <div class="col-md-3">
-                                <select name="categoryOneId" v-model="productName" class="bs-select form-control" >
-                                    <option  v-for="categoryOne in categoryOnes" value="{{categoryOne.id}}">
-                                        {{categoryOne.categoryName}}
+                                <select name="categoryOneId" v-model="parameter.articleName" class="bs-select form-control" >
+                                    <option  v-for="productName in productNameArr" value="{{parameter.articleName}}">
+                                        {{productName.name}}
                                     </option>
                                 </select>
                                 </div>
                             </div>
 
                             <div class="form-group row" >
-                                <label class="col-md-2 control-label">菜品编号</label>
+                                <label class="col-md-2 control-label">菜品编码</label>
                                 <div class="col-md-3">
-                                    <label class="col-md-2 control-label"> {{productCode}}</label>
+                                    <label class="col-md-2 control-label"> {{parameter.productCode}}</label>
                                 </div>
                                     <label class="col-md-2 control-label">计量单位</label>
                                     <div class="col-md-3">
-                                        <input type="text" class="form-control" name="materialName" v-model="materialName" required="required">
+                                        <input type="text" class="form-control" name="materialName" v-model="parameter.measurementUnit" required="required">
                                     </div>
                             </div>
-
-
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">版本号</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="priority" v-model="priority" required="required">
+                                    <input type="text" class="form-control" name="priority" v-model="parameter.version" required="required">
                                 </div>
 
                                 <label class="col-md-2 control-label">序号</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="priority" v-model="priority" required="required">
+                                    <input type="text" class="form-control" name="priority" v-model="parameter.priority" required="required">
                                 </div>
                             </div>
 
@@ -72,16 +70,17 @@
                             </div>
                         </div>
                         <div>
-                            <table class="table table-bordered">
+                            <input type="hidden" name="bomDetailDoList" id="bomDetailDoList" v-model="parameter.bomDetailDoList">
+                            <table class="table table-bordered" id="yuanliaolist">
                                 <thead><tr>
                                     <th>行号</th><th>原料编码</th><th>原料类型</th>
                                     <th>原料名称</th><th>规格</th><th>最小单位</th>
                                     <th>所需最小单位数量</th><th>操作</th>
                                 </tr></thead>
                                 <tbody>
-                                <tr>
-                                    <td>Tanmay</td><td>Bangalore</td><td>560001</td><td>Tanmay</td>
-                                    <td>Tanmay</td><td>Bangalore</td><td>560001</td><td>Tanmay</td>
+                                <tr v-for="(index,item) in parameter.bomDetailDoList">
+                                    <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.INGREDIENTS}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
+                                    <td><input type="text" value="1"></td><td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -97,29 +96,44 @@
     </div>
     <!--树状图-->
     <div class="row form-div" v-show="treeView">
-        <div class="col-md-offset-4 col-md-4">
-            <div class="portlet light bordered form-horizontal">
-            <div class="text-center">
-                    <span class="caption-subject bold font-blue-hoki">添加原材料</span>
+        <div class="col-md-offset-3 col-md-6" style="background: #FFF;">
+            <div class="text-center" style="padding: 20px 0">
+                <span class="caption-subject bold font-blue-hoki">添加原材料</span>
             </div>
-                <div class="modal-body">
-                    <input type="input" class="form-control" id="input-check-node" placeholder="请输入原材料名称" value="">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="modal-body">
+                        <input type="input" class="form-control" id="input-check-node" placeholder="请输入原材料名称" value="">
+                    </div>
+                    <div id="treeview-checkable" class="" style="height: 500px;overflow: auto;"></div>
                 </div>
-            <div id="treeview-checkable" class=""></div>
+                <div class="col-md-6" style="display: none;">
+                    <div id="checkable-output">
+                        <table class="table table-bordered">
+                            <thead><tr>
+                                <th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th>
+                                <th>规格</th><th>最小单位</th><th>所需最小单位数量</th><th>操作</th>
+                            </tr></thead>
+                            <tbody>
+                        <tr v-for="(index,item) in bomRawMaterial">
+                            <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.INGREDIENTS}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
+                            <td><input type="text" value="1"></td><td><button class="btn btn-xs red">移除</button></td>
+                        </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center" style="padding: 20px 0">
+                <input class="btn green"  @click="bomRawMaterialSub"  value="保存"/>&nbsp;&nbsp;&nbsp;
+                <a class="btn default" @click="cancelTreeView" >取消</a>
+            </div>
+        </div>
 
-        <div class="col-sm-4">
-            <div id="checkable-output"></div>
-        </div>
-        <div class="form-group text-center">
-            <input class="btn green"  type="submit"  value="保存"/>&nbsp;&nbsp;&nbsp;
-            <a class="btn default" @click="cancelTreeView" >取消</a>
-        </div>
-        </div>
-        </div>
     </div>
     <div class="table-div">
         <div class="table-operator">
-            <s:hasPermission name="scmMaterial/add">
+            <s:hasPermission name="scmBom/add">
                 <button class="btn green pull-right" @click="create">新建BOM</button>
             </s:hasPermission>
         </div>
@@ -134,6 +148,10 @@
         </table>
     </div>
 </div>
+<!--树状图-->
+<%--<link href="assets/treeview/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+<script src="assets/treeview/bower_components/jquery/dist/jquery.js"></script>--%>
+<script src="assets/treeview/js/bootstrap-treeview.js"></script>
 
 <script>
     (function(){
@@ -193,13 +211,13 @@
                 {
                     title : "操作",
                     data : "id",
-                    createdCell:function(td,tdData,rowData,row){
+                    createdCell:function(td,tdData,rowData){
                         var operator=[
-                            <s:hasPermission name="scmMaterial/edit">
+                            <s:hasPermission name="scmBom/edit">
                             C.createEditBtn(rowData),
                             </s:hasPermission>
-                            <s:hasPermission name="scmMaterial/delete">
-                            C.createDelBtn(tdData,"scmMaterial/delete"),
+                            <s:hasPermission name="scmBom/delete">
+                            C.createDelBtn(tdData,"scmBom/delete"),
                             </s:hasPermission>
                         ];
                         $(td).html(operator);
@@ -215,25 +233,39 @@
                 showform:false,//弹出框
                 treeView:false,//树状图
 
-                articleFamilyId:[],//菜品类别id
-                productName:[],//菜品名称
-                productCode:[],//产品编码
-                measurementUnit:[],//计量单位
-                version:[],//版本号
-                priority:[],//序号
+                bomRawMaterial:[],//bom原材料
+                //bomRawMaterial2:[],//bom原材料显示
+
+                articleFamilyIdArr:[],//菜品类别选项
+                productNameArr:[],//菜品名称选项
+                parameter:{
+                    priority:'',//序号
+                    productCode:'',//菜品编码
+                    version:'',//版本号
+                    familyName:'',//菜品类别
+                    articleName:'',//菜品名称
+                    measurementUnit:'',//计量单位
+                    size:'',//原料种类
+                    id:'',//id
+                    bomDetailDoList:[],//bom原材料显示
+                }
             },
             methods:{
+                create:function(){ //打开新增弹窗
+                    this.parameter= {
+                        bomDetailDoList:[],//bom原材料显示
+                    };
+                    this.showform=true;
+                },
                 closeForm:function(){ //关闭新增弹窗
                     this.showform=false;
                 },
-                create:function(){ //打开新增弹窗
-                    this.showform=true;
-                },
                 edit:function(model){ //编辑打开弹窗
-                    this.m= model;
+                    console.log(model)
+                    this.parameter= model;
                     this.showform=true;
                 },
-                save:function(e){
+                save:function(e){ //新增and编辑保存
                     var that = this;
                     var formDom = e.target;
                     C.ajaxFormEx(formDom,function(){
@@ -241,11 +273,19 @@
                         tb.ajax.reload();
                     });
                 },
-                closeTreeView:function () {
+                bomRawMaterialSub:function () { //添加原料保存
+                    this.parameter.bomDetailDoList.push.apply(this.parameter.bomDetailDoList,this.bomRawMaterial);//合并数组
+                    this.treeView=false;
+                },
+                closeTreeView:function () { //添加原料打开
                     this.treeView=true;
                 },
-                cancelTreeView:function () {
+                cancelTreeView:function () { //添加原料关闭
                     this.treeView=false;
+                },
+                removeArticleItem: function (mealItem) { //移除
+                    this.parameter.bomDetailDoList.$remove(mealItem);
+                    console.log(this.parameter.bomDetailDoList);
                 },
             },
             ready:function(){//钩子加载后
@@ -255,92 +295,73 @@
                     $('#tableBodyLists table').html('');
                     $('#tableBodyLists table').html($(this).find('.bomDetailDoList').html());
                 });
+                $.get('articlefamily/list_all',function (data) { //菜品类别选项
+                    console.log('菜品类别选项');
+                    for(var i=0;i<data.length;i++){
+                        that.articleFamilyIdArr.push({id:data[i].id , name:data[i].name});
+                    }
+                    console.log(that.articleFamilyIdArr);
+                });
+                $.get('article/list_all',function (data) { //菜品名称选项
+                    console.log('菜品名称选项');
+                    for(var i=0;i<data.length;i++){
+                        that.productNameArr.push({id:data[i].id , name:data[i].name});
+                    }
+                    console.log(that.productNameArr);
+                })
             },
         });
         C.vue=vueObj;
-    }());
-</script>
-<!--树状图-->
-<%--<link href="assets/treeview/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
-<script src="assets/treeview/bower_components/jquery/dist/jquery.js"></script>--%>
-<script src="assets/treeview/js/bootstrap-treeview.js"></script>
-<script type="text/javascript">
-    $(function() {
+
+
         $.get('scmCategory/query',function (jsonData) {
-            console.log(jsonData)
-            var data=JSON.stringify(jsonData).data;
-            var defaultData=[];
-            for (var i=0;i<data.length;i++){
-                defaultData[i]=data[i]
+            var defaultData=jsonData.data;
+            console.log(defaultData);
+            for(var i=0;i<defaultData.length;i++){
+                if (defaultData[i].twoList) {
+                    for(var j=0;j<defaultData[i].twoList.length;j++){
+                        if (defaultData[i].twoList) {
+                            defaultData[i].twoList[j].twoList = defaultData[i].twoList[j].threeList;
+                            delete defaultData[i].twoList[j].threeList;
+                            if(defaultData[i].twoList[j].twoList){
+                                for(var k=0;k<defaultData[i].twoList[j].twoList.length;k++){
+                                    defaultData[i].twoList[j].twoList[k].twoList = defaultData[i].twoList[j].twoList[k].materialList;
+                                    delete defaultData[i].twoList[j].twoList[k].materialList;
+                                    if(defaultData[i].twoList[j].twoList[k].twoList){
+                                        for(var l=0;l<defaultData[i].twoList[j].twoList[k].twoList.length;l++){
+                                            defaultData[i].twoList[j].twoList[k].twoList[l].name = defaultData[i].twoList[j].twoList[k].twoList[l].materialName;
+                                            delete defaultData[i].twoList[j].twoList[k].twoList[l].materialName;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
+            var $checkableTree = $('#treeview-checkable').treeview({
+                data: defaultData,
+                showIcon: true,
+                showCheckbox: true,
+                onNodeChecked: function(event, node) {
+                    if(node){
+                        Vue.set(vueObj.bomRawMaterial,vueObj.bomRawMaterial.length,node)
+                    }
+                },
+                onNodeUnchecked: function (event, node) {
+                        vueObj.bomRawMaterial= vueObj.bomRawMaterial.filter(o => o.id != node.id);
+                }
+            });
+            var findCheckableNodess = function() {
+                return $checkableTree.treeview('search', [ $('#input-check-node').val(), { ignoreCase: false, exactMatch: false } ]);
+            };
+            var checkableNodes = findCheckableNodess();
+            // Check/uncheck/toggle nodes
+            $('#input-check-node').on('keyup', function (e) {
+                checkableNodes = findCheckableNodess();
+                $('.check-node').prop('disabled', !(checkableNodes.length >= 1));
+            });
         })
 
-        var defaultData = [
-            {
-                text: '一',
-                href: '一',
-                tags: ['4'],
-                nodes: [
-                    {
-                        text: 'Child 1',
-                        href: '#child1',
-                        tags: ['2'],
-                        nodes: [
-                            {
-                                text: '序号1',
-                                href: '#grandchild1',
-                                tags: ['0']
-                            },
-                            {
-                                text: '序号2',
-                                href: '#grandchild2',
-                                tags: ['0']
-                            }
-                        ]
-                    },
-                    {
-                        text: 'Child 2',
-                        href: '#child2',
-                        tags: ['0']
-                    }
-                ]
-            },
-            {
-                text: 'Parent 3',
-                href: '#parent3',
-                tags: ['0']
-            },
-            {
-                text: 'Parent 4',
-                href: '#parent4',
-                tags: ['0']
-            },
-            {
-                text: 'Parent 5',
-                href: '#parent5'  ,
-                tags: ['0']
-            }
-        ];
-        var $checkableTree = $('#treeview-checkable').treeview({
-            data: defaultData,
-            showIcon: true,
-            showCheckbox: true,
-            onNodeChecked: function(event, node) {
-                $('#checkable-output').prepend('<p>' + node.text + ' was checked</p>');
-            },
-            onNodeUnchecked: function (event, node) {
-                $('#checkable-output').prepend('<p>' + node.text + ' was unchecked</p>');
-            }
-        });
-        var findCheckableNodess = function() {
-            return $checkableTree.treeview('search', [ $('#input-check-node').val(), { ignoreCase: false, exactMatch: false } ]);
-        };
-        var checkableNodes = findCheckableNodess();
-        // Check/uncheck/toggle nodes
-        $('#input-check-node').on('keyup', function (e) {
-            checkableNodes = findCheckableNodess();
-            $('.check-node').prop('disabled', !(checkableNodes.length >= 1));
-        });
-        //
-    });
+    }());
 </script>
