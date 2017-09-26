@@ -20,7 +20,7 @@ public class TableGroup implements Serializable {
 
     private Integer state;     //0 正常 1已付款 2已释放
 
-    private String createCustomnerId;     //创建者id
+    private String createCustomerId;     //创建者id
 
     private String orderId;     //该组的主订单
 
@@ -68,12 +68,12 @@ public class TableGroup implements Serializable {
         this.state = state;
     }
 
-    public String getCreateCustomnerId() {
-        return createCustomnerId;
+    public String getcreateCustomerId() {
+        return createCustomerId;
     }
 
-    public void setCreateCustomnerId(String createCustomnerId) {
-        this.createCustomnerId = createCustomnerId;
+    public void setcreateCustomerId(String createCustomerId) {
+        this.createCustomerId = createCustomerId;
     }
 
     public String getOrderId() {
