@@ -4,7 +4,7 @@
   <resultMap id="BaseResultMap" type="com.resto.shop.web.model.CustomerGroup">
     <id column="id" property="id"/>
     <result column="group_id" property="groupId"/>
-    <result column="customner_id" property="customerId"/>
+    <result column="customer_id" property="customerId"/>
     <result column="customer_name" property="customerName"/>
     <result column="head_photo" property="headPhoto"/>
     <result column="is_leader" property="isLeader"/>
@@ -14,7 +14,7 @@
     <result column="brand_id" property="brandId"/>
   </resultMap>
 
-  <sql id="Base_Column_List">id, group_id, customner_id, customer_name, head_photo, is_leader, table_number, create_time, shop_detail_id, brand_id</sql>
+  <sql id="Base_Column_List">id, group_id, customer_id, customer_name, head_photo, is_leader, table_number, create_time, shop_detail_id, brand_id</sql>
 
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select
     <include refid="Base_Column_List"/> from tb_customer_group where id = #{id}
@@ -24,7 +24,7 @@
 
   <insert id="insert" parameterType="com.resto.shop.web.model.CustomerGroup">
     insert into tb_customer_group
-    (id, group_id, customner_id, customer_name, head_photo, is_leader, table_number, create_time, shop_detail_id, brand_id)
+    (id, group_id, customer_id, customer_name, head_photo, is_leader, table_number, create_time, shop_detail_id, brand_id)
     values (#{id}, #{groupId}, #{customerId}, #{customerName},#{headPhoto}, #{isLeader},
     #{tableNumber}, #{createTime}, #{shopDetailId}, #{brandId})
   </insert>
@@ -33,7 +33,7 @@
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">id,</if>
       <if test="groupId != null">group_id,</if>
-      <if test="customerId != null">customner_id,</if>
+      <if test="customerId != null">customer_id,</if>
       <if test="customerName != null">customer_name,</if>
       <if test="headPhoto != null">head_photo,</if>
       <if test="isLeader != null">is_leader,</if>
@@ -59,7 +59,7 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.CustomerGroup">update tb_customer_group
     <set>
       <if test="groupId != null">group_id = #{groupId},</if>
-      <if test="customerId != null">customner_id = #{customerId},</if>
+      <if test="customerId != null">customer_id = #{customerId},</if>
       <if test="customerName != null">customer_name = #{customerName},</if>
       <if test="headPhoto != null">head_photo = #{headPhoto},</if>
       <if test="isLeader != null">is_leader = #{isLeader},</if>
@@ -72,7 +72,7 @@
 
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.CustomerGroup">
     update tb_customer_group set
-    group_id = #{groupId}, customner_id = #{customerId},customer_name = #{customerName}, head_photo = #{headPhoto},
+    group_id = #{groupId}, customer_id = #{customerId},customer_name = #{customerName}, head_photo = #{headPhoto},
     is_leader = #{isLeader}, table_number = #{tableNumber}, create_time = #{createTime}, shop_detail_id = #{shopDetailId},
     brand_id = #{brandId}
     where id = #{id}
