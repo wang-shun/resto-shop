@@ -14,4 +14,8 @@ public interface ParticipantService extends GenericService<Participant, Long> {
 
     Participant selectByOrderIdCustomerId(String orderId, String customerId);
 
+    void updateAppraiseByOrderIdCustomerId(String orderId, String customerId);
+
+    List<Participant> selectNotAppraiseByGroupId(String groupId, String orderId);
+
 }
