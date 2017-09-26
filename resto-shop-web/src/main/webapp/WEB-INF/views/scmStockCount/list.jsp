@@ -60,20 +60,12 @@
                                                     </div>
 
                                                 </div>
-
-
-                                                <%--<div class="tools">--%>
-                                                    <%--<a href="javascript:;" class="remove"--%>
-                                                       <%--@click="delMealAttr(attr)"></a>--%>
-                                                <%--</div>--%>
                                             </div>
-                                            <div class="portlet-body"> <!--v-for="attr in articles "-->
-                                                <%--<div class="portlet-body" v-if="m.id != null" v-for="attr in m.articles "  >--%>
+                                            <div class="portlet-body"> 
                                                 <div class="form-group col-md-12" v-for="item in unit.detailList">
                                                     <div class="flex-row" style="text-align: center">
 
-                                                        <div class="flex-2">名称</div>
-                                                        <%--<div class="flex-2">差价</div>--%>
+                                                        <div class="flex-2">名称</div>                                              
                                                         <div class="flex-2">排序</div>
                                                         <div class="flex-2">移除</div>
                                                     </div>
@@ -85,11 +77,7 @@
                                                                    v-model="item.name" name="name"
                                                                    required="required"/>
                                                         </div>
-                                                        <%--<div class="flex-2">--%>
-                                                            <%--<input type="text" class="form-control"--%>
-                                                                   <%--v-model="item.spread" name="spread"--%>
-                                                                   <%--required="required"/>--%>
-                                                        <%--</div>--%>
+                          
                                                         <div class="flex-2">
                                                             <input type="text" class="form-control" name="sort"
                                                                    v-model="item.sort"
@@ -111,14 +99,7 @@
                                                 </div>
                                                 <div class="clearfix"></div>
                                             </div>
-                                        </div>
-                                        <%--<div class="col-md-4 col-md-offset-4">--%>
-                                            <%--<button class="btn btn-block blue" type="button"--%>
-                                                    <%--@click="addMealItem(unit.familyList)">--%>
-                                                <%--<i class="fa fa-plus"></i>--%>
-                                                <%--添加规格包属性--%>
-                                            <%--</button>--%>
-                                        <%--</div>--%>
+                                        </div>                           
                                         <div class="clearfix"></div>
                                     </div>
                                 </div>
@@ -169,7 +150,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="col-md-6">
+                        <!--<div class="col-md-6">
                             <table class="table">
                                 <thead>
                                 <tr>
@@ -187,7 +168,7 @@
                                 </tr>
                                 </tbody>
                             </table>
-                        </div>
+                        </div>-->
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -210,7 +191,21 @@
     </div>
 
 </div>
-
+<!--<div class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title text-center"><strong></strong></h4>
+			</div>
+			<div class="modal-body" style="word-wrap: break-word;">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+			</div>
+		</div>
+	</div>
+</div>-->
 
 <script>
     (function () {
@@ -230,16 +225,40 @@
 
         var tb = $table.DataTable({
             ajax: {
-                url: "unit/list_all",
-                dataSrc: ""
+                url: "scmStockCount/list_all",
+                dataSrc: "data"
             },
             columns: [
                 {
-                    title: "属性名称",
-                    data: "name",
+                    title: "盘点单号",
+                    data: "id",
                 },
-
-
+                {
+                  title:"盘点单名",
+                    data:"orderName"
+                },
+                {
+                  title:"盘点日期",
+                    data:"publishedTime"
+                },
+                {
+                    title:"盘点人",
+                    data:"createrName"
+                },
+                {
+                    title:"备注",
+                    data:"orderStatus"
+                },
+//              {
+//					title : "查看",
+//					defaultContent:"",
+//					createdCell:function(td,tdData,rowData){
+//						var button = $("<button class='btn green'>查看</button>");
+//						button.click(function(){
+//							showDetails(rowData);
+//						})
+//						$(td).html(button);
+//					},
                 {
                     title: "属性明细",
                     data: "details",
@@ -262,10 +281,10 @@
                     data: "id",
                     createdCell: function (td, tdData, rowData, row) {
                         var operator = [
-                            <s:hasPermission name="unit/delete">
-                            C.createDelBtn(tdData, "unit/delete"),
-                            </s:hasPermission>
-                            <s:hasPermission name="unit/edit">
+//                          <s:hasPermission name="scmMaterial/delete">
+//                          C.createDelBtn(tdData, "scmMaterial/delete"),
+//                          </s:hasPermission>
+                            <s:hasPermission name="scmMaterial/edit">
                             C.createEditBtn(rowData),
                             </s:hasPermission>
                         ];
@@ -808,5 +827,14 @@
 
     }());
 
-
+////用于显示描述详情
+//	function showDetails(data){
+//		$(".modal-title > strong").html(data.slogan);
+//		var html='';
+//		for(var i=0;i<data.length;i++){
+//            html+='<tr><td>'+data[i].name+'</td><td></td></tr>'
+//		}
+//        $(".modal-body").html(html);
+//		$(".modal").modal();
+//	}
 </script>

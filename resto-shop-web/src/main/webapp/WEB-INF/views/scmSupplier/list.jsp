@@ -1,14 +1,9 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
-<style>
-    #tableBodyList table tr th:first-of-type,#tableBodyList table tr td:first-of-type{display: none;}
-    #tableBodyList table tr th,#tableBodyList table tr td{text-align: center;}
-    #tableBodyLists th,#tableBodyLists td{text-align: center;line-height:2.5;}
-</style>
 <div id="control">
     <div class="row form-div" v-if="showform">
-        <div class="col-md-offset-3 col-md-6" >
+        <div class="col-md-offset-3 col-md-6" style="text-align:center">
             <div class="portlet light bordered">
                 <div class="portlet-title">
                     <div class="caption">
@@ -17,22 +12,22 @@
                 </div>
 
                 <div class="portlet-body">
-                    <form role="form" class="form-horizontal" action="{{id?'scmMaterial/modify':'scmMaterial/create'}}" @submit.prevent="save">
-                        <input type="hidden" name="id" v-model="id" />
+                    <form role="form" class="form-horizontal" action="{{m.id?'scmSupplier/modify':'scmSupplier/create'}}" @submit.prevent="save" style="text-align:center">
+                        <input type="hidden" name="id" v-model="m.id" />
                         <div class="form-body">
 
                             <div class="form-group row">
-                                <label class="col-md-2 control-label">类型</label>
-                                <div class="col-md-3">
-                                    <select name="materialType" v-model="articleFamilyId" class="bs-select form-control" >
-                                        <option  v-for="materialType in materialTypes" value="{{materialType.code}}">
-                                            {{materialType.name}}
-                                        </option>
-                                    </select>
-                                </div>
+                                <label class="col-md-2 control-label">类型 </label>
+                                <select class="col-md-3 border-radius" name="supplierType" v-model="m.supplierType"  style="height:30px">
+                                    <option  v-for="materialType in materialTypes" value="{{supplierType.code}}">
+                                        {{materialType.name}}
+                                    </option>
+                                </select>
+
                                 <label class="col-md-2 control-label">编码</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="materialName" v-model="productName" required="required">
+                                    <input type="text" class="form-control" name="supCode" v-model="m.supCode"
+                                           required="required">
                                 </div>
                             </div>
 
@@ -41,9 +36,10 @@
                                 <div class="col-md-3">
                                     <input type="text" class="form-control" name="materialName" v-model="productCode" required="required">
                                 </div>
+
                                 <label class="col-md-2 control-label">别名</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="materialName" v-model="materialName" required="required">
+                                    <input type="text" class="form-control" name="supAliasName" v-model="m.supAliasName" required="required">
                                 </div>
                             </div>
 
@@ -51,34 +47,48 @@
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">序号</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="priority" v-model="priority" required="required">
+                                    <input type="text" class="form-control" name="version" v-model="m.version"
+                                           required="required">
                                 </div>
                             </div>
 
                             <div class="form-group row">
-                                <label class="col-md-2 control-label">产品原料</label>
-                                <div class="col-md-3">
-                                    <input class="btn btn-default"  type="button"  value="添加原料"/>
+                                <label class="col-md-2 control-label">产品(可多选)</label>
+                                <div  class="col-md-4 checkbox-list">
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="printReceipt" v-model="m.printKitchen1" value = "1">主料
+                                    </label>
+                                    <label class="checkbox-inline">
+                                        <input type="checkbox" name="printKitchen" v-model="m.printKitchen2" value ="1">辅料
+                                    </label>
+                                    <label class="checkbox-inline">
+                                       <input type="checkbox" name="printKitchen" v-model="m.printKitchen3" value ="1">配料
+                                   </label>
                                 </div>
                             </div>
-                            <div class="form-group row">
-                                <label class="col-md-2 control-label"></label>
-                                <div class="col-sm-8">
-                                <table class="table table-bordered">
-                                    <thead><tr>
-                                        <th>行号</th><th>原料编码</th><th>原料类型</th>
-                                        <th>原料名称</th><th>规格</th><th>最小单位</th>
-                                        <th>所需最小单位数量</th><th>操作</th>
-                                    </tr></thead>
+                         <%--编辑添加--%>
+                                <table class="table table-bordered" style= "width:600px;">
+                                    <thead >
+                                    <tr>
+                                        <th>编号</th>
+                                        <th>姓名</th>
+                                        <th>电话</th>
+                                        <th>邮箱</th>
+                                        <th>设为默认</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
                                     <tbody>
                                     <tr>
-                                        <td>560001</td><td>560001</td><td>560001</td><td>560001</td>
-                                        <td>560001</td><td>560001</td><td>560001</td><td>560001</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
                                     </tr>
                                     </tbody>
-                                </table>
-                                </div>
-                            </div>
+                            </table>
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">备注</label>
                                 <div class="col-sm-8">
@@ -89,7 +99,7 @@
 
                         <div class="form-group text-center">
                             <input class="btn green"  type="submit"  value="保存"/>&nbsp;&nbsp;&nbsp;
-                            <a class="btn default" @click="cancel" >取消</a>
+                            <a class="btn default" @click="cancel">取消</a>
                         </div>
                     </form>
                 </div>
@@ -100,7 +110,7 @@
     <div class="table-div">
         <div class="table-operator">
             <s:hasPermission name="scmMaterial/add">
-                <button class="btn green pull-right" @click="create">新建供应商</button>
+                <button class="btn green pull-right" @click="create">新增供应商</button>
             </s:hasPermission>
         </div>
         <div class="clearfix"></div>
@@ -115,59 +125,68 @@
     </div>
 </div>
 
+
 <script>
     (function(){
-        var tableBodyList = $("#tableBodyList>table");
-        var tb = tableBodyList.DataTable({
+        var cid="#control";
+        var $table = $(".table-body>table");
+        var tb = $table.DataTable({
             ajax : {
-                url : "scmBom/list_all",
-                dataSrc : "data",
-                type : "GET",
-                data : function(data) {
-                    return data;
-                },
+                url : "scmSupplier/list_all",
+                dataSrc : "data"
             },
             columns : [
                 {
                     title : "序号",
-                    data : "priority",
+                    data : "id",
                 },
                 {
-                    title: "编码",
-                    data : "productCode"
+                    title : "编码",
+                    data : "supCode",
+//					createdCell : function(td,tdData){
+//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
+//					}
                 },
                 {
-                    title: "类型",
-                    data: "version",
-                },
+                    title : "类型",
+                    data : "supplierType",
+//					createdCell : function(td,tdData){
+//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
+//					}
+                }
+                ,
                 {
                     title : "公司全称",
-                    data : "familyName",
+                    data : "supName",
+//					createdCell : function(td,tdData){
+//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
+//					}
                 },
                 {
                     title : "别称",
-                    data : "articleName",
+                    data : "supAliasName",
                 },
                 {
                     title : "联系人 ",
-                    data : "measurementUnit",
+                    data : "contact",
                 },
                 {
                     title : "电话",
-                    data : "size",
+                    data : "mobile",
                 },
                 {
                     title : "邮件",
-                    data : "size",
+                    data : "email",
                 },
                 {
                     title : "产品",
-                    data : "size",
+                    data : "supplierType",
                 },
                 {
                     title : "备注",
-                    data : "size",
+                    data : "note"
                 },
+
                 {
                     title : "操作",
                     data : "id",
@@ -175,9 +194,9 @@
                         var operator=[
                             <s:hasPermission name="scmMaterial/edit">
                             C.createEditBtn(rowData),
-                            </s:hasPermission>
                             <s:hasPermission name="scmMaterial/delete">
                             C.createDelBtn(tdData,"scmMaterial/delete"),
+                            </s:hasPermission>
                             </s:hasPermission>
                         ];
                         $(td).html(operator);
@@ -189,22 +208,27 @@
             mixins:[C.formVueMix],
             el:"#control",
             data:{
-                tableBodyListsShow:false,//列表详情页
-                showform:false,//弹出框
-
-                articleFamilyId:[],//菜品类别id
-                productName:[],//菜品名称
-                productCode:[],//产品编码
-                measurementUnit:[],//计量单位
-                version:[],//版本号
-                priority:[],//序号
+                materialTypes: [
+                    {
+                        code:"INGREDIENTS" ,
+                        name:"主料"
+                    },
+                    {
+                        code:"ACCESSORIES" ,
+                        name:"辅料"
+                    },{
+                        code:"SEASONING" ,
+                        name:"调料"
+                    }],
             },
+
             methods:{
                 closeForm:function(){ //关闭新增弹窗
                     this.showform=false;
                 },
                 create:function(){ //打开新增弹窗
                     this.showform=true;
+
                 },
                 edit:function(model){ //编辑打开弹窗
                     this.m= model;
@@ -218,12 +242,12 @@
                         tb.ajax.reload();
                     });
                 }
-            },
-            ready:function(){//钩子
-
-            },
-        });
+              
+            }
+       });
         C.vue=vueObj;
     }());
-
 </script>
+
+
+
