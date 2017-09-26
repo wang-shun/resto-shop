@@ -41,5 +41,5 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
     /**
      * 判断菜品是否重复
      */
-    Boolean checkRepeat(String articleId,String groupId);
+    Integer checkRepeat(String articleId,String groupId);
 }

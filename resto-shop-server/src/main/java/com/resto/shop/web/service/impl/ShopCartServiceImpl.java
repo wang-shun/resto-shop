@@ -163,7 +163,7 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
 
 
     @Override
-    public Boolean checkRepeat(String articleId, String groupId) {
-        return shopcartMapper.checkRepeat(articleId, groupId) > 1;
+    public Integer checkRepeat(String articleId, String groupId) {
+        return shopcartMapper.checkRepeat(articleId, groupId) ;
     }
 }
