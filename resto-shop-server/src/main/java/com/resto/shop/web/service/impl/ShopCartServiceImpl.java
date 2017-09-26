@@ -144,4 +144,10 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     public void groupNew(String customerId, String shopId, String groupId) {
         shopcartMapper.groupNew(customerId, shopId, groupId);
     }
+
+
+    @Override
+    public Boolean checkRepeat(String articleId, String groupId) {
+        return shopcartMapper.checkRepeat(articleId, groupId) > 1;
+    }
 }

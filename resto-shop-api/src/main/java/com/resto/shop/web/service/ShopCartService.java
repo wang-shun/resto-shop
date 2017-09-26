@@ -37,4 +37,9 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
      * @param groupId
      */
     void groupNew(String customerId,String shopId,String groupId);
+
+    /**
+     * 判断菜品是否重复
+     */
+    Boolean checkRepeat(String articleId,String groupId);
 }
