@@ -168,6 +168,6 @@
 
     <select id="checkRepeat" resultType="java.lang.Integer">
         select count(1) from tb_shop_cart where article_id = #{articleId}
-        and group_id = #{groupId}
+        and group_id = #{groupId} GROUP BY customer_id
     </select>
 </mapper>
