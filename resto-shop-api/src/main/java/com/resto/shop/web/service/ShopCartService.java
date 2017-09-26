@@ -29,4 +29,12 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
 
 
     void deleteCustomerArticle(String customerId,String articleId);
+
+    /**
+     * 把用户在这家店铺的购物车同步给某个组
+     * @param customerId
+     * @param shopId
+     * @param groupId
+     */
+    void groupNew(String customerId,String shopId,String groupId);
 }

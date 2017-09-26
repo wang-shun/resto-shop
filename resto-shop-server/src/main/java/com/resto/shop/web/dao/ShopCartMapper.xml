@@ -158,4 +158,11 @@
         set group_id = null
         where id = #{id}
     </update>
+
+    <update id="groupNew">
+        update tb_shop_cart
+        set group_id = #{groupId}
+        where shop_detail_id = #{shopId}
+        and customer_id = #{customerId}
+    </update>
 </mapper>
