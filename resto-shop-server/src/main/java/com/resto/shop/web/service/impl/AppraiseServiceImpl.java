@@ -236,4 +236,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	public List<Appraise> selectByTimeAndBrandId(Date begin, Date end) {
 		return appraiseMapper.selectByTimeAndBrandId(begin,end);
 	}
+
+	@Override
+	public Appraise selectByOrderIdCustomerId(String orderId, String customerId) {
+		return appraiseMapper.selectByOrderIdCustomerId(orderId, customerId);
+	}
 }
