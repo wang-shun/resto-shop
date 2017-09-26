@@ -11,7 +11,7 @@
     <result column="order_id" property="orderId"/>
     <result column="shop_detail_id" property="shopDetailId"/>
     <result column="brand_id" property="brandId"/>
-    <collection property="customerGroups" ofType="com.resto.shop.web.model.CustomerGroup">
+    <collection property="customerGroups" ofType="com.resto.shop.web.model.CustomerGroup" javaType="List">
       <id column="customer_group_id" property="id"/>
       <result column="customer_id" property="customerId"/>
       <result column="customer_name" property="customerName"/>
