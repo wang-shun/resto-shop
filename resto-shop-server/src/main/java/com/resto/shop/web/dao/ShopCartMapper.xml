@@ -170,4 +170,8 @@
         select count(1) from tb_shop_cart where article_id = #{articleId}
         and group_id = #{groupId} GROUP BY customer_id
     </select>
+
+    <select id="getListByGroupId" resultType="ShopCart">
+        select * from tb_shop_cart where group_id = #{groupId}
+    </select>
 </mapper>

@@ -3,10 +3,14 @@ package com.resto.shop.web.service.impl;
 import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.constant.ShopCarType;
 import com.resto.shop.web.dao.ShopCartMapper;
 import com.resto.shop.web.model.ShopCart;
 import com.resto.shop.web.service.ShopCartService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -20,6 +24,11 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     @Resource
     private ShopCartMapper shopcartMapper;
 
+
+    @Autowired
+    private ShopDetailService shopDetailService;
+
+
     @Override
     public GenericDao<ShopCart, Integer> getDao() {
         return shopcartMapper;
@@ -27,7 +36,14 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
 
     @Override
     public List<ShopCart> listUserAndShop(ShopCart shopcart) {
-        return shopcartMapper.listUserAndShop(shopcart);
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopcart.getShopDetailId());
+        if(shopDetail.getOpenManyCustomerOrder() == Common.YES && shopcart.getGroupId() != null){
+            //开启多人点餐
+            return shopcartMapper.getListByGroupId(shopcart.getGroupId());
+        }else{
+            return shopcartMapper.listUserAndShop(shopcart);
+        }
+
     }
 
     @Override
