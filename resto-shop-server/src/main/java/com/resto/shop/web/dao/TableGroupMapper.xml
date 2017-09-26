@@ -11,6 +11,12 @@
     <result column="order_id" property="orderId"/>
     <result column="shop_detail_id" property="shopDetailId"/>
     <result column="brand_id" property="brandId"/>
+    <collection property="customerGroups" ofType="com.resto.shop.web.model.CustomerGroup">
+      <id column="customer_group_id" property="id"/>
+      <result column="customer_id" property="customerId"/>
+      <result column="customer_name" property="customerName"/>
+      <result column="head_photo" property="headPhoto"/>
+    </collection>
   </resultMap>
 
   <sql id="Base_Column_List">id, table_number, group_id, create_time, state, create_customer_id, order_id, shop_detail_id, brand_id</sql>
@@ -78,8 +84,10 @@
 
   <select id="selectList" resultType="TableGroup">select * from tb_table_group </select>
 
-  <select id="getTableGroupByShopId" resultType="TableGroup">
-      select * from tb_table_group where shop_detail_id = #{shopId} and table_number = #{tableNumber}
+  <select id="getTableGroupByShopId" resultMap="BaseResultMap">
+      select t.id,t.tableNumber,t2.customer_id,t2.customer_name,t2.head_photo,t2.id as customer_group_id from tb_table_group t
+      left join tb_customer_group t2 on t2.group_id = t.group_id
+       where shop_detail_id = #{shopId} and table_number = #{tableNumber}
       and state = 0
   </select>
 

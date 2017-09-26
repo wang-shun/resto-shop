@@ -2,6 +2,7 @@ package com.resto.shop.web.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by carl on 2017/9/25.
@@ -27,6 +28,24 @@ public class TableGroup implements Serializable {
     private String shopDetailId;
 
     private String brandId;
+
+    private List<CustomerGroup> customerGroups;
+
+    public String getCreateCustomerId() {
+        return createCustomerId;
+    }
+
+    public void setCreateCustomerId(String createCustomerId) {
+        this.createCustomerId = createCustomerId;
+    }
+
+    public List<CustomerGroup> getCustomerGroups() {
+        return customerGroups;
+    }
+
+    public void setCustomerGroups(List<CustomerGroup> customerGroups) {
+        this.customerGroups = customerGroups;
+    }
 
     public Long getId() {
         return id;
