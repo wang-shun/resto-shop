@@ -152,4 +152,10 @@
     <delete id="deleteCustomerArticle">
         delete from tb_shop_cart where customer_id = #{customerId} and article_id = #{articleId}
     </delete>
+
+    <update id="clearGroupId">
+        update tb_shop_cart
+        set group_id = null
+        where id = #{id}
+    </update>
 </mapper>
