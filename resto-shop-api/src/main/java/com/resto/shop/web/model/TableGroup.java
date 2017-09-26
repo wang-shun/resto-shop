@@ -31,13 +31,6 @@ public class TableGroup implements Serializable {
 
     private List<CustomerGroup> customerGroups;
 
-    public String getCreateCustomerId() {
-        return createCustomerId;
-    }
-
-    public void setCreateCustomerId(String createCustomerId) {
-        this.createCustomerId = createCustomerId;
-    }
 
     public List<CustomerGroup> getCustomerGroups() {
         return customerGroups;
@@ -87,11 +80,11 @@ public class TableGroup implements Serializable {
         this.state = state;
     }
 
-    public String getcreateCustomerId() {
+    public String getCreateCustomerId() {
         return createCustomerId;
     }
 
-    public void setcreateCustomerId(String createCustomerId) {
+    public void setCreateCustomerId(String createCustomerId) {
         this.createCustomerId = createCustomerId;
     }
 
