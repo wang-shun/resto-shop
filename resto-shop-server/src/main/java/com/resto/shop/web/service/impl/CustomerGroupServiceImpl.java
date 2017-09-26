@@ -42,7 +42,7 @@ public class CustomerGroupServiceImpl extends GenericServiceImpl<CustomerGroup, 
         if(tableGroup != null){
             //如果这个人是这个组的组长
             List<CustomerGroup> customerGroupList = getGroupByGroupId(tableGroup.getGroupId());
-            if(CollectionUtils.isEmpty(customerGroupList)){
+            if(!CollectionUtils.isEmpty(customerGroupList)){
                 //如果这个组还有别的人，那么选取最早加入的一位 成为新的组长
                 tableGroup.setcreateCustomerId(customerGroupList.get(0).getCustomerId());
                 tableGroupService.update(tableGroup);
