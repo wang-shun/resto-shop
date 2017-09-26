@@ -85,7 +85,7 @@
   <select id="selectList" resultType="TableGroup">select * from tb_table_group </select>
 
   <select id="getTableGroupByShopId" resultMap="BaseResultMap">
-      select t.id,t.tableNumber,t2.customer_id,t2.customer_name,t2.head_photo,t2.id as customer_group_id from tb_table_group t
+      select t.id,t.table_number,t2.customer_id,t2.customer_name,t2.head_photo,t2.id as customer_group_id from tb_table_group t
       left join tb_customer_group t2 on t2.group_id = t.group_id
        where shop_detail_id = #{shopId} and table_number = #{tableNumber}
       and state = 0
