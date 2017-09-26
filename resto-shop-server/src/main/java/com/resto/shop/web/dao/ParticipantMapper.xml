@@ -70,4 +70,12 @@
       select * from tb_participant where order_id = #{orderId} and customer_id = #{customerId}
   </select>
 
+  <update id="updateAppraiseByOrderIdCustomerId">
+      update tb_participant set appraise = 1 where order_id = #{orderId} and customer_id = #{customerId}
+  </update>
+
+  <select id="selectNotAppraiseByGroupId" resultType="Participant">
+      select * from tb_participant where group_id = #{groupId} and order_id = #{orderId} and appraise = 0
+  </select>
+
 </mapper>

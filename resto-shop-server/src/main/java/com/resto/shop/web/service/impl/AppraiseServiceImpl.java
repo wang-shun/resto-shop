@@ -54,7 +54,10 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 
     @Resource
     RedPacketService redPacketService;
-    
+
+	@Resource
+	ParticipantService participantService;
+
     @Override
     public GenericDao<Appraise, String> getDao() {
         return appraiseMapper;
@@ -103,7 +106,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	@Override
 	public Appraise saveAppraise(Appraise appraise) throws AppException {
 		Order order= orderService.selectById(appraise.getOrderId());
-		if(order.getAllowAppraise()){
+		if(order.getAllowAppraise() && (order.getGroupId() == null || "".equals(order.getGroupId()))){
 //			String pic = getPicture(appraise);
 //			appraise.setPictureUrl(pic);
 			appraise.setId(ApplicationUtils.randomUUID());
@@ -116,6 +119,26 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			insert(appraise);
 			order.setOrderState(OrderState.HASAPPRAISE);
 			order.setAllowAppraise(false);
+			order.setAllowCancel(false);
+			order.setAllowContinueOrder(false);
+			orderService.update(order);
+		}else if(order.getAllowAppraise() && order.getGroupId() != null && !"".equals(order.getGroupId())){
+			appraise.setId(ApplicationUtils.randomUUID());
+			appraise.setCreateTime(new Date());
+			appraise.setStatus((byte)1);
+			appraise.setShopDetailId(order.getShopDetailId());
+			BigDecimal redMoney= rewardRed(order);
+			appraise.setRedMoney(redMoney);
+			appraise.setBrandId(order.getBrandId());
+			insert(appraise);
+			//仅修改  够餐组下面的单人的领取红包记录
+			participantService.updateAppraiseByOrderIdCustomerId(order.getId(), order.getCustomerId());
+			//查询该够餐组 下面是否还存在未领取红包的记录   如没有则订单状态变成11
+			List<Participant> participants = participantService.selectNotAppraiseByGroupId(order.getGroupId(), order.getId());
+			if(participants.size() == 0){
+				order.setOrderState(OrderState.HASAPPRAISE);
+				order.setAllowAppraise(false);
+			}
 			order.setAllowCancel(false);
 			order.setAllowContinueOrder(false);
 			orderService.update(order);
