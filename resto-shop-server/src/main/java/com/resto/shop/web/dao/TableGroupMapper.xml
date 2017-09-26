@@ -96,6 +96,6 @@
   <select id="getTableGroupByCustomer" resultType="TableGroup">
      select * from tb_table_group
      where create_customer_id = #{customerId} and shop_detail_id = #{shopId}
-     and table_number = #{tableNumber}
+     and table_number = #{tableNumber} and state = 0
   </select>
 </mapper>
