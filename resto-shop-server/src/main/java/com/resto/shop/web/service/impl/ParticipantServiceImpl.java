@@ -28,4 +28,9 @@ public class ParticipantServiceImpl extends GenericServiceImpl<Participant, Long
     public List<Participant> selectCustomerListByGroupIdOrderId(String groupId, String orderId) {
         return participantMapper.selectCustomerListByGroupIdOrderId(groupId, orderId);
     }
+
+    @Override
+    public Participant selectByOrderIdCustomerId(String orderId, String customerId) {
+        return participantMapper.selectByOrderIdCustomerId(orderId, customerId);
+    }
 }

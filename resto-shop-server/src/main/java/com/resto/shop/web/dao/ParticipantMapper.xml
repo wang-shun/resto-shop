@@ -61,4 +61,13 @@
       is_pay = #{isPay}, appraise = #{appraise} where id = #{id,jdbcType=BIGINT}
   </update>
   <select id="selectList" resultType="Participant">select * from tb_participant</select>
+
+  <select id="selectCustomerListByGroupIdOrderId" resultType="Participant">
+      select * from tb_participant where group_id = #{groupId} and order_id = #{orderId}
+  </select>
+
+  <select id="selectByOrderIdCustomerId" resultType="Participant">
+      select * from tb_participant where order_id = #{orderId} and customer_id = #{customerId}
+  </select>
+
 </mapper>
