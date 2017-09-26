@@ -88,7 +88,7 @@
 
         var tb = $table.DataTable({
             ajax : {
-                url : "scmMaterial/list_all",
+                url : "scmBom/list_all",
                 dataSrc : "data"
             },
             columns : [
@@ -136,6 +136,7 @@
                     title : "状态",
                     data : "materialCode",
                 },
+                
                 {
                     title : "操作",
                     data : "id",
@@ -295,5 +296,6 @@
         });
         C.vue=vueObj;
     }());
+  
 
 </script>
