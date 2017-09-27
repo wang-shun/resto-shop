@@ -395,7 +395,21 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
-	
+	this.findBtn = function(model,url,urlData){
+		var button = $("<button class='btn btn-xs btn-primary'>查看</button>");
+		button.click(function(){
+			if(_C.vue){
+				_C.vue.edit(model);
+			}else{
+				_C.loadForm({
+					url:url,
+					data:{id:model},
+					formaction:urlData
+				});
+			}
+		});
+		return button;
+	}
 	this.createConfirmDialogBtn=function(opt){
 		var o= {
 				style:"btn btn-xs red",

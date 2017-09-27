@@ -15,8 +15,6 @@
         max-height: 80vh;
         overflow-y: auto;
     }
-
-
 </style>
 <div id="control">
 
