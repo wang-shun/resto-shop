@@ -98,7 +98,7 @@
 
   <select id="getGroupByShopCart" resultType="CustomerGroup" >
       select t.customer_id,t.customer_name,sum(t2.number),t.is_leader,t.head_photo from tb_customer_group t
-left join tb_shop_cart t2 on t2.group_id = t.group_id
+left join tb_shop_cart t2 on t2.group_id = t.group_id and t.customer_id = t2.customer_id
 where t.group_id = #{groupId}
 GROUP BY t.customer_id
   </select>
