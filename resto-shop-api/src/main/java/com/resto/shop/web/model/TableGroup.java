@@ -9,6 +9,12 @@ import java.util.List;
  */
 public class TableGroup implements Serializable {
 
+    public static final Integer PAY = 1;
+
+    public static final Integer NOT_PAY= 0;
+
+    public static final Integer FINISH = 2;
+
     private static final long serialVersionUID = 1L;
 
     private Long id;

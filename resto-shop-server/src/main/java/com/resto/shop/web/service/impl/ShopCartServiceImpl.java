@@ -171,4 +171,9 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     public List<ShopCart> getListByGroupId(String groupId) {
         return shopcartMapper.getListByGroupId(groupId);
     }
+
+    @Override
+    public void resetGroupId(String groupId) {
+        shopcartMapper.resetGroupId(groupId);
+    }
 }

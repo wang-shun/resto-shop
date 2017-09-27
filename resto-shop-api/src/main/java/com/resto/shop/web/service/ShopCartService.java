@@ -27,6 +27,8 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
 
     void clearGroupId(Integer id);
 
+    void resetGroupId(String groupId);
+
 
     void deleteCustomerArticle(String customerId,String articleId);
 
