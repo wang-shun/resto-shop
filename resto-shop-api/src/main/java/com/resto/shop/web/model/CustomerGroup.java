@@ -30,6 +30,16 @@ public class CustomerGroup implements Serializable{
 
     private String brandId;
 
+    private Integer articleCount;
+
+    public Integer getArticleCount() {
+        return articleCount;
+    }
+
+    public void setArticleCount(Integer articleCount) {
+        this.articleCount = articleCount;
+    }
+
     public Long getId() {
         return id;
     }
