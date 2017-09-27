@@ -101,6 +101,7 @@
 left join tb_shop_cart t2 on t2.group_id = t.group_id and t.customer_id = t2.customer_id
 where t.group_id = #{groupId}
 GROUP BY t.customer_id
+order by is_leader desc
   </select>
 
   <delete id="removeByGroupId">
