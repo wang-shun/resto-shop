@@ -223,7 +223,6 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             if (cfg.getPushDay() == null) {
                 coupon.setPushDay(3);
             }
-            log.info("添加优惠券list："+coupons);
             for (int i = 0; i < cfg.getCouponNumber(); i++) {
                 couponService.insertCoupon(coupon);
                 coupons.add(coupon);
@@ -231,7 +230,6 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             long begin = coupon.getBeginDate().getTime();
             long end = coupon.getEndDate().getTime();
 //            timedPush(begin, end, coupon.getCustomerId(), coupon.getName(), coupon.getValue(), shopDetail, null);
-            log.info("添加优惠券list：hhhjjhkjhkhj"+coupons);
         }
        } catch (Exception e) {
            e.printStackTrace();
