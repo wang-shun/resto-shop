@@ -19,4 +19,6 @@ public interface TableGroupMapper extends GenericDao<TableGroup, Long>{
 
     TableGroup getTableGroupByCustomer(@Param("tableNumber") String tableNumber,@Param("customerId") String customerId
             ,@Param("shopId") String shopId);
+
+    TableGroup selectByGroupId(String groupId);
 }

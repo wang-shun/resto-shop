@@ -106,4 +106,8 @@
      where create_customer_id = #{customerId} and shop_detail_id = #{shopId}
      and table_number = #{tableNumber} and state = 0
   </select>
+
+  <select id="selectByGroupId" resultType="TableGroup">
+    select * from tb_table_group where group_id = #{groupId}
+  </select>
 </mapper>
