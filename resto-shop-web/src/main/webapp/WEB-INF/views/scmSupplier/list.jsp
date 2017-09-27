@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <div id="control">
-    <div class="row form-div" v-if="showform">
+    <div class="row form-div" v-show="showform">
         <div class="col-md-offset-3 col-md-6" style="text-align:center">
             <div class="portlet light bordered">
                 <div class="portlet-title">
@@ -12,21 +12,25 @@
                 </div>
 
                 <div class="portlet-body">
-                    <form role="form" class="form-horizontal" action="{{m.id?'scmSupplier/modify':'scmSupplier/create'}}" @submit.prevent="save" style="text-align:center">
-                        <input type="hidden" name="id" v-model="m.id" />
+                    <form role="form" class="form-horizontal" action="{{parameter.id?'scmSupplier/modify':'scmSupplier/create'}}" @submit.prevent="save" style="text-align:center">
+                        <input type="hidden" name="id" v-model="parameter.id" />
+                        <%--<input type="hidden"  name="bankName" v-model="parameter.bankName" />--%>
+                        <%--<input type="hidden"  name="bankAccount" v-model="parameter.bankAccount" />--%>
+                        <%--<input type="hidden"  name="topContact" v-model="parameter.bankAccount" />--%>
+                        <%--<input type="hidden"  name="topMobile" v-model="parameter.bankAccount" />--%>
+                        <%--<input type="hidden"  name="topEmail" v-model="parameter.bankAccount" />--%>
                         <div class="form-body">
-
                             <div class="form-group row">
-                                <label class="col-md-2 control-label">类型 </label>
-                                <select class="col-md-3 border-radius" name="supplierType" v-model="m.supplierType"  style="height:30px">
-                                    <option  v-for="materialType in materialTypes" value="{{supplierType.code}}">
-                                        {{materialType.name}}
+                                <label class="col-md-2 control-label">供应商类型</label>
+                                <select class="col-md-3 border-radius" name="supplierType" v-model="parameter.supplierType">
+                                    <option  v-for="supplierType in supplierTypes" value="{{parameter.supplierType}}">
+                                        {{supplierType.name}}
                                     </option>
                                 </select>
 
                                 <label class="col-md-2 control-label">编码</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="supCode" v-model="m.supCode"
+                                    <input type="text" class="form-control" name="supCode" v-model="parameter.supCode"
                                            required="required">
                                 </div>
                             </div>
@@ -34,65 +38,52 @@
                             <div class="form-group row" >
                                 <label class="col-md-2 control-label">公司名</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="materialName" v-model="productCode" required="required">
+                                    <input type="text" class="form-control" name="materialName" v-model="parameter.supName" required="required">
                                 </div>
 
                                 <label class="col-md-2 control-label">别名</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="supAliasName" v-model="m.supAliasName" required="required">
+                                    <input type="text" class="form-control" name="supAliasName" v-model="parameter.supAliasName" required="required">
                                 </div>
                             </div>
-
-
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">序号</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="version" v-model="m.version"
+                                    <input type="text" class="form-control" name="version" v-model="parameter.version"
                                            required="required">
                                 </div>
                             </div>
 
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">产品(可多选)</label>
-                                <div  class="col-md-4 checkbox-list">
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" name="printReceipt" v-model="m.printKitchen1" value = "1">主料
+                                <div  class="col-md-4 checkbox-list" id="checkboxs">
+                                    <label class="checkbox-inline" v-for="materialType in materialTypes">
+                                        <input type="checkbox" name=""  v-model="parameter.materialTypes" :value="materialType.code">{{materialType.name}}
                                     </label>
-                                    <label class="checkbox-inline">
-                                        <input type="checkbox" name="printKitchen" v-model="m.printKitchen2" value ="1">辅料
-                                    </label>
-                                    <label class="checkbox-inline">
-                                       <input type="checkbox" name="printKitchen" v-model="m.printKitchen3" value ="1">配料
-                                   </label>
                                 </div>
+                                <div>{{parameter.materialTypes}}</div>
                             </div>
-                         <%--编辑添加--%>
-                                <table class="table table-bordered" style= "width:600px;">
+                                <table class="table table-bordered" id="supplierContacts">
                                     <thead >
                                     <tr>
-                                        <th>编号</th>
-                                        <th>姓名</th>
-                                        <th>电话</th>
-                                        <th>邮箱</th>
-                                        <th>设为默认</th>
-                                        <th>操作</th>
+                                        <th>编号</th><th>姓名</th><th>电话</th><th>邮箱</th><th>设为默认</th><th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
+                                    <tr v-for="(index,item) in parameter.supplierContacts">
+                                        <td>{{index+1}}</td><td><input type="text" v-model="item.contact"></td><td><input type="text" v-model="item.mobile"></td><td><input type="text" v-model="item.email"></td>
+                                        <td><input name="isTop" type="radio" v-model="isTop" :value="item.isTop" @click="supplierContactsRadio(item)"></td>
+                                        <td><span class="btn btn-xs red" @click="removeArticleItem(item)">移除</span></td>
                                     </tr>
                                     </tbody>
                             </table>
+                            <div class="form-group text-center">
+                                <span class="btn green" @click="addSupplierContacts">添加联系资料</span>
+                            </div>
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">备注</label>
                                 <div class="col-sm-8">
-                                    <textarea class="form-control" name="content"></textarea>
+                                    <textarea class="form-control" v-model="parameter.note" value="{{parameter.note?parameter.note:'内容'}}" name="note"></textarea>
                                 </div>
                             </div>
                         </div>
@@ -143,24 +134,15 @@
                 {
                     title : "编码",
                     data : "supCode",
-//					createdCell : function(td,tdData){
-//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
-//					}
                 },
                 {
-                    title : "类型",
+                    title : "供应商类型",
                     data : "supplierType",
-//					createdCell : function(td,tdData){
-//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
-//					}
                 }
                 ,
                 {
                     title : "公司全称",
                     data : "supName",
-//					createdCell : function(td,tdData){
-//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
-//					}
                 },
                 {
                     title : "别称",
@@ -186,7 +168,6 @@
                     title : "备注",
                     data : "note"
                 },
-
                 {
                     title : "操作",
                     data : "id",
@@ -208,38 +189,122 @@
             mixins:[C.formVueMix],
             el:"#control",
             data:{
+                supplierTypes: [
+                    {code:"1",name:"物料类"},
+                    {code:"2",name:"服务类"},
+                    {code:"3" , name:"工程类"}
+                ],
                 materialTypes: [
-                    {
-                        code:"INGREDIENTS" ,
-                        name:"主料"
-                    },
-                    {
-                        code:"ACCESSORIES" ,
-                        name:"辅料"
-                    },{
-                        code:"SEASONING" ,
-                        name:"调料"
-                    }],
+                    {code:"INGREDIENTS",name:"主料"},
+                    {code:"ACCESSORIES",name:"辅料"},
+                    {code:"SEASONING" , name:"调料"}
+                    ],
+                isTop:'0',//单选框绑定
+                parameter:{
+                    supCode: "",
+                    supplierType: "",
+                    materialTypes:[],
+                    supAliasName: "",
+                    supName: "",
+                    note:'',//备注
+                    bankName: "",
+                    bankAccount: "",
+                    version: "",
+                    topContact: "",
+                    topMobile: "",
+                    topEmail: "",
+                    supplierContacts:[],//详情
+                },
             },
-
             methods:{
+                addSupplierContacts:function () { //添加供应商联系资料
+                    this.parameter.supplierContacts.push({contact:'',mobile:'',email:'',isTop:'1'});
+                },
+                removeArticleItem:function (data) { //移除供应商联系资料
+                    this.parameter.supplierContacts.$remove(data);
+                },
+                supplierContactsRadio:function(item){ //供应商联系默认值
+                    this.parameter.supplierContacts.forEach(function(element) {
+                        element.isTop='1';
+                    });
+                    item.isTop='0';
+                    this.isTop='0';
+                },
                 closeForm:function(){ //关闭新增弹窗
                     this.showform=false;
                 },
                 create:function(){ //打开新增弹窗
+                    this.parameter={
+                        supplierContacts:[],
+                        materialTypes:[],
+                    };
                     this.showform=true;
-
                 },
                 edit:function(model){ //编辑打开弹窗
-                    this.m= model;
+                    console.log(model);
+                    this.parameter= model;
                     this.showform=true;
+                    this.parameter.materialTypes='INGREDIENTS';
+                    this.parameter.materialTypes=this.parameter.materialTypes.split(',');
+//                    this.parameter.materialTypes.forEach(function(element){
+//                        debugger
+//                        switch(element){
+//                            case '主料':element='INGREDIENTS';break;
+//                            case '辅料':element='ACCESSORIES';break;
+//                            case '调料':element='SEASONING';break;
+//                        }
+//                    })
+                    this.$nextTick(function(){
+                        $('#supplierContacts div').removeClass('radio');
+                        $.each($('#checkboxs span'),function () {
+                            if($(this).find('input').is(':checked')) $(this).attr('class','checked');
+                        })
+                    })
+
                 },
-                save:function(e){
-                    var that = this;
-                    var formDom = e.target;
-                    C.ajaxFormEx(formDom,function(){
-                        that.cancel();
-                        tb.ajax.reload();
+                save:function(){
+                    var _this=this;
+                    var saveObj={};
+                    saveObj.id=this.parameter.id;
+                    saveObj.supCode=this.parameter.supCode;
+                    saveObj.supplierType=this.parameter.supplierType;
+                    saveObj.materialTypes=this.parameter.materialTypes;
+                    saveObj.supAliasName=this.parameter.supAliasName;
+                    saveObj.supName=this.parameter.supName;
+                    saveObj.note=this.parameter.note;
+                    saveObj.bankName=this.parameter.bankName;
+                    saveObj.bankAccount=this.parameter.bankAccount;
+                    //saveObj.version=this.parameter.version;
+                    saveObj.supplierContacts=[];
+                    var parSup=this.parameter.supplierContacts;
+                    for(var i=0;i<parSup.length;i++){
+                        saveObj.supplierContacts[i]={
+                            contact:parSup[i].contact,
+                            mobile:parSup[i].mobile,
+                            email:parSup[i].email,
+                            isTop:parSup[i].isTop
+                        }
+                    }
+                    var url='scmSupplier/modify';
+                    saveObj.materialTypes=saveObj.materialTypes.toString();
+                    if(!this.parameter.id) {
+                        url='scmSupplier/create';
+                        _this.parameter;
+                    }
+                    $.ajax({
+                        type:"POST",
+                        url:url,
+                        contentType:"application/json",
+                        datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
+                        data:JSON.stringify(saveObj),
+                        beforeSend:function(){ //请求之前执行
+                            _this.showform=false;
+                        },
+                        success:function(data){ //成功后返回
+                            console.log(data);
+                        },
+                        error: function(){ //失败后执行
+                        }
                     });
                 }
               
