@@ -47,11 +47,9 @@ public class ScmStockController extends GenericController{
 
     @RequestMapping("create")
     @ResponseBody
-
     public Result create(@Valid @RequestBody DocStockInput docStockInput){
         docStockInput.setShopId(getCurrentShopId());
         docStockInput.setCreateId(getCurrentUserId());
-        docStockInput.setCreateName(getCurrentBrandUser().getUsername());
         try {
             stockCountCheckService.saveStock(docStockInput);
             return Result.getSuccess();
