@@ -25,7 +25,21 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
 
     ShopCart selectByUuId(String uuid);
 
+    void clearGroupId(Integer id);
+
+
     void deleteCustomerArticle(String customerId,String articleId);
 
-    List<ShopCart> selectListByGroupId(String groupId);
+    /**
+     * 把用户在这家店铺的购物车同步给某个组
+     * @param customerId
+     * @param shopId
+     * @param groupId
+     */
+    void groupNew(String customerId,String shopId,String groupId);
+
+    /**
+     * 判断菜品是否重复
+     */
+    Integer checkRepeat(String articleId,String groupId);
 }

@@ -32,5 +32,5 @@ public interface CustomerGroupService extends GenericService<CustomerGroup, Long
      * @param tableNumber 桌号
      * @return
      */
-    List<CustomerGroup> getGroupByCustomerId(String customerId,String shopId,String tableNumber);
+    CustomerGroup  getGroupByCustomerId(String customerId,String shopId,String tableNumber);
 }

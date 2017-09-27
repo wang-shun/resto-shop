@@ -127,6 +127,7 @@
         </set> where id = #{id,jdbcType=INTEGER}
     </update>
 
+
     <delete id="clearShopCart">
         delete from tb_shop_cart where customer_id = #{0} and distribution_mode_id = #{1} and  shop_detail_id = #{2}
     </delete>
@@ -147,11 +148,30 @@
       delete from tb_shop_cart where  pid = #{0}
     </delete>
 
+
     <delete id="deleteCustomerArticle">
         delete from tb_shop_cart where customer_id = #{customerId} and article_id = #{articleId}
     </delete>
 
-    <select id="selectList" resultType="ShopCart">
+    <update id="clearGroupId">
+        update tb_shop_cart
+        set group_id = null
+        where id = #{id}
+    </update>
+
+    <update id="groupNew">
+        update tb_shop_cart
+        set group_id = #{groupId}
+        where shop_detail_id = #{shopId}
+        and customer_id = #{customerId}
+    </update>
+
+    <select id="checkRepeat" resultType="java.lang.Integer">
+        select sum(`number`) from tb_shop_cart where article_id = #{articleId}
+        and group_id = #{groupId} GROUP BY customer_id
+    </select>
+
+    <select id="getListByGroupId" resultType="ShopCart">
         select * from tb_shop_cart where group_id = #{groupId}
     </select>
 </mapper>
