@@ -172,7 +172,8 @@
     </select>
 
     <select id="getListByGroupId" resultType="ShopCart">
-        select * from tb
+        select * from tb_shop_cart where group_id = #{groupId}
+    </select>
 
     <update id="resetGroupId">
         update tb_shop_cart
