@@ -68,7 +68,7 @@
                             </div>
                          <%--编辑添加--%>
                                 <table class="table table-bordered" style= "width:600px;">
-                                    <thead >
+                                    <thead>
                                     <tr>
                                         <th>编号</th>
                                         <th>姓名</th>
@@ -143,24 +143,15 @@
                 {
                     title : "编码",
                     data : "supCode",
-//					createdCell : function(td,tdData){
-//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
-//					}
                 },
                 {
                     title : "类型",
                     data : "supplierType",
-//					createdCell : function(td,tdData){
-//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
-//					}
                 }
                 ,
                 {
                     title : "公司全称",
                     data : "supName",
-//					createdCell : function(td,tdData){
-//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
-//					}
                 },
                 {
                     title : "别称",
@@ -247,6 +238,7 @@
        });
         C.vue=vueObj;
     }());
+
 </script>
 
 

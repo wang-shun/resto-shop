@@ -345,11 +345,11 @@
                 showCheckbox: true,
                 onNodeChecked: function(event, node) {
                     if(node){
-                        Vue.set(vueObj.bomRawMaterial,vueObj.bomRawMaterial.length,node)
+                        Vue.set(vueObj.vueObj.bomRawMaterial.length,node)
                     }
                 },
                 onNodeUnchecked: function (event, node) {
-                        vueObj.bomRawMaterial= vueObj.bomRawMaterial.filter(o => o.id != node.id);
+                        vueObj.bomRawMaterial= vueObj.bomRawMaterial.filter(o =>o.id != node.id);
                 }
             });
             var findCheckableNodess = function() {
