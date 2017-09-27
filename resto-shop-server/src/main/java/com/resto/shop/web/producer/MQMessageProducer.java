@@ -245,7 +245,7 @@ public class MQMessageProducer {
 
 	public static void removeTableGroup(TableGroup tableGroup,final long delayTime){
 		JSONObject obj = new JSONObject();
-		obj.put("id",tableGroup.getId());
+		obj.put("groupId",tableGroup.getGroupId());
 		obj.put("brandId",tableGroup.getBrandId());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_REMOVE_TABLE_GROUP,obj.toJSONString().getBytes());
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);

@@ -136,7 +136,7 @@ public class OrderMessageListener implements MessageListener {
             JSONObject obj = JSONObject.parseObject(msg);
             String brandId = obj.getString("brandId");
             DataSourceContextHolder.setDataSourceName(brandId);
-            tableGroupService.removeTableGroup(Long.valueOf(obj.getString("id")));
+            tableGroupService.removeTableGroup(obj.getString("groupId"));
         }catch (Exception e){
             e.printStackTrace();
             return Action.ReconsumeLater;
