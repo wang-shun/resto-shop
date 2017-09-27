@@ -76,6 +76,9 @@ public class CustomerGroupServiceImpl extends GenericServiceImpl<CustomerGroup, 
 
     }
 
+
+
+
     @Override
     public List<CustomerGroup> getGroupByGroupId(String groupId) {
         return customerGroupMapper.getGroupByGroupId(groupId);
@@ -84,5 +87,15 @@ public class CustomerGroupServiceImpl extends GenericServiceImpl<CustomerGroup, 
     @Override
     public CustomerGroup getGroupByCustomerId(String customerId, String shopId, String tableNumber) {
             return customerGroupMapper.getGroupByCustomerId(customerId, shopId, tableNumber);
+    }
+
+    @Override
+    public List<CustomerGroup> getGroupByShopCart(String groupId) {
+        return customerGroupMapper.getGroupByShopCart(groupId);
+    }
+
+    @Override
+    public void removeByGroupId(String groupId) {
+        customerGroupMapper.removeByGroupId(groupId);
     }
 }

@@ -33,4 +33,20 @@ public interface CustomerGroupService extends GenericService<CustomerGroup, Long
      * @return
      */
     CustomerGroup  getGroupByCustomerId(String customerId,String shopId,String tableNumber);
+
+
+    /**
+     * 返回当前购物车组中所有人
+     * @param groupId 组号
+     * @return
+     */
+    List<CustomerGroup> getGroupByShopCart(String groupId);
+
+
+    /**
+     * 删除组内所有人
+     * @param groupId 组号
+     */
+    void removeByGroupId(String groupId);
+
 }

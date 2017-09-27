@@ -166,4 +166,9 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     public Integer checkRepeat(String articleId, String groupId) {
         return shopcartMapper.checkRepeat(articleId, groupId) ;
     }
+
+    @Override
+    public void resetGroupId(String groupId) {
+        shopcartMapper.resetGroupId(groupId);
+    }
 }

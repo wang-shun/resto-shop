@@ -16,4 +16,8 @@ public interface CustomerGroupMapper extends GenericDao<CustomerGroup, Long> {
     List<CustomerGroup> getGroupByGroupId(String groupId);
 
     CustomerGroup getGroupByCustomerId(@Param("customerId") String customerId,@Param("shopId") String shopId,@Param("tableNumber") String tableNumber);
+
+    List<CustomerGroup> getGroupByShopCart(String groupId);
+
+    void removeByGroupId(String groupId);
 }
