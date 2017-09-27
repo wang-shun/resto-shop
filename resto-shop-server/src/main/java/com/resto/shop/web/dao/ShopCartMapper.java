@@ -25,7 +25,6 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
 
     void updateShopCartItem(ShopCart shopCartItem);
 
-
 	void clearShopCart(String customerId, Integer distributionModeId, String shopDetailId);
 
 	void clearAllShopCart(String customerId,String shopDetailId);
@@ -41,4 +40,6 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
     ShopCart selectByUuId(String uuid);
 
     void deleteCustomerArticle(@Param("customerId") String customerId,@Param("articleId") String articleId);
+
+    List<ShopCart> selectListByGroupId(String groupId);
 }

@@ -134,4 +134,9 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     public void deleteCustomerArticle(String customerId, String articleId) {
         shopcartMapper.deleteCustomerArticle(customerId, articleId);
     }
+
+    @Override
+    public List<ShopCart> selectListByGroupId(String groupId) {
+        return shopcartMapper.selectListByGroupId(groupId);
+    }
 }

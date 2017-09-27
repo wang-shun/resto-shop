@@ -127,7 +127,6 @@
         </set> where id = #{id,jdbcType=INTEGER}
     </update>
 
-
     <delete id="clearShopCart">
         delete from tb_shop_cart where customer_id = #{0} and distribution_mode_id = #{1} and  shop_detail_id = #{2}
     </delete>
@@ -148,8 +147,11 @@
       delete from tb_shop_cart where  pid = #{0}
     </delete>
 
-
     <delete id="deleteCustomerArticle">
         delete from tb_shop_cart where customer_id = #{customerId} and article_id = #{articleId}
     </delete>
+
+    <select id="selectList" resultType="ShopCart">
+        select * from tb_shop_cart where group_id = #{groupId}
+    </select>
 </mapper>
