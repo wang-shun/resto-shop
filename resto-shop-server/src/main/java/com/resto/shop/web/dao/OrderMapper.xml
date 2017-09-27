@@ -1031,7 +1031,7 @@
         </if>
         UNION ALL
         select * from tb_order where id in (
-          select order_id from tb_participant where t.customer_id != #{customerId} and is_pay = 0
+          select order_id from tb_participant where customer_id != #{customerId} and is_pay = 0
         )
         ORDER BY create_time DESC LIMIT
         #{start},#{datalength}
