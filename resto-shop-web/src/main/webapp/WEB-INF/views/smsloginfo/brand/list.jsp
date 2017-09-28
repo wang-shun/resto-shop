@@ -1,8 +1,7 @@
 <%@ page language="java" pageEncoding="utf-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
-<link rel="stylesheet" type="text/css"
-	href="assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
+<link rel="stylesheet" type="text/css" href="assets/global/plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css">
 
 <h2 class="text-center">
 	<strong>短信记录</strong>

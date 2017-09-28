@@ -23,8 +23,8 @@
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">菜品类别</label>
                                 <div class="col-md-3">
-                                    <select name="materialType" v-model="parameter.familyName" class="bs-select form-control" >
-                                        <option  v-for="articleFamily in articleFamilyIdArr" value="{{parameter.familyName}}">
+                                    <select name="productCategory"  class="bs-select form-control" @change='changeType1' >
+                                        <option  v-for="articleFamily in articleFamilyIdArr" value="{{articleFamily.articleFamilyId}}">
                                             {{articleFamily.name}}
                                         </option>
                                     </select>
@@ -32,8 +32,8 @@
 
                                 <label class="col-md-2 control-label">菜品名称</label>
                                 <div class="col-md-3">
-                                <select name="categoryOneId" v-model="parameter.articleName" class="bs-select form-control" >
-                                    <option  v-for="productName in productNameArr" value="{{parameter.articleName}}">
+                                <select name="categoryOneId"   class="bs-select form-control" @change='changeType2'>
+                                    <option  v-for="productName in productNameArr" value="{{productName.articleId}}">
                                         {{productName.name}}
                                     </option>
                                 </select>
@@ -70,7 +70,6 @@
                             </div>
                         </div>
                         <div>
-                            <input type="hidden" name="bomDetailDoList" id="bomDetailDoList" v-model="parameter.bomDetailDoList">
                             <table class="table table-bordered" id="yuanliaolist">
                                 <thead><tr>
                                     <th>行号</th><th>原料编码</th><th>原料类型</th>
@@ -80,7 +79,7 @@
                                 <tbody>
                                 <tr v-for="(index,item) in parameter.bomDetailDoList">
                                     <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.INGREDIENTS}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
-                                    <td><input type="text" value="1"></td><td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
+                                    <td><input type="text" v-model="item.materialCount" value="1"></td><td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -117,7 +116,7 @@
                             <tbody>
                         <tr v-for="(index,item) in bomRawMaterial">
                             <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.INGREDIENTS}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
-                            <td><input type="text" value="1"></td><td><button class="btn btn-xs red">移除</button></td>
+                            <td><input type="text" v-model="materialCount" value="item.materialCount"></td><td><button class="btn btn-xs red">移除</button></td>
                         </tr>
                         </tbody>
                         </table>
@@ -169,9 +168,9 @@
                 {
                     data : "bomDetailDoList",
                     createdCell : function(td,tdData){
-                        var html='<tr><th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th><th>规格</th><th>最小单位</th><th>所需最小单位数量</th></tr>';
+                        var html='<tr><th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th><th>规格</th><th>最小单位</th><th>所需最小单位数量</th><th>数量</th></tr>';
                         for(var i=0;i<tdData.length;i++){
-                            html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].minMeasureUnit+'</td></tr>';
+                            html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].minMeasureUnit+'</td><td><input type="text" value="'+tdData[i].materialCount+'"></td></tr>';
                         }
                         $(td).addClass('bomDetailDoList');
                         $(td).html(html);
@@ -234,26 +233,41 @@
                 treeView:false,//树状图
 
                 bomRawMaterial:[],//bom原材料
-                //bomRawMaterial2:[],//bom原材料显示
 
                 articleFamilyIdArr:[],//菜品类别选项
                 productNameArr:[],//菜品名称选项
                 parameter:{
+                    id:'',//id
                     priority:'',//序号
+                    bomCode:'',//bom清单的编码
                     productCode:'',//菜品编码
                     version:'',//版本号
-                    familyName:'',//菜品类别
-                    articleName:'',//菜品名称
+                    productCategory:'',//菜品类别
+                    productName:'',//菜品名称
+                    articleFamilyId:'',//菜品类别id
+                    articleId:'',//菜品id
                     measurementUnit:'',//计量单位
                     size:'',//原料种类
-                    id:'',//id
                     bomDetailDoList:[],//bom原材料显示
+                    bomDetailDeleteIds:[],//删除的list节点
                 }
             },
             methods:{
+                changeType1: function (ele) {
+                    this.parameter.productCategory = $(ele.target).find("option:selected").text();
+                    this.parameter.articleFamilyId = ele.target.value;
+                },
+                changeType2: function (ele) {
+                    this.parameter.productName = $(ele.target).find("option:selected").text();
+                    this.parameter.articleId = ele.target.value;
+                },
                 create:function(){ //打开新增弹窗
                     this.parameter= {
                         bomDetailDoList:[],//bom原材料显示
+                        bomDetailDeleteIds:[],//删除的list节点
+                        bomCode:'',
+                        productCode:'',
+                        measurementUnit:''
                     };
                     this.showform=true;
                 },
@@ -261,20 +275,56 @@
                     this.showform=false;
                 },
                 edit:function(model){ //编辑打开弹窗
-                    console.log(model)
                     this.parameter= model;
+                    console.log(this.parameter);
+                    this.parameter.bomDetailDeleteIds=[];
                     this.showform=true;
                 },
                 save:function(e){ //新增and编辑保存
-                    var that = this;
-                    var formDom = e.target;
-                    C.ajaxFormEx(formDom,function(){
-                        that.cancel();
-                        tb.ajax.reload();
+                    var _this=this;
+                    var savearr=[];
+                    for(var i=0;i<_this.parameter.bomDetailDoList.length;i++){
+                        savearr[i]={
+                            id:_this.parameter.bomDetailDoList[i].id,minMeasureUnit:_this.parameter.bomDetailDoList[i].minMeasureUnit,unitName:_this.parameter.bomDetailDoList[i].unitName,materialName:_this.parameter.bomDetailDoList[i].name,
+                            specName:_this.parameter.bomDetailDoList[i].specName,materialCode:_this.parameter.bomDetailDoList[i].materialCode,materialId:_this.parameter.bomDetailDoList[i].id,lossFactor:_this.parameter.bomDetailDoList[i].lossFactor,
+                            actLossFactor:_this.parameter.bomDetailDoList[i].actLossFactor,materialCount:_this.parameter.bomDetailDoList[i].materialCount
+                        }
+                    }
+                    _this.parameter.bomDetailDoList=savearr;
+                    var url='scmBom/modify';
+                    if(!this.parameter.id) {
+                        url='scmBom/create';
+                        _this.parameter;
+                        delete _this.parameter.bomDetailDeleteIds;
+                    }
+                    $.ajax({
+                        type:"POST",
+                        url:url,
+                        contentType:"application/json",
+                        datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
+                        data:JSON.stringify(_this.parameter),
+                        beforeSend:function(){ //请求之前执行
+                            console.log("请求之前执行");
+                            _this.showform=false;
+                        },
+                        success:function(data){ //成功后返回
+                            console.log(data);
+                        },
+                        error: function(){ //失败后执行
+                        }
                     });
+                    this.parameter= {
+                        bomDetailDoList:[],//bom原材料显示
+                        bomDetailDeleteIds:[],//删除的list节点
+                        bomCode:'',
+                        productCode:'',
+                        measurementUnit:''
+                    };
                 },
                 bomRawMaterialSub:function () { //添加原料保存
+
                     this.parameter.bomDetailDoList.push.apply(this.parameter.bomDetailDoList,this.bomRawMaterial);//合并数组
+                    console.log(this.parameter.bomDetailDoList);
                     this.treeView=false;
                 },
                 closeTreeView:function () { //添加原料打开
@@ -285,7 +335,8 @@
                 },
                 removeArticleItem: function (mealItem) { //移除
                     this.parameter.bomDetailDoList.$remove(mealItem);
-                    console.log(this.parameter.bomDetailDoList);
+                    console.log(mealItem);
+                    this.parameter.bomDetailDeleteIds.push(mealItem.id);
                 },
             },
             ready:function(){//钩子加载后
@@ -296,24 +347,19 @@
                     $('#tableBodyLists table').html($(this).find('.bomDetailDoList').html());
                 });
                 $.get('articlefamily/list_all',function (data) { //菜品类别选项
-                    console.log('菜品类别选项');
                     for(var i=0;i<data.length;i++){
-                        that.articleFamilyIdArr.push({id:data[i].id , name:data[i].name});
+                        that.articleFamilyIdArr.push({articleFamilyId:data[i].id , name:data[i].name});
                     }
-                    console.log(that.articleFamilyIdArr);
                 });
                 $.get('article/list_all',function (data) { //菜品名称选项
-                    console.log('菜品名称选项');
+                    console.log(data);
                     for(var i=0;i<data.length;i++){
-                        that.productNameArr.push({id:data[i].id , name:data[i].name});
+                        that.productNameArr.push({articleId:data[i].id, name:data[i].name});
                     }
-                    console.log(that.productNameArr);
                 })
             },
         });
         C.vue=vueObj;
-
-
         $.get('scmCategory/query',function (jsonData) {
             var defaultData=jsonData.data;
             console.log(defaultData);
@@ -343,13 +389,18 @@
                 data: defaultData,
                 showIcon: true,
                 showCheckbox: true,
-                onNodeChecked: function(event, node) {
-                    if(node){
-                        Vue.set(vueObj.vueObj.bomRawMaterial.length,node)
+                onNodeChecked: function(event, data) {
+                    //var node={};
+                    if(data){
+//                        node.id=data.id;node.minMeasureUnit=data.minMeasureUnit;node.unitName=data.unitName;node.materialName=data.materialName;
+//                        node.specName=data.specName;node.materialCode=data.materialCode;node.materialId=data.materialId;node.lossFactor=data.lossFactor;
+//                        node.actLossFactor=data.actLossFactor;node.materialCount=data.materialCount;
+//                        console.log(node);
+                        Vue.set(vueObj.bomRawMaterial,vueObj.bomRawMaterial.length,data);
                     }
                 },
                 onNodeUnchecked: function (event, node) {
-                        vueObj.bomRawMaterial= vueObj.bomRawMaterial.filter(o =>o.id != node.id);
+                        vueObj.bomRawMaterial= vueObj.bomRawMaterial.filter(o => o.id != node.id);
                 }
             });
             var findCheckableNodess = function() {

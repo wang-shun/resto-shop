@@ -59,7 +59,7 @@
 
 	 @RequestMapping("create")
 	 @ResponseBody
-	 public Result create(@Valid @RequestBody MdCategory mdCategory){
+	 public Result create(@Valid  MdCategory mdCategory){
 		 int i = categoryService.addCategory(mdCategory);
 		 if(i>0){
 			 return Result.getSuccess();

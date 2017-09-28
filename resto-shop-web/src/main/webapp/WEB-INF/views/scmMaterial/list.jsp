@@ -414,14 +414,11 @@
                             that.m.districtId = data[0].id;
                     });
                     this.showform=true;
-
 				},
 				edit:function(model){
 					var that = this;
 					this.m= model;
 					this.openForm();
-
-
 				},
 				save:function(e){
                     var that = this;
@@ -430,7 +427,6 @@
 							that.cancel();
 							tb.ajax.reload();
 						});
-
 				}
 			}
 		});
