@@ -22,12 +22,13 @@
                         <div class="form-body">
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">供应商类型</label>
-                                <select class="col-md-3 border-radius" name="supplierType" v-model="parameter.supplierType">
+                                <div class="col-md-3">
+                                <select class="bs-select form-control" name="supplierType" v-model="parameter.supplierType">
                                     <option  v-for="supplierType in supplierTypes" value="{{parameter.supplierType}}">
                                         {{supplierType.name}}
                                     </option>
                                 </select>
-
+                                </div>
                                 <label class="col-md-2 control-label">编码</label>
                                 <div class="col-md-3">
                                     <input type="text" class="form-control" name="supCode" v-model="parameter.supCode"
@@ -61,7 +62,6 @@
                                         <input type="checkbox" name=""  v-model="parameter.materialTypes" :value="materialType.code">{{materialType.name}}
                                     </label>
                                 </div>
-                                <div>{{parameter.materialTypes}}</div>
                             </div>
                                 <table class="table table-bordered" id="supplierContacts">
                                     <thead >
@@ -100,7 +100,7 @@
 
     <div class="table-div">
         <div class="table-operator">
-            <s:hasPermission name="scmMaterial/add">
+            <s:hasPermission name="scmSupplier/add">
                 <button class="btn green pull-right" @click="create">新增供应商</button>
             </s:hasPermission>
         </div>
@@ -171,12 +171,12 @@
                 {
                     title : "操作",
                     data : "id",
-                    createdCell:function(td,tdData,rowData,row){
+                    createdCell:function(td,tdData,rowData){
                         var operator=[
-                            <s:hasPermission name="scmMaterial/edit">
+                            <s:hasPermission name="scmSupplier/create">
                             C.createEditBtn(rowData),
-                            <s:hasPermission name="scmMaterial/delete">
-                            C.createDelBtn(tdData,"scmMaterial/delete"),
+                            <s:hasPermission name="scmSupplier/delete">
+                            C.createDelBtn(tdData,"scmSupplier/delete"),
                             </s:hasPermission>
                             </s:hasPermission>
                         ];
@@ -295,7 +295,7 @@
                         type:"POST",
                         url:url,
                         contentType:"application/json",
-                        datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
+                        datatype: "json",
                         data:JSON.stringify(saveObj),
                         beforeSend:function(){ //请求之前执行
                             _this.showform=false;
