@@ -259,7 +259,7 @@ public class OrderAspect {
         Map<String, Object> keyword5 = new HashMap<String, Object>();
         List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
         StringBuffer msg = new StringBuffer();
-        for (int i=0; i<=5; i++) {
+        for (int i=0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
             OrderItem item = orderItem.get(i);
             if(i == 0){
                 msg.append(" " + item.getArticleName() + "×" + item.getCount() + "\n");
@@ -812,7 +812,7 @@ public class OrderAspect {
             Map<String, Object> keyword5 = new HashMap<String, Object>();
             List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
             StringBuffer msg = new StringBuffer();
-            for (int i=0; i<=5; i++) {
+            for (int i=0; i<(orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                 OrderItem item = orderItem.get(i);
                 if(i == 0){
                     msg.append(" " + item.getArticleName() + "×" + item.getCount() + "\n");
