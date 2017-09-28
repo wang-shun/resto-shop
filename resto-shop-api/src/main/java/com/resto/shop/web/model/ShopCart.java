@@ -1,7 +1,6 @@
 package com.resto.shop.web.model;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.util.List;
 
 public class ShopCart implements Serializable {
@@ -38,10 +37,6 @@ public class ShopCart implements Serializable {
     private String uuid;
 
     private String groupId;
-
-    private String name;
-
-    private BigDecimal realPrice;
 
     public String getUuid() {
         return uuid;
@@ -161,21 +156,5 @@ public class ShopCart implements Serializable {
 
     public void setGroupId(String groupId) {
         this.groupId = groupId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getRealPrice() {
-        return realPrice;
-    }
-
-    public void setRealPrice(BigDecimal realPrice) {
-        this.realPrice = realPrice;
     }
 }
