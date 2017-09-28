@@ -401,6 +401,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setId(orderId);
         order.setPosDiscount(new BigDecimal(1));
         Customer customer = customerService.selectById(order.getCustomerId());
+        if(!StringUtils.isEmpty(order.getGroupId())){
+            Boolean bool = (Boolean) RedisUtil.get(order.getCustomerId()+order.getGroupId());
+            if(!bool){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("万分抱歉，菜品发生变动，请重新变动！");
+                return jsonResult;
+            }
+        }
 
         if (customer == null && "wechat".equals(order.getCreateOrderByAddress())) {
             throw new AppException(AppException.CUSTOMER_NOT_EXISTS);
