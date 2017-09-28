@@ -31,6 +31,7 @@ import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.util.BrandAccountSendUtil;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
+import net.sf.jsqlparser.schema.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
@@ -72,6 +73,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     private static final String NUMBER = "0123456789";
 
     private static final List<String> orderList = new ArrayList<>();
+
+    @Autowired
+    TableGroupService tableGroupService;
+
+    @Autowired
+    CustomerGroupService customerGroupService;
 
     @Resource
     private OrderMapper orderMapper;
@@ -4513,6 +4520,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void updateAllowContinue(String id, boolean b) {
         orderMapper.changeAllowContinue(id, b);
+        Order order = selectById(id);
+        if(!StringUtils.isEmpty(order.getGroupId())){
+            //如果订单是在组里的
+            //禁止加菜后，组释放，并且删除所有 人与组的关系，并且删除该组的购物车
+            TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
+            tableGroup.setState(TableGroup.FINISH);
+            tableGroupService.update(tableGroup);
+            customerGroupService.removeByGroupId(order.getGroupId());
+            shopCartService.resetGroupId(order.getGroupId());
+        }
     }
 
     @Override

@@ -41,6 +41,8 @@ public interface TableGroupService extends GenericService<TableGroup, Long> {
 
     TableGroup insertGroup(TableGroup tableGroup);
 
+    TableGroup selectByGroupId(String groupId);
+
     void removeTableGroup(String groupId);
 
     TableGroup selectByGroupId(String groupId);
