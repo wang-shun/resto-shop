@@ -356,6 +356,14 @@ public class OrderMessageListener implements MessageListener {
 
     private Action executeSendCallMessage(Message message) throws UnsupportedEncodingException {
         try {
+           /* String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
+            JSONObject obj = JSONObject.parseObject(msg);
+            String brandId = obj.getString("brandId");
+            DataSourceContextHolder.setDataSourceName(brandId);
+            String customerId = obj.getString("customerId");
+            Customer customer = customerService.selectById(customerId);
+            WechatConfig config = wechatConfigService.selectByBrandId(brandId);
+            WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());*/
             String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
             JSONObject obj = JSONObject.parseObject(msg);
             String brandId = obj.getString("brandId");
@@ -363,7 +371,41 @@ public class OrderMessageListener implements MessageListener {
             String customerId = obj.getString("customerId");
             Customer customer = customerService.selectById(customerId);
             WechatConfig config = wechatConfigService.selectByBrandId(brandId);
-            WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            Order order=orderService.selectById(obj.getString("orderId"));
+            ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
+            String res = WeChatUtils.getTemplate("OPENTM411223846", config.getAppid(), config.getAppsecret());
+            org.json.JSONObject access = new org.json.JSONObject(res);
+            String templateId = access.optString("template_id");
+            String jumpUrl ="";
+            Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+            Map<String, Object> first = new HashMap<String, Object>();
+            first.put("value", "您好，餐点已备齐，请取餐。");
+            first.put("color", "#00DB00");
+            Map<String, Object> keyword1 = new HashMap<String, Object>();
+            keyword1.put("value", shop.getName());
+            keyword1.put("color", "#000000");
+            Map<String, Object> keyword2 = new HashMap<String, Object>();
+            keyword2.put("value", order.getVerCode());
+            keyword2.put("color", "#000000");
+            Map<String, Object> keyword3 = new HashMap<String, Object>();
+            keyword3.put("value", order.getSerialNumber());
+            keyword3.put("color", "#000000");
+            Map<String, Object> remark = new HashMap<String, Object>();
+            remark.put("value", "为了保证出品新鲜美味，请您请尽快到吧台取餐！");
+            remark.put("color", "#173177");
+            content.put("first", first);
+            content.put("keyword1", keyword1);
+            content.put("keyword2", keyword2);
+            content.put("keyword3", keyword3);
+            content.put("remark", remark);
+            String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+            Brand brand = brandService.selectById(brandId);
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(LogUtils.url, map);
         }catch (Exception e){
             e.printStackTrace();
             return Action.ReconsumeLater;

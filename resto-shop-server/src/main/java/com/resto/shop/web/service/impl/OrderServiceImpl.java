@@ -7712,7 +7712,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Brand brand = brandService.selectById(o.getBrandId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
-            StringBuilder msg = new StringBuilder("亲，您");
+            /*StringBuilder msg = new StringBuilder("亲，您");
             msg.append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("的订单已完成退菜，相关款项")
                     .append("会在24小时内退还至您的微信账户，请注意查收！\n");
             msg.append("订单编号:\n");
@@ -7771,8 +7771,64 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             msg.append("退菜金额:").append(order.getRefundMoney()).append("\n");
             WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
+//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),*/
 //                "订单发送推送：" + msg.toString());
+            String res = WeChatUtils.getTemplate("OPENTM203022210", config.getAppid(), config.getAppsecret());
+            JSONObject access = new JSONObject(res);
+            String templateId = access.optString("template_id");
+            String jumpUrl ="";
+            Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+            Map<String, Object> first = new HashMap<String, Object>();
+            first.put("value", "您好，您的订单已完成退菜！");
+            first.put("color", "#00DB00");
+            Map<String, Object> keyword1 = new HashMap<String, Object>();
+            keyword1.put("value", shopDetail.getName());
+            keyword1.put("color", "#000000");
+            Map<String, Object> keyword2 = new HashMap<String, Object>();
+            keyword2.put("value", o.getTableNumber());
+            keyword2.put("color", "#000000");
+            Map<String, Object> keyword3 = new HashMap<String, Object>();
+            StringBuffer msg = new StringBuffer();
+            for (int i=0; i<=5; i++) {
+                OrderItem orderItem1 = order.getOrderItems().get(i);
+                if (orderItem1.getType().equals(ArticleType.ARTICLE)) {
+                    OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem1.getId());
+                    msg.append("\t").append(item.getArticleName()).append("×").append(orderItem1.getCount()).append("\n");
+                    if (item.getType() == OrderItemType.SETMEALS) {
+                        List<OrderItem> child = orderitemMapper.getListByParentId(item.getId());
+                        for (OrderItem c : child) {
+                            //                childItem.setArticleName("|__" + childItem.getArticleName());
+                            msg.append("\t").append("|__").append(c.getArticleName()).append("×").append(c.getRefundCount()).append("\n");
+                        }
+                    }
+
+                } else if (orderItem1.getType().equals(ArticleType.SERVICE_PRICE)) {
+                    msg.append("\t").append(shopDetail.getServiceName()).append("×").append(orderItem1.getCount()).append("\n");
+                }
+                if(order.getOrderItems().size()>5){
+                    msg.append("...");
+                }
+
+            }
+            keyword3.put("value", msg.toString());
+            keyword3.put("color", "#000000");
+            Map<String, Object> keyword4 = new HashMap<String, Object>();
+            keyword4.put("value", "共"+order.getOrderItems().size()+"份");
+            keyword4.put("color", "#000000");
+            Map<String, Object> keyword5 = new HashMap<String, Object>();
+            keyword5.put("value",DateUtil.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
+            keyword5.put("color", "#000000");
+            Map<String, Object> remark = new HashMap<String, Object>();
+            remark.put("value", "相关款项会在24小时内退还至您的账户，请注意查收！");
+            remark.put("color", "#173177");
+            content.put("first", first);
+            content.put("keyword1", keyword1);
+            content.put("keyword2", keyword2);
+            content.put("keyword3", keyword3);
+            content.put("keyword4", keyword4);
+            content.put("keyword5", keyword5);
+            content.put("remark", remark);
+            String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
             Map customerMap = new HashMap(4);
             customerMap.put("brandName", brand.getBrandName());
             customerMap.put("fileName", customer.getId());
