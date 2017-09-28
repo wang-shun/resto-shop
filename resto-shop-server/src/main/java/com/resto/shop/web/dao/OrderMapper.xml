@@ -2666,7 +2666,7 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and pay_type = 1 and order_state = 1
         and parent_order_id is null
         and pay_type = 1
-        and #{closeContinueTime} >  now() - create_time
+        and #{closeContinueTime} > TIMESTAMPDIFF(SECOND,create_time,now())
         and customer_id != #{customerId}
     </select>
 
