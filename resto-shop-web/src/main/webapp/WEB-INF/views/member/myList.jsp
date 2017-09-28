@@ -23,6 +23,7 @@
                     <button type="button" class="btn btn-primary" @click="createExcel" v-if="state == 1">下载报表</button>
                     <button type="button" class="btn btn-default" disabled="disabled" v-if="state == 2">下载数据过多，正在生成中。请勿刷新页面</button>
                     <button type="button" class="btn btn-success" @click="download" v-if="state == 3">已完成，点击下载</button>
+                    <a href="newcustomcoupon/goToGrant?intoType=1" class="btn btn-primary ajaxify">会员筛选</a>
                     <br/>
                 </div>
             </form>

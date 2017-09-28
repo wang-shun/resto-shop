@@ -1,11 +1,9 @@
 package com.resto.shop.web.config;
 
 import cn.restoplus.rpc.client.RpcProxy;
-import com.resto.brand.web.model.AccountAddressInfo;
 import com.resto.brand.web.service.*;
 import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.shop.web.service.*;
-import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.service.EmployeeService;
 import com.resto.shop.web.service.OrderRemarkService;
 import com.resto.shop.web.service.PermissionService;
@@ -525,6 +523,11 @@ public class SpringContextConfig {
 	public AccountNoticeService accountNoticeService(){
 		return proxy.create(AccountNoticeService.class);
 	}
+
+    @Bean
+    public MealItemService mealItemService(){
+        return proxy.create(MealItemService.class);
+    }
 
 	//-----------------------
 

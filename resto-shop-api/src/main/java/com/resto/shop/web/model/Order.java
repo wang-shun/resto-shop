@@ -249,6 +249,16 @@ public class Order implements Serializable{
 
     private BigDecimal noDiscountMoney;
 
+    private Integer refundType;
+
+    public Integer getRefundType() {
+        return refundType;
+    }
+
+    public void setRefundType(Integer refundType) {
+        this.refundType = refundType;
+    }
+
     public Integer getTag() {
         return tag;
     }
