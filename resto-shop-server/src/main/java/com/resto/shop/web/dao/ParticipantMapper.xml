@@ -82,4 +82,7 @@
       update tb_participant set is_pay = 2 where group_id = #{groupId} and order_id = #{orderId} and customer_id = #{customerId}
   </update>
 
+  <select id="selectCustomerIdByGroupId" resultType="java.lang.String">
+      select DISTINCT customer_id from tb_participant where group_id = #{groupId}
+  </select>
 </mapper>

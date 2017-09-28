@@ -20,4 +20,6 @@ public interface ParticipantService extends GenericService<Participant, Long> {
 
     void updateIsPayByOrderIdCustomerId(String groupId, String orderId, String customerId);
 
+    List<String> selectCustomerIdByGroupId(String groupId);
+
 }

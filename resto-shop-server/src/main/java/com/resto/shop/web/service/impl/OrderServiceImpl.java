@@ -1019,6 +1019,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }else{
                     participantService.updateIsPayByOrderIdCustomerId(order.getGroupId(), order.getId(), order.getCustomerId());
                 }
+            }else if(order.getGroupId() != null && !"".equals(order.getGroupId()) && order.getParentOrderId() != null){
+                //加菜  查出加菜订单的记录  判断在现有参与 是否存在   不存在则记录  如果买单人是新出现(以前没有参与，加菜订单也未点餐，仅买单的人) is_pay的状态也当作0处理
+                List<String> cIdParticipant = participantService.selectCustomerIdByGroupId(order.getGroupId());
+                List<String> customerIdList = shopCartService.getListByGroupIdDistinctCustomerId(order.getGroupId());
+                for(String cId : customerIdList){
+                    if(!cIdParticipant.contains(cId)){
+                        Participant participant = new Participant();
+                        participant.setGroupId(order.getGroupId());
+                        participant.setCustomerId(cId);
+                        participant.setOrderId(order.getParentOrderId());
+                        participant.setIsPay(0);
+                        participant.setAppraise(0);
+                        participantService.insert(participant);
+                    }
+                }
+                if(!cIdParticipant.contains(order.getCustomerId()) && !customerIdList.contains(order.getCustomerId())){
+                    Participant participant = new Participant();
+                    participant.setGroupId(order.getGroupId());
+                    participant.setCustomerId(order.getCustomerId());
+                    participant.setOrderId(order.getParentOrderId());
+                    participant.setIsPay(0);
+                    participant.setAppraise(0);
+                    participantService.insert(participant);
+                }
             }
 
             insert(order);
