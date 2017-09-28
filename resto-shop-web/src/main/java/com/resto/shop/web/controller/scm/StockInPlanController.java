@@ -45,6 +45,7 @@ public class StockInPlanController extends GenericController{
 	@RequestMapping("create")
 	@ResponseBody
 	public Result create(@Valid @RequestBody DocStkInPlanHeaderDo stockinplan){
+		stockinplan.setShopDetailId(getCurrentShopId());
 		stockinplanService.addDocStkInPlanHeaderDo(stockinplan);
 		return Result.getSuccess();
 	}
@@ -55,7 +56,14 @@ public class StockInPlanController extends GenericController{
 		stockinplanService.updateDocStkInPlanHeaderDo(stockinplan);
 		return Result.getSuccess();
 	}
-	
+
+	 @RequestMapping("approve")
+	 @ResponseBody
+	 public Result approve(Long id,String orderStatus){
+		 stockinplanService.updateDocStkStatusById(id,orderStatus);
+		 return Result.getSuccess();
+	 }
+
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(Long id){

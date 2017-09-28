@@ -16,106 +16,108 @@
         overflow-y: auto;
     }
 
-
+    .col-md-12{
+         margin:3px;
+        text-align: left;
+    }
 </style>
 <div id="control">
-
-    <div class="modal fade" id="article-dialog" v-if="showform">
-        <div class="modal-dialog " style="width:90%;">
+    <div class="modal fade" id="article-dialog" v-show="showform">
+        <div class="modal-dialog " style="width:50%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">规格属性</h4>
+                    <h4 class="modal-title" style="text-align:center">入库单详情</h4>
                 </div>
-                <form class="form-horizontal" role="form"
+                <div class="form-horizontal" role="form"
                       @submit.prevent="save">
-
-                    <div class="modal-body auto-height">
-                        <div class="form-body">
-
-
+                    <div class="modal-body auto">
+                        <div class="form-body" >
                             <div class="col-md-12">
-                                <div class="portlet light bordered">
-
-                                    <div class="portlet-body">
-                                        <div class="portlet box blue-hoki" >
-                                            <div class="portlet-title">
-                                                <div class="caption">
-                                                    <label class="control-label col-md-4"
-                                                           style="width:120px">属性名称&nbsp;</label>
-                                                    <div class="col-md-6">
-                                                        <input class="form-control" type="text" v-model="m.name"
-                                                               id="uName" required="required" lazy>
-                                                    </div>
-
-                                                </div>
-
-
-                                                <div class="caption">
-                                                    <label class="control-label col-md-4"
-                                                           style="width:200px">排序&nbsp;</label>
-                                                    <div class="col-md-6">
-                                                        <input class="form-control" type="text" v-model="m.sort"
-                                                               id="uSort" required="required" name="sort" lazy
-                                                        >
-                                                    </div>
-
-                                                </div>
-                                            </div>
-                                            <div class="portlet-body"> 
-                                                <div class="form-group col-md-12" v-for="item in unit.detailList">
-                                                    <div class="flex-row" style="text-align: center">
-
-                                                        <div class="flex-2">名称</div>                                              
-                                                        <div class="flex-2">排序</div>
-                                                        <div class="flex-2">移除</div>
-                                                    </div>
-                                                    <div class="flex-row" style="text-align: center">
-
-
-                                                        <div class="flex-2">
-                                                            <input type="text" class="form-control"
-                                                                   v-model="item.name" name="name"
-                                                                   required="required"/>
-                                                        </div>
-                          
-                                                        <div class="flex-2">
-                                                            <input type="text" class="form-control" name="sort"
-                                                                   v-model="item.sort"
-                                                                   required="required" lazy/>
-                                                        </div>
-
-                                                        <div class="flex-2">
-                                                            <button class="btn red" type="button"
-                                                                    @click="removeMealItem(item)">移除
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4 col-md-offset-8">
-                                                    <button class="btn btn-block blue" type="button"
-                                                            @click="addItem"><i class="fa fa-cutlery"></i>
-                                                        添加规格
-                                                    </button>
-                                                </div>
-                                                <div class="clearfix"></div>
-                                            </div>
-                                        </div>                           
-                                        <div class="clearfix"></div>
-                                    </div>
+                                <div class="col-md-6 ">
+                                    <div class="col-md-3">盘点单号</div>
+                                    <div class="col-md-3" id="pddh"></div>
                                 </div>
-                            </div>
+                                <%--<div class="col-md-6">--%>
+                                    <div class="col-md-2">盘点时间</div>
+                                    <div class="col-md-4" id="pdsj"></div>
+                                <%--</div>--%>
                         </div>
-                        <div class="clearfix"></div>
+                            </div>
+                            <div class="col-md-12 ">
+                                <div class="col-md-6">
+                                    <div class="col-md-3">类型</div>
+                                    <div class="col-md-3" id="lx"></div>
+                                </div>
+                                <%--<div class="col-md-6">--%>
+                                    <div class="col-md-2">物料种类</div>
+                                    <div class="col-md-4" id="zl"></div>
+                                <%--</div>--%>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="col-md-12 ">
+                                <div class="col-md-6 ">
+                                    <div class="col-md-3">盘点人</div>
+                                    <div class="col-md-3" id="pdr"></div>
+                                </div>
+                                <%--<div class="col-md-6 ">--%>
+                                    <div class="col-md-2">备注</div>
+                                    <div class="col-md-4" id="bz"></div>
+                                <%--</div>--%>
+                                <div class="clearfix"></div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="col-md-6">
+                                    <div class="col-md-3">入库人</div>
+                                    <div class="col-md-3"></div>
+                                </div>
+                                <%--<div class="col-md-6 ">--%>
+                                    <div class="col-md-2">审核人</div>
+                                    <div class="col-md-4"></div>
+                                <%--</div>--%>
+                            </div>
+                            <div id="pandian">
+                                <table class="table table-bordered" >
+                                    <thead>
+                                    <tr>
+                                        <th>类型</th>
+                                        <th>一级类别</th>
+                                        <th>二级类别</th>
+                                        <th>品牌名</th>
+                                        <th>材料名</th>
+                                        <th>编码</th>
+                                        <th>规格</th>
+                                        <th>产地</th>
+                                        <th>理论库存</th>
+                                        <th>盘点库存</th>
+                                        <th>差异数量</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr v-for="(index,item) in parameter.stockCountDetailList">
+                                        <td>{{index+1}}</td>
+                                        <td>{{item.materialType}}</td>
+                                        <td>{{item.INGREDIENTS}}</td>
+                                        <td>{{item.materialName}}</td>
+                                        <td>{{item.unitName}}</td>
+                                        <td>{{item.minMeasureUnit}}</td>
+                                        <td>{{item.minMeasureUnit}}</td>
+                                        <td>{{item.minMeasureUnit}}</td>
+                                        <td>{{item.minMeasureUnit}}</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                        </div>
                     </div>
-                    <div class="modal-footer">
+                </div>
+                    </div>
+                    <div class="modal-footer" style="border:0;text-align:center;">
                         <input type="hidden" name="id" v-model="m.id"/>
-                        <button type="button" class="btn btn-default" @click="cancel">取消</button>
-                        <button type="submit" class="btn btn-primary">保存</button>
+                        <button type="button" class="btn btn-default" @click="cancel">关闭</button>
                     </div>
-                </form>
             </div>
-        </div>
-    </div>
+
 
     <div class="modal fade" id="article-choice-dialog" v-if="showform&&choiceArticleShow.show">
         <div class="modal-dialog " style="width:90%;">
@@ -149,26 +151,7 @@
                                 </tr>
                                 </tbody>
                             </table>
-                        </div>
-                        <!--<div class="col-md-6">
-                            <table class="table">
-                                <thead>
-                                <tr>
-                                    <th>餐品名称(已添加)</th>
-                                    <th>移除</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr v-for="art in choiceArticleShow.items">
-                                    <td>{{art.articleName}}</td>
-                                    <td>
-                                        <button class="btn red" type="button" @click="removeArticleItem(art)">移除
-                                        </button>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>-->
+                        </div>   
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -190,8 +173,7 @@
         </div>
     </div>
 
-</div>
-<!--<div class="modal fade">
+<div class="modal fade">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -205,8 +187,9 @@
 			</div>
 		</div>
 	</div>
-</div>-->
-
+</div>
+</div>
+</div>
 <script>
     (function () {
         var cid = "#control";
@@ -249,48 +232,35 @@
                     title:"备注",
                     data:"orderStatus"
                 },
-//              {
-//					title : "查看",
-//					defaultContent:"",
-//					createdCell:function(td,tdData,rowData){
-//						var button = $("<button class='btn green'>查看</button>");
-//						button.click(function(){
-//							showDetails(rowData);
-//						})
-//						$(td).html(button);
-//					},
                 {
-                    title: "属性明细",
-                    data: "details",
-                    defaultContent: "",
-                    createdCell: function (td, tdData) {
-                        $(td).html('');
-
-                        for (var i in tdData) {
-                            if (tdData[i].name) {
-                                var span = $("<span class='btn blue btn-xs'></span>");
-                                $(td).append(span.html(tdData[i].name));
-                            }
-
-                        }
+                    title : "操作",
+                    defaultContent:"",
+                    createdCell:function(td,tdData,rowData){
+                        var button = $("<button class='btn btn-xs btn-primary'>查看</button>");
+                        button.click(function(){
+                            showDetails(rowData);
+                        })
+                        $(td).html(button);
                     }
-                },
-
-                {
-                    title: "操作",
-                    data: "id",
-                    createdCell: function (td, tdData, rowData, row) {
-                        var operator = [
-//                          <s:hasPermission name="scmMaterial/delete">
-//                          C.createDelBtn(tdData, "scmMaterial/delete"),
-//                          </s:hasPermission>
-                            <s:hasPermission name="scmMaterial/edit">
-                            C.createEditBtn(rowData),
-                            </s:hasPermission>
-                        ];
-                        $(td).html(operator);
-                    }
-                }],
+                }
+                <%--,--%>
+                 <%--{--%>
+                    <%--title : "操作",--%>
+                    <%--data : "id",--%>
+                    <%--createdCell:function(td,tdData,rowData,row){--%>
+                        <%--var operator=[--%>
+                            <%--<s:hasPermission name="scmStockCount/find">--%>
+                            <%--C.findBtn(rowData),                           --%>
+                            <%--<s:hasPermission name="scmMaterial/delete">--%>
+                            <%--C.createDelBtn(tdData,"scmMaterial/delete"),--%>
+                            <%--</s:hasPermission>--%>
+                            <%--</s:hasPermission>--%>
+                            <%----%>
+                        <%--];--%>
+                        <%--$(td).html(operator);--%>
+                    <%--}--%>
+                <%--}--%>
+                ],
             initComplete: function () {
                 var api = this.api();
                 api.search('');
@@ -325,24 +295,12 @@
                     el: "#control",
                     mixins: [C.formVueMix],
                     data: {
-                        articlefamilys: [],
-                        supportTimes: [],
-                        kitchenList: [],
-                        checkedUnit: [],
-                        articleattrs: [],
-                        articles: [],
-                        unit: new HashMap(),
+                        parameter:{
+                            materialType:'',//类型
+                            categoryOneName:'',//一级分类
+                            categoryTwoName:'',//二级分类
 
-                        articleunits: {},
-                        familyLis: [],
-
-                        unitPrices: [],
-                        mealtempList: [],
-                        articleList: [],
-                        choiceTemp: "",
-                        lastChoiceTemp: "",
-                        allArticles: allArticles,
-                        choiceArticleShow: {show: false, mealAttr: null, items: [], itemsLess: [], currentFamily: ""}
+                        }
                     },
                     methods: {
                         itemDefaultChange: function (attr, item) {
@@ -824,17 +782,27 @@
                 })
                 ;
         C.vue = vueObj;
-
+        //用于显示描述查看
+        function showDetails(data){
+            debugger
+            console.log()
+            $("#pddh").html(data.id);//盘点单号
+            $("#pdsj").html(data.publishedTime);//盘点时间
+            $("#lx").html(data.materialType);//类型
+            $("#zl").html(data.size);//物料种类
+            $("#pdr").html(data.createrName);//盘点人
+            $("#bz").html(data.createrName);//备注
+            var html='';
+            for(var i=0;i<data.stockCountDetailList.length;i++){
+                html+='<tr><td>'+data.stockCountDetailList[i].materialType+'</td><td>'+data.stockCountDetailList[i].categoryOneName+'</td>+' +
+                    '<td>'+data.stockCountDetailList[i].categoryTwoName+'</td><td>'+data.stockCountDetailList[i].defferentDeason+'</td>+' +
+                    '<td>'+data.stockCountDetailList[i].materialName+'</td><td>'+data.stockCountDetailList[i].materialCode+'</td>+' +
+                    '<td>'+data.stockCountDetailList[i].unitName+'</td><td>'+data.stockCountDetailList[i].produceArea+'</td>+' +
+                    '<td>'+data.stockCountDetailList[i].theoryStockCount+'</td><td>'+data.stockCountDetailList[i].actStockCount+'</td>+' +
+                    '<td>'+data.stockCountDetailList[i].actStockCount+'</td></tr>'
+            }
+            $("#pandian tbody").html(html);
+            vueObj.showform=true;
+        }
     }());
-
-////用于显示描述详情
-//	function showDetails(data){
-//		$(".modal-title > strong").html(data.slogan);
-//		var html='';
-//		for(var i=0;i<data.length;i++){
-//            html+='<tr><td>'+data[i].name+'</td><td></td></tr>'
-//		}
-//        $(".modal-body").html(html);
-//		$(".modal").modal();
-//	}
 </script>

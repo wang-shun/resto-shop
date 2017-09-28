@@ -43,6 +43,7 @@ public class ArticleBomController extends GenericController{
 		try {
 			articlebom.setShopDetailId(this.getCurrentShopId());
 			articlebom.setCreaterId(this.getCurrentUserId());
+			articlebom.setCreaterName(getCurrentBrandUser().getName());
 			articlebomService.addArticleBomHead(articlebom);
 			return Result.getSuccess();
 		}catch (Exception e){
@@ -55,8 +56,7 @@ public class ArticleBomController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid @RequestBody MdRulArticleBomHeadDo articlebom){
 		articlebom.setShopDetailId(this.getCurrentShopId());
-		articlebom.setCreaterId(this.getCurrentUserId());
-		articlebomService.updateRulArticleBomHead(articlebom);
+  		articlebomService.updateRulArticleBomHead(articlebom);
 		return Result.getSuccess();
 	}
 
