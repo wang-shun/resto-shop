@@ -194,23 +194,19 @@
         tc.`name` couponName,
         COUNT(1) couponCount,
         SUM(tc.`value`) couponMoney,
-        IFNULL((select r.useCount from (select COUNT(1) useCount,coupon_type from tb_coupon
-        where using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59')
-        and is_used = 1 GROUP BY coupon_type) r where r.coupon_type = tc.coupon_type),0) useCouponCount,
-        IFNULL((select r.useMoney from (select SUM(`value`) useMoney,coupon_type from tb_coupon
-        where using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59')
-        and is_used = 1 GROUP BY coupon_type) r where r.coupon_type = tc.coupon_type),0) useCouponMoney,
         CASE tc.coupon_type
-        WHEN 0 THEN COUNT(1)
-        WHEN 1 THEN COUNT(1)
+        WHEN 0 THEN COUNT(DISTINCT tc.customer_id)
+        WHEN 1 THEN COUNT(DISTINCT tc.customer_id)
         ELSE 0
         END customerCount,
         tc.shop_detail_id shopDetailId,
-        tc.coupon_type couponTypeInt
+        tc.coupon_type couponTypeInt,
+        SUM(IF(tc.is_used = 1 and using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59'),1,0)) useCouponCount,
+        SUM(IF(tc.is_used = 1 and using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59'),tc.value,0)) useCouponMoney
         from tb_coupon tc
         where tc.add_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
         and tc.add_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
-        GROUP BY tc.coupon_type
+        GROUP BY tc.`name`
     </select>
 
     <select id="usedCouponBeforeByOrderId" resultType="Coupon">
