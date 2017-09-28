@@ -361,6 +361,19 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
+    this.systemButton = function(delUrl,obj,alertName){
+            //_C.delConfirmDialog(function(){
+                _C.ajax(delUrl,obj,function(result){
+                    if(result.success){
+                        tb.ajax.reload();
+                        _C.simpleMsg(alertName[0]);
+                    }else{
+                        _C.errorMsg(result.message,alertName[1]);
+                    }
+                });
+        //});
+        return button;
+    }
 	this.createBtn = function(model,url,urlData){
 		var button = $("<button class='btn btn-xs btn-primary'>编辑</button>");
 		button.click(function(){
@@ -399,7 +412,7 @@ var Controller = function(controlId,datatable){
 		var button = $("<button class='btn btn-xs btn-primary'>查看</button>");
 		button.click(function(){
 			if(_C.vue){
-				_C.vue.edit(model);
+				_C.vue.showDetails(model);
 			}else{
 				_C.loadForm({
 					url:url,
@@ -410,6 +423,23 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
+
+    this.createApproveBtn = function(model,url,urlData){
+        var button = $("<button class='btn btn-xs red'>审核</button>");
+        button.click(function(){
+            if(_C.vue){
+                _C.vue.approve(model);
+            }else{
+                _C.loadForm({
+                    url:url,
+                    data:{id:model},
+                    formaction:urlData
+                });
+            }
+        });
+        return button;
+    }
+
 	this.createConfirmDialogBtn=function(opt){
 		var o= {
 				style:"btn btn-xs red",
@@ -429,7 +459,6 @@ var Controller = function(controlId,datatable){
 	this.delConfirmDialog = function(yes,no){
 		_C.confirmDialog("你确定要删除吗?","提醒",yes,no);
 	}
-	
 	this.confirmDialog=function(text,title,successcbk,cancelcbk){
 		var width = text.length*16;
 		width = width>200?width:200;
