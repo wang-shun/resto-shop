@@ -221,6 +221,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ParticipantService participantService;
 
+    @Resource
+    private TableGroupService tableGroupService;
 
     Logger log = LoggerFactory.getLogger(getClass());
 
@@ -984,6 +986,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (order.getOrderMode() == ShopMode.MANUAL_ORDER) {
                 order.setNeedScan(Common.YES);
             }
+
+            //创建订单时候  如果存在groupId  则组状态改变   以及添加订单参与者信息
+            if(order.getGroupId() != null && !"".equals(order.getGroupId()) && order.getParentOrderId() == null){
+                TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
+                tableGroup.setState(TableGroup.PAY);
+                tableGroupService.update(tableGroup);
+
+                List<String> customerIdList = shopCartService.getListByGroupIdDistinctCustomerId(order.getGroupId());
+            }
+
             insert(order);
             customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
             if (order.getPaymentAmount().doubleValue() == 0) {
