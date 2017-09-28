@@ -7793,7 +7793,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             keyword2.put("color", "#000000");
             Map<String, Object> keyword3 = new HashMap<String, Object>();
             StringBuffer msg = new StringBuffer();
-            for (int i=0; i<=5; i++) {
+            for (int i=0; i<(order.getOrderItems().size() > 5 ? 6 : order.getOrderItems().size()); i++) {
                 OrderItem orderItem1 = order.getOrderItems().get(i);
                 if (orderItem1.getType().equals(ArticleType.ARTICLE)) {
                     OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem1.getId());
