@@ -19,4 +19,6 @@ public interface ParticipantMapper extends GenericDao<Participant, Long> {
 
     List<Participant> selectNotAppraiseByGroupId(@Param("groupId") String groupId, @Param("orderId") String orderId);
 
+    void updateIsPayByOrderIdCustomerId(@Param("groupId") String groupId, @Param("orderId") String orderId, @Param("customerId") String customerId);
+
 }

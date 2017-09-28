@@ -43,4 +43,9 @@ public class ParticipantServiceImpl extends GenericServiceImpl<Participant, Long
     public List<Participant> selectNotAppraiseByGroupId(String groupId, String orderId) {
         return participantMapper.selectNotAppraiseByGroupId(groupId, orderId);
     }
+
+    @Override
+    public void updateIsPayByOrderIdCustomerId(String groupId, String orderId, String customerId) {
+        participantMapper.updateIsPayByOrderIdCustomerId(groupId, orderId, customerId);
+    }
 }

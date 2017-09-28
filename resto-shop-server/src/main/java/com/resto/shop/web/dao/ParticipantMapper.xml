@@ -78,4 +78,8 @@
       select * from tb_participant where group_id = #{groupId} and order_id = #{orderId} and appraise = 0
   </select>
 
+  <update id="updateAppraiseByOrderIdCustomerId">
+      update tb_participant set is_pay = 2 where group_id = #{groupId} and order_id = #{orderId} and customer_id = #{customerId}
+  </update>
+
 </mapper>

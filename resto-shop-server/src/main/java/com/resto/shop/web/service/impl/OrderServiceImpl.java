@@ -75,9 +75,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     private static final List<String> orderList = new ArrayList<>();
 
     @Autowired
-    TableGroupService tableGroupService;
-
-    @Autowired
     CustomerGroupService customerGroupService;
 
     @Resource
@@ -999,8 +996,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
                 tableGroup.setState(TableGroup.PAY);
                 tableGroupService.update(tableGroup);
-
+                //获取去重后的点餐人员列表  记录参与者
                 List<String> customerIdList = shopCartService.getListByGroupIdDistinctCustomerId(order.getGroupId());
+                for(String cId : customerIdList){
+                    Participant participant = new Participant();
+                    participant.setGroupId(order.getGroupId());
+                    participant.setCustomerId(cId);
+                    participant.setOrderId(order.getId());
+                    participant.setIsPay(0);
+                    participant.setAppraise(0);
+                    participantService.insert(participant);
+                }
+                //判断付款人是否参与点餐    如果为买单并且未加过菜 状态1    如果买单且加过菜  状态2
+                if(!customerIdList.contains(order.getCustomerId())){
+                    Participant participant = new Participant();
+                    participant.setGroupId(order.getGroupId());
+                    participant.setCustomerId(order.getCustomerId());
+                    participant.setOrderId(order.getId());
+                    participant.setIsPay(1);
+                    participant.setAppraise(0);
+                    participantService.insert(participant);
+                }else{
+                    participantService.updateIsPayByOrderIdCustomerId(order.getGroupId(), order.getId(), order.getCustomerId());
+                }
             }
 
             insert(order);
