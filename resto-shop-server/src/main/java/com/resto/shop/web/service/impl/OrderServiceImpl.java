@@ -75,9 +75,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     private static final List<String> orderList = new ArrayList<>();
 
     @Autowired
-    TableGroupService tableGroupService;
-
-    @Autowired
     CustomerGroupService customerGroupService;
 
     @Resource
@@ -228,6 +225,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ParticipantService participantService;
 
+    @Resource
+    private TableGroupService tableGroupService;
 
     Logger log = LoggerFactory.getLogger(getClass());
 
@@ -999,6 +998,61 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (order.getOrderMode() == ShopMode.MANUAL_ORDER) {
                 order.setNeedScan(Common.YES);
             }
+
+            //创建订单时候  如果存在groupId  则组状态改变   以及添加订单参与者信息
+            if(order.getGroupId() != null && !"".equals(order.getGroupId()) && order.getParentOrderId() == null){
+                TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
+                tableGroup.setState(TableGroup.PAY);
+                tableGroupService.update(tableGroup);
+                //获取去重后的点餐人员列表  记录参与者
+                List<String> customerIdList = shopCartService.getListByGroupIdDistinctCustomerId(order.getGroupId());
+                for(String cId : customerIdList){
+                    Participant participant = new Participant();
+                    participant.setGroupId(order.getGroupId());
+                    participant.setCustomerId(cId);
+                    participant.setOrderId(order.getId());
+                    participant.setIsPay(0);
+                    participant.setAppraise(0);
+                    participantService.insert(participant);
+                }
+                //判断付款人是否参与点餐    如果为买单并且未加过菜 状态1    如果买单且加过菜  状态2
+                if(!customerIdList.contains(order.getCustomerId())){
+                    Participant participant = new Participant();
+                    participant.setGroupId(order.getGroupId());
+                    participant.setCustomerId(order.getCustomerId());
+                    participant.setOrderId(order.getId());
+                    participant.setIsPay(1);
+                    participant.setAppraise(0);
+                    participantService.insert(participant);
+                }else{
+                    participantService.updateIsPayByOrderIdCustomerId(order.getGroupId(), order.getId(), order.getCustomerId());
+                }
+            }else if(order.getGroupId() != null && !"".equals(order.getGroupId()) && order.getParentOrderId() != null){
+                //加菜  查出加菜订单的记录  判断在现有参与 是否存在   不存在则记录  如果买单人是新出现(以前没有参与，加菜订单也未点餐，仅买单的人) is_pay的状态也当作0处理
+                List<String> cIdParticipant = participantService.selectCustomerIdByGroupId(order.getGroupId());
+                List<String> customerIdList = shopCartService.getListByGroupIdDistinctCustomerId(order.getGroupId());
+                for(String cId : customerIdList){
+                    if(!cIdParticipant.contains(cId)){
+                        Participant participant = new Participant();
+                        participant.setGroupId(order.getGroupId());
+                        participant.setCustomerId(cId);
+                        participant.setOrderId(order.getParentOrderId());
+                        participant.setIsPay(0);
+                        participant.setAppraise(0);
+                        participantService.insert(participant);
+                    }
+                }
+                if(!cIdParticipant.contains(order.getCustomerId()) && !customerIdList.contains(order.getCustomerId())){
+                    Participant participant = new Participant();
+                    participant.setGroupId(order.getGroupId());
+                    participant.setCustomerId(order.getCustomerId());
+                    participant.setOrderId(order.getParentOrderId());
+                    participant.setIsPay(0);
+                    participant.setAppraise(0);
+                    participantService.insert(participant);
+                }
+            }
+
             insert(order);
             customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
             if (order.getPaymentAmount().doubleValue() == 0) {

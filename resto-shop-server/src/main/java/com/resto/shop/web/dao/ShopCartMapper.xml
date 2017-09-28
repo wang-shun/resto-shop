@@ -180,4 +180,8 @@
         set group_id = null
         where group_id = #{groupId}
     </update>
+
+    <select id="getListByGroupIdDistinctCustomerId" resultType="java.lang.String">
+        select DISTINCT customer_id from tb_shop_cart where group_id = #{groupId}
+    </select>
 </mapper>

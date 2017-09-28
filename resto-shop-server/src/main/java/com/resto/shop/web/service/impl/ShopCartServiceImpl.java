@@ -173,6 +173,11 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     }
 
     @Override
+    public List<String> getListByGroupIdDistinctCustomerId(String groupId) {
+        return shopcartMapper.getListByGroupIdDistinctCustomerId(groupId);
+    }
+
+    @Override
     public void resetGroupId(String groupId) {
         shopcartMapper.resetGroupId(groupId);
     }

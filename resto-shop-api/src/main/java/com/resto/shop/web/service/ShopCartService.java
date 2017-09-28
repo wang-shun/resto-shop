@@ -46,4 +46,11 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
     Integer checkRepeat(String articleId,String groupId);
 
     List<ShopCart> getListByGroupId(String groupId);
+
+    /**
+     * 去重该组下不同点餐的人员
+     * @param groupId
+     * @return
+     */
+    List<String>  getListByGroupIdDistinctCustomerId(String groupId);
 }

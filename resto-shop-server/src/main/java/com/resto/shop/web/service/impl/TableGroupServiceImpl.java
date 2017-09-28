@@ -68,10 +68,8 @@ public class TableGroupServiceImpl extends GenericServiceImpl<TableGroup, Long> 
         }
     }
 
-
     @Override
     public TableGroup selectByGroupId(String groupId) {
-        TableGroup tableGroup = tableGroupMapper.selectByGroupId(groupId);
-        return tableGroup;
+        return tableGroupMapper.selectByGroupId(groupId);
     }
 }

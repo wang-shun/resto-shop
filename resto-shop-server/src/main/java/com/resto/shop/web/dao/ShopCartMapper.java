@@ -51,4 +51,6 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
     List<ShopCart> getListByGroupId(String groupId);
 
     void resetGroupId(String groupId);
+
+    List<String>  getListByGroupIdDistinctCustomerId(String groupId);
 }
