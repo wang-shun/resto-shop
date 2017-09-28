@@ -286,17 +286,6 @@
                     title : "状态",
                     data : "supStatus",
                 },
-//                {
-//                    title : "操作",
-//                    data:"id",
-//                    createdCell:function(td,tdData,rowData){
-//                        var button = $("<button class='btn btn-xs btn-primary'>查看</button>");
-//                        button.click(function(){
-//                            vueObj.showDetails(rowData);
-//                        })
-//                        $(td).html(button);
-//                    }
-//                },
                 {
                     title : "操作",
                     data : "id",
