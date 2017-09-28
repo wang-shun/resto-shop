@@ -18,8 +18,10 @@
         <result column="unit_new_id" property="unitNewId"/>
         <result column="uuid" property="uuid"/>
         <result column="group_id" property="groupId"/>
+        <result column="name" property="name"/>
+        <result column="real_price" property="realPrice"/>
     </resultMap>
-    <sql id="Base_Column_List">id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, shop_type, pid, user_id, attr_id,recommend_id,recommend_article_id,unit_new_id,uuid, group_id</sql>
+    <sql id="Base_Column_List">id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, shop_type, pid, user_id, attr_id,recommend_id,recommend_article_id,unit_new_id,uuid, group_id, `name`, real_price</sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select
         <include refid="Base_Column_List"/> from tb_shop_cart where id = #{id,jdbcType=INTEGER}
     </select>
@@ -42,6 +44,8 @@
             <if test="unitNewId != null">unit_new_id,</if>
             <if test="uuid != null">uuid,</if>
             <if test="groupId != null">group_id,</if>
+            <if test="name != null">`name`,</if>
+            <if test="realPrice != null">real_price,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=INTEGER},</if>
@@ -59,6 +63,8 @@
             <if test="unitNewId != null">#{unitNewId},</if>
             <if test="uuid != null">#{uuid},</if>
             <if test="groupId != null">#{groupId},</if>
+            <if test="name != null">#{name},</if>
+            <if test="realPrice != null">#{realPrice},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart
@@ -77,6 +83,8 @@
             <if test="unitNewId != null">unit_new_id = #{unitNewId},</if>
             <if test="uuid != null">uuid = #{uuid},</if>
             <if test="groupId != null">group_id = #{groupId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="realPrice != null">real_price = #{realPrice},</if>
         </set> where id = #{id,jdbcType=INTEGER}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart set number = #{number,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, shop_type = #{shopType,jdbcType=VARCHAR}, pid = #{pid,jdbcType=INTEGER}, user_id = #{userId,jdbcType=VARCHAR}, attr_id = #{attrId,jdbcType=VARCHAR}, unit_new_id = #{unitNewId}, uuid = #{uuid} where id = #{id,jdbcType=INTEGER}</update>
@@ -84,22 +92,22 @@
 
     <!-- 查询购物车明细 -->
     <select id="listUserAndShop" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid,group_id from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid,group_id,`name`,real_price from tb_shop_cart
         where distribution_mode_id=#{distributionModeId} and customer_id=#{customerId} and shop_detail_id=#{shopDetailId}
     </select>
 
     <select id="listUserShopCart" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_article_id,unit_new_id,uuid,group_id from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_article_id,unit_new_id,uuid,group_id,`name`,real_price from tb_shop_cart
         where  user_id=#{0} and shop_detail_id=#{1} and distribution_mode_id=#{2} order by id
     </select>
 
     <select id="selectByUuId" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid,group_id from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid,group_id,`name`,real_price from tb_shop_cart
         where uuid = #{uuid};
     </select>
 
     <select id="selectShopCartItem" parameterType="com.resto.shop.web.model.ShopCart" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid,group_id from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid,group_id,`name`,real_price from tb_shop_cart
         where
         distribution_mode_id =#{distributionModeId} and
         article_id = #{articleId} and
@@ -124,6 +132,8 @@
             <if test="unitNewId != null">unit_new_id = #{unitNewId},</if>
             <if test="uuid != null">uuid = #{uuid},</if>
             <if test="groupId != null">group_id = #{groupId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="realPrice != null">real_price = #{realPrice},</if>
         </set> where id = #{id,jdbcType=INTEGER}
     </update>
 
