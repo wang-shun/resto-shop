@@ -4,6 +4,7 @@ import cn.restoplus.rpc.client.RpcProxy;
 import com.resto.brand.web.service.*;
 import com.resto.brand.web.service.TableQrcodeService;
 import com.resto.scm.web.service.*;
+import com.resto.scm.web.service.ScmUnitService;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.service.EmployeeService;
 import com.resto.shop.web.service.OrderRemarkService;
