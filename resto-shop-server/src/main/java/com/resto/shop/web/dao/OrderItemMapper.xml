@@ -381,7 +381,7 @@ order by t.print_sort asc
         select  article_id articleId, article_name articleName,
         SUM(refund_count) refundCount,SUM(count) count,
         SUM(IF(type = 4, count, 0)) packageNumber,
-        type
+        type,meal_fee_number
         from tb_order_item
         where order_id in
         <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
