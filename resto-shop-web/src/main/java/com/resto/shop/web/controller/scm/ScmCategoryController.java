@@ -41,13 +41,6 @@ public class ScmCategoryController extends GenericController {
         return getSuccessResult(list);
     }
 
-    @RequestMapping("/list_categoryHierarchy")
-    @ResponseBody
-    public Result list_categoryHierarchy(Integer categoryHierarchy) {
-        List<MdCategory> list = categoryService.queryByCategoryHierarchy(categoryHierarchy);
-        return getSuccessResult(list);
-    }
-
     @RequestMapping("/list_one")
     @ResponseBody
     public Result list_one(Long id) {
@@ -57,14 +50,18 @@ public class ScmCategoryController extends GenericController {
 
     @RequestMapping("look_down")
     @ResponseBody
-    public Result look_down(Integer hierarchyId) {
-        if (hierarchyId == null) {
-            return new Result("hierarchyId不能为空", 5000, false);
-        } else if (hierarchyId >= 3) {
-            return new Result("已经是最小层级", 5000, false);
-        } else {
-            List<MdCategory> list = categoryService.queryByCategoryHierarchy(hierarchyId + 1);
-            return getSuccessResult(list);
+    public Result look_down(Integer hierarchyId,Long id) {
+        try{
+            Assertion.isPositive(id,"id不能为空");
+            Assertion.isPositive(hierarchyId,"hierarchyId不能为空");
+            if (hierarchyId >= 3) {
+                return new Result("已经是最小层级", 5000, false);
+            } else {
+                List<MdCategory> list = categoryService.queryByCategoryHierarchy(hierarchyId + 1,id);
+                return getSuccessResult(list);
+            }
+        }catch (Exception e){
+            return new Result(e.getMessage(), 5000, false);
         }
     }
 
@@ -72,12 +69,12 @@ public class ScmCategoryController extends GenericController {
     @ResponseBody
     public Result create(@Valid @RequestBody MdCategory mdCategory) {
         try{
-            Assertion.isNull(mdCategory,"新增参数不能为空");
-            Assertion.isEmpty(mdCategory.getCategoryName(),"名称不能为空");
+            Assertion.isTrue(mdCategory != null,"新增参数不能为空");
+            Assertion.notEmpty(mdCategory.getCategoryName(),"名称不能为空");
             Assertion.isPositive(mdCategory.getParentId(),"父类id不能为空");
             Assertion.isPositive(mdCategory.getCategoryHierarchy(),"层级id不能为空");
             Assertion.isPositive(mdCategory.getSort(),"排序不能为空");
-            Assertion.isEmpty(mdCategory.getCategoryDesc(),"分类备注不能为空");
+            Assertion.notEmpty(mdCategory.getCategoryDesc(),"分类备注不能为空");
 
             mdCategory.setShopDetailId(this.getCurrentShopId());
             mdCategory.setBrandId(this.getCurrentBrandId());
