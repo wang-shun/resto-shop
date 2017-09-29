@@ -413,6 +413,5 @@
                 $('.check-node').prop('disabled', !(checkableNodes.length >= 1));
             });
         })
-
     }());
 </script>
