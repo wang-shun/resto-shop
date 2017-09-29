@@ -861,7 +861,7 @@ public class OrderAspect {
                 accountLogService.insert(acclog);
 
                 StringBuffer msg = new StringBuffer();
-                SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy/MM/dd");
                 msg.append("太好啦，"+shopDetail.getName()+"送给您"+(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney())+"元的返利红包，"+sdf.format(acclog.getFreezeReturnDate())+"后即可使用！");
                 msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue&shopId=" + order.getShopDetailId() + "'>查看余额</a>");
 
