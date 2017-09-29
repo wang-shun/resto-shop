@@ -676,7 +676,7 @@
     </select>
 
     <select id="selectCustomerAccount" parameterType="String" resultType="com.resto.shop.web.model.Customer">
-		select tc.id,tc.nickname,tc.telephone,tc.account_id,IFNULL(ta.remain,0) remain ,IFNULL(ta.frozen_remain,0) frozenRemain,(IFNULL(ta.remain,0) + IFNULL(ta.frozen_remain,0)) sumRemain from tb_customer tc
+		select tc.id,tc.nickname,tc.telephone,tc.account_id,IFNULL(ta.remain,0) remain from tb_customer tc
 		left join tb_account ta
 		on tc.account_id = ta.id
 		where tc.telephone = #{telephone}
