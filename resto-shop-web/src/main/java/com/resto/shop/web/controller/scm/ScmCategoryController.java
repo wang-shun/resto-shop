@@ -5,6 +5,8 @@ import com.resto.scm.web.dto.CategoryOne;
 import com.resto.scm.web.model.MdCategory;
 import com.resto.scm.web.service.CategoryService;
 import com.resto.shop.web.controller.GenericController;
+import com.resto.shop.web.util.Assertion;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,7 +21,7 @@ import java.util.List;
 public class ScmCategoryController extends GenericController {
 
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
 
     @RequestMapping("/list")
     public void list() {
@@ -69,12 +71,22 @@ public class ScmCategoryController extends GenericController {
     @RequestMapping("create")
     @ResponseBody
     public Result create(@Valid @RequestBody MdCategory mdCategory) {
-        if (mdCategory != null) {
+        try{
+            Assertion.isNull(mdCategory,"新增参数不能为空");
+            Assertion.isEmpty(mdCategory.getCategoryName(),"名称不能为空");
+            Assertion.isPositive(mdCategory.getParentId(),"父类id不能为空");
+            Assertion.isPositive(mdCategory.getCategoryHierarchy(),"层级id不能为空");
+            Assertion.isPositive(mdCategory.getSort(),"排序不能为空");
+            Assertion.isEmpty(mdCategory.getCategoryDesc(),"分类备注不能为空");
+
             mdCategory.setShopDetailId(this.getCurrentShopId());
+            mdCategory.setBrandId(this.getCurrentBrandId());
             int i = categoryService.addCategory(mdCategory);
             if (i > 0) {
                 return Result.getSuccess();
             }
+        }catch (Exception e){
+            return new Result(e.getMessage(), 5000, false);
         }
         return new Result("保存失败", 5000, false);
     }
