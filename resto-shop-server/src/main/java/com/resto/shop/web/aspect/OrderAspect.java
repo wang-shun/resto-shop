@@ -841,7 +841,7 @@ public class OrderAspect {
                 o.setIsConsumptionRebate(1);
                 orderService.update(o);
                 Account account = accountService.selectById(customer.getAccountId());
-                account.setFrozenRemain(account.getFrozenRemain().add(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney()));
+                account.setFrozenRemain(account.getFrozenRemain().add((o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney())));
                 accountService.update(account);
                 AccountLog acclog = new AccountLog();
                 acclog.setCreateTime(new Date());
