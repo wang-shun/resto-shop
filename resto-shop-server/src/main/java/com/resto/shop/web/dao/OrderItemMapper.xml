@@ -26,6 +26,7 @@
         <result column="refund_count" property="refundCount"/>
         <result column="change_count" property="changeCount"/>
         <result column="print_fail_flag" property="printFailFlag"/>
+        <result column="meal_fee_number" property="mealFeeNumber"/>
         <association property="orderRefundRemark" javaType="com.resto.shop.web.model.OrderRefundRemark">
             <id column="id1" property="id" jdbcType="BIGINT"/>
             <result column="article_id1" property="articleId" jdbcType="VARCHAR"/>
