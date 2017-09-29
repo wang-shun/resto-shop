@@ -642,16 +642,14 @@
 					</div>
 
 					<div class="form-group" v-if="m.consumptionRebate==1">
-						<div class="row">
-							<label class="control-label col-md-2">消费返利解冻时间</label>
-							<div class="col-md-4">
-								<div class="input-group date form_datetime">
-									<input type="text" readonly class="form-control" name="consumptionRebate" v-model="m.consumptionRebate" @focus="initCouponTime"> <span class="input-group-btn">
-												<button class="btn default date-set" type="button">
-													<i class="fa fa-calendar" @click="initCouponTime"></i>
-												</button>
-											</span>
-								</div>
+						<label class="col-md-4 control-label">消费返利解冻时间:</label>
+						<div class="col-md-6 radio-list">
+							<div class="input-group date form_datetime">
+								<input type="text" readonly class="form-control" name="rebateTime" v-model="m.rebateTime" @focus="initCouponTime"> <span class="input-group-btn">
+											<button class="btn default date-set" type="button">
+												<i class="fa fa-calendar" @click="initCouponTime"></i>
+											</button>
+										</span>
 							</div>
 						</div>
 					</div>
@@ -792,15 +790,14 @@
 						},
 						initCouponTime: function(){
 							$('.form_datetime').datetimepicker({
-								format: "yyyy-mm-dd hh:ii:ss",
+								format: "yyyy-mm-dd",
 								autoclose: true,
 								todayBtn: true,
 								todayHighlight: true,
 								showMeridian: true,
-								pickerPosition: "bottom-left",
 								language: 'zh-CN',//中文，需要引用zh-CN.js包
 								startView: 2,//月视图
-								//minView: 2//日期时间选择器所能够提供的最精确的时间选择视图
+								minView: 2//日期时间选择器所能够提供的最精确的时间选择视图
 							});
 						},
 						cancel : function() {
