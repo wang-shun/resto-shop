@@ -13,7 +13,6 @@
 	                    <span class="caption-subject bold font-blue-hoki">原料管理</span>
 	                </div>
 	            </div>
-
 				<div class="portlet-body">
 		            <form role="form" class="form-horizontal" action="{{m.id?'scmMaterial/modify':'scmMaterial/create'}}" @submit.prevent="save">
 						<input type="hidden" name="id" v-model="m.id" />
@@ -27,7 +26,6 @@
 										</option>
 								</select>
 								</div>
-
 								<label class="col-md-2 control-label">一级类别</label>
 								<div class="col-md-3">
 								<select name="categoryOneId" v-model="m.categoryOneId" class="bs-select form-control" >
@@ -37,9 +35,7 @@
 								</select>
 								</div>
 							</div>
-
 							<div class="form-group row" >
-
 								<label class="col-md-2 control-label">二级类别</label>
 								<div class="col-md-3">
 								<select name="categoryTwoId" v-model="m.categoryTwoId" class="bs-select form-control" >
@@ -48,7 +44,6 @@
 									</option>
 								</select>
 								</div>
-
 								<label class="col-md-2 control-label">品牌</label>
 								<div class="col-md-3">
 								<select name="categoryThirdId" v-model="m.categoryThirdId" class="bs-select form-control" >
@@ -60,23 +55,18 @@
 								</select>
 								</div>
 							</div>
-
-
 							<div class="form-group row">
 								<label class="col-md-2 control-label">原材料名</label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="materialName" v-model="m.materialName"
 										   required="required">
 								</div>
-
 								<label class="col-md-2 control-label">原材编码</label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="materialCode" v-model="m.materialCode"
 										   required="required">
 								</div>
-
 							</div>
-
 							<div class="form-group row">
 
 								<label class="col-md-2 control-label">序号</label>
@@ -94,9 +84,12 @@
 								</select>
 								</div>
 							</div>
-
-
 							<div class="form-group row">
+								<label class="col-md-2 control-label">规格的核算单位值</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" name="measureUnit" v-model="m.measureUnit"
+										   required="required">
+								</div>
 								<label class="col-md-2 control-label">标准单位</label>
 								<div class="col-md-3">
 								<select name="unitId" v-model="m.unitId" class="bs-select form-control" >
@@ -105,38 +98,36 @@
 									</option>
 								</select>
 								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-md-2 control-label">转换率</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" name="rate" v-model="m.rate"
+										   required="required">
+								</div>
 
 								<label class="col-md-2 control-label">转换单位</label>
 								<div class="col-md-3">
-								<select name="convertUnitId" v-model="m.convertUnitId" class="bs-select form-control" >
-									<option  v-for="unit in unitLists" value="{{unit.id}}">
-										{{unit.unitName}}
-									</option>
-								</select>
+									<select name="convertUnitId" v-model="m.convertUnitId" class="bs-select form-control" >
+										<option  v-for="unit in unitLists" value="{{unit.id}}">
+											{{unit.unitName}}
+										</option>
+									</select>
 								</div>
 							</div>
 							<div class="form-group row">
-								<label class="col-md-2 control-label">最小单位</label>
-								<div class="col-md-3">
-									<input type="text" class="form-control" name="minConvertUnitId" v-model="m.minConvertUnitId" required="required"> g
-								</div>
-								<label class="col-md-2 control-label">最小转换系数</label>
+
+								<label class="col-md-2 control-label">核算最小单位值</label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="minMeasureUnit" v-model="m.minMeasureUnit" required="required">
+									{{m.convertUnitId}}
 								</div>
-								<input type="hidden" class="form-control" name="measureUnit" v-model="m.measureUnit" required="required">
-							</div>
-							<div class="form-group row">
-								<label class="col-md-2 control-label">最小单位</label>
+								<label class="col-md-2 control-label">转换系数</label>
 								<div class="col-md-3">
-									<input type="text" class="form-control" name="minConvertUnitId" v-model="m.minConvertUnitId" required="required"> g
+									<input type="text" class="form-control" name="coefficient"  v-model="m.coefficient" required="required">
 								</div>
-								<label class="col-md-2 control-label">最小转换系数</label>
-								<div class="col-md-3">
-									<input type="text" class="form-control" name="minMeasureUnit" v-model="m.minMeasureUnit" required="required">
-								</div>
-								<input type="hidden" class="form-control" name="measureUnit" v-model="m.measureUnit" required="required">
 							</div>
+
 							<div class="form-group row">
 								<label class="col-md-2 control-label">省份</label>
 								<div class="col-md-3">
@@ -203,7 +194,6 @@
 
 <script>
 	(function(){
-		var cid="#control";
 		var $table = $(".table-body>table");
 		var tb = $table.DataTable({
 			ajax : {
@@ -227,9 +217,6 @@
                 {
                     title : "品牌",
                     data : "categoryThirdName",
-//					createdCell : function(td,tdData){
-//						$(td).html("<span class='label label-primary'>"+tdData+"%</span>");
-//					}
                 },
 				{
 					title : "材料名",
@@ -243,31 +230,34 @@
                     title : "编码",
                     data : "materialCode",
                 },
-
                 {
                     title : "规格",
                     data : "specName",
                 },
+                {
+                    title : "规格的核算单位",
+                    data : "measureUnit",
+                },
 
                 {
-                    title : "标准单位",
+                    title : "核算单位",
                     data : "unitName",
+                },
+                {
+                    title : "转化率",
+                    data : "rate",
                 },
                 {
                     title : "转换单位",
                     data : "convertUnitName",
                 },
                 {
-                    title : "标准单位转换系数",
-                    data : "measureUnit",
+                    title : "最小核算单位值",
+                    data : "minMeasureUnit",
                 },
                 {
                     title : "最小转换单位",
                     data : "minUnitName",
-                },
-                {
-                    title : "最小转换单位转换系数",
-                    data : "minMeasureUnit",
                 },
                 {
                     title : "产地(省份)",
@@ -302,129 +292,62 @@
 					}
 				}],
 		});
-		//debugger
-		console.log(tb);
 		var C = new Controller(null,tb);
 		var vueObj = new Vue({
 			mixins:[C.formVueMix],
 			el:"#control",
 			data:{
-				checkedValues: [],
+                materialTypes: [ //类型
+                    {code:"INGREDIENTS" , name:"主料"},
+                    {code:"ACCESSORIES" , name:"辅料"},
+					{code:"SEASONING" ,name:"调料"},
+                ],
+                categoryOnes:[],//一级类别集合
+                categoryTwos:[],//二级类别集合
+                categoryThirds:[],//品牌类别集合
+                specLists:[],//规格
+                unitLists:[],//各种单位
+                provinceNameLists:[],//省份
+                cityNameLists:[],//市
+                districtNameLists:[],//区
+
+                unitLists:[],
+                specLists:[],
                 categoryOnes:[],
                 categoryTwos:[],
                 categoryThirds:[],
-                specLists:[],
-                unitLists:[],
                 provinceNameLists:[],
                 cityNameLists:[],
                 districtNameLists:[],
-                materialTypes: [
-                    {
-                      code:"INGREDIENTS" ,
-				      name:"主料"
-				   },
-					{
-                        code:"ACCESSORIES" ,
-                        name:"辅料"
-				   },{
-                        code:"SEASONING" ,
-                        name:"调料"
-				   }],
+                m:{
+                    materialType: 'INGREDIENTS',
+                    categoryOneId :'',
+                    categoryTwoId :'',
+                    categoryThirdId :'',
+                    materialName :'',
+                    materialCode :'',
+                    specId	 :'',
+                    priority :'',
+                    unitId	 :'',
+                    convertUnitId :'',
+                    minConvertUnitId  :'',
+                    provinceId :'',
+                    cityId	 :'',
+                    districtId :'',
+                    description :''
+                },
+
 			},
 			methods:{
 				closeForm:function(){
 					this.m={};
 					this.showform=false;
-					this.checkedValues=[];
 				},
 				create:function(){
-                    var that = this;
-					this.m={
-                        materialType: 'INGREDIENTS',
-                        categoryOneId :'',
-                        categoryTwoId :'',
-                        categoryThirdId :'',
-                        materialName :'',
-                        materialCode :'',
-                        specId	 :'',
-                        priority :'',
-                        unitId	 :'',
-                        convertUnitId :'',
-                        minConvertUnitId  :'',
-                        provinceId :'',
-                        cityId	 :'',
-                        districtId :'',
-                        description :''
-
-                    };
-                    that.unitLists = [];
-                    $.post("scmUnit/list_type?type=1", null, function (data) {
-                        that.unitLists = data.data
-                        if(!that.m.unitId ) {
-                            that.m.unitId = data.data[0].id;
-
-                        }
-                        if(that.m.convertUnitId){
-                            that.m.convertUnitId = data.data[0].id;
-						}
-                    });
-
-                    this.specLists = [];
-                    $.post("scmUnit/list_type?type=2", null, function (data) {
-                        that.specLists = data.data;
-                        if(!that.m.specId) {
-                            that.m.specId = data.data[0].id;
-                        }
-                    });
-                    this.categoryOnes = [];
-                    $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=1", null, function (data) {
-                        that.categoryOnes = data.data;
-                        if(!that.m.categoryOneId){
-                            that.m.categoryOneId= data.data[0].id;
-						}
-                    });
-
-                    this.categoryTwos = [];
-                    $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=2", null, function (data) {
-                        that.categoryTwos = data.data;
-                        if(!that.m.categoryTwoId){
-                            that.m.categoryTwoId= data.data[0].id;
-						}
-
-
-                    });
-
-                    this.categoryThirds = [];
-                    $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=3", null, function (data) {
-                        that.categoryThirds = data.data;
-                        if(!that.m.categoryThirdId){
-                            that.m.categoryThirdId = data.data[0].id;
-						}
-
-                    });
-
-                    this.provinceNameLists = [];
-                    $.post("province/list_province", null, function (data) {
-                        that.provinceNameLists = data;
-                            that.m.provinceId = data[0].id;
-
-                    });
-
-                    this.cityNameLists = [];
-                    $.post("province/list_city", null, function (data) {
-                        that.cityNameLists = data;
-                            that.m.cityId= data[0].id;
-                    });
-
-                    this.districtNameLists = [];
-                    $.post("province/list_district", null, function (data) {
-                        that.districtNameLists = data;
-                            that.m.districtId = data[0].id;
-                    });
+                    this.m={};
                     this.showform=true;
 				},
 				edit:function(model){
-					var that = this;
 					this.m= model;
 					this.openForm();
 				},
@@ -436,6 +359,63 @@
 							tb.ajax.reload();
 						});
 				}
+			},
+			ready:function () { //钩子函数
+                var that = this;
+                $.post("scmUnit/list_type?type=1", null, function (data) {
+                    that.unitLists = data.data
+                    if(!that.m.unitId ) {
+                        that.m.unitId = data.data[0].id;
+                    }
+                    if(that.m.convertUnitId){
+                        that.m.convertUnitId = data.data[0].id;
+                    }
+                });
+
+                $.post("scmUnit/list_type?type=2", null, function (data) {
+                    that.specLists = data.data;
+                    if(!that.m.specId) {
+                        that.m.specId = data.data[0].id;
+                    }
+                });
+                $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=1", null, function (data) {
+                    that.categoryOnes = data.data;
+                    if(!that.m.categoryOneId){
+                        that.m.categoryOneId= data.data[0].id;
+                    }
+                });
+                $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=2", null, function (data) {
+                    that.categoryTwos = data.data;
+                    if(!that.m.categoryTwoId){
+                        that.m.categoryTwoId= data.data[0].id;
+                    }
+                });
+
+
+                $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=3", null, function (data) {
+                    that.categoryThirds = data.data;
+                    if(!that.m.categoryThirdId){
+                        that.m.categoryThirdId = data.data[0].id;
+                    }
+                });
+
+
+                $.post("province/list_province", null, function (data) {
+                    that.provinceNameLists = data;
+                    that.m.provinceId = data[0].id;
+                });
+
+
+                $.post("province/list_city", null, function (data) {
+                    that.cityNameLists = data;
+                    that.m.cityId= data[0].id;
+                });
+
+
+                $.post("province/list_district", null, function (data) {
+                    that.districtNameLists = data;
+                    that.m.districtId = data[0].id;
+                });
 			}
 		});
 		C.vue=vueObj;

@@ -362,7 +362,6 @@ var Controller = function(controlId,datatable){
 		return button;
 	}
     this.systemButton = function(delUrl,obj,alertName){
-            //_C.delConfirmDialog(function(){
                 _C.ajax(delUrl,obj,function(result){
                     if(result.success){
                         tb.ajax.reload();
@@ -371,7 +370,6 @@ var Controller = function(controlId,datatable){
                         _C.errorMsg(result.message,alertName[1]);
                     }
                 });
-        //});
         return button;
     }
 	this.createBtn = function(model,url,urlData){
@@ -392,7 +390,21 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
-//
+    this.createEditBtn = function(model,url,urlData){
+        var button = $("<button class='btn btn-xs btn-primary'>编辑</button>");
+        button.click(function(){
+            if(_C.vue){
+                _C.vue.edit(model);
+            }else{
+                _C.loadForm({
+                    url:url,
+                    data:{id:model},
+                    formaction:urlData
+                });
+            }
+        });
+        return button;
+    }
 	this.showFind = function(model,url,urlData){
 		var button = $("<button class='btn btn-xs btn-primary'>查看下级</button>");
 		button.click(function(){
