@@ -65,7 +65,7 @@ public class SupplierController extends GenericController{
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(Long id){
-		supplierService.delete(id);
+		supplierService.delete(id,getCurrentShopId());
 		return Result.getSuccess();
 	}
 }

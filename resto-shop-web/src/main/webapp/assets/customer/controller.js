@@ -392,12 +392,12 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
-
-	this.createEditBtn = function(model,url,urlData){
-		var button = $("<button class='btn btn-xs btn-primary'>编辑</button>");
+//
+	this.showFind = function(model,url,urlData){
+		var button = $("<button class='btn btn-xs btn-primary'>查看下级</button>");
 		button.click(function(){
 			if(_C.vue){
-				_C.vue.edit(model);
+				_C.vue.showFind(model);
 			}else{
 				_C.loadForm({
 					url:url,
@@ -408,6 +408,22 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
+    this.createFind = function(model,url,urlData){
+        var button = $("<button class='btn btn-xs btn-primary'>新增下级</button>");
+        button.click(function(){
+            if(_C.vue){
+                _C.vue.createFind(model);
+            }else{
+                _C.loadForm({
+                    url:url,
+                    data:{id:model},
+                    formaction:urlData
+                });
+            }
+        });
+        return button;
+    }
+    //
 	this.findBtn = function(model,url,urlData){
 		var button = $("<button class='btn btn-xs btn-primary'>查看</button>");
 		button.click(function(){

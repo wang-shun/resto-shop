@@ -27,8 +27,8 @@
 
 	 @RequestMapping("/list_all")
 	 @ResponseBody
-	 public Result listData(MdMaterial mdMaterial){
-		 List<MaterialDo> list = materialService.queryJoin4Page();
+	 public Result listData(){
+		 List<MaterialDo> list = materialService.queryJoin4Page(getCurrentShopId());
 		return getSuccessResult(list);
 	 }
 
@@ -43,6 +43,8 @@
 	 @ResponseBody
 	 public Result create(@Valid  MdMaterial mdMaterial){
 		 mdMaterial.setShopDetailId(getCurrentShopId());
+		 mdMaterial.setCreaterId(mdMaterial.getCreaterId());
+		 mdMaterial.setCreaterName(mdMaterial.getCreaterName());
 		 int i = materialService.addMaterial(mdMaterial);
 		 if(i>0){
 			 return Result.getSuccess();
