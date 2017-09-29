@@ -181,4 +181,10 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     public void resetGroupId(String groupId) {
         shopcartMapper.resetGroupId(groupId);
     }
+
+
+    @Override
+    public void deleteByGroup(String groupId) {
+        shopcartMapper.deleteByGroup(groupId);
+    }
 }

@@ -1015,7 +1015,7 @@
 
     <!-- 根据 店铺ID 和 用户ID 分页查询订单列表 -->
     <select id="orderList" resultType="Order">
-        SELECT * from tb_order where shop_detail_id = #{shopId} and
+        ( SELECT * from tb_order where shop_detail_id = #{shopId} and
         customer_id = #{customerId}
         and ( (order_state != 1 and parent_order_id is null and order_mode != 5)
         or (order_state = 1 and order_mode != 5 and parent_order_id is null)
@@ -1028,11 +1028,11 @@
                      separator="," close=")">
                 #{state}
             </foreach>
-        </if>
+        </if> )
         UNION ALL
         (select * from tb_order where id in (
           select order_id from tb_participant where customer_id = #{customerId}
-        ) and customer_id != #{customerId} )
+        ) and customer_id != #{customerId})
         ORDER BY create_time DESC LIMIT
         #{start},#{datalength}
     </select>

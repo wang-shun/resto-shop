@@ -184,4 +184,8 @@
     <select id="getListByGroupIdDistinctCustomerId" resultType="java.lang.String">
         select DISTINCT customer_id from tb_shop_cart where group_id = #{groupId}
     </select>
+
+    <delete id="deleteByGroup">
+        delete from tb_shop_cart where group_id = #{groupId}
+    </delete>
 </mapper>

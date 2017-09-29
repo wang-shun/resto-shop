@@ -116,8 +116,12 @@ public class OrderAspect {
                 return;
             }
 
+            if(order.getPayMode() != PayMode.WEIXIN_PAY && !StringUtils.isEmpty(order.getGroupId())){
+                //如果多人买的 一起清空购物车
+                shopCartService.deleteByGroup(order.getGroupId());
+            }
 
-            if (order.getPayMode() != PayMode.WEIXIN_PAY) {
+            if (order.getPayMode() != PayMode.WEIXIN_PAY && StringUtils.isEmpty(order.getGroupId())){
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
 //            现金银联闪惠支付应该在pos上确认订单已收款后在进行出单
@@ -405,10 +409,13 @@ public class OrderAspect {
             }
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
-
-        if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
+        if(StringUtils.isEmpty(order.getGroupId())){
             shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
+        }else{
+            shopCartService.deleteByGroup(order.getGroupId());
         }
+
+
 
         //订单不为空  已支付  电视叫号模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
