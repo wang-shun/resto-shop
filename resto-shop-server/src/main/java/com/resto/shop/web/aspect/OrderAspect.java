@@ -24,10 +24,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
@@ -861,8 +858,11 @@ public class OrderAspect {
                 accountLogService.insert(acclog);
 
                 StringBuffer msg = new StringBuffer();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(acclog.getFreezeReturnDate());
+                String date =  calendar.get(Calendar.MONTH) + "年" + calendar.get(Calendar.YEAR) + "月" + calendar.get(Calendar.DAY_OF_MONTH) + "日";
                 SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy/MM/dd");
-                msg.append("太好啦，"+shopDetail.getName()+"送给您"+(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney())+"元的返利红包，"+sdf.format(acclog.getFreezeReturnDate())+"后即可使用！");
+                msg.append("太好啦，"+shopDetail.getName()+"送给您"+(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney())+"元的返利红包，"+date+"后即可使用！");
                 msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue&shopId=" + order.getShopDetailId() + "'>查看余额</a>");
 
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
