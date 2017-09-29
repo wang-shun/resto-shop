@@ -629,6 +629,33 @@
 						</div>
 					</div>
 
+					<div class="form-group">
+						<label class="col-md-4 control-label">是否开启消费返利(1:1)：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="consumptionRebate"v-model="m.consumptionRebate" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="consumptionRebate" v-model="m.consumptionRebate" value="0"> 否
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group" v-if="m.consumptionRebate==1">
+						<div class="row">
+							<label class="control-label col-md-2">消费返利解冻时间</label>
+							<div class="col-md-4">
+								<div class="input-group date form_datetime">
+									<input type="text" readonly class="form-control" name="consumptionRebate" v-model="m.consumptionRebate" @focus="initCouponTime"> <span class="input-group-btn">
+												<button class="btn default date-set" type="button">
+													<i class="fa fa-calendar" @click="initCouponTime"></i>
+												</button>
+											</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>
@@ -762,6 +789,19 @@
 								}
 							})
 
+						},
+						initCouponTime: function(){
+							$('.form_datetime').datetimepicker({
+								format: "yyyy-mm-dd hh:ii:ss",
+								autoclose: true,
+								todayBtn: true,
+								todayHighlight: true,
+								showMeridian: true,
+								pickerPosition: "bottom-left",
+								language: 'zh-CN',//中文，需要引用zh-CN.js包
+								startView: 2,//月视图
+								//minView: 2//日期时间选择器所能够提供的最精确的时间选择视图
+							});
 						},
 						cancel : function() {
 							this.initContent();
