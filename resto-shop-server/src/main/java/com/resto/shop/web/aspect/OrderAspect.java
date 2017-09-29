@@ -855,6 +855,7 @@ public class OrderAspect {
                 acclog.setAccountId(account.getId());
                 acclog.setSource(AccountLog.FREEZE_RED_MONEY);
                 acclog.setShopDetailId(shopDetail.getId());
+                acclog.setOrderId(o.getId());
                 accountLogService.insert(acclog);
             }
         }

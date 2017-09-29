@@ -12,10 +12,11 @@
     <result column="account_id" property="accountId" jdbcType="VARCHAR" />
     <result column="source" property="source" jdbcType="INTEGER" />
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
-     <result column="freeze_return_date" property="freezeReturnDate" jdbcType="VARCHAR"/>
+    <result column="freeze_return_date" property="freezeReturnDate"/>
+    <result column="order_id" property="orderId"/>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, money, create_time, payment_type, remain, remark, account_id, source, shop_detail_id, freeze_return_date
+    id, money, create_time, payment_type, remain, remark, account_id, source, shop_detail_id, freeze_return_date, order_id
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -28,12 +29,12 @@
     where id = #{id,jdbcType=VARCHAR}
   </delete>
   <insert id="insert" parameterType="com.resto.shop.web.model.AccountLog" >
-    insert into tb_account_log (id, money, create_time, 
-      payment_type, remain, remark, 
-      account_id, source, shop_detail_id, freeze_return_date)
+    insert into tb_account_log (id, money, create_time, payment_type, remain, remark,
+      account_id, source, shop_detail_id, freeze_return_date, order_id)
     values (#{id,jdbcType=VARCHAR}, #{money,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, 
       #{paymentType,jdbcType=INTEGER}, #{remain,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
-      #{accountId,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER}, #{shopDetailId,jdbcType=VARCHAR}, #{freezeReturnDate})
+      #{accountId,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER}, #{shopDetailId,jdbcType=VARCHAR},
+      #{freezeReturnDate}, #{orderId})
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.AccountLog" >
     insert into tb_account_log
@@ -68,6 +69,9 @@
       <if test="freezeReturnDate != null">
         freeze_return_date,
       </if>
+      <if test="orderId != null">
+        order_id,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="id != null" >
@@ -99,6 +103,9 @@
       </if>
       <if test="freezeReturnDate != null" >
         #{freezeReturnDate},
+      </if>
+      <if test="orderId != null" >
+        #{orderId},
       </if>
     </trim>
   </insert>
@@ -132,6 +139,9 @@
       <if test="freezeReturnDate != null" >
         freeze_return_date = #{freezeReturnDate},
       </if>
+      <if test="orderId != null" >
+        order_id = #{orderId},
+      </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
   </update>
@@ -145,7 +155,8 @@
       account_id = #{accountId,jdbcType=VARCHAR},
       source = #{source,jdbcType=INTEGER},
       shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},
-      freeze_return_date = #{freezeReturnDate}
+      freeze_return_date = #{freezeReturnDate},
+      order_id = #{orderId}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   <select id="selectList" resultType="AccountLog">select * from tb_account_log</select>

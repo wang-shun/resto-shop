@@ -37,6 +37,8 @@ public class AccountLog implements Serializable {
 
     private Date freezeReturnDate;
 
+    private String orderId;
+
     public String getId() {
         return id;
     }
@@ -115,5 +117,13 @@ public class AccountLog implements Serializable {
 
     public void setFreezeReturnDate(Date freezeReturnDate) {
         this.freezeReturnDate = freezeReturnDate;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
     }
 }
