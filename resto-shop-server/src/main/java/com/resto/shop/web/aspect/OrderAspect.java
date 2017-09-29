@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -860,7 +861,8 @@ public class OrderAspect {
                 accountLogService.insert(acclog);
 
                 StringBuffer msg = new StringBuffer();
-                msg.append("太好啦，"+shopDetail.getName()+"送给您"+(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney())+"元的返利红包，"+acclog.getFreezeReturnDate()+"后即可使用！");
+                SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
+                msg.append("太好啦，"+shopDetail.getName()+"送给您"+(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney())+"元的返利红包，"+sdf.format(acclog.getFreezeReturnDate())+"后即可使用！");
                 msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue&shopId=" + order.getShopDetailId() + "'>查看余额</a>");
 
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
