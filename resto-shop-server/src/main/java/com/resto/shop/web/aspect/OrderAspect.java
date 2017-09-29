@@ -64,6 +64,10 @@ public class OrderAspect {
     NewCustomCouponService newcustomcouponService;
     @Resource
     BrandService brandService;
+    @Resource
+    AccountService accountService;
+    @Resource
+    AccountLogService accountLogService;
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
     public void createOrder() {
@@ -777,6 +781,7 @@ public class OrderAspect {
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
             Brand brand = brandService.selectById(customer.getBrandId());
+            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
             if (order.getAllowAppraise()) {
                 StringBuffer msg = new StringBuffer();
@@ -829,6 +834,19 @@ public class OrderAspect {
             } catch (Exception e) {
                 log.error("分享功能出错:" + e.getMessage());
                 e.printStackTrace();
+            }
+            Date now = new Date();
+            //判断这比订单是否属于   1:1 消费返利的订单
+            if(setting.getConsumptionRebate() == 1 && shopDetail.getConsumptionRebate() == 1
+                    && shopDetail.getRebateTime().compareTo(now) == 1){
+                Order o = orderService.selectById(order.getId());
+                o.setIsConsumptionRebate(1);
+                orderService.update(o);
+                Account account = accountService.selectById(customer.getAccountId());
+                account.setFrozenRemain(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney());
+                accountService.update(account);
+                AccountLog accountLog = new AccountLog();
+
             }
         }
     }
