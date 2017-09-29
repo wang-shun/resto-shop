@@ -214,4 +214,8 @@
   <select id="selectByShareMoneyCount" resultType="java.lang.Integer">
     SELECT count(1) from tb_account_log where account_id = #{accountId} and source = 4
   </select>
+
+  <select id="selectByOrderId" resultType="AccountLog">
+    SELECT * from tb_account_log where order_id = #{orderId}
+  </select>
 </mapper>

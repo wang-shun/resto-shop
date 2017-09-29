@@ -37,4 +37,6 @@ public interface AccountLogService extends GenericService<AccountLog, String> {
 	 * @return
 	 */
 	Integer selectByShareMoneyCount(String accountId);
+
+	AccountLog selectByOrderId(String orderId);
 }
