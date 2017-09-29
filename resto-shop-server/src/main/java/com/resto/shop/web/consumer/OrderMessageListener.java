@@ -75,6 +75,8 @@ public class OrderMessageListener implements MessageListener {
     @Resource
 	AccountNoticeService accountNoticeService;
 
+    @Resource
+    TemplateService templateService;
 
     @Resource
     LogBaseService logBaseService;
@@ -373,9 +375,8 @@ public class OrderMessageListener implements MessageListener {
             WechatConfig config = wechatConfigService.selectByBrandId(brandId);
             Order order=orderService.selectById(obj.getString("orderId"));
             ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
-            String res = WeChatUtils.getTemplate("OPENTM411223846", config.getAppid(), config.getAppsecret());
-            org.json.JSONObject access = new org.json.JSONObject(res);
-            String templateId = access.optString("template_id");
+            TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM411223846");
+            String templateId = templateFlow.getTemplateId();
             String jumpUrl ="";
             Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
             Map<String, Object> first = new HashMap<String, Object>();

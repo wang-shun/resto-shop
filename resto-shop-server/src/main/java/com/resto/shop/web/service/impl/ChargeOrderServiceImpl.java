@@ -17,7 +17,9 @@ import com.resto.brand.web.dto.RechargeLogDto;
 import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.dto.ShopDetailDto;
 import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.TemplateFlow;
 import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.TemplateService;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.ChargeSettingMapper;
@@ -66,6 +68,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
     @Resource
     BonusLogService bonusLogService;
+
+	@Resource
+	TemplateService templateService;
 
 
     @Override
@@ -327,9 +332,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
             map.put("type", "UserAction");
             map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msgFrist.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, map);*/
-			String res = WeChatUtils.getTemplate("OPENTM412000235", brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
-			JSONObject access = new JSONObject(res);
-			String templateId = access.optString("template_id");
+			TemplateFlow templateFlow=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412000235");
+			String templateId = templateFlow.getTemplateId();
 			String jumpUrl ="";
 			Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
 			Map<String, Object> first = new HashMap<String, Object>();
@@ -371,9 +375,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
         map.put("type", "UserAction");
         map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(LogUtils.url, map);*/
-		String res = WeChatUtils.getTemplate("OPENTM412427536", brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
-		JSONObject access = new JSONObject(res);
-		String templateId = access.optString("template_id");
+		TemplateFlow templateFlow=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412427536");
+		String templateId = templateFlow.getTemplateId();
 		String jumpUrl ="http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
 		Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
 		Map<String, Object> first = new HashMap<String, Object>();

@@ -3,14 +3,8 @@ package com.resto.shop.web.aspect;
 import com.resto.brand.core.util.LogUtils;
 import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.core.util.WeChatUtils;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.BrandSetting;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.model.WechatConfig;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.BrandSettingService;
-import com.resto.brand.web.service.ShopDetailService;
-import com.resto.brand.web.service.WechatConfigService;
+import com.resto.brand.web.model.*;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.WaitModerState;
 import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.GetNumber;
@@ -59,6 +53,9 @@ public class GetNumberAspect {
     @Resource
     private BrandService brandService;
 
+    @Resource
+    TemplateService templateService;
+
     @Pointcut("execution(* com.resto.shop.web.service.GetNumberService.updateGetNumber(..))")
     public void updateGetNumber(){};
 
@@ -84,9 +81,8 @@ public class GetNumberAspect {
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);*/
-                String res = WeChatUtils.getTemplate("OPENTM206094658", config.getAppid(), config.getAppsecret());
-                JSONObject access = new JSONObject(res);
-                String templateId = access.optString("template_id");
+                TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
+                String templateId = templateFlow.getTemplateId();
                 String jumpUrl ="";
                 Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                 Map<String, Object> first = new HashMap<String, Object>();
@@ -142,9 +138,8 @@ public class GetNumberAspect {
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);*/
-                String res = WeChatUtils.getTemplate("OPENTM206094658", config.getAppid(), config.getAppsecret());
-                JSONObject access = new JSONObject(res);
-                String templateId = access.optString("template_id");
+                TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
+                String templateId = templateFlow.getTemplateId();
                 String jumpUrl =setting.getWechatWelcomeUrl() + "?dialog=waitScan";
                 Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                 Map<String, Object> first = new HashMap<String, Object>();
@@ -198,9 +193,8 @@ public class GetNumberAspect {
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);*/
-                String res = WeChatUtils.getTemplate("OPENTM206094658", config.getAppid(), config.getAppsecret());
-                JSONObject access = new JSONObject(res);
-                String templateId = access.optString("template_id");
+                TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
+                String templateId = templateFlow.getTemplateId();
                 String jumpUrl ="";
                 Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                 Map<String, Object> first = new HashMap<String, Object>();
@@ -253,9 +247,8 @@ public class GetNumberAspect {
                     StringBuffer msg = new StringBuffer();
                     /*msg.append(shop.getWaitRemindText());
                     WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());*/
-                    String res = WeChatUtils.getTemplate("OPENTM206094658", config.getAppid(), config.getAppsecret());
-                    JSONObject access = new JSONObject(res);
-                    String templateId = access.optString("template_id");
+                    TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
+                    String templateId = templateFlow.getTemplateId();
                     String jumpUrl ="";
                     Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                     Map<String, Object> first = new HashMap<String, Object>();

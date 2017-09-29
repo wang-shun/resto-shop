@@ -66,6 +66,8 @@ public class OrderAspect {
     NewCustomCouponService newcustomcouponService;
     @Resource
     BrandService brandService;
+    @Resource
+    TemplateService templateService;
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
     public void createOrder() {
@@ -220,9 +222,8 @@ public class OrderAspect {
         Customer customer = customerService.selectById(order.getCustomerId());
         WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
         ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
-        String res = WeChatUtils.getTemplate("OPENTM408705883", config.getAppid(), config.getAppsecret());
-        JSONObject access = new JSONObject(res);
-        String templateId = access.optString("template_id");
+        TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM408705883");
+        String templateId = templateFlow.getTemplateId();
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         String jumpUrl ="";
         if (order.getParentOrderId() == null) {
@@ -530,9 +531,8 @@ public class OrderAspect {
             map.put("type", "UserAction");
             map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:您的餐品已经准备好了，请尽快到吧台取餐！,请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, map);*/
-            String res = WeChatUtils.getTemplate("OPENTM411223846", config.getAppid(), config.getAppsecret());
-            org.json.JSONObject access = new org.json.JSONObject(res);
-            String templateId = access.optString("template_id");
+            TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM411223846");
+            String templateId = templateFlow.getTemplateId();
             String jumpUrl ="";
             Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
             Map<String, Object> first = new HashMap<String, Object>();
@@ -773,9 +773,11 @@ public class OrderAspect {
             map.put("type", "UserAction");
             map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, map);*/
-            String res = WeChatUtils.getTemplate("OPENTM408705883", config.getAppid(), config.getAppsecret());
+            /*String res = WeChatUtils.getTemplate("OPENTM408705883", config.getAppid(), config.getAppsecret());
             JSONObject access = new JSONObject(res);
-            String templateId = access.optString("template_id");
+            String templateId = access.optString("template_id");*/
+            TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM408705883");
+            String templateId = templateFlow.getTemplateId();
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             String jumpUrl ="";
             if (order.getParentOrderId() == null) {
@@ -1079,10 +1081,8 @@ public class OrderAspect {
                 WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
                 ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
                 Brand brand = brandService.selectById(order.getBrandId());
-                StringBuffer msg = new StringBuffer();
-                String res = WeChatUtils.getTemplate("OPENTM402104200", config.getAppid(), config.getAppsecret());
-                JSONObject access = new JSONObject(res);
-                String templateId = access.optString("template_id");
+                TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM402104200");
+                String templateId = templateFlow.getTemplateId();
                 String jumpUrl ="";
                 Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                 Map<String, Object> first = new HashMap<String, Object>();

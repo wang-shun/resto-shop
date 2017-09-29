@@ -221,6 +221,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
 	private AccountNoticeService accountNoticeService;
 
+    @Resource
+    TemplateService templateService;
+
 
 
     Logger log = LoggerFactory.getLogger(getClass());
@@ -7777,9 +7780,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),*/
 //                "订单发送推送：" + msg.toString());
-            String res = WeChatUtils.getTemplate("OPENTM203022210", config.getAppid(), config.getAppsecret());
-            JSONObject access = new JSONObject(res);
-            String templateId = access.optString("template_id");
+            TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM203022210");
+            String templateId = templateFlow.getTemplateId();
             String jumpUrl ="";
             Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
             Map<String, Object> first = new HashMap<String, Object>();
