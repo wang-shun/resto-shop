@@ -8,11 +8,11 @@
     <result column="status" property="status" jdbcType="TINYINT"/>
     <result column="frozen_remain" property="frozenRemain"/>
     <collection property="accountLogs" ofType="com.resto.shop.web.model.AccountLog" javaType="java.util.List">
-      <id column="id" property="id" jdbcType="VARCHAR" />
+      <id column="account_log_id" property="id" jdbcType="VARCHAR" />
       <result column="money" property="money" jdbcType="DECIMAL" />
       <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
       <result column="payment_type" property="paymentType" jdbcType="INTEGER" />
-      <result column="remain" property="remain" jdbcType="DECIMAL" />
+      <result column="account_log_remain" property="remain" jdbcType="DECIMAL" />
       <result column="remark" property="remark" jdbcType="VARCHAR" />
       <result column="account_id" property="accountId" jdbcType="VARCHAR" />
       <result column="source" property="source" jdbcType="INTEGER" />
@@ -58,7 +58,7 @@
 
   <select id="selectRebate" resultMap="BaseResultMap">
     SELECT
-        *
+        *, tal.id account_log_id, tal.remain account_log_remain
     FROM
         tb_account ta
     INNER JOIN tb_account_log tal ON ta.id = tal.account_id
