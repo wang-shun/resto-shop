@@ -845,8 +845,17 @@ public class OrderAspect {
                 Account account = accountService.selectById(customer.getAccountId());
                 account.setFrozenRemain(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney());
                 accountService.update(account);
-                AccountLog accountLog = new AccountLog();
-
+                AccountLog acclog = new AccountLog();
+                acclog.setCreateTime(new Date());
+                acclog.setId(ApplicationUtils.randomUUID());
+                acclog.setMoney(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney());
+                acclog.setRemain(account.getRemain());
+                acclog.setPaymentType(AccountLogType.FROZEN);
+                acclog.setRemark("1:1消费返利冻结余额");
+                acclog.setAccountId(account.getId());
+                acclog.setSource(AccountLog.FREEZE_RED_MONEY);
+                acclog.setShopDetailId(shopDetail.getId());
+                accountLogService.insert(acclog);
             }
         }
     }
