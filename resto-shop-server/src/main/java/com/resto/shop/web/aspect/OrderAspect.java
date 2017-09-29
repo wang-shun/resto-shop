@@ -858,6 +858,18 @@ public class OrderAspect {
                 acclog.setOrderId(o.getId());
                 acclog.setFreezeReturnDate(shopDetail.getRebateTime());
                 accountLogService.insert(acclog);
+
+                StringBuffer msg = new StringBuffer();
+                msg.append("太好啦，"+shopDetail.getName()+"送给您X元的返利红包，"+shopDetail.getRebateTime()+"后即可使用！");
+                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue&shopId=" + order.getShopDetailId() + "'>查看余额</a>");
+
+                String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(LogUtils.url, map);
             }
         }
     }
