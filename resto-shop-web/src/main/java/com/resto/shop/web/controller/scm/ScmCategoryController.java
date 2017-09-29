@@ -1,12 +1,9 @@
 package com.resto.shop.web.controller.scm;
 
 import com.resto.brand.core.entity.Result;
-import com.resto.common.dao.domain.PageResult;
 import com.resto.scm.web.dto.CategoryOne;
 import com.resto.scm.web.model.MdCategory;
-import com.resto.scm.web.model.MdUnit;
 import com.resto.scm.web.service.CategoryService;
-import com.resto.scm.web.service.ScmUnitService;
 import com.resto.shop.web.controller.GenericController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
