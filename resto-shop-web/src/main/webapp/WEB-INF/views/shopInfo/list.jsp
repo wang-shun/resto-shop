@@ -712,9 +712,10 @@
                             this.daySmsTypeWx = 2;
                             this.daySmsTypeSms = 1;
                         }else if(this.m.daySmsType==2){
-                            this.daySmsTypeWx=2
+                            this.daySmsTypeWx=2;
                             this.daySmsTypeSms=false;
                         }
+						this.m.rebateTime = new Date(this.m.rebateTime).format("yyyy-MM-dd");
                     },
 					methods : {
                         weChatPaySetting: function (name) {
