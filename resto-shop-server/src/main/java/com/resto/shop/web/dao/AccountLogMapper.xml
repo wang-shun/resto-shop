@@ -12,9 +12,10 @@
     <result column="account_id" property="accountId" jdbcType="VARCHAR" />
     <result column="source" property="source" jdbcType="INTEGER" />
     <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+     <result column="freeze_return_date" property="freezeReturnDate" jdbcType="VARCHAR"/>
   </resultMap>
   <sql id="Base_Column_List" >
-    id, money, create_time, payment_type, remain, remark, account_id, source, shop_detail_id
+    id, money, create_time, payment_type, remain, remark, account_id, source, shop_detail_id, freeze_return_date
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
@@ -29,10 +30,10 @@
   <insert id="insert" parameterType="com.resto.shop.web.model.AccountLog" >
     insert into tb_account_log (id, money, create_time, 
       payment_type, remain, remark, 
-      account_id, source, shop_detail_id)
+      account_id, source, shop_detail_id, freeze_return_date)
     values (#{id,jdbcType=VARCHAR}, #{money,jdbcType=DECIMAL}, #{createTime,jdbcType=TIMESTAMP}, 
       #{paymentType,jdbcType=INTEGER}, #{remain,jdbcType=DECIMAL}, #{remark,jdbcType=VARCHAR}, 
-      #{accountId,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER}, #{shopDetailId,jdbcType=VARCHAR})
+      #{accountId,jdbcType=VARCHAR}, #{source,jdbcType=INTEGER}, #{shopDetailId,jdbcType=VARCHAR}, #{freezeReturnDate})
   </insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.AccountLog" >
     insert into tb_account_log
@@ -62,7 +63,10 @@
         source,
       </if>
       <if test="shopDetailId != null">
-      	shop_detail_id
+      	shop_detail_id,
+      </if>
+      <if test="freezeReturnDate != null">
+        freeze_return_date,
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
@@ -91,7 +95,10 @@
         #{source,jdbcType=INTEGER},
       </if>
       <if test="shopDetailId != null" >
-        #{shopDetailId,jdbcType=VARCHAR}
+        #{shopDetailId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeReturnDate != null" >
+        #{freezeReturnDate},
       </if>
     </trim>
   </insert>
@@ -120,7 +127,10 @@
         source = #{source,jdbcType=INTEGER},
       </if>
       <if test="shopDetailId != null" >
-        shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}
+        shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},
+      </if>
+      <if test="freezeReturnDate != null" >
+        freeze_return_date = #{freezeReturnDate},
       </if>
     </set>
     where id = #{id,jdbcType=VARCHAR}
@@ -134,7 +144,8 @@
       remark = #{remark,jdbcType=VARCHAR},
       account_id = #{accountId,jdbcType=VARCHAR},
       source = #{source,jdbcType=INTEGER},
-      shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}
+      shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},
+      freeze_return_date = #{freezeReturnDate}
     where id = #{id,jdbcType=VARCHAR}
   </update>
   <select id="selectList" resultType="AccountLog">select * from tb_account_log</select>
