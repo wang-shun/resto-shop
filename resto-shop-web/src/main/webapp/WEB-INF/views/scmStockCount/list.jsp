@@ -69,7 +69,7 @@
                                 <td>{{item.provinceName+item.cityName+item.districtName}}</td>
                                 <td>{{item.theoryStockCount}}</td>
                                 <td>{{item.actStockCount}}</td>
-                                <td>{{item.defferentDeason}}</td>
+                                <td>{{item.actStockCount-item.theoryStockCount}}</td>
                             </tr>
                             </tbody>
                         </table>
