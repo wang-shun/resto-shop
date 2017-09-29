@@ -402,6 +402,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(order.getCustomerId());
         if(!StringUtils.isEmpty(order.getGroupId())){
             Boolean bool = (Boolean) RedisUtil.get(order.getCustomerId()+order.getGroupId());
+            log.info(order.getCustomerId()+"check = "+bool);
             if(!bool){
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("万分抱歉，菜品发生变动，请重新变动！");
