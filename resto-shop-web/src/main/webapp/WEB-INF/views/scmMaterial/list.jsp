@@ -126,9 +126,17 @@
 								</div>
 								<input type="hidden" class="form-control" name="measureUnit" v-model="m.measureUnit" required="required">
 							</div>
-
-
-
+							<div class="form-group row">
+								<label class="col-md-2 control-label">最小单位</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" name="minConvertUnitId" v-model="m.minConvertUnitId" required="required"> g
+								</div>
+								<label class="col-md-2 control-label">最小转换系数</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" name="minMeasureUnit" v-model="m.minMeasureUnit" required="required">
+								</div>
+								<input type="hidden" class="form-control" name="measureUnit" v-model="m.measureUnit" required="required">
+							</div>
 							<div class="form-group row">
 								<label class="col-md-2 control-label">省份</label>
 								<div class="col-md-3">
