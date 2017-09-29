@@ -471,6 +471,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                return jsonResult;
 //            }
         }
+        Date now = new Date();
+        //判断这比订单是否属于   1:1 消费返利的订单
+        if(brandSetting.getConsumptionRebate() == 1 && shopDetail.getConsumptionRebate() == 1
+                && shopDetail.getRebateTime().compareTo(now) == 1){
+            order.setIsConsumptionRebate(2);
+        }
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
         List<Article> articles = articleService.selectList(order.getShopDetailId());
         List<ArticlePrice> articlePrices = articlePriceService.selectList(order.getShopDetailId());

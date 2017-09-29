@@ -23,10 +23,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
@@ -858,6 +856,22 @@ public class OrderAspect {
                 acclog.setOrderId(o.getId());
                 acclog.setFreezeReturnDate(shopDetail.getRebateTime());
                 accountLogService.insert(acclog);
+
+                StringBuffer msg = new StringBuffer();
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTime(acclog.getFreezeReturnDate());
+                String date =  calendar.get(Calendar.MONTH) + "年" + calendar.get(Calendar.YEAR) + "月" + calendar.get(Calendar.DAY_OF_MONTH) + "日";
+                SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy/MM/dd");
+                msg.append("太好啦，"+shopDetail.getName()+"送给您"+(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney())+"元的返利红包，"+date+"后即可使用！");
+                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue&shopId=" + order.getShopDetailId() + "'>查看余额</a>");
+
+                String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(LogUtils.url, map);
             }
         }
     }
