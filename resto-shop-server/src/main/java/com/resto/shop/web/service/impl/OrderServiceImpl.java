@@ -1011,6 +1011,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     participant.setGroupId(order.getGroupId());
                     participant.setCustomerId(cId);
                     participant.setShopDetailId(order.getShopDetailId());
+                    participant.setBrandId(order.getBrandId());
                     participant.setOrderId(order.getId());
                     participant.setIsPay(0);
                     participant.setAppraise(0);
@@ -1025,6 +1026,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     participant.setIsPay(1);
                     participant.setShopDetailId(order.getShopDetailId());
                     participant.setAppraise(0);
+                    participant.setBrandId(order.getBrandId());
                     participantService.insert(participant);
                 }else{
                     participantService.updateIsPayByOrderIdCustomerId(order.getGroupId(), order.getId(), order.getCustomerId());
@@ -1041,6 +1043,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         participant.setOrderId(order.getParentOrderId());
                         participant.setIsPay(0);
                         participant.setAppraise(0);
+                        participant.setBrandId(order.getBrandId());
                         participant.setShopDetailId(order.getShopDetailId());
                         participantService.insert(participant);
                     }
@@ -1052,6 +1055,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     participant.setOrderId(order.getParentOrderId());
                     participant.setIsPay(0);
                     participant.setAppraise(0);
+                    participant.setBrandId(order.getBrandId());
                     participant.setShopDetailId(order.getShopDetailId());
                     participantService.insert(participant);
                 }
