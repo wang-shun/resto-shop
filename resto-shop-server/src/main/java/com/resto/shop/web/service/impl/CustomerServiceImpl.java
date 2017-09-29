@@ -368,4 +368,9 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public int updateCustomerWechatId(Customer customer) {
 		return customerMapper.updateCustomerWechatId(customer);
 	}
+
+	@Override
+	public Customer selectByAccountId(String accountId) {
+		return customerMapper.selectByAccountId(accountId);
+	}
 }
