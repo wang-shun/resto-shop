@@ -860,7 +860,7 @@ public class OrderAspect {
                 accountLogService.insert(acclog);
 
                 StringBuffer msg = new StringBuffer();
-                msg.append("太好啦，"+shopDetail.getName()+"送给您X元的返利红包，"+shopDetail.getRebateTime()+"后即可使用！");
+                msg.append("太好啦，"+shopDetail.getName()+"送给您X元的返利红包，"+acclog.getShopDetailId()+"后即可使用！");
                 msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue&shopId=" + order.getShopDetailId() + "'>查看余额</a>");
 
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
