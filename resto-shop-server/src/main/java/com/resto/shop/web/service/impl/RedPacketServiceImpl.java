@@ -42,8 +42,8 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
 
     @Override
     public void useRedPacketPay(BigDecimal redPay, String customerId, Order order, Brand brand, ShopDetail shopDetail) {
-        //扣除红包，扣除顺序 评论红包-->分享红包-->退菜红包-->第三方储值余额   --2017-08-23新增红包类型wtl
-        Integer[] redType = {0,1,2,3};
+        //扣除红包，扣除顺序 评论红包-->分享红包-->退菜红包-->第三方储值余额-->消费返利余额   --2017-08-23新增第三方储值余额红包类型 auto by wtl-->2017-09-29新增红包消费返利余额类型 auto by wtl
+        Integer[] redType = {0,1,2,3,4};
         for(Integer type : redType){
             redPay = useRedPacket(type,redPay,customerId,order,brand,shopDetail);
             //如果已扣完则不再扣除
@@ -82,6 +82,9 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
                 case RedType.THIRD_MONEY:
                     item.setPaymentModeId(PayMode.THIRD_MONEY_RED_PAY);
                     break;
+                case RedType.REBATE_MONEY:
+                    item.setPaymentModeId(PayMode.REBATE_MONEY_RED_PAY);
+                    break;
             }
 			item.setPayTime(new Date());
 			item.setPayValue(redPacket.getRedRemainderMoney());
@@ -113,6 +116,9 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
                     break;
                 case RedType.THIRD_MONEY:
                     item.setPaymentModeId(PayMode.THIRD_MONEY_RED_PAY);
+                    break;
+                case RedType.REBATE_MONEY:
+                    item.setPaymentModeId(PayMode.REBATE_MONEY_RED_PAY);
                     break;
             }
             item.setPayTime(new Date());

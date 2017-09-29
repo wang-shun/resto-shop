@@ -2452,7 +2452,7 @@ on o.id = oi.order_id
         from tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
-        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND oi.payment_mode_id not in (13,14,15,20)
+        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND oi.payment_mode_id not in (13,14,15,20,21)
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}
         ]]>
     </select>
@@ -2747,7 +2747,7 @@ AND o.brand_id = #{brandId}
 
     <select id="selectPayBefore" resultType="java.math.BigDecimal">
     select sum(pay_value) from tb_order_payment_item
-    where order_id = #{orderId} and payment_mode_id not in (13,14,15,20)
+    where order_id = #{orderId} and payment_mode_id not in (13,14,15,20,21)
 </select>
 
     <select id="getPayHoufu" resultType="java.math.BigDecimal">
@@ -2937,7 +2937,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
-opi.payment_mode_id not in (13,14,15,20) AND
+opi.payment_mode_id not in (13,14,15,20,21) AND
 o.production_status in(2,3,6)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
@@ -2971,7 +2971,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
-opi.payment_mode_id not in (13,14,15,20) AND
+opi.payment_mode_id not in (13,14,15,20,21) AND
 o.production_status in(2,3,6)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}

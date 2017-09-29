@@ -776,4 +776,8 @@ and wechat_id != '0'
             </if>
         </where>
     </select>
+
+    <select id="selectByAccountId" resultType="com.resto.shop.web.model.Customer" parameterType="java.lang.String">
+        select * from tb_customer where account_id = #{accountId}
+    </select>
 </mapper>
