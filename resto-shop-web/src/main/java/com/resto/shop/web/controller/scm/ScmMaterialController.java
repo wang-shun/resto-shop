@@ -2,12 +2,13 @@
 
  import com.resto.brand.core.entity.Result;
  import com.resto.scm.web.dto.MaterialDo;
+ import com.resto.scm.web.dto.MdSupplierPriceHeadDo;
  import com.resto.scm.web.model.MdMaterial;
  import com.resto.scm.web.service.MaterialService;
+ import com.resto.scm.web.service.SupplierMaterialPriceService;
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
- import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -20,6 +21,11 @@
 
 	 @Autowired
 	 MaterialService materialService;
+
+	 @Autowired
+	 SupplierMaterialPriceService supplierpriceService;
+
+
 
 	 @RequestMapping("/list")
 	 public void list(){
@@ -62,7 +68,24 @@
 	 @RequestMapping("delete")
 	 @ResponseBody
 	 public Result delete(Long id){
-		 Integer row = materialService.deleteById(id);
+		 MdSupplierPriceHeadDo mdSupplierPriceHeadDo = supplierPriceIsContainThisId(id);
+		 if(mdSupplierPriceHeadDo !=null){
+			  new Result(mdSupplierPriceHeadDo.getPriceName()+"包含该原料,暂时不可以删除，如要删除请联系管理员！",  5000, false);
+		  }else{
+			  Integer row = materialService.deleteById(id);
+		  }
 		 return Result.getSuccess();
+	 }
+
+	 private MdSupplierPriceHeadDo supplierPriceIsContainThisId(Long id) {
+	 	//查询该shop所有供应商报价单
+		 List<MdSupplierPriceHeadDo> effectiveList = supplierpriceService.findEffectiveList(getCurrentShopId(), null);
+		 for (MdSupplierPriceHeadDo effective:effectiveList) {
+                    if(id.equals(effective.getId())){
+                    	return effective;
+					}
+		 }
+
+		 return null;
 	 }
  }
