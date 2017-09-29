@@ -60,7 +60,7 @@ public class ScmCategoryController extends GenericController {
     public Result look_down(Integer hierarchyId) {
         if (hierarchyId == null) {
             return new Result("hierarchyId不能为空", 5000, false);
-        } else if (hierarchyId >= 4) {
+        } else if (hierarchyId >= 3) {
             return new Result("已经是最小层级", 5000, false);
         } else {
             List<MdCategory> list = categoryService.queryByCategoryHierarchy(hierarchyId + 1);
