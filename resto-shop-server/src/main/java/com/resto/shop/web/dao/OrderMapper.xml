@@ -1030,9 +1030,9 @@
             </foreach>
         </if>
         UNION ALL
-        select * from tb_order where id in (
+        (select * from tb_order where id in (
           select order_id from tb_participant where customer_id = #{customerId}
-        ) and customer_id != #{customerId}
+        ) and customer_id != #{customerId} )
         ORDER BY create_time DESC LIMIT
         #{start},#{datalength}
     </select>
