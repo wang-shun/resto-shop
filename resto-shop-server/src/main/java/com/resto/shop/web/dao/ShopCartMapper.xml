@@ -168,7 +168,7 @@
 
     <select id="checkRepeat" resultType="java.lang.Integer">
         select sum(`number`) from tb_shop_cart where article_id = #{articleId}
-        and group_id = #{groupId} GROUP BY customer_id
+        and group_id = #{groupId} and customer_id != #{customerId}
     </select>
 
     <select id="getListByGroupId" resultType="ShopCart">

@@ -43,7 +43,7 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
     /**
      * 判断菜品是否重复
      */
-    Integer checkRepeat(String articleId,String groupId);
+    Integer checkRepeat(String articleId,String groupId,String customerId);
 
     List<ShopCart> getListByGroupId(String groupId);
 
