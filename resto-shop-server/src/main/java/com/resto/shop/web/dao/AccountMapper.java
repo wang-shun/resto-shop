@@ -1,6 +1,7 @@
 package com.resto.shop.web.dao;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -21,4 +22,6 @@ public interface AccountMapper  extends GenericDao<Account,String> {
     int updateByPrimaryKey(Account record);
     
     Account selectAccountByCustomerId(@Param("customerId") String customerId);
+
+    List<Account> selectRebate();
 }

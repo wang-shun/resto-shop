@@ -7,6 +7,19 @@
     <result column="remain" property="remain" jdbcType="DECIMAL"/>
     <result column="status" property="status" jdbcType="TINYINT"/>
     <result column="frozen_remain" property="frozenRemain"/>
+    <collection property="accountLogs" ofType="com.resto.shop.web.model.AccountLog" javaType="java.util.List">
+      <id column="id1" property="id" jdbcType="VARCHAR" />
+      <result column="money" property="money" jdbcType="DECIMAL" />
+      <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+      <result column="payment_type" property="paymentType" jdbcType="INTEGER" />
+      <result column="remain" property="remain" jdbcType="DECIMAL" />
+      <result column="remark" property="remark" jdbcType="VARCHAR" />
+      <result column="account_id" property="accountId" jdbcType="VARCHAR" />
+      <result column="source" property="source" jdbcType="INTEGER" />
+      <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+      <result column="freeze_return_date" property="freezeReturnDate"/>
+      <result column="order_id" property="orderId"/>
+    </collection>
   </resultMap>
   <sql id="Base_Column_List">id, remain, status, frozen_remain</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
@@ -41,5 +54,15 @@
   <!-- 根据用户ID查询账户余额 -->
   <select id="selectAccountByCustomerId" resultType="Account">
 	SELECT a.* from tb_account a LEFT JOIN tb_customer c on a.id = c.account_id where c.id = #{customerId}
-  </select>  
+  </select>
+
+  <select id="selectRebate" resultMap="BaseResultMap">
+    SELECT
+        *
+    FROM
+        tb_account ta
+    INNER JOIN tb_account_log tal ON ta.id = tal.account_id
+    WHERE
+        tal.payment_type = 3 and NOW() >= tal.freeze_return_date
+  </select>
 </mapper>
