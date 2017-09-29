@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
@@ -44,5 +45,9 @@ public interface AccountService extends GenericService<Account, String> {
 	 */
 	void updateCustomerAccount(String operationPhone,String customerPhone,ChargeSetting chargeSetting,String customerId,String accountId,Brand brand,ShopDetail shopDetail);
 
-
+	/**
+	 * 查询所有到期返利余额
+	 * @return
+	 */
+	List<Account> selectRebate();
 }

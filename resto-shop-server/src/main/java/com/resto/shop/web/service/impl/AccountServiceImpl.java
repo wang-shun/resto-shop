@@ -327,5 +327,9 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
         map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(LogUtils.url, map);
 	}
-	
+
+	@Override
+	public List<Account> selectRebate() {
+		return accountMapper.selectRebate();
+	}
 }
