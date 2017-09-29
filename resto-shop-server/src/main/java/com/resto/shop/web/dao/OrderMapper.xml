@@ -964,6 +964,9 @@
             <if test="baseOrderMoney != null">
                 base_order_money = #{baseOrderMoney},
             </if>
+            <if test="isConsumptionRebate != null">
+                is_consumption_rebate = #{isConsumptionRebate},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
