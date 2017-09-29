@@ -6,32 +6,36 @@
     <id column="id" property="id" jdbcType="VARCHAR"/>
     <result column="remain" property="remain" jdbcType="DECIMAL"/>
     <result column="status" property="status" jdbcType="TINYINT"/>
+    <result column="frozen_remain" property="frozenRemain"/>
   </resultMap>
-  <sql id="Base_Column_List">id, remain, status</sql>
+  <sql id="Base_Column_List">id, remain, status, frozen_remain</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> from tb_account where id = #{id,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.String">delete from tb_account where id = #{id,jdbcType=VARCHAR}</delete>
-  <insert id="insert" parameterType="com.resto.shop.web.model.Account">insert into tb_account (id, remain, status ) values (#{id,jdbcType=VARCHAR}, #{remain,jdbcType=DECIMAL}, #{status,jdbcType=TINYINT} )</insert>
+  <insert id="insert" parameterType="com.resto.shop.web.model.Account">insert into tb_account (id, remain, status, frozen_remain) values (#{id,jdbcType=VARCHAR}, #{remain,jdbcType=DECIMAL}, #{status,jdbcType=TINYINT}, #{frozenRemain})</insert>
   <insert id="insertSelective" parameterType="com.resto.shop.web.model.Account">insert into tb_account 
     <trim prefix="(" suffix=")" suffixOverrides=","> 
       <if test="id != null">id,</if>  
       <if test="remain != null">remain,</if>  
-      <if test="status != null">status,</if> 
+      <if test="status != null">status,</if>
+      <if test="frozenRemain != null">frozen_remain,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
       <if test="remain != null">#{remain,jdbcType=DECIMAL},</if>  
-      <if test="status != null">#{status,jdbcType=TINYINT},</if> 
+      <if test="status != null">#{status,jdbcType=TINYINT},</if>
+      <if test="frozenRemain != null">#{frozenRemain},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Account">update tb_account 
     <set> 
       <if test="remain != null">remain = #{remain,jdbcType=DECIMAL},</if>  
-      <if test="status != null">status = #{status,jdbcType=TINYINT},</if> 
+      <if test="status != null">status = #{status,jdbcType=TINYINT},</if>
+      <if test="frozenRemain != null">frozen_remain = #{frozenRemain},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Account">update tb_account set remain = #{remain,jdbcType=DECIMAL}, status = #{status,jdbcType=TINYINT} where id = #{id,jdbcType=VARCHAR}</update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Account">update tb_account set remain = #{remain,jdbcType=DECIMAL}, status = #{status,jdbcType=TINYINT}, frozen_remain = #{frozenRemain} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="Account">select * from tb_account</select>
   
   <!-- 根据用户ID查询账户余额 -->
