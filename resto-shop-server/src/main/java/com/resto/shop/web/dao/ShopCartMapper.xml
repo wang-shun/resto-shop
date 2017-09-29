@@ -167,7 +167,7 @@
     </update>
 
     <select id="checkRepeat" resultType="java.lang.Integer">
-        select sum(`number`) from tb_shop_cart where article_id = #{articleId}
+        select ifnull(sum(`number`),0) from tb_shop_cart where article_id = #{articleId}
         and group_id = #{groupId} and customer_id != #{customerId}
     </select>
 
