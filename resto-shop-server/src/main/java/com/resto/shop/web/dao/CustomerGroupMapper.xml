@@ -98,9 +98,8 @@
 
   <select id="getGroupByShopCart" resultType="CustomerGroup" >
       select t.customer_id,t.customer_name,ifnull(sum(t2.number),0) as articleCount ,t.is_leader,t.head_photo from tb_customer_group t
-left join tb_shop_cart t2 on t2.group_id = t.group_id and t.customer_id = t2.customer_id
+inner join tb_shop_cart t2 on t2.group_id = t.group_id and t.customer_id = t2.customer_id and t2.shop_type != 3
 where t.group_id = #{groupId}
-and t2.shop_type != 3
 GROUP BY t.customer_id
 order by is_leader desc
   </select>
