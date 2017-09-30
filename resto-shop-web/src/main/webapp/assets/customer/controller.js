@@ -370,7 +370,7 @@ var Controller = function(controlId,datatable){
                         _C.errorMsg(result.message,alertName[1]);
                     }
                 });
-        return button;
+        // return button;
     }
 	this.createBtn = function(model,url,urlData){
 		var button = $("<button class='btn btn-xs btn-primary'>编辑</button>");

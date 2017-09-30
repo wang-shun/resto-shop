@@ -392,10 +392,6 @@
                 onNodeChecked: function(event, data) {
                     //var node={};
                     if(data){
-//                        node.id=data.id;node.minMeasureUnit=data.minMeasureUnit;node.unitName=data.unitName;node.materialName=data.materialName;
-//                        node.specName=data.specName;node.materialCode=data.materialCode;node.materialId=data.materialId;node.lossFactor=data.lossFactor;
-//                        node.actLossFactor=data.actLossFactor;node.materialCount=data.materialCount;
-//                        console.log(node);
                         Vue.set(vueObj.bomRawMaterial,vueObj.bomRawMaterial.length,data);
                     }
                 },
