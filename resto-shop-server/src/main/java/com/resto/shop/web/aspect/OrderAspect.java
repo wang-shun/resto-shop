@@ -784,7 +784,7 @@ public class OrderAspect {
             if (order.getAllowAppraise()) {
                 StringBuffer msg = new StringBuffer();
                 msg.append("您有一个红包未领取，红包是" + brand.getBrandName() + "送您的一片心意xoxo");
-                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
+                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?qiehuan=qiehuan&subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
