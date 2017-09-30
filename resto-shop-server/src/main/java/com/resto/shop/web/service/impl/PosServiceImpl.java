@@ -365,7 +365,7 @@ public class PosServiceImpl implements PosService {
         if(refundOrder.getOrderState() == OrderState.SUBMIT){
             for(OrderItem orderItem : order.getOrderItems()){
                 OrderItem item = orderItemService.selectById(orderItem.getId());
-                orderService.updateOrderItem(orderItem.getOrderId(),item.getCount() - orderItem.getCount(),orderItem.getId(), 1);
+                orderService.updateOrderItem(item.getOrderId(),item.getCount() - orderItem.getCount(),orderItem.getId(), 1);
             }
 
         }else{
