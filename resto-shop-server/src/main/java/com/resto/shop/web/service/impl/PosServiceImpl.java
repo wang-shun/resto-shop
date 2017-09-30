@@ -269,6 +269,10 @@ public class PosServiceImpl implements PosService {
         JSONObject json = new JSONObject(data);
 
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
+        if(!StringUtils.isEmpty(orderDto.getParentOrderId())){
+            Order order = orderService.selectById(orderDto.getParentOrderId());
+            orderDto.setCustomerId(order.getCustomerId());
+        }
         orderDto.setShopDetailId(json.getString("shopId"));
         Order order = new Order(orderDto);
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(json.getString("shopId"));
