@@ -17,13 +17,14 @@
                 </div>
 
                 <div class="portlet-body">
-                    <form role="form" class="form-horizontal" action="{{parameter.id?'scmBom/modify':'scmBom/create'}}" @submit.prevent="save">
+                    <%--<form role="form" class="form-horizontal" action="{{parameter.id?'scmBom/modify':'scmBom/create'}}" @submit.prevent="save">--%>
                         <input type="hidden" name="id" v-model="parameter.id" />
                         <div class="form-body">
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">菜品类别</label>
                                 <div class="col-md-3">
-                                    <select name="productCategory"  class="bs-select form-control" @change='changeType1' >
+                                    <select name="productCategory" v-model="parameter.productCategory"  class="bs-select form-control" @change='changeType1' >
+                                        <option disabled selected value>请选择</option>
                                         <option  v-for="articleFamily in articleFamilyIdArr" value="{{articleFamily.articleFamilyId}}">
                                             {{articleFamily.name}}
                                         </option>
@@ -32,7 +33,8 @@
 
                                 <label class="col-md-2 control-label">菜品名称</label>
                                 <div class="col-md-3">
-                                <select name="categoryOneId"   class="bs-select form-control" @change='changeType2'>
+                                <select name="categoryOneId"  v-model="parameter.productName"  class="bs-select form-control" @change='changeType2'>
+                                    <option disabled selected value>请选择</option>
                                     <option  v-for="productName in productNameArr" value="{{productName.articleId}}">
                                         {{productName.name}}
                                     </option>
@@ -85,10 +87,10 @@
                             </table>
                         </div>
                         <div class="form-group text-center">
-                            <input class="btn green"  type="submit"  value="保存"/>&nbsp;&nbsp;&nbsp;
+                            <input class="btn green"  type="submit"  @click="save" value="保存"/>&nbsp;&nbsp;&nbsp;
                             <a class="btn default" @click="cancel" >取消</a>
                         </div>
-                    </form>
+                    <%--</form>--%>
                 </div>
             </div>
         </div>
@@ -273,14 +275,18 @@
                 },
                 closeForm:function(){ //关闭新增弹窗
                     this.showform=false;
+                    this.parameter.productCategory='';//菜品类别
+                    this.parameter.productName='';//菜品名称
                 },
                 edit:function(model){ //编辑打开弹窗
+                    debugger
                     this.parameter= model;
                     console.log(this.parameter);
                     this.parameter.bomDetailDeleteIds=[];
                     this.showform=true;
                 },
                 save:function(e){ //新增and编辑保存
+                    debugger
                     var _this=this;
                     var savearr=[];
                     for(var i=0;i<_this.parameter.bomDetailDoList.length;i++){
@@ -309,8 +315,10 @@
                         },
                         success:function(data){ //成功后返回
                             console.log(data);
+                            C.systemButtonNo('success','成功');
                         },
                         error: function(){ //失败后执行
+                            C.systemButtonNo('error','失败');
                         }
                     });
                     this.parameter= {
