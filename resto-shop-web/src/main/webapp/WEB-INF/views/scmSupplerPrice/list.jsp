@@ -41,8 +41,8 @@
                                 </div>
                                 <label class="col-md-2 control-label">联系人 </label>
                                 <div class="col-md-3">
-                                <select name="categoryOneId" v-model="parameter.contactId" class="bs-select form-control" >
-                                    <option  v-for="contact in contacts" value="{{contact.id}}" v-if="parameter.supplierId==contact.id">
+                                <select name="categoryOneId" v-model="parameter.contact" class="bs-select form-control" >
+                                    <option  v-for="contact in contacts" value="{{contact.supplierId}}" v-if="parameter.supplierId==contact.supplierId">
                                         {{contact.contact}}
                                     </option>
                                 </select>
@@ -90,8 +90,8 @@
                                     <td>{{item.materialType}}</td>
                                     <td>{{item.categoryOneName}}</td>
                                     <td>{{item.categoryTwoName}}</td>
-                                    <td>{{item.categoryThirdName}}</td>
-                                    <td>{{item.name}}</td>
+                                    <td>{{item.categoryThreeName}}</td>
+                                    <td>{{item.materialName}}</td>
                                     <td>{{item.materialCode}}</td>
                                     <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                     <td>{{item.provinceName+item.cityName+item.districtName}}</td>
@@ -131,87 +131,6 @@
         </div>
     </div>
     <!--树状图结束-->
-    <!--查看详情-->
-    <div class="row form-div" v-show="details">
-        <div class="col-md-offset-3 col-md-6" style="background: #FFF;">
-            <div class="text-center" style="padding: 20px 0">
-                <span class="caption-subject bold font-blue-hoki">查看详情</span>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group row">
-                        <label class="col-md-2 control-label">报价单号</label>
-                        <div class="col-md-4">
-                            {{detailsArr.priceNo}}
-                        </div>
-                        <label class="col-md-2 control-label">有效期</label>
-                        <div class="col-md-4">
-                            {{detailsArr.startEffect}}--{{detailsArr.endEffect}}
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-2 control-label">类型</label>
-                        <div class="col-md-4">
-                            {{detailsArr.materialTypes}}
-                        </div>
-                        <label class="col-md-2 control-label">供应商</label>
-                        <div class="col-md-4">
-                            {{detailsArr.supName}}
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <label class="col-md-2 control-label">联系人</label>
-                        <div class="col-md-4">
-                            {{detailsArr.contact}}
-                        </div>
-                        <label class="col-md-2 control-label">备注</label>
-                        <div class="col-md-4">
-                            {{detailsArr.remark}}
-                        </div>
-                    </div>
-                    <div class="form-group row">
-                        <table class="table table-bordered" >
-                            <thead>
-                            <tr>
-                                <th>类型</th>
-                                <th>一级类别</th>
-                                <th>二级类别</th>
-                                <th>品牌名</th>
-                                <th>材料名</th>
-                                <th>编码</th>
-                                <th>规格</th>
-                                <th>产地</th>
-                                <th>单价</th>
-
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr v-for="item in detailsArr.mdSupplierPriceDetailDoList">
-                                <td>{{item.materialType}}</td>
-                                <td>{{item.categoryOneName}}</td>
-                                <td>{{item.categoryTwoName}}</td>
-                                <td>{{item.categoryThirdName}}</td>
-                                <td>{{item.name}}</td>
-                                <td>{{item.materialCode}}</td>
-                                <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
-                                <td>{{item.provinceName+item.cityName+item.districtName}}</td>
-                                <td>{{item.purchasePrice}}</td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-            <div class="text-center" style="padding: 20px 0">
-                <a class="btn default" @click="detailsCli" v-if="detailsBtn">取消</a>
-            </div>
-            <div class="text-center" style="padding: 20px 0" v-if="approveBtn">
-                <a class="btn default" @click="approveCli1" >驳回</a>
-                <a class="btn blue pull-center" @click="approveCli2" >批准</a>
-            </div>
-        </div>
-    </div>
-    <!--查看详情-->
     <div class="table-div">
         <div class="table-operator">
             <s:hasPermission name="scmSupplerPrice/add">
@@ -239,7 +158,11 @@
         var tb = $table.DataTable({
             ajax : {
                 url : "scmSupplerPrice/list_all",
-                dataSrc : "data"
+                dataSrc : "data",
+
+
+
+
             },
             columns : [
                 {
@@ -286,35 +209,31 @@
                     title : "状态",
                     data : "supStatus",
                 },
+
                 {
                     title : "操作",
                     data : "id",
                     createdCell:function(td,tdData,rowData){
                         var operator=[
-                            <s:hasPermission name="scmSupplerPrice/approve">
-                             C.createApproveBtn(rowData),
+                            <s:hasPermission name="scmMaterial/delete">
+                            C.createDelBtn(tdData,"scmMaterial/delete"),
                             </s:hasPermission>
-                            <s:hasPermission name="scmSupplerPrice/showDetails">
-                            C.findBtn(rowData),
+                            <s:hasPermission name="scmMaterial/edit">
+                            C.createEditBtn(rowData),
                             </s:hasPermission>
                         ];
                         $(td).html(operator);
                     }
-                },
-                ],
+                }],
         });
         var C = new Controller(null,tb);
         var vueObj = new Vue({
             mixins:[C.formVueMix],
             el:"#control",
             data:{
-                details:false,//查看详情
-                detailsBtn:false,//查看详情返回按钮
-                approveBtn:false,//查看详情（审核）-审核按钮
                 showform:false,//弹窗
                 treeView:false,//树状图
                 bomRawMaterial:[],//树状图原材料
-                detailsArr:'',//查看详情对象
                 supplierTypes: [ //供应商类型数组
                     {code:"1",name:"物料类"},
                     {code:"2",name:"服务类"},
@@ -328,11 +247,15 @@
                     supplierId:'',//供应商id
                     startEffect:'',//生效日期
                     endEffect:'',//失效效日期
-                    contactId:4,//联系人id
+                    contactId:'',//联系人id
                     remark:'',//备注
                     priceName:'',//报价单名称
                     mdSupplierPriceDetailDoList:[
-
+//                        {
+//                        materialId: '',
+//                        materialCode: "",
+//                        purchasePrice: ""
+//                    }
                     ],
 
                 }
@@ -346,30 +269,6 @@
                 },
                 closeTreeView:function () { //添加原料打开
                     this.treeView=true;
-                },
-                approve:function (data) { //开始审核
-                    this.details=true;
-                    this.detailsArr=data;
-                    this.approveBtn=true;
-                },
-                approveCli1:function () { //驳回审核
-                    this.details=false;
-                    this.approveBtn=false;
-                    C.systemButton('scmSupplerPrice/approve',{id:this.detailsArr.id,supStatus:'13'},['驳回成功','驳回失败']);
-                },
-                approveCli2:function () { //批准审核
-                    this.details=false;
-                    this.approveBtn=false;
-                    C.systemButton('scmSupplerPrice/approve',{id:this.detailsArr.id,supStatus:'12'},['审核成功','审核失败']);
-                },
-                showDetails:function (data) { //查看详情
-                    this.details=true;
-                    this.detailsArr=data;
-                    this.detailsBtn=true;
-                },
-                detailsCli:function () { //关闭查看详情
-                    this.details=false;
-                    this.detailsBtn=false;
                 },
                 cancelTreeView:function () { //添加原料关闭
                     this.treeView=false;
@@ -387,20 +286,20 @@
                     var saveObj=[];
                     var parSup=this.parameter.mdSupplierPriceDetailDoList;
                     for(var i=0;i<parSup.length;i++){
-                        saveObj[i]={
-                            materialId:parSup[i].id,
-                            materialCode:parSup[i].materialCode,
-                            purchasePrice:parSup[i].purchasePrice,
-                        }
+                        //materialId: '',
+//                        materialCode: "",
+//                        purchasePrice: ""
+                        saveObj[i].materialId=parSup[i].materialId;
+                        saveObj[i].materialCode=parSup[i].materialCode;
+                        saveObj[i].purchasePrice=parSup[i].purchasePrice;
                     }
-                    _this.parameter.mdSupplierPriceDetailDoList=saveObj;
-                    console.log(_this.parameter);
+
                     $.ajax({
                         type:"POST",
                         url:'scmSupplerPrice/create',
                         contentType:"application/json",
                         datatype: "json",
-                        data:JSON.stringify(_this.parameter),
+                        data:JSON.stringify(saveObj),
                         beforeSend:function(){ //请求之前执行
                             _this.showform=false;
                         },
@@ -423,6 +322,7 @@
                 $.get('scmSupplier/list_all',function (jsonData) { //供应商查询
                     var data=jsonData.data;
                     _this.supNames=data;//供应商
+                    debugger
                         for(var i=0;i<data.length;i++){
                             if(data[i].supplierContacts){
                                 _this.contacts=_this.contacts.concat(data[i].supplierContacts);
@@ -430,6 +330,7 @@
                         }
                 });
                 $.get('scmCategory/query',function (jsonData) { //加载树状图
+                    console.log(jsonData);
                     var defaultData=jsonData.data;
                     for(var i=0;i<defaultData.length;i++){
                         if (defaultData[i].twoList) {
@@ -484,17 +385,17 @@
             created : function(){
                 //初始化多选框按钮 和 时间插件
                 //时间默认值
-                $('.form_datetime').val(new Date().format("yyyy-mm-dd HH:mm:ss"));
+                $('.form_datetime').val(new Date().format("yyyy-MM-dd"));
                 //this.initTime();
                 $('.form_datetime').datetimepicker({
                     endDate : new Date(),
-                    //minView : "month",
-                    //maxView : "month",
+                    minView : "month",
+                    maxView : "month",
                     autoclose : true,//选择后自动关闭时间选择器
                     todayBtn : true,//在底部显示 当天日期
                     todayHighlight : true,//高亮当前日期
-                    format : "yyyy-mm-dd HH:mm:ss",
-                    //startView : "month",
+                    format : "yyyy-mm-dd",
+                    startView : "month",
                     language : "zh-CN"
                 });
 
