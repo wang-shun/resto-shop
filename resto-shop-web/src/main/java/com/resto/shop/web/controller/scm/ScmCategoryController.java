@@ -34,6 +34,13 @@ public class ScmCategoryController extends GenericController {
         return getSuccessResult(list);
     }
 
+    @RequestMapping("/list_categoryHierarchy")
+    @ResponseBody
+    public Result list_categoryHierarchy(Integer categoryHierarchy) {
+        List<MdCategory> list = categoryService.queryByCategoryHierarchy(categoryHierarchy);
+        return getSuccessResult(list);
+    }
+
     @RequestMapping("/list_all")
     @ResponseBody
     public Result listData() {
@@ -57,7 +64,7 @@ public class ScmCategoryController extends GenericController {
             if (hierarchyId >= 3) {
                 return new Result("已经是最小层级", 5000, false);
             } else {
-                List<MdCategory> list = categoryService.queryByCategoryHierarchy(hierarchyId + 1,id);
+                List<MdCategory> list = categoryService.queryDown(hierarchyId + 1,id);
                 return getSuccessResult(list);
             }
         }catch (Exception e){
