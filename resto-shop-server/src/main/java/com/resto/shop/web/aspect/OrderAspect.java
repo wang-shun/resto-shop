@@ -861,9 +861,8 @@ public class OrderAspect {
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(acclog.getFreezeReturnDate());
                 String date =  calendar.get(Calendar.YEAR) + "年" + (calendar.get(Calendar.MONTH) + 1) + "月" + calendar.get(Calendar.DAY_OF_MONTH) + "日";
-                SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy/MM/dd");
                 msg.append("太好啦，"+shopDetail.getName()+"送给您"+(o.getAmountWithChildren().doubleValue() > 0 ? o.getAmountWithChildren() : o.getOrderMoney())+"元的返利红包，"+date+"后即可使用！");
-                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?qiehuan=qiehuan&subpage=my&dialog=myYue&shopId=" + order.getShopDetailId() + "'>查看余额</a>");
+                msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue&shopId=" + order.getShopDetailId() + "'>查看余额</a>");
 
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
                 Map map = new HashMap(4);
