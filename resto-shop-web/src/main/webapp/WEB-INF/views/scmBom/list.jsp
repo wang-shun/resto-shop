@@ -81,7 +81,7 @@
                                 <tbody>
                                 <tr v-for="(index,item) in parameter.bomDetailDoList">
                                     <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.INGREDIENTS}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
-                                    <td><input type="text" v-model="item.materialCount" value="1"></td><td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
+                                    <td><input type="text" v-model="item.materialCount" value="{{(item.materialCount?item.materialCount:1)}}" ></td><td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -279,9 +279,7 @@
                     this.parameter.productName='';//菜品名称
                 },
                 edit:function(model){ //编辑打开弹窗
-                    debugger
                     this.parameter= model;
-                    console.log(this.parameter);
                     this.parameter.bomDetailDeleteIds=[];
                     this.showform=true;
                 },
@@ -292,7 +290,7 @@
                     for(var i=0;i<_this.parameter.bomDetailDoList.length;i++){
                         savearr[i]={
                             id:_this.parameter.bomDetailDoList[i].id,minMeasureUnit:_this.parameter.bomDetailDoList[i].minMeasureUnit,unitName:_this.parameter.bomDetailDoList[i].unitName,materialName:_this.parameter.bomDetailDoList[i].name,
-                            specName:_this.parameter.bomDetailDoList[i].specName,materialCode:_this.parameter.bomDetailDoList[i].materialCode,materialId:_this.parameter.bomDetailDoList[i].id,lossFactor:_this.parameter.bomDetailDoList[i].lossFactor,
+                            specName:_this.parameter.bomDetailDoList[i].specName,materialCode:_this.parameter.bomDetailDoList[i].materialCode,materialId:_this.parameter.bomDetailDoList[i].materialId,lossFactor:_this.parameter.bomDetailDoList[i].lossFactor,
                             actLossFactor:_this.parameter.bomDetailDoList[i].actLossFactor,materialCount:_this.parameter.bomDetailDoList[i].materialCount
                         }
                     }
@@ -330,7 +328,6 @@
                     };
                 },
                 bomRawMaterialSub:function () { //添加原料保存
-
                     this.parameter.bomDetailDoList.push.apply(this.parameter.bomDetailDoList,this.bomRawMaterial);//合并数组
                     console.log(this.parameter.bomDetailDoList);
                     this.treeView=false;
@@ -398,8 +395,9 @@
                 showIcon: true,
                 showCheckbox: true,
                 onNodeChecked: function(event, data) {
-                    //var node={};
                     if(data){
+                        data.materialId=data.id;
+                        delete data.id;
                         Vue.set(vueObj.bomRawMaterial,vueObj.bomRawMaterial.length,data);
                     }
                 },
