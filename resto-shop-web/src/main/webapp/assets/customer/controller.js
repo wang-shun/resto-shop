@@ -361,7 +361,7 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
-    this.systemButton = function(delUrl,obj,alertName){
+    this.systemButton = function(delUrl,obj,alertName){ //执行ajax，返回
                 _C.ajax(delUrl,obj,function(result){
                     if(result.success){
                         tb.ajax.reload();
@@ -370,7 +370,15 @@ var Controller = function(controlId,datatable){
                         _C.errorMsg(result.message,alertName[1]);
                     }
                 });
-        return button;
+        // return button;
+    }
+    this.systemButtonNo = function(yn,alertName){
+    	if(yn=='success'){
+            tb.ajax.reload();
+            _C.simpleMsg(alertName);
+		}else if(yn=='error') {
+            _C.errorMsg(result.message,alertName);
+		}
     }
 	this.createBtn = function(model,url,urlData){
 		var button = $("<button class='btn btn-xs btn-primary'>编辑</button>");
