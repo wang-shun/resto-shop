@@ -6,7 +6,6 @@ import com.resto.scm.web.model.MdCategory;
 import com.resto.scm.web.service.CategoryService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.util.Assertion;
-import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
