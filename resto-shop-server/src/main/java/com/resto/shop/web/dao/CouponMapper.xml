@@ -21,8 +21,9 @@
         <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
         <result column="shop_det" property="customerId" jdbcType="VARCHAR"/>
         <result column="coupon_type" property="couponType"/>
+        <result column="new_custom_coupon_id" property="newCustomCouponId"/>
     </resultMap>
-    <sql id="Base_Column_List">id, name, value, min_amount, begin_date, end_date, begin_time, end_time, is_used, using_time, coupon_source, use_with_account, remark, distribution_mode_id, customer_id</sql>
+    <sql id="Base_Column_List">id, name, value, min_amount, begin_date, end_date, begin_time, end_time, is_used, using_time, coupon_source, use_with_account, remark, distribution_mode_id, customer_id, new_custom_coupon_id</sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select
         <include refid="Base_Column_List"/>
         from tb_coupon where id = #{id,jdbcType=VARCHAR}
@@ -54,6 +55,7 @@
             <if test="brandId != null">brand_id,</if>
             <if test="pushDay !=null">push_day,</if>
             <if test="recommendDelayTime != null">recommend_delay_time,</if>
+            <if test="newCustomCouponId != null">new_custom_coupon_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=VARCHAR},</if>
@@ -76,6 +78,7 @@
             <if test="brandId != null">#{brandId,jdbcType=VARCHAR},</if>
             <if test="pushDay != null">#{pushDay,jdbcType=INTEGER},</if>
             <if test="recommendDelayTime != null">#{recommendDelayTime},</if>
+            <if test="newCustomCouponId != null">#{newCustomCouponId},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Coupon">update tb_coupon

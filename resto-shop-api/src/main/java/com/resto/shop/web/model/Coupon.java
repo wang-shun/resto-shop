@@ -47,6 +47,16 @@ public class Coupon implements Serializable {
 
     private Date addTime;
 
+    private Long newCustomCouponId;
+
+    public Long getNewCustomCouponId() {
+        return newCustomCouponId;
+    }
+
+    public void setNewCustomCouponId(Long newCustomCouponId) {
+        this.newCustomCouponId = newCustomCouponId;
+    }
+
     public Date getAddTime() {
         return addTime;
     }
