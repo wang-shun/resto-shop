@@ -96,16 +96,29 @@ public class ScmCategoryController extends GenericController {
 
     @RequestMapping("modify")
     @ResponseBody
-    public Result modify(@Valid MdCategory mdCategory) {
+    public Result modify(MdCategory mdCategory) {
         Integer row = categoryService.updateMdCategory(mdCategory);
-        return Result.getSuccess();
+        if (row>0){
+            log.info("分类id：" + mdCategory.getId()  + "修改成功" + "操作用户id：" + this.getCurrentUserId());
+            return Result.getSuccess();
+        }
+        return new Result("修改失败", 5000, false);
     }
 
     @RequestMapping("delete")
     @ResponseBody
     public Result delete(Long id) {
+        if (id == null){
+            return new Result("删除分类的id不能为空", 5000, false);
+        }
+
         Integer row = categoryService.deleteById(id);
-        return Result.getSuccess();
+        if (row>0){
+            log.info("分类id：" + id  + "删除成功" + "操作用户id：" + this.getCurrentUserId());
+            return Result.getSuccess();
+        }
+
+        return new Result("删除失败", 5000, false);
     }
 
 }
