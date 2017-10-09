@@ -1,5 +1,7 @@
  package com.resto.shop.web.controller.scm;
 
+ import cn.restoplus.common.utils.ListUtil;
+ import com.alibaba.fastjson.JSONObject;
  import com.resto.brand.core.entity.Result;
  import com.resto.scm.web.dto.MdSupplierPriceHeadDo;
  import com.resto.scm.web.service.SupplierMaterialPriceService;
@@ -52,7 +54,19 @@ public class SupplierPriceController extends GenericController{
 		supplierpriceService.updateMdSupplierPrice(supplierprice);
 		return Result.getSuccess();
 	}
-	
+
+
+	@RequestMapping("findEffectiveSupPriceIds")
+	@ResponseBody
+	public Result findEffectiveSupPriceIds(Long supplierId ){
+		List<String> effectiveSupPriceIds = supplierpriceService.findEffectiveSupPriceIds(getCurrentShopId(), supplierId);
+		if(ListUtil.isNotEmpty(effectiveSupPriceIds)){
+			return new Result("该供应商存在有效报价单号：["+JSONObject.toJSON(effectiveSupPriceIds)+"]",  5000, true);
+		}
+		return Result.getSuccess();
+
+	}
+
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(Long id){

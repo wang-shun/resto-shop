@@ -70,10 +70,10 @@
 	 public Result delete(Long id){
 		 MdSupplierPriceHeadDo mdSupplierPriceHeadDo = supplierPriceIsContainThisId(id);
 		 if(mdSupplierPriceHeadDo !=null){
-			  new Result(mdSupplierPriceHeadDo.getPriceName()+"包含该原料,暂时不可以删除，如要删除请联系管理员！",  5000, false);
-		  }else{
-			  Integer row = materialService.deleteById(id);
+			  return new Result(mdSupplierPriceHeadDo.getPriceName()+"报价单，包含该原料,暂时不可以删除，如要删除请联系管理员！",  5000, false);
 		  }
+		   Integer row = materialService.deleteById(id);
+
 		 return Result.getSuccess();
 	 }
 
