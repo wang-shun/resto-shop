@@ -36,7 +36,7 @@ public class OrderItemDto implements Serializable {
         this.recommendId = orderItem.getRecommendId() == null ? "" : orderItem.getRecommendId();
         this.kitchenId = "";
         this.parentId = orderItem.getParentId() == null ? "" : orderItem.getParentId();
-        this.mealItemId = orderItem.getMealItemId() == null ? 0 : orderItem.getMealItemId();
+        this.mealItemId = orderItem.getMealItemId();
     }
 
     //状态
