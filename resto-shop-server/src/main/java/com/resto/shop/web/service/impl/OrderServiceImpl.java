@@ -5878,7 +5878,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 Map<String, Object> canceledMap = new HashMap<>();
                 Order canceledOrder = orderMapper.selectOrderDetails(map.getKey());
                 canceledMap.put("ORDER_NUMBER", map.getKey());
-                canceledMap.put("TEL", StringUtils.isBlank(canceledOrder.getCustomer().getTelephone()) ? "--" : canceledOrder.getCustomer().getTelephone());
+                if (canceledOrder.getCustomer() != null) {
+                    canceledMap.put("TEL", StringUtils.isBlank(canceledOrder.getCustomer().getTelephone()) ? "--" : canceledOrder.getCustomer().getTelephone());
+                }else {
+                    canceledMap.put("TEL", "--");
+                }
                 canceledMap.put("SUBTOTAL", map.getValue());
                 canceledOrders.add(canceledMap);
                 canceledProductAmount = canceledProductAmount.add(new BigDecimal(map.getValue().toString()));
