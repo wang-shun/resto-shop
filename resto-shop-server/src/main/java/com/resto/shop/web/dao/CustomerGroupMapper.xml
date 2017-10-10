@@ -103,6 +103,7 @@ where t.group_id = #{groupId}
 and t2.article_id != '' and t2.article_id is not null
 and t2.pid = 0
 GROUP BY t.customer_id
+HAVING  sum(t2.number) > 0
 order by is_leader desc
   </select>
 
