@@ -57,9 +57,10 @@
 
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">产品(可多选)</label>
-                                <div  class="col-md-4 checkbox-list" id="checkboxs">
+                                <div class="col-md-7 checkbox-list" id="checkboxs">
                                     <label class="checkbox-inline" v-for="materialType in materialTypes">
-                                        <input type="checkbox" name=""  v-model="parameter.materialTypes" :value="materialType.id">{{materialType.categoryName}}
+                                        <input type="checkbox" name=""  v-model="parameter.materialTypes" :value="materialType.id">
+                                        <span>{{materialType.categoryName}}</span>
                                     </label>
                                 </div>
                             </div>
@@ -129,40 +130,40 @@
             columns : [
                 {
                     title : "序号",
-                    data : "id",
+                    data : "id"
                 },
                 {
                     title : "编码",
-                    data : "supCode",
+                    data : "supCode"
                 },
                 {
                     title : "供应商类型",
-                    data : "supplierType",
+                    data : "supplierType"
                 }
                 ,
                 {
                     title : "公司全称",
-                    data : "supName",
+                    data : "supName"
                 },
                 {
                     title : "别称",
-                    data : "supAliasName",
+                    data : "supAliasName"
                 },
                 {
                     title : "联系人 ",
-                    data : "contact",
+                    data : "contact"
                 },
                 {
                     title : "电话",
-                    data : "mobile",
+                    data : "mobile"
                 },
                 {
                     title : "邮件",
-                    data : "email",
+                    data : "email"
                 },
                 {
                     title : "产品",
-                    data : "materialTypes",
+                    data : "materialTypes"
                 },
                 {
                     title : "备注",
@@ -175,14 +176,14 @@
                         var operator=[
                             <s:hasPermission name="scmSupplier/create">
                             C.createEditBtn(rowData),
+                            </s:hasPermission>
                             <s:hasPermission name="scmSupplier/delete">
                             C.createDelBtn(tdData,"scmSupplier/delete"),
-                            </s:hasPermission>
                             </s:hasPermission>
                         ];
                         $(td).html(operator);
                     }
-                }],
+                }]
         });
         var C = new Controller(null,tb);
         var vueObj = new Vue({
@@ -209,8 +210,8 @@
                     topContact: "",
                     topMobile: "",
                     topEmail: "",
-                    supplierContacts:[],//详情
-                },
+                    supplierContacts:[]//详情
+                }
             },
             methods:{
                 addSupplierContacts:function () { //添加供应商联系资料
@@ -230,23 +231,29 @@
                     this.showform=false;
                 },
                 create:function(){ //打开新增弹窗
+                    var that = this;
                     $.get('scmCategory/list_all',function (jsonData) {
-                        this.materialTypes=jsonData.data;
+                        that.materialTypes=jsonData.data;
                     });
                     this.showform=true;
                 },
                 edit:function(model){ //编辑打开弹窗
+                    var that = this;
+                    $.get('scmCategory/list_all',function (jsonData) {
+                        that.materialTypes=jsonData.data;
+                    });
                     this.parameter= model;
                     this.showform=true;
-                    this.parameter.materialTypes=model.materialTypes;
-                    this.parameter.materialTypes=this.parameter.materialTypes.split(',');
-                    this.$nextTick(function(){
-                        $('#supplierContacts div').removeClass('radio');
+                    var typeArray = [];
+                    typeArray = model.materialTypes.split(",");
+                    $('#supplierContacts div').removeClass('radio');
+                    for (var n=0;n<typeArray.length;n++){
                         $.each($('#checkboxs span'),function () {
-                            if($(this).find('input').is(':checked')) $(this).attr('class','checked');
-                        })
-                    })
-
+                            if (typeArray[n] === $(this).text()){
+                                $(this).parent().attr('class','checked');
+                            }
+                        });
+                    }
                 },
                 save:function(){
                     var _this=this;
