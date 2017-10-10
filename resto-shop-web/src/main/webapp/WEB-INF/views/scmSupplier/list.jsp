@@ -10,21 +10,15 @@
                         <span class="caption-subject bold font-blue-hoki">新增供应商</span>
                     </div>
                 </div>
-
                 <div class="portlet-body">
                     <form role="form" class="form-horizontal" action="{{parameter.id?'scmSupplier/modify':'scmSupplier/create'}}" @submit.prevent="save" style="text-align:center">
                         <input type="hidden" name="id" v-model="parameter.id" />
-                        <%--<input type="hidden"  name="bankName" v-model="parameter.bankName" />--%>
-                        <%--<input type="hidden"  name="bankAccount" v-model="parameter.bankAccount" />--%>
-                        <%--<input type="hidden"  name="topContact" v-model="parameter.bankAccount" />--%>
-                        <%--<input type="hidden"  name="topMobile" v-model="parameter.bankAccount" />--%>
-                        <%--<input type="hidden"  name="topEmail" v-model="parameter.bankAccount" />--%>
                         <div class="form-body">
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">供应商类型</label>
                                 <div class="col-md-3">
                                 <select class="bs-select form-control" name="supplierType" v-model="parameter.supplierType">
-                                    <option  v-for="supplierType in supplierTypes" value="{{parameter.supplierType}}">
+                                    <option  v-for="supplierType in supplierTypes" value="{{supplierType.code}}">
                                         {{supplierType.name}}
                                     </option>
                                 </select>
@@ -32,10 +26,9 @@
                                 <label class="col-md-2 control-label">编码</label>
                                 <div class="col-md-3">
                                     <input type="text" class="form-control" name="supCode" v-model="parameter.supCode"
-                                           required="required">
+                                           readonly="readonly">
                                 </div>
                             </div>
-
                             <div class="form-group row" >
                                 <label class="col-md-2 control-label">公司名</label>
                                 <div class="col-md-3">
@@ -57,9 +50,11 @@
 
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">产品(可多选)</label>
-                                <div  class="col-md-4 checkbox-list" id="checkboxs">
-                                    <label class="checkbox-inline" v-for="materialType in materialTypes">
-                                        <input type="checkbox" name=""  v-model="parameter.materialTypes" :value="materialType.code">{{materialType.name}}
+                                <div class="col-md-7 checkbox-list" id="checkboxs">
+                                    {{parameter.materialTypes}}
+                                    <label class="checkbox-inline" v-for="materialType in productTypes">
+                                        <input type="checkbox" name="checkbox" v-model="parameter.materialTypes" value="{{materialType.id}}">
+                                        <span>{{materialType.categoryName}}</span>
                                     </label>
                                 </div>
                             </div>
@@ -87,7 +82,6 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="form-group text-center">
                             <input class="btn green"  type="submit"  value="保存"/>&nbsp;&nbsp;&nbsp;
                             <a class="btn default" @click="cancel">取消</a>
@@ -115,8 +109,6 @@
         </table>
     </div>
 </div>
-
-
 <script>
     (function(){
         var cid="#control";
@@ -129,40 +121,40 @@
             columns : [
                 {
                     title : "序号",
-                    data : "id",
+                    data : "id"
                 },
                 {
                     title : "编码",
-                    data : "supCode",
+                    data : "supCode"
                 },
                 {
                     title : "供应商类型",
-                    data : "supplierType",
+                    data : "supplierTypeShow"
                 }
                 ,
                 {
                     title : "公司全称",
-                    data : "supName",
+                    data : "supName"
                 },
                 {
                     title : "别称",
-                    data : "supAliasName",
+                    data : "supAliasName"
                 },
                 {
                     title : "联系人 ",
-                    data : "contact",
+                    data : "contact"
                 },
                 {
                     title : "电话",
-                    data : "mobile",
+                    data : "mobile"
                 },
                 {
                     title : "邮件",
-                    data : "email",
+                    data : "email"
                 },
                 {
                     title : "产品",
-                    data : "supplierType",
+                    data : "materialTypes"
                 },
                 {
                     title : "备注",
@@ -175,14 +167,14 @@
                         var operator=[
                             <s:hasPermission name="scmSupplier/create">
                             C.createEditBtn(rowData),
+                            </s:hasPermission>
                             <s:hasPermission name="scmSupplier/delete">
                             C.createDelBtn(tdData,"scmSupplier/delete),
-                            </s:hasPermission>
                             </s:hasPermission>
                         ];
                         $(td).html(operator);
                     }
-                }],
+                }]
         });
         var C = new Controller(null,tb);
         var vueObj = new Vue({
@@ -194,16 +186,13 @@
                     {code:"2",name:"服务类"},
                     {code:"3" , name:"工程类"}
                 ],
-                materialTypes: [
-                    {code:"INGREDIENTS",name:"主料"},
-                    {code:"ACCESSORIES",name:"辅料"},
-                    {code:"SEASONING" , name:"调料"}
-                    ],
+                productTypes:[],//接收所有的产品分类
                 isTop:'0',//单选框绑定
                 parameter:{
                     supCode: "",
                     supplierType: "",
                     materialTypes:[],
+                    materialIds:[],
                     supAliasName: "",
                     supName: "",
                     note:'',//备注
@@ -214,7 +203,8 @@
                     topMobile: "",
                     topEmail: "",
                     supplierContacts:[],//详情
-                },
+                    supContactIds:[],
+                }
             },
             methods:{
                 addSupplierContacts:function () { //添加供应商联系资料
@@ -222,6 +212,7 @@
                 },
                 removeArticleItem:function (data) { //移除供应商联系资料
                     this.parameter.supplierContacts.$remove(data);
+                    this.parameter.supContactIds.push(data.id);
                 },
                 supplierContactsRadio:function(item){ //供应商联系默认值
                     this.parameter.supplierContacts.forEach(function(element) {
@@ -234,35 +225,25 @@
                     this.showform=false;
                 },
                 create:function(){ //打开新增弹窗
-                    this.parameter={
-                        supplierContacts:[],
-                        materialTypes:[],
-                    };
+                    var that = this;
+                    $.get('scmCategory/list_all',function (jsonData) {
+                        that.productTypes=jsonData.data;
+                    });
+                    this.parameter.materialTypes=[];
                     this.showform=true;
                 },
                 edit:function(model){ //编辑打开弹窗
-                    console.log(model);
+                    var that = this;
                     this.parameter= model;
+                    $.get('scmCategory/list_all',function (jsonData) {
+                        that.productTypes=jsonData.data;
+                    });
+                    this.parameter.materialTypes=model.materialIds.split(',');
                     this.showform=true;
-                    this.parameter.materialTypes='INGREDIENTS';
-                    this.parameter.materialTypes=this.parameter.materialTypes.split(',');
-//                    this.parameter.materialTypes.forEach(function(element){
-//                        debugger
-//                        switch(element){
-//                            case '主料':element='INGREDIENTS';break;
-//                            case '辅料':element='ACCESSORIES';break;
-//                            case '调料':element='SEASONING';break;
-//                        }
-//                    })
-                    this.$nextTick(function(){
-                        $('#supplierContacts div').removeClass('radio');
-                        $.each($('#checkboxs span'),function () {
-                            if($(this).find('input').is(':checked')) $(this).attr('class','checked');
-                        })
-                    })
-
+                    debugger
+                    $('#supplierContacts div').removeClass('radio');
                 },
-                save:function(){
+                save:function(){//提交
                     var _this=this;
                     var saveObj={};
                     saveObj.id=this.parameter.id;
@@ -274,11 +255,12 @@
                     saveObj.note=this.parameter.note;
                     saveObj.bankName=this.parameter.bankName;
                     saveObj.bankAccount=this.parameter.bankAccount;
-                    //saveObj.version=this.parameter.version;
                     saveObj.supplierContacts=[];
+                    saveObj.supContactIds =this.parameter.supContactIds;
                     var parSup=this.parameter.supplierContacts;
                     for(var i=0;i<parSup.length;i++){
                         saveObj.supplierContacts[i]={
+                            id:parSup[i].id,
                             contact:parSup[i].contact,
                             mobile:parSup[i].mobile,
                             email:parSup[i].email,
@@ -297,13 +279,13 @@
                         contentType:"application/json",
                         datatype: "json",
                         data:JSON.stringify(saveObj),
-                        beforeSend:function(){ //请求之前执行
+                        success:function(data){ //成功后返回
+                            C.systemButtonNo('success','成功');
                             _this.showform=false;
                         },
-                        success:function(data){ //成功后返回
-                            console.log(data);
-                        },
                         error: function(){ //失败后执行
+                            C.systemButtonNo('error','失败');
+                            _this.showform=false;
                         }
                     });
                 }
