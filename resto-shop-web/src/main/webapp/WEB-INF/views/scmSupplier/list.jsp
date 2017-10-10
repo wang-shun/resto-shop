@@ -59,7 +59,7 @@
                                 <label class="col-md-2 control-label">产品(可多选)</label>
                                 <div  class="col-md-4 checkbox-list" id="checkboxs">
                                     <label class="checkbox-inline" v-for="materialType in materialTypes">
-                                        <input type="checkbox" name=""  v-model="parameter.materialTypes" :value="materialType.code">{{materialType.name}}
+                                        <input type="checkbox" name=""  v-model="parameter.materialTypes" :value="materialType.id">{{materialType.categoryName}}
                                     </label>
                                 </div>
                             </div>
@@ -162,7 +162,7 @@
                 },
                 {
                     title : "产品",
-                    data : "supplierType",
+                    data : "materialTypes",
                 },
                 {
                     title : "备注",
@@ -194,11 +194,7 @@
                     {code:"2",name:"服务类"},
                     {code:"3" , name:"工程类"}
                 ],
-                materialTypes: [
-                    {code:"INGREDIENTS",name:"主料"},
-                    {code:"ACCESSORIES",name:"辅料"},
-                    {code:"SEASONING" , name:"调料"}
-                    ],
+                materialTypes:[],
                 isTop:'0',//单选框绑定
                 parameter:{
                     supCode: "",
@@ -234,26 +230,16 @@
                     this.showform=false;
                 },
                 create:function(){ //打开新增弹窗
-                    this.parameter={
-                        supplierContacts:[],
-                        materialTypes:[],
-                    };
+                    $.get('scmCategory/list_all',function (jsonData) {
+                        this.materialTypes=jsonData.data;
+                    });
                     this.showform=true;
                 },
                 edit:function(model){ //编辑打开弹窗
-                    console.log(model);
                     this.parameter= model;
                     this.showform=true;
-                    this.parameter.materialTypes='INGREDIENTS';
+                    this.parameter.materialTypes=model.materialTypes;
                     this.parameter.materialTypes=this.parameter.materialTypes.split(',');
-//                    this.parameter.materialTypes.forEach(function(element){
-//                        debugger
-//                        switch(element){
-//                            case '主料':element='INGREDIENTS';break;
-//                            case '辅料':element='ACCESSORIES';break;
-//                            case '调料':element='SEASONING';break;
-//                        }
-//                    })
                     this.$nextTick(function(){
                         $('#supplierContacts div').removeClass('radio');
                         $.each($('#checkboxs span'),function () {
