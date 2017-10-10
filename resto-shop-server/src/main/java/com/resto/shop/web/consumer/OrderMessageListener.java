@@ -396,13 +396,10 @@ public class OrderMessageListener implements MessageListener {
     private Action executeNotAllowContinue(Message message) throws UnsupportedEncodingException {
         try {
             String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
-            JSONObject obj = JSONObject.parseObject(msg);
-            String id = obj.getString("id");
-            String brandId = obj.getString("brandId");
-            DataSourceContextHolder.setDataSourceName(brandId);
-            Order order = orderService.selectById(id);
+            Order order = JSON.parseObject(msg, Order.class);
 //            Brand brand = brandService.selectById(order.getBrandId());
 //            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+            DataSourceContextHolder.setDataSourceName(order.getBrandId());
             orderService.updateAllowContinue(order.getId(), false);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单加菜时间已过期，不允许继续加菜！");
