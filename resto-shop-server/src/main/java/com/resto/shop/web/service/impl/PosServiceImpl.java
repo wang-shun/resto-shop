@@ -269,6 +269,10 @@ public class PosServiceImpl implements PosService {
         JSONObject json = new JSONObject(data);
 
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
+        if(!StringUtils.isEmpty(orderDto.getParentOrderId())){
+            Order order = orderService.selectById(orderDto.getParentOrderId());
+            orderDto.setCustomerId(order.getCustomerId());
+        }
         orderDto.setShopDetailId(json.getString("shopId"));
         Order order = new Order(orderDto);
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(json.getString("shopId"));
@@ -365,7 +369,7 @@ public class PosServiceImpl implements PosService {
         if(refundOrder.getOrderState() == OrderState.SUBMIT){
             for(OrderItem orderItem : order.getOrderItems()){
                 OrderItem item = orderItemService.selectById(orderItem.getId());
-                orderService.updateOrderItem(orderItem.getOrderId(),item.getCount() - orderItem.getCount(),orderItem.getId(), 1);
+                orderService.updateOrderItem(item.getOrderId(),item.getCount() - orderItem.getCount(),orderItem.getId(), 1);
             }
 
         }else{
