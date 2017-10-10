@@ -58,8 +58,9 @@
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">产品(可多选)</label>
                                 <div class="col-md-7 checkbox-list" id="checkboxs">
-                                    <label class="checkbox-inline" v-for="materialType in materialTypes">
-                                        <input type="checkbox" name=""  v-model="parameter.materialTypes" :value="materialType.id">
+                                    {{parameter.materialType}}
+                                    <label class="checkbox-inline" v-for="materialType in productTypes">
+                                        <input type="checkbox" name="checkbox" v-model="parameter.materialType" value="{{materialType.id}}">
                                         <span>{{materialType.categoryName}}</span>
                                     </label>
                                 </div>
@@ -195,11 +196,12 @@
                     {code:"2",name:"服务类"},
                     {code:"3" , name:"工程类"}
                 ],
-                materialTypes:[],
+                productTypes:[],
                 isTop:'0',//单选框绑定
                 parameter:{
                     supCode: "",
                     supplierType: "",
+                    materialType:[],
                     materialTypes:[],
                     supAliasName: "",
                     supName: "",
@@ -233,27 +235,24 @@
                 create:function(){ //打开新增弹窗
                     var that = this;
                     $.get('scmCategory/list_all',function (jsonData) {
-                        that.materialTypes=jsonData.data;
+                        that.productTypes=jsonData.data;
                     });
+                    this.parameter.materialType=[];
                     this.showform=true;
                 },
                 edit:function(model){ //编辑打开弹窗
                     var that = this;
-                    $.get('scmCategory/list_all',function (jsonData) {
-                        that.materialTypes=jsonData.data;
-                    });
                     this.parameter= model;
-                    this.showform=true;
-                    var typeArray = [];
-                    typeArray = model.materialTypes.split(",");
-                    $('#supplierContacts div').removeClass('radio');
-                    for (var n=0;n<typeArray.length;n++){
-                        $.each($('#checkboxs span'),function () {
-                            if (typeArray[n] === $(this).text()){
-                                $(this).parent().attr('class','checked');
-                            }
-                        });
+                    this.parameter.materialType=[];
+                    $.get('scmCategory/list_all',function (jsonData) {
+                        that.productTypes=jsonData.data;
+                    });
+                    for(var i=0;i<this.productTypes.length;i++){
+                        this.parameter.materialType[i]=this.productTypes[i].id.toString();
                     }
+                    console.log(this.parameter.materialType);
+                    this.showform=true;
+                    $('#supplierContacts div').removeClass('radio');
                 },
                 save:function(){
                     var _this=this;
@@ -261,7 +260,7 @@
                     saveObj.id=this.parameter.id;
                     saveObj.supCode=this.parameter.supCode;
                     saveObj.supplierType=this.parameter.supplierType;
-                    saveObj.materialTypes=this.parameter.materialTypes;
+                    saveObj.materialTypes=this.parameter.materialType;
                     saveObj.supAliasName=this.parameter.supAliasName;
                     saveObj.supName=this.parameter.supName;
                     saveObj.note=this.parameter.note;
@@ -284,6 +283,7 @@
                         url='scmSupplier/create';
                         _this.parameter;
                     }
+                    debugger;
                     $.ajax({
                         type:"POST",
                         url:url,
