@@ -17,7 +17,6 @@
                 </div>
 
                 <div class="portlet-body">
-                    <%--<form role="form" class="form-horizontal" action="{{parameter.id?'scmBom/modify':'scmBom/create'}}" @submit.prevent="save">--%>
                         <input type="hidden" name="id" v-model="parameter.id" />
                         <div class="form-body">
                             <div class="form-group row">
@@ -90,7 +89,6 @@
                             <input class="btn green"  type="submit"  @click="save" value="保存"/>&nbsp;&nbsp;&nbsp;
                             <a class="btn default" @click="cancel" >取消</a>
                         </div>
-                    <%--</form>--%>
                 </div>
             </div>
         </div>
@@ -103,10 +101,11 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <div class="modal-body">
+                    <div class="modal-body" style="display: none;">
                         <input type="input" class="form-control" id="input-check-node" placeholder="请输入原材料名称" value="">
                     </div>
-                    <div id="treeview-checkable" class="" style="height: 500px;overflow: auto;"></div>
+                    <div id="assignTree" style="height: 500px;overflow: auto;"></div>
+                    <div id="treeview-checkable" class="" style="height: 500px;overflow: auto;display: none"></div>
                 </div>
                 <div class="col-md-6" style="display: none;">
                     <div id="checkable-output">
@@ -152,7 +151,9 @@
 <!--树状图-->
 <%--<link href="assets/treeview/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
 <script src="assets/treeview/bower_components/jquery/dist/jquery.js"></script>--%>
-<script src="assets/treeview/js/bootstrap-treeview.js"></script>
+<%--<script src="assets/treeview/js/bootstrap-treeview.js"></script>--%>
+<link href="assets/treeview/themes/default/style.min.css" rel="stylesheet">
+<script src="assets/treeview/js/jstrestwo.js"></script>
 
 <script>
     (function(){
@@ -172,7 +173,7 @@
                     createdCell : function(td,tdData){
                         var html='<tr><th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th><th>规格</th><th>最小单位</th><th>所需最小单位数量</th><th>数量</th></tr>';
                         for(var i=0;i<tdData.length;i++){
-                            html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].minMeasureUnit+'</td><td><input type="text" value="'+tdData[i].materialCount+'"></td></tr>';
+                            html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].minMeasureUnit+'</td><td>'+tdData[i].materialCount+'</td></tr>';
                         }
                         $(td).addClass('bomDetailDoList');
                         $(td).html(html);
@@ -328,6 +329,14 @@
                     };
                 },
                 bomRawMaterialSub:function () { //添加原料保存
+                    var originaldata=$('#assignTree').jstrestwo().get_bottom_checked(true);//拿到树状图中的数组
+                    for(var i=0;i<originaldata.length;i++){
+                        this.bomRawMaterial[i]= originaldata[i].original;
+                    }
+                    for(var i=0;i<this.bomRawMaterial.length;i++){
+                        this.bomRawMaterial[i].materialId=this.bomRawMaterial[i].id;
+                        delete this.bomRawMaterial[i].id;
+                    }
                     this.parameter.bomDetailDoList.push.apply(this.parameter.bomDetailDoList,this.bomRawMaterial);//合并数组
                     console.log(this.parameter.bomDetailDoList);
                     this.treeView=false;
@@ -367,7 +376,6 @@
         C.vue=vueObj;
         $.get('scmCategory/query',function (jsonData) {
             var defaultData=jsonData.data;
-            console.log(defaultData);
             for(var i=0;i<defaultData.length;i++){
                 if (defaultData[i].twoList) {
                     for(var j=0;j<defaultData[i].twoList.length;j++){
@@ -390,30 +398,46 @@
                     }
                 }
             }
-            var $checkableTree = $('#treeview-checkable').treeview({
-                data: defaultData,
-                showIcon: true,
-                showCheckbox: true,
-                onNodeChecked: function(event, data) {
-                    if(data){
-                        data.materialId=data.id;
-                        delete data.id;
-                        Vue.set(vueObj.bomRawMaterial,vueObj.bomRawMaterial.length,data);
+            $('#assignTree').jstrestwo(
+                {'plugins':["wholerow","checkbox"],
+                    'core' :{
+                        'data':defaultData
                     }
-                },
-                onNodeUnchecked: function (event, node) {
-                        vueObj.bomRawMaterial= vueObj.bomRawMaterial.filter(o => o.id != node.id);
                 }
+            );
+            $('#assignTree').on("changed.jstrestwo",function(e,data){
+//                console.log($('#assignTree').jstrestwo().get_checked());
+//                console.log($('#assignTree').jstrestwo().get_checked(true));
             });
-            var findCheckableNodess = function() {
-                return $checkableTree.treeview('search', [ $('#input-check-node').val(), { ignoreCase: false, exactMatch: false } ]);
-            };
-            var checkableNodes = findCheckableNodess();
-            // Check/uncheck/toggle nodes
-            $('#input-check-node').on('keyup', function (e) {
-                checkableNodes = findCheckableNodess();
-                $('.check-node').prop('disabled', !(checkableNodes.length >= 1));
+            $("#assignTree").on("ready.jstrestwo",function(e,data){
+
             });
+//            var $checkableTree = $('#treeview-checkable').treeview({
+//                data: defaultData,
+//                showIcon: true,
+//                showCheckbox: true,
+//                multiSelect:false,
+//                onNodeChecked: function(event, data) {
+//                    if(data){
+//                        data.materialId=data.id;
+//                        delete data.id;
+//                        Vue.set(vueObj.bomRawMaterial,vueObj.bomRawMaterial.length,data);
+//                    }
+//                },
+//                onNodeUnchecked: function (event, node) {
+//                        vueObj.bomRawMaterial= vueObj.bomRawMaterial.filter(o => o.id != node.id);
+//                }
+//            });
+
+//            var findCheckableNodess = function() {
+//                return $checkableTree.treeview('search', [ $('#input-check-node').val(), { ignoreCase: false, exactMatch: false } ]);
+//            };
+//            var checkableNodes = findCheckableNodess();
+//            // Check/uncheck/toggle nodes
+//            $('#input-check-node').on('keyup', function (e) {
+//                checkableNodes = findCheckableNodess();
+//                $('.check-node').prop('disabled', !(checkableNodes.length >= 1));
+//            });
         })
     }());
 </script>

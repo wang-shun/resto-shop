@@ -149,7 +149,9 @@
 <script src="assets/global/plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js"></script>
 <script src="assets/global/plugins/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js"></script>
 <!--树状图-->
-<script src="assets/treeview/js/bootstrap-treeview.js"></script>
+<%--<script src="assets/treeview/js/bootstrap-treeview.js"></script>--%>
+<link href="assets/treeview/themes/default/style.min.css" rel="stylesheet">
+<script src="assets/treeview/js/jstrestwo.js"></script>
 <script>
     (function(){
         var cid="#control";
@@ -159,10 +161,6 @@
             ajax : {
                 url : "scmSupplerPrice/list_all",
                 dataSrc : "data",
-
-
-
-
             },
             columns : [
                 {
@@ -250,13 +248,7 @@
                     contactId:'',//联系人id
                     remark:'',//备注
                     priceName:'',//报价单名称
-                    mdSupplierPriceDetailDoList:[
-//                        {
-//                        materialId: '',
-//                        materialCode: "",
-//                        purchasePrice: ""
-//                    }
-                    ],
+                    mdSupplierPriceDetailDoList:[],
 
                 }
             },
@@ -286,9 +278,6 @@
                     var saveObj=[];
                     var parSup=this.parameter.mdSupplierPriceDetailDoList;
                     for(var i=0;i<parSup.length;i++){
-                        //materialId: '',
-//                        materialCode: "",
-//                        purchasePrice: ""
                         saveObj[i].materialId=parSup[i].materialId;
                         saveObj[i].materialCode=parSup[i].materialCode;
                         saveObj[i].purchasePrice=parSup[i].purchasePrice;
@@ -309,12 +298,6 @@
                         error: function(){ //失败后执行
                         }
                     });
-//                    var that = this;
-//                    var formDom = e.target;
-//                    C.ajaxFormEx(formDom,function(){
-//                        that.cancel();
-//                        tb.ajax.reload();
-//                    });
                 },
             },
             ready:function(){//钩子函数加载后
@@ -359,14 +342,13 @@
                         showIcon: true,
                         showCheckbox: true,
                         onNodeChecked: function(event, data) {
+                            debugger
                             if(data){
-                                //Vue.set(vueObj.bomRawMaterial,vueObj.bomRawMaterial.length,data);
+
                                 Vue.set(vueObj.parameter.mdSupplierPriceDetailDoList,vueObj.parameter.mdSupplierPriceDetailDoList.length,data);
-                                //console.log(vueObj.bomRawMaterial);
                             }
                         },
                         onNodeUnchecked: function (event, node) {
-                            //vueObj.bomRawMaterial= vueObj.bomRawMaterial.filter(o => o.id != node.id);
                             vueObj.parameter.mdSupplierPriceDetailDoList= vueObj.parameter.mdSupplierPriceDetailDoList.filter(o => o.id != node.id);
                         }
                     });
