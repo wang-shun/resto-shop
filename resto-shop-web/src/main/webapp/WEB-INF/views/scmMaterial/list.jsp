@@ -289,7 +289,6 @@
                     title : "最小核算单位",
                     data : "minMeasureUnit",
                     createdCell:function (td,tdData,rowData) {
-                        debugger
                         $(td).html(tdData+rowData.convertUnitName);
                     }
                 },
@@ -299,14 +298,6 @@
                     data : "coefficient",
                 },
 
-//              {
-//                    title : "最小核算单位值",
-//                    data : "minMeasureUnit",
-//                },
-//                {
-//                    title : "最小转换单位",
-//                    data : "convertUnitName",
-//               },
                 {
                     title : "产地",
                     data : "provinceName",
@@ -314,14 +305,6 @@
                         $(td).html(tdData+rowData.cityName+rowData.districtName);
                     }
                 },
-//                {
-//                    title : "城市",
-//                    data : "cityName",
-//                },
-//                {
-//                    title : "区（县）",
-//                    data : "districtName",
-//                },
 
                 {
                     title : "描述",
@@ -479,16 +462,9 @@
                     this.openForm();
                 },
                 save:function(){
-                    debugger
 					if(this.m.id) C.systemButton('scmMaterial/modify',this.m,['编辑成功','编辑失败']);
 					else C.systemButton('scmMaterial/create',this.m,['新增成功','新增失败']);
                     this.showform=false;
-//                    C.systemButton((this.m.id?'scmMaterial/modify':'scmMaterial/create'),this.m,['驳回成功','驳回失败']);
-//                    var formDom = e.target;
-//                    C.ajaxFormEx(formDom,function(){
-//                        that.cancel();
-//                        tb.ajax.reload();
-//                    });
                 }
             },
             ready:function () { //钩子函数
@@ -511,7 +487,6 @@
 //                    }
                 });
                 $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=1", null, function (data) {
-                    debugger
                     that.categoryOnes = data.data;
 //                    if(!that.m.categoryOneId){
 //                        that.m.categoryOneId= data.data[0].id;

@@ -22,7 +22,7 @@
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">菜品类别</label>
                                 <div class="col-md-3">
-                                    <select name="productCategory" v-model="parameter.productCategory"  class="bs-select form-control" @change='changeType1' >
+                                    <select name="productCategory" v-model="parameter.articleFamilyId"  class="bs-select form-control" @change='changeType1' >
                                         <option disabled selected value>请选择</option>
                                         <option  v-for="articleFamily in articleFamilyIdArr" value="{{articleFamily.articleFamilyId}}">
                                             {{articleFamily.name}}
@@ -32,7 +32,7 @@
 
                                 <label class="col-md-2 control-label">菜品名称</label>
                                 <div class="col-md-3">
-                                <select name="categoryOneId"  v-model="parameter.productName"  class="bs-select form-control" @change='changeType2'>
+                                <select name="categoryOneId"  v-model="parameter.articleId"  class="bs-select form-control" @change='changeType2'>
                                     <option disabled selected value>请选择</option>
                                     <option  v-for="productName in productNameArr" value="{{productName.articleId}}">
                                         {{productName.name}}
@@ -44,7 +44,7 @@
                             <div class="form-group row" >
                                 <label class="col-md-2 control-label">菜品编码</label>
                                 <div class="col-md-3">
-                                    <label class="col-md-2 control-label"> {{parameter.productCode}}</label>
+                                    <label class="col-md-2 control-label"> {{parameter.articleId}}</label>
                                 </div>
                                     <label class="col-md-2 control-label">计量单位</label>
                                     <div class="col-md-3">
@@ -70,7 +70,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div>
+                        <div style="max-height: 300px;overflow: auto;">
                             <table class="table table-bordered" id="yuanliaolist">
                                 <thead><tr>
                                     <th>行号</th><th>原料编码</th><th>原料类型</th>
@@ -79,7 +79,7 @@
                                 </tr></thead>
                                 <tbody>
                                 <tr v-for="(index,item) in parameter.bomDetailDoList">
-                                    <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.INGREDIENTS}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
+                                    <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.materialType}}</td><td>{{item.materialName}}{{item.name}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
                                     <td><input type="text" v-model="item.materialCount" value="{{(item.materialCount?item.materialCount:1)}}" ></td><td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>
@@ -95,7 +95,7 @@
     </div>
     <!--树状图-->
     <div class="row form-div" v-show="treeView">
-        <div class="col-md-offset-3 col-md-6" style="background: #FFF;">
+        <div class="col-md-offset-3 col-md-6" style="background:#FFF;">
             <div class="text-center" style="padding: 20px 0">
                 <span class="caption-subject bold font-blue-hoki">添加原材料</span>
             </div>
@@ -116,7 +116,7 @@
                             </tr></thead>
                             <tbody>
                         <tr v-for="(index,item) in bomRawMaterial">
-                            <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.INGREDIENTS}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
+                            <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.materialType}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
                             <td><input type="text" v-model="materialCount" value="item.materialCount"></td><td><button class="btn btn-xs red">移除</button></td>
                         </tr>
                         </tbody>
@@ -173,7 +173,7 @@
                     createdCell : function(td,tdData){
                         var html='<tr><th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th><th>规格</th><th>最小单位</th><th>所需最小单位数量</th><th>数量</th></tr>';
                         for(var i=0;i<tdData.length;i++){
-                            html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].minMeasureUnit+'</td><td>'+tdData[i].materialCount+'</td></tr>';
+                            html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialType+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].minUnitName+'</td><td>'+tdData[i].minMeasureUnit+'</td><td>'+tdData[i].materialCount+'</td></tr>';
                         }
                         $(td).addClass('bomDetailDoList');
                         $(td).html(html);
@@ -185,7 +185,7 @@
                 },
                 {
                     title: "菜品编码",
-                    data : "productCode"
+                    data : "articleId"
                 },
                 {
                     title: "版本号",
@@ -406,38 +406,11 @@
                 }
             );
             $('#assignTree').on("changed.jstrestwo",function(e,data){
-//                console.log($('#assignTree').jstrestwo().get_checked());
-//                console.log($('#assignTree').jstrestwo().get_checked(true));
+
             });
             $("#assignTree").on("ready.jstrestwo",function(e,data){
 
             });
-//            var $checkableTree = $('#treeview-checkable').treeview({
-//                data: defaultData,
-//                showIcon: true,
-//                showCheckbox: true,
-//                multiSelect:false,
-//                onNodeChecked: function(event, data) {
-//                    if(data){
-//                        data.materialId=data.id;
-//                        delete data.id;
-//                        Vue.set(vueObj.bomRawMaterial,vueObj.bomRawMaterial.length,data);
-//                    }
-//                },
-//                onNodeUnchecked: function (event, node) {
-//                        vueObj.bomRawMaterial= vueObj.bomRawMaterial.filter(o => o.id != node.id);
-//                }
-//            });
-
-//            var findCheckableNodess = function() {
-//                return $checkableTree.treeview('search', [ $('#input-check-node').val(), { ignoreCase: false, exactMatch: false } ]);
-//            };
-//            var checkableNodes = findCheckableNodess();
-//            // Check/uncheck/toggle nodes
-//            $('#input-check-node').on('keyup', function (e) {
-//                checkableNodes = findCheckableNodess();
-//                $('.check-node').prop('disabled', !(checkableNodes.length >= 1));
-//            });
         })
     }());
 </script>
