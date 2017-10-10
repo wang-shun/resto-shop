@@ -576,7 +576,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        org_price = item.getPrice();
 //                    }
                     if(item.getDiscount() < 100){
-                        org_price = item.getPrice().divide(new BigDecimal(item.getDiscount())).multiply(new BigDecimal(100));
+                        org_price = item.getPrice().divide(new BigDecimal(item.getDiscount()), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
                     }else if(a.getFansPrice() != null && a.getFansPrice().doubleValue() > 0){
                         org_price = item.getPrice().subtract(a.getFansPrice()).add(a.getPrice());
                     }else{
@@ -7427,16 +7427,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (orders.containsKey(orderItem.getOrderId())) {
                     orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
                 } else {
-                    MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", 0);
+                    RedisUtil.set(orderItem.getOrderId() + "ItemCount", 0);
                     orders.put(orderItem.getOrderId(), itemValue);
                 }
             }else{
                 BigDecimal itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
                 if (orders.containsKey(orderItem.getOrderId())) {
                     orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
-                    MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", Integer.parseInt(MemcachedUtils.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
+                    RedisUtil.set(orderItem.getOrderId() + "ItemCount", Integer.parseInt(RedisUtil.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
                 } else {
-                    MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", orderItem.getCount());
+                    RedisUtil.set(orderItem.getOrderId() + "ItemCount", orderItem.getCount());
                     orders.put(orderItem.getOrderId(), itemValue);
                 }
             }
@@ -7685,18 +7685,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
-        o.setArticleCount(o.getArticleCount() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
+        o.setArticleCount(o.getArticleCount() - Integer.parseInt(RedisUtil.get(o.getId() + "ItemCount").toString()));
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(origin.add(shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount() != null ? o.getCustomerCount() : 0))));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
-            o.setCountWithChild(o.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
+            o.setCountWithChild(o.getCountWithChild() - Integer.parseInt(RedisUtil.get(o.getId() + "ItemCount").toString()));
         }
         if (o.getParentOrderId() != null) {
             Order parent = selectById(o.getParentOrderId());
             parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
-            parent.setCountWithChild(parent.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
+            parent.setCountWithChild(parent.getCountWithChild() - Integer.parseInt(RedisUtil.get(o.getId() + "ItemCount").toString()));
             update(parent);
             Map map = new HashMap(4);
             map.put("brandName", brandSetting.getBrandName());
