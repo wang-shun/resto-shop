@@ -218,6 +218,16 @@
                 {
                     title : "类型",
                     data : "materialType",
+                    createdCell:function (td,tdData) {
+                        console.log(tdData);
+                        switch (tdData){
+							case 'INGREDIENTS':tdData='主料';break;
+                            case 'ACCESSORIES':tdData='辅料';break;
+                            case 'SEASONING':tdData='调料';break;
+						}
+                        $(td).html(tdData);
+                    }
+
                 },
                 {
                     title : "一级类别",
@@ -249,7 +259,7 @@
                     data : "specName",
                 },
                 {
-                    title : "规格的核算单位",
+                    title : "规格核算单位",
                     data : "measureUnit",
                 },
 
@@ -274,17 +284,20 @@
                     data : "minUnitName",
                 },
                 {
-                    title : "产地(省份)",
+                    title : "产地",
                     data : "provinceName",
+                    createdCell:function (td,tdData,rowData) {
+                        $(td).html(tdData+rowData.cityName+rowData.districtName);
+                    }
                 },
-                {
-                    title : "城市",
-                    data : "cityName",
-                },
-                {
-                    title : "区（县）",
-                    data : "districtName",
-                },
+//                {
+//                    title : "城市",
+//                    data : "cityName",
+//                },
+//                {
+//                    title : "区（县）",
+//                    data : "districtName",
+//                },
 
                 {
                     title : "描述",
@@ -381,7 +394,6 @@
                     var provinces=a.split(',')
                     this.m.specName=provinces[0];
                     this.m.specId=provinces[1];
-                    console.log(this.m);
                 },
                 unitList:function (a,b) {//标准单位
                     var provinces=a.split(',')
@@ -442,9 +454,8 @@
                     },
                     this.openForm();
                 },
-                save:function(e){
+                save:function(){
                     debugger
-                    //var that = this;
 					if(this.m.id) C.systemButton('scmMaterial/modify',this.m,['编辑成功','编辑失败']);
 					else C.systemButton('scmMaterial/create',this.m,['新增成功','新增失败']);
                     this.showform=false;
@@ -461,38 +472,39 @@
                 $.post("scmUnit/list_type?type=1", null, function (data) {
                     that.unitLists = data.data
                     that.convertUnitLists = data.data
-                    if(!that.m.unitId ) {
-                        that.m.unitId = data.data[0].id;
-                    }
-                    if(that.m.convertUnitId){
-                        that.m.convertUnitId = data.data[0].id;
-                    }
+//                    if(!that.m.unitId ) {
+//                        that.m.unitId = data.data[0].id;
+//                    }
+//                    if(that.m.convertUnitId){
+//                        that.m.convertUnitId = data.data[0].id;
+//                    }
                 });
 
                 $.post("scmUnit/list_type?type=2", null, function (data) {
                     that.specLists = data.data;
-                    if(!that.m.specId) {
-                        that.m.specId = data.data[0].id;
-                    }
+//                    if(!that.m.specId) {
+//                        that.m.specId = data.data[0].id;
+//                    }
                 });
                 $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=1", null, function (data) {
+                    debugger
                     that.categoryOnes = data.data;
-                    if(!that.m.categoryOneId){
-                        that.m.categoryOneId= data.data[0].id;
-                    }
+//                    if(!that.m.categoryOneId){
+//                        that.m.categoryOneId= data.data[0].id;
+//                    }
                 });
                 $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=2", null, function (data) {
                     that.categoryTwos = data.data;
-                    if(!that.m.categoryTwoId){
-                        that.m.categoryTwoId= data.data[0].id;
-                    }
+//                    if(!that.m.categoryTwoId){
+//                        that.m.categoryTwoId= data.data[0].id;
+//                    }
                 });
 
                 $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=3", null, function (data) {
                     that.categoryThirds = data.data;
-                    if(!that.m.categoryThirdId){
-                        that.m.categoryThirdId = data.data[0].id;
-                    }
+//                    if(!that.m.categoryThirdId){
+//                        that.m.categoryThirdId = data.data[0].id;
+//                    }
                 });
 
                 $.post("province/list_province", null, function (data) {
