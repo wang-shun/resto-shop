@@ -17,8 +17,10 @@ import com.resto.brand.web.dto.RechargeLogDto;
 import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.dto.ShopDetailDto;
 import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.TemplateFlow;
 import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.TemplateService;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.ChargeOrderMapper;
@@ -71,6 +73,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
 	@Resource
 	TemplateService templateService;
+
+	@Resource
+	BrandSettingService brandSettingService;
 
 
     @Override
@@ -321,35 +326,84 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	public void wxPush(ChargeOrder chargeOrder){
 		Brand brand = brandService.selectById(chargeOrder.getBrandId());
 		Customer customer = customerService.selectById(chargeOrder.getCustomerId());
-        DecimalFormat df = new DecimalFormat("#.00");
+		BrandSetting setting = brandSettingService.selectByBrandId(chargeOrder.getBrandId());
+		DecimalFormat df = new DecimalFormat("#.00");
 		//如果不是立即到账 优先推送一条提醒
 		if(chargeOrder.getNumberDayNow() > 0){
-			/*String msgFrist = "充值成功！充值赠送红包会在" + (chargeOrder.getNumberDayNow() + 1) + "天内分批返还给您，请注意查收～";
-			WeChatUtils.sendCustomerMsg(msgFrist.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
-            Map map = new HashMap(4);
-            map.put("brandName", brand.getBrandName());
-            map.put("fileName", customer.getId());
-            map.put("type", "UserAction");
-            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msgFrist.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-            doPostAnsc(LogUtils.url, map);*/
-			TemplateFlow templateFlow=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412000235");
+			if(setting.getTemplateEdition()==0){
+				String msgFrist = "充值成功！充值赠送红包会在" + (chargeOrder.getNumberDayNow() + 1) + "天内分批返还给您，请注意查收～";
+				WeChatUtils.sendCustomerMsg(msgFrist.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+				Map map = new HashMap(4);
+				map.put("brandName", brand.getBrandName());
+				map.put("fileName", customer.getId());
+				map.put("type", "UserAction");
+				map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msgFrist.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+				doPostAnsc(LogUtils.url, map);
+			}else{
+				TemplateFlow templateFlow=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412000235");
+				String templateId = templateFlow.getTemplateId();
+				String jumpUrl ="";
+				Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+				Map<String, Object> first = new HashMap<String, Object>();
+				first.put("value", "恭喜您！充值成功！");
+				first.put("color", "#00DB00");
+				Map<String, Object> keyword1 = new HashMap<String, Object>();
+				keyword1.put("value", df.format(chargeOrder.getChargeMoney()));
+				keyword1.put("color", "#000000");
+				Map<String, Object> keyword2 = new HashMap<String, Object>();
+				keyword2.put("value", df.format(chargeOrder.getRewardMoney()));
+				keyword2.put("color", "#000000");
+				Map<String, Object> keyword3 = new HashMap<String, Object>();
+				keyword3.put("value", DateUtil.formatDate(chargeOrder.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+				keyword3.put("color", "#000000");
+				Map<String, Object> remark = new HashMap<String, Object>();
+				remark.put("value", "充值赠送红包会在"+ (chargeOrder.getNumberDayNow() + 1) +"天内分批返还给您，请注意查收～");
+				remark.put("color", "#173177");
+				content.put("first", first);
+				content.put("keyword1", keyword1);
+				content.put("keyword2", keyword2);
+				content.put("keyword3", keyword3);
+				content.put("remark", remark);
+				String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+				Map map = new HashMap(4);
+				map.put("brandName", brand.getBrandName());
+				map.put("fileName", customer.getId());
+				map.put("type", "UserAction");
+				map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+				doPostAnsc(LogUtils.url, map);
+			}
+        }
+        if(setting.getTemplateEdition()==0){
+			StringBuffer msg = new StringBuffer();
+			msg.append("今日充值余额已到账，快去看看吧~");
+			String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
+			msg.append("<a href='" + jumpurl + "'>查看账户</a>");
+			WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+			Map map = new HashMap(4);
+			map.put("brandName", brand.getBrandName());
+			map.put("fileName", customer.getId());
+			map.put("type", "UserAction");
+			map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+			doPostAnsc(LogUtils.url, map);
+		}else{
+			TemplateFlow templateFlow=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412427536");
 			String templateId = templateFlow.getTemplateId();
-			String jumpUrl ="";
+			String jumpUrl ="http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
 			Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
 			Map<String, Object> first = new HashMap<String, Object>();
-			first.put("value", "恭喜您！充值成功！");
+			first.put("value", "今日充值赠送红包已到账！");
 			first.put("color", "#00DB00");
 			Map<String, Object> keyword1 = new HashMap<String, Object>();
 			keyword1.put("value", df.format(chargeOrder.getChargeMoney()));
 			keyword1.put("color", "#000000");
 			Map<String, Object> keyword2 = new HashMap<String, Object>();
-			keyword2.put("value", df.format(chargeOrder.getRewardMoney()));
+			keyword2.put("value", df.format(chargeOrder.getCreateTime()));
 			keyword2.put("color", "#000000");
 			Map<String, Object> keyword3 = new HashMap<String, Object>();
-			keyword3.put("value", DateUtil.formatDate(chargeOrder.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+			keyword3.put("value", chargeOrder.getRewardMoney());
 			keyword3.put("color", "#000000");
 			Map<String, Object> remark = new HashMap<String, Object>();
-			remark.put("value", "充值赠送红包会在"+ (chargeOrder.getNumberDayNow() + 1) +"天内分批返还给您，请注意查收～");
+			remark.put("value", "点击这里查看账户余额");
 			remark.put("color", "#173177");
 			content.put("first", first);
 			content.put("keyword1", keyword1);
@@ -363,49 +417,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			map.put("type", "UserAction");
 			map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
 			doPostAnsc(LogUtils.url, map);
-        }
-        /*StringBuffer msg = new StringBuffer();
-        msg.append("今日充值余额已到账，快去看看吧~");
-        String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
-        msg.append("<a href='" + jumpurl + "'>查看账户</a>");
-        WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
-        Map map = new HashMap(4);
-        map.put("brandName", brand.getBrandName());
-        map.put("fileName", customer.getId());
-        map.put("type", "UserAction");
-        map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPostAnsc(LogUtils.url, map);*/
-		TemplateFlow templateFlow=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412427536");
-		String templateId = templateFlow.getTemplateId();
-		String jumpUrl ="http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
-		Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
-		Map<String, Object> first = new HashMap<String, Object>();
-		first.put("value", "今日充值赠送红包已到账！");
-		first.put("color", "#00DB00");
-		Map<String, Object> keyword1 = new HashMap<String, Object>();
-		keyword1.put("value", df.format(chargeOrder.getChargeMoney()));
-		keyword1.put("color", "#000000");
-		Map<String, Object> keyword2 = new HashMap<String, Object>();
-		keyword2.put("value", df.format(chargeOrder.getCreateTime()));
-		keyword2.put("color", "#000000");
-		Map<String, Object> keyword3 = new HashMap<String, Object>();
-		keyword3.put("value", chargeOrder.getRewardMoney());
-		keyword3.put("color", "#000000");
-		Map<String, Object> remark = new HashMap<String, Object>();
-		remark.put("value", "点击这里查看账户余额");
-		remark.put("color", "#173177");
-		content.put("first", first);
-		content.put("keyword1", keyword1);
-		content.put("keyword2", keyword2);
-		content.put("keyword3", keyword3);
-		content.put("remark", remark);
-		String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
-		Map map = new HashMap(4);
-		map.put("brandName", brand.getBrandName());
-		map.put("fileName", customer.getId());
-		map.put("type", "UserAction");
-		map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-		doPostAnsc(LogUtils.url, map);
+		}
     }
 
     @Override
