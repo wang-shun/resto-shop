@@ -397,8 +397,8 @@ public class OrderMessageListener implements MessageListener {
         try {
             String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
             Order order = JSON.parseObject(msg, Order.class);
-            Brand brand = brandService.selectById(order.getBrandId());
-            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+//            Brand brand = brandService.selectById(order.getBrandId());
+//            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             DataSourceContextHolder.setDataSourceName(order.getBrandId());
             orderService.updateAllowContinue(order.getId(), false);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
@@ -478,8 +478,9 @@ public class OrderMessageListener implements MessageListener {
             log.info("执行自动确认逻辑" + order.getId());
             if(order.getProductionStatus()==4){
                 orderService.confirmWaiMaiOrder(order);
-            }else
-            orderService.confirmOrder(order);
+            }else{
+                orderService.confirmOrder(order);
+            }
         }catch (Exception e){
             e.printStackTrace();
             return Action.ReconsumeLater;

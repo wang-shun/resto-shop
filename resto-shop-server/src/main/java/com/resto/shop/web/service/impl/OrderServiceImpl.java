@@ -4299,6 +4299,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            orderMap.put("content", "订单:" + order.getId() + "被确认订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
 //            doPostAnsc(url, orderMap);
             LogTemplateUtils.getConfirmByOrderType(brand.getBrandName(), order, orginState, "confirmBossOrder");
+            if(!StringUtils.isEmpty(order.getGroupId())){
+                //如果订单是在组里的
+                //禁止加菜后，组释放，并且删除所有 人与组的关系，并且删除该组的购物车
+                TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
+                tableGroup.setState(TableGroup.FINISH);
+                tableGroupService.update(tableGroup);
+                customerGroupService.removeByGroupId(order.getGroupId());
+                shopCartService.resetGroupId(order.getGroupId());
+            }
             return order;
         }
         return null;
