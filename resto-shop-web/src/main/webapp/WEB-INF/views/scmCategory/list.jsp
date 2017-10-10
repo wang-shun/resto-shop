@@ -88,7 +88,7 @@
                                 <th>排序</th>
                                 <th>关键词</th>
                                 <th>备注</th>
-                                <th>操作</th>
+                                <%--<th>操作</th>--%>
                             </tr>
                             </thead>
                             <tbody>

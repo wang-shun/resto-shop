@@ -51,7 +51,6 @@
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">产品(可多选)</label>
                                 <div class="col-md-7 checkbox-list" id="checkboxs">
-                                    {{parameter.materialTypes}}
                                     <label class="checkbox-inline" v-for="materialType in productTypes">
                                         <input type="checkbox" name="checkbox" v-model="parameter.materialTypes" value="{{materialType.id}}">
                                         <span>{{materialType.categoryName}}</span>
@@ -169,7 +168,7 @@
                             C.createEditBtn(rowData),
                             </s:hasPermission>
                             <s:hasPermission name="scmSupplier/delete">
-                            C.createDelBtn(tdData,"scmSupplier/delete),
+                            C.createDelBtn(tdData,"scmSupplier/delete"),
                             </s:hasPermission>
                         ];
                         $(td).html(operator);
@@ -223,6 +222,7 @@
                 },
                 closeForm:function(){ //关闭新增弹窗
                     this.showform=false;
+                    this.parameter={};
                 },
                 create:function(){ //打开新增弹窗
                     var that = this;
