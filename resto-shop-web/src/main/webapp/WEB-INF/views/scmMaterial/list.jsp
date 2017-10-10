@@ -65,8 +65,8 @@
 								</div>
 								<label class="col-md-2 control-label">原材编码</label>
 								<div class="col-md-3">
-									<input type="text" class="form-control" name="materialCode" v-model="m.materialCode"
-										   :readonly="materReadonly">
+									<input type="text" class="form-control" name="materialCode" v-model="m.materialCode" disabled
+										   :readonly="materReadonly" >
 								</div>
 							</div>
 							<div class="form-group row">
@@ -257,16 +257,26 @@
                 {
                     title : "规格",
                     data : "specName",
+                    createdCell:function (td,tdData,rowData) {
+                        $(td).html(rowData.measureUnit+rowData.unitName+'/'+rowData.specName);
+                    }
                 },
-                {
-                    title : "规格核算单位",
-                    data : "measureUnit",
-                },
+//                {
+//                    title : "规格",
+//                    data : "specName",
+//
+//                },
+//                {
+//                    title : "规格核算单位",
+//                    data : "measureUnit",
+//                },
+//
+//                {
+//                    title : "核算单位",
+//                    data : "unitName",
+//                },
 
-                {
-                    title : "核算单位",
-                    data : "unitName",
-                },
+
                 {
                     title : "转化率",
                     data : "rate",
@@ -275,14 +285,28 @@
                     title : "转换单位",
                     data : "convertUnitName",
                 },
-                {
-                    title : "最小核算单位值",
+				{
+                    title : "最小核算单位",
                     data : "minMeasureUnit",
+                    createdCell:function (td,tdData,rowData) {
+                        debugger
+                        $(td).html(tdData+rowData.convertUnitName);
+                    }
                 },
+
                 {
-                    title : "最小转换单位",
-                    data : "minUnitName",
+                    title : "转化系数",
+                    data : "coefficient",
                 },
+
+//              {
+//                    title : "最小核算单位值",
+//                    data : "minMeasureUnit",
+//                },
+//                {
+//                    title : "最小转换单位",
+//                    data : "convertUnitName",
+//               },
                 {
                     title : "产地",
                     data : "provinceName",

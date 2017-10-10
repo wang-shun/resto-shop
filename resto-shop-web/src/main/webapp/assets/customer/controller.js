@@ -361,6 +361,40 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
+
+
+    this.createDelBtnForSupplier = function(value,delUrl,successCbk){
+        var button = $("<button class='btn btn-xs red'>").html(name||"删除");
+        button.click(function(){
+
+            _C.delConfirmDialog(function(){
+
+
+                _C.ajax("",{id:value},function(resultData){
+
+
+                    _C.ajax(delUrl,{id:value},function(result){
+                        if(result.success){
+                            tb.ajax.reload();
+                            _C.simpleMsg("删除成功");
+                        }else{
+                            _C.errorMsg(result.message,"删除失败");
+                        }
+                    });
+
+
+                })
+
+
+
+
+
+            });
+        });
+        return button;
+    }
+
+
     this.systemButton = function(delUrl,obj,alertName){ //执行ajax，返回
                 _C.ajax(delUrl,obj,function(result){
                     if(result.success){

@@ -176,7 +176,7 @@
                             <s:hasPermission name="scmSupplier/create">
                             C.createEditBtn(rowData),
                             <s:hasPermission name="scmSupplier/delete">
-                            C.createDelBtn(tdData,"scmSupplier/delete"),
+                            C.createDelBtn(tdData,"scmSupplier/delete),
                             </s:hasPermission>
                             </s:hasPermission>
                         ];
