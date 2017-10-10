@@ -219,7 +219,28 @@ public class OrderMessageListener implements MessageListener {
             String jumpurl = setting.getWechatWelcomeUrl()+"?subpage=tangshi";
             str.append("优惠券到期提醒"+"\n");
             str.append("<a href='"+jumpurl+"'>"+shopName+"温馨提醒您：您价值"+pr+"元的\""+name+"\""+pushDay+"天后即将到期，别浪费啊~</a>");
-            WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
+            //WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
+            TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"TM00710");
+            String templateId = templateFlow.getTemplateId();
+            String jumpUrl ="";
+            Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+            Map<String, Object> first = new HashMap<String, Object>();
+            first.put("value", str.toString());
+            first.put("color", "#00DB00");
+            Map<String, Object> time = new HashMap<String, Object>();
+            time.put("value", pushDay);
+            time.put("color", "#000000");
+            Map<String, Object> number = new HashMap<String, Object>();
+            number.put("value", "-");
+            number.put("color", "#000000");
+            Map<String, Object> remark = new HashMap<String, Object>();
+            remark.put("value", "快来尝尝我们的新菜吧~");
+            remark.put("color", "#173177");
+            content.put("first", first);
+            content.put("time", time);
+            content.put("number", number);
+            content.put("remark", remark);
+            String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
             Map map = new HashMap(4);
             map.put("brandName", setting.getBrandName());
             map.put("fileName", customer.getId());

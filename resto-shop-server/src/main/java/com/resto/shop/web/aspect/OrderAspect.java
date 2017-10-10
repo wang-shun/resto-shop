@@ -870,7 +870,7 @@ public class OrderAspect {
                 str.append("送他/她" + money + "元红包，朋友到店消费后，您将获得" + shareSetting.getMinMoney() + "元-" + shareSetting.getMaxMoney() + "元红包返利\n");
             }
             String jumpurl = setting.getWechatWelcomeUrl() + "?dialog=scanAqrCode&subpage=my&shopId=" + order.getShopDetailId();
-            str.append("<a href='" + jumpurl + "'>打开邀请二维码</a>");
+            /*str.append("<a href='" + jumpurl + "'>打开邀请二维码</a>");
             String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "订单发送推送：" + str.toString());
@@ -879,6 +879,32 @@ public class OrderAspect {
             map.put("fileName", customer.getId());
             map.put("type", "UserAction");
             map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + str.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(LogUtils.url, map);*/
+            TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
+            String templateId = templateFlow.getTemplateId();
+            Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+            Map<String, Object> first = new HashMap<String, Object>();
+            first.put("value",str.toString());
+            first.put("color", "#00DB00");
+            Map<String, Object> keyword1 = new HashMap<String, Object>();
+            keyword1.put("value", order.getSerialNumber());
+            keyword1.put("color", "#000000");
+            Map<String, Object> keyword2 = new HashMap<String, Object>();
+            keyword2.put("value",DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+            keyword2.put("color", "#000000");
+            Map<String, Object> remark = new HashMap<String, Object>();
+            remark.put("value", "打开邀请二维码");
+            remark.put("color", "#173177");
+            content.put("first", first);
+            content.put("keyword1", keyword1);
+            content.put("keyword2", keyword2);
+            content.put("remark", remark);
+            String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpurl, content, config.getAppid(), config.getAppsecret());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, map);
         }
     }
@@ -934,7 +960,7 @@ public class OrderAspect {
             Brand brand = brandService.selectById(customer.getBrandId());
 //		RedConfig redConfig = redConfigService.selectListByShopId(order.getShopDetailId());
             if (order.getAllowAppraise()) {
-                StringBuffer msg = new StringBuffer();
+                /*StringBuffer msg = new StringBuffer();
                 msg.append("您有一个红包未领取，红包是" + brand.getBrandName() + "送您的一片心意xoxo");
                 msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
 
@@ -946,6 +972,33 @@ public class OrderAspect {
                 map.put("fileName", customer.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(LogUtils.url, map);*/
+                TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
+                String templateId = templateFlow.getTemplateId();
+                String jumpUrl =setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId();
+                Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+                Map<String, Object> first = new HashMap<String, Object>();
+                first.put("value", "您有一个红包未领取，红包是" + brand.getBrandName() + "送您的一片心意xoxo");
+                first.put("color", "#00DB00");
+                Map<String, Object> keyword1 = new HashMap<String, Object>();
+                keyword1.put("value", order.getSerialNumber());
+                keyword1.put("color", "#000000");
+                Map<String, Object> keyword2 = new HashMap<String, Object>();
+                keyword2.put("value", DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+                keyword2.put("color", "#000000");
+                Map<String, Object> remark = new HashMap<String, Object>();
+                remark.put("value", "点击领取红包");
+                remark.put("color", "#173177");
+                content.put("first", first);
+                content.put("keyword1", keyword1);
+                content.put("keyword2", keyword2);
+                content.put("remark", remark);
+                String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);
 //            log.info("发送评论通知成功:" + msg + result);
                 scanaQRcode(config, customer, setting, order);
@@ -996,15 +1049,35 @@ public class OrderAspect {
         if (rewardMoney.compareTo(BigDecimal.ZERO) != 0) {
             rewardMoney = rewardMoney.setScale(2, BigDecimal.ROUND_HALF_UP);
         }
-        msg.append("您邀请的好友" + customer.getNickname() + "已到店消费，您已获得" + rewardMoney + "元红包返利\n<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>点击查看余额！</a>");
+ //       msg.append("您邀请的好友" + customer.getNickname() + "已到店消费，您已获得" + rewardMoney + "元红包返利\n<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>点击查看余额！</a>");
 //        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue'>")
 //                .append("您邀请的好友").append(customer.getNickname()).append("已到店消费，您已获得")
 //                .append(rewardMoney).append("元红包返利").append("</a>");
-        String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
+//        String result = WeChatUtils.sendCustomerMsg(msg.toString(), shareCustomer.getWechatId(), config.getAppid(), config.getAppsecret());
         //logBaseService.insertLogBaseInfoState(shopDetailService.selectById(order.getShopDetailId()),customer,shareCustomer.getId(),LogBaseState.FIRST_SHARE_PAY);
 //        log.info("发送返利通知成功:" + shareCustomer.getId() + " MSG: " + msg + result);
 //                "订单发送推送：" + msg.toString());//        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-
+        TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
+        String templateId = templateFlow.getTemplateId();
+        String jumpUrl =setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue";
+        Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+        Map<String, Object> first = new HashMap<String, Object>();
+        first.put("value", "您邀请的好友" + customer.getNickname() + "已到店消费，您已获得" + rewardMoney + "元红包返利");
+        first.put("color", "#00DB00");
+        Map<String, Object> keyword1 = new HashMap<String, Object>();
+        keyword1.put("value", order.getSerialNumber());
+        keyword1.put("color", "#000000");
+        Map<String, Object> keyword2 = new HashMap<String, Object>();
+        keyword2.put("value", DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+        keyword2.put("color", "#000000");
+        Map<String, Object> remark = new HashMap<String, Object>();
+        remark.put("value", "查看余额");
+        remark.put("color", "#173177");
+        content.put("first", first);
+        content.put("keyword1", keyword1);
+        content.put("keyword2", keyword2);
+        content.put("remark", remark);
+        String result1 = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
 		Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shareCustomer.getId());

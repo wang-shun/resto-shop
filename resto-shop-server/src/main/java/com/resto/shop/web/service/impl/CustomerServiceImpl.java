@@ -130,7 +130,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	}
 
 	@Override
-	public Customer bindPhone(String phone, String currentCustomerId,Integer couponType,String shopId,String shareCustomer) throws AppException {
+	public Customer bindPhone(String phone, String currentCustomerId,Integer couponType,String shopId,String shareCustomer,String shareOrderId) throws AppException {
 		Customer customer = customerMapper.selectByPhone(phone);
 		if(customer!=null){
 			throw new AppException(AppException.PHONE_IS_BIND);
