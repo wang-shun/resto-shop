@@ -43,7 +43,7 @@
                             <div class="form-group row" >
                             <label class="col-md-4 control-label">排序</label>
                             <div class="col-md-3">
-                                <input type="text" class="form-control" name="sort" v-model="parameter.sort"  required="required">
+                                <input type="number" class="form-control" name="sort" v-model="parameter.sort"  required="required">
                             </div>
                             </div>
                             <div class="form-group row" >
@@ -98,7 +98,6 @@
                                 <td>{{finds.sort}}</td>
                                 <td>{{finds.keyword}}</td>
                                 <td>{{finds.categoryDesc}}</td>
-                                <td></td>
                                 <%--<td><button class="btn btn-xs btn-primary" style="margin-right:10px;">编辑</button><button class="btn btn-xs btn-danger">删除</button></td>--%>
                             </tr>
                             </tbody>
