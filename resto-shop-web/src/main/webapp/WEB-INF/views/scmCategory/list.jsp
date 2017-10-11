@@ -216,7 +216,7 @@
                       this.parameter={
                           categoryName:'',//分类名称
                           parentId:'',//ID
-                          sort:'',//排序
+                          sort:'1',//排序
                           keyword:'',//关键词
                           categoryDesc:"",//备注
                           categoryHierarchy:'3',
@@ -242,6 +242,7 @@
                             success:function(data){ //成功后返回
                                 C.systemButtonNo('success','成功');
                                 that.showform=false;
+                                that.Find2=false;
                             },
                             error: function(){ //失败后执行
                                 C.systemButtonNo('error','失败');

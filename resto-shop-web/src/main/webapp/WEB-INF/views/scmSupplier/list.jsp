@@ -18,6 +18,7 @@
                                 <label class="col-md-2 control-label">供应商类型</label>
                                 <div class="col-md-3">
                                 <select class="bs-select form-control" name="supplierType" v-model="parameter.supplierType">
+                                    <option disabled="" selected="" value="">请选择</option>
                                     <option  v-for="supplierType in supplierTypes" value="{{supplierType.code}}">
                                         {{supplierType.name}}
                                     </option>
@@ -232,6 +233,23 @@
                     });
                     this.parameter.materialTypes=[];
                     this.showform=true;
+                    this.parameter={
+                        supCode: "",
+                        supplierType: "",
+                        materialTypes:[],
+                        materialIds:[],
+                        supAliasName: "",
+                        supName: "",
+                        note:'',//备注
+                        bankName: "",
+                        bankAccount: "",
+                        version: "",
+                        topContact: "",
+                        topMobile: "",
+                        topEmail: "",
+                        supplierContacts:[],//详情
+                        supContactIds:[],
+                    };
                 },
                 edit:function(model){ //编辑打开弹窗
                     var that = this;
@@ -241,7 +259,6 @@
                     });
                     this.parameter.materialTypes=model.materialIds.split(',');
                     this.showform=true;
-                    debugger
                     $('#supplierContacts div').removeClass('radio');
                 },
                 save:function(){//提交

@@ -420,7 +420,7 @@
                         materialCode :'',
                         specId:'',//规格
                         specName:'',//规格
-                        priority:'',
+                        priority:'1',
                         unitId:'',//标准单位
                         unitName:'',//标准单位
                         convertUnitId :'',//转换单位

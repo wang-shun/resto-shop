@@ -32,9 +32,9 @@
 
                                 <label class="col-md-2 control-label">菜品名称</label>
                                 <div class="col-md-3">
-                                <select name="categoryOneId"  v-model="parameter.articleId"  class="bs-select form-control" @change='changeType2'>
+                                <select name="articleId"  v-model="parameter.articleId"  class="bs-select form-control" @change='changeType2'>
                                     <option disabled selected value>请选择</option>
-                                    <option  v-for="productName in productNameArr" value="{{productName.articleId}}">
+                                    <option  v-for="productName in productNameArr" value="{{productName.articleId}}" v-if="parameter.articleFamilyId == productName.articleFamilyId">
                                         {{productName.name}}
                                     </option>
                                 </select>
@@ -67,7 +67,7 @@
                                 </div>
                                 <label class="col-md-2 control-label">计量单位</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="materialName" v-model="parameter.measurementUnit" required="required">
+                                    <input type="text" class="form-control" name="materialName" v-model="parameter.measurementUnit" disabled>
                                 </div>
                             </div>
                         </div>
@@ -75,12 +75,12 @@
                             <table class="table table-bordered" id="yuanliaolist">
                                 <thead><tr>
                                     <th>行号</th><th>原料编码</th><th>原料类型</th>
-                                    <th>原料名称</th><th>规格</th><th>最小单位</th>
+                                    <th>原料名称</th><th>规格</th>
                                     <th>所需最小单位数量</th><th>操作</th>
                                 </tr></thead>
                                 <tbody>
                                 <tr v-for="(index,item) in parameter.bomDetailDoList">
-                                    <td>{{index+1}}</td><td>{{item.materialCode}}</td><td v-text="((((item.materialType=='INGREDIENTS')?'主料':item.materialType)=='ACCESSORIES')?'辅料':'其他')"></td><td>{{item.materialName}}{{item.name}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
+                                    <td>{{index+1}}</td><td>{{item.materialCode}}</td><td v-text="((((item.materialType=='INGREDIENTS')?'主料':item.materialType)=='ACCESSORIES')?'辅料':'其他')"></td><td>{{item.materialName}}{{item.name}}</td><td>{{item.minMeasureUnit}}/{{item.unitName}}</td>
                                     <td><input type="text" v-model="item.materialCount" value="{{(item.materialCount?item.materialCount:1)}}" ></td><td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>
@@ -172,7 +172,7 @@
                 {
                     data : "bomDetailDoList",
                     createdCell : function(td,tdData){
-                        var html='<tr><th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th><th>规格</th><th>最小单位</th><th>所需最小单位数量</th><th>数量</th></tr>';
+                        var html='<tr><th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th><th>规格</th><th>最小单位</th><th>所需最小单位数量</th></tr>';
 
                         for(var i=0;i<tdData.length;i++){
                             switch(tdData[i].materialType){
@@ -180,7 +180,7 @@
                                 case 'ACCESSORIES':tdData[i].materialType='辅料';break;
                                 default:tdData[i].materialType='其他';break;
                             }
-                            html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialType+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].minUnitName+'</td><td>'+tdData[i].minMeasureUnit+'</td><td>'+tdData[i].materialCount+'</td></tr>';
+                            html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialType+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].minMeasureUnit+'/'+tdData[i].minUnitName+'</td><td>'+tdData[i].materialCount+'</td></tr>';
                         }
                         $(td).addClass('bomDetailDoList');
                         $(td).html(html);
@@ -268,8 +268,15 @@
                     this.parameter.articleFamilyId = ele.target.value;
                 },
                 changeType2: function (ele) {
+                    console.log(this.productNameArr);
                     this.parameter.productName = $(ele.target).find("option:selected").text();
                     this.parameter.articleId = ele.target.value;
+                    for(var i=0;i<this.productNameArr.length;i++){
+                        if(ele.target.value==this.productNameArr[i].articleId){
+                            this.parameter.measurementUnit=this.productNameArr[i].unit;
+                            break;
+                        }
+                    }
                 },
                 create:function(){ //打开新增弹窗
                     this.parameter= {
@@ -277,7 +284,9 @@
                         bomDetailDeleteIds:[],//删除的list节点
                         bomCode:'',
                         productCode:'',
-                        measurementUnit:''
+                        measurementUnit:'',
+                        articleFamilyId:'',
+                        articleId:'',
                     };
                     this.showform=true;
                 },
@@ -287,9 +296,13 @@
                     this.parameter.productName='';//菜品名称
                 },
                 edit:function(model){ //编辑打开弹窗
+                    var that=this;
                     this.parameter= model;
                     this.parameter.bomDetailDeleteIds=[];
                     this.showform=true;
+                    setTimeout(function () {
+                        that.tableBodyListsShow=false;
+                    },200);
                 },
                 save:function(e){ //新增and编辑保存
                     var _this=this;
@@ -317,7 +330,6 @@
                         _this.parameter;
                         delete _this.parameter.bomDetailDeleteIds;
                     }
-                    debugger
                     $.ajax({
                         type:"POST",
                         url:url,
@@ -384,7 +396,7 @@
                 $.get('article/list_all',function (data) { //菜品名称选项
                     console.log(data);
                     for(var i=0;i<data.length;i++){
-                        that.productNameArr.push({articleId:data[i].id, name:data[i].name});
+                        that.productNameArr.push({articleId:data[i].id, name:data[i].name,articleFamilyId:data[i].articleFamilyId,unit:data[i].unit});
                     }
                 })
             },
