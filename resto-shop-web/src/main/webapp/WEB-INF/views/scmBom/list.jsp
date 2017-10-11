@@ -290,7 +290,7 @@
                     var savearr=[];
                     for(var i=0;i<_this.parameter.bomDetailDoList.length;i++){
                         savearr[i]={
-                            id:_this.parameter.bomDetailDoList[i].id,minMeasureUnit:_this.parameter.bomDetailDoList[i].minMeasureUnit,unitName:_this.parameter.bomDetailDoList[i].unitName,materialName:_this.parameter.bomDetailDoList[i].name,
+                            id:_this.parameter.bomDetailDoList[i].idTwo,minMeasureUnit:_this.parameter.bomDetailDoList[i].minMeasureUnit,unitName:_this.parameter.bomDetailDoList[i].unitName,materialName:_this.parameter.bomDetailDoList[i].name,
                             specName:_this.parameter.bomDetailDoList[i].specName,materialCode:_this.parameter.bomDetailDoList[i].materialCode,materialId:_this.parameter.bomDetailDoList[i].materialId,lossFactor:_this.parameter.bomDetailDoList[i].lossFactor,
                             actLossFactor:_this.parameter.bomDetailDoList[i].actLossFactor,materialCount:_this.parameter.bomDetailDoList[i].materialCount
                         }
@@ -377,17 +377,25 @@
         $.get('scmCategory/query',function (jsonData) {
             var defaultData=jsonData.data;
             for(var i=0;i<defaultData.length;i++){
+                defaultData[i].idTwo = defaultData[i].id;
+                delete defaultData[i].id;
                 if (defaultData[i].twoList) {
                     for(var j=0;j<defaultData[i].twoList.length;j++){
+                        defaultData[i].twoList[j].idTwo = defaultData[i].twoList[j].id;
+                        delete defaultData[i].twoList[j].id;
                         if (defaultData[i].twoList) {
                             defaultData[i].twoList[j].twoList = defaultData[i].twoList[j].threeList;
                             delete defaultData[i].twoList[j].threeList;
                             if(defaultData[i].twoList[j].twoList){
                                 for(var k=0;k<defaultData[i].twoList[j].twoList.length;k++){
+                                    defaultData[i].twoList[j].twoList[k].idTwo = defaultData[i].twoList[j].twoList[k].id;
+                                    delete defaultData[i].twoList[j].twoList[k].id;
                                     defaultData[i].twoList[j].twoList[k].twoList = defaultData[i].twoList[j].twoList[k].materialList;
                                     delete defaultData[i].twoList[j].twoList[k].materialList;
                                     if(defaultData[i].twoList[j].twoList[k].twoList){
                                         for(var l=0;l<defaultData[i].twoList[j].twoList[k].twoList.length;l++){
+                                            defaultData[i].twoList[j].twoList[k].twoList[l].idTwo = defaultData[i].twoList[j].twoList[k].twoList[l].id;
+                                            delete defaultData[i].twoList[j].twoList[k].twoList[l].id;
                                             defaultData[i].twoList[j].twoList[k].twoList[l].name = defaultData[i].twoList[j].twoList[k].twoList[l].materialName;
                                             delete defaultData[i].twoList[j].twoList[k].twoList[l].materialName;
                                         }
