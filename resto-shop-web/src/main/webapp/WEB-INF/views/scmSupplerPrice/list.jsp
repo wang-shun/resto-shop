@@ -374,7 +374,7 @@
                         switch(this.detailsArr.mdSupplierPriceDetailDoList[i].materialType){
                             case 'INGREDIENTS':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='主料';break;
                             case 'ACCESSORIES':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='辅料';break;
-                            case 'SEASONING':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='其他';break;
+                            default:this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='其他';break;
                         }
                     }
                     this.detailsBtn=true;
@@ -404,7 +404,7 @@
                     var parSup=this.parameter.mdSupplierPriceDetailDoList;
                     for(var i=0;i<parSup.length;i++){
                         saveObj[i]={
-                            materialId:parSup[i].id,
+                            materialId:parSup[i].idTwo,
                             materialCode:parSup[i].materialCode,
                             purchasePrice:parSup[i].purchasePrice,
                         }
@@ -442,17 +442,25 @@
                 $.get('scmCategory/query',function (jsonData) { //加载树状图
                     var defaultData=jsonData.data;
                     for(var i=0;i<defaultData.length;i++){
+                        defaultData[i].idTwo = defaultData[i].id;
+                        delete defaultData[i].id;
                         if (defaultData[i].twoList) {
                             for(var j=0;j<defaultData[i].twoList.length;j++){
+                                defaultData[i].twoList[j].idTwo = defaultData[i].twoList[j].id;
+                                delete defaultData[i].twoList[j].id;
                                 if (defaultData[i].twoList) {
                                     defaultData[i].twoList[j].twoList = defaultData[i].twoList[j].threeList;
                                     delete defaultData[i].twoList[j].threeList;
                                     if(defaultData[i].twoList[j].twoList){
                                         for(var k=0;k<defaultData[i].twoList[j].twoList.length;k++){
+                                            defaultData[i].twoList[j].twoList[k].idTwo = defaultData[i].twoList[j].twoList[k].id;
+                                            delete defaultData[i].twoList[j].twoList[k].id;
                                             defaultData[i].twoList[j].twoList[k].twoList = defaultData[i].twoList[j].twoList[k].materialList;
                                             delete defaultData[i].twoList[j].twoList[k].materialList;
                                             if(defaultData[i].twoList[j].twoList[k].twoList){
                                                 for(var l=0;l<defaultData[i].twoList[j].twoList[k].twoList.length;l++){
+                                                    defaultData[i].twoList[j].twoList[k].twoList[l].idTwo = defaultData[i].twoList[j].twoList[k].twoList[l].id;
+                                                    delete defaultData[i].twoList[j].twoList[k].twoList[l].id;
                                                     defaultData[i].twoList[j].twoList[k].twoList[l].name = defaultData[i].twoList[j].twoList[k].twoList[l].materialName;
                                                     delete defaultData[i].twoList[j].twoList[k].twoList[l].materialName;
                                                 }
