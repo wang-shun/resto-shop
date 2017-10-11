@@ -222,8 +222,8 @@ public class OrderMessageListener implements MessageListener {
             if(setting.getTemplateEdition()==0){
                 WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());//提交推送
             }else{
-                TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"TM00710");
-                String templateId = templateFlow.getTemplateId();
+                List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"TM00710");
+                String templateId = templateFlowList.get(0).getTemplateId();
                 String jumpUrl ="";
                 Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                 Map<String, Object> first = new HashMap<String, Object>();
@@ -395,8 +395,8 @@ public class OrderMessageListener implements MessageListener {
             if(setting.getTemplateEdition()==0){
                 WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
             }else{
-                TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM411223846");
-                String templateId = templateFlow.getTemplateId();
+                List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM411223846");
+                String templateId = templateFlowList.get(0).getTemplateId();
                 String jumpUrl ="";
                 Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                 Map<String, Object> first = new HashMap<String, Object>();

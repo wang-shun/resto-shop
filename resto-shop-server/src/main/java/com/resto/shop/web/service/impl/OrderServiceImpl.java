@@ -7783,8 +7783,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
     //                "订单发送推送：" + msg.toString());
             }else{
-                TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM203022210");
-                String templateId = templateFlow.getTemplateId();
+                List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM203022210");
+                String templateId = templateFlowList.get(0).getTemplateId();
                 String jumpUrl ="";
                 Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                 Map<String, Object> first = new HashMap<String, Object>();

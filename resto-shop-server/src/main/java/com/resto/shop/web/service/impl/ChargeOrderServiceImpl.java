@@ -340,8 +340,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msgFrist.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
 				doPostAnsc(LogUtils.url, map);
 			}else{
-				TemplateFlow templateFlow=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412000235");
-				String templateId = templateFlow.getTemplateId();
+				List<TemplateFlow> templateFlowList=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412000235");
+				String templateId = templateFlowList.get(0).getTemplateId();
 				String jumpUrl ="";
 				Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
 				Map<String, Object> first = new HashMap<String, Object>();
@@ -386,8 +386,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
 			doPostAnsc(LogUtils.url, map);
 		}else{
-			TemplateFlow templateFlow=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412427536");
-			String templateId = templateFlow.getTemplateId();
+			List<TemplateFlow> templateFlowList=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412427536");
+			String templateId = templateFlowList.get(0).getTemplateId();
 			String jumpUrl ="http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
 			Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
 			Map<String, Object> first = new HashMap<String, Object>();

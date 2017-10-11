@@ -83,8 +83,8 @@ public class GetNumberAspect {
                     map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                     doPostAnsc(LogUtils.url, map);
                 }else{
-                    TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
-                    String templateId = templateFlow.getTemplateId();
+                    List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
+                    String templateId = templateFlowList.get(0).getTemplateId();
                     String jumpUrl ="";
                     Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                     Map<String, Object> first = new HashMap<String, Object>();
@@ -143,8 +143,8 @@ public class GetNumberAspect {
                     map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                     doPostAnsc(LogUtils.url, map);
                 }else{
-                    TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
-                    String templateId = templateFlow.getTemplateId();
+                    List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
+                    String templateId = templateFlowList.get(0).getTemplateId();
                     String jumpUrl =setting.getWechatWelcomeUrl() + "?dialog=waitScan";
                     Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                     Map<String, Object> first = new HashMap<String, Object>();
@@ -201,8 +201,8 @@ public class GetNumberAspect {
                     map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                     doPostAnsc(LogUtils.url, map);
                 }else{
-                    TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
-                    String templateId = templateFlow.getTemplateId();
+                    List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
+                    String templateId = templateFlowList.get(0).getTemplateId();
                     String jumpUrl ="";
                     Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                     Map<String, Object> first = new HashMap<String, Object>();
@@ -258,8 +258,8 @@ public class GetNumberAspect {
                         msg.append(shop.getWaitRemindText());
                         WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());
                     }else{
-                        TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
-                        String templateId = templateFlow.getTemplateId();
+                        List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
+                        String templateId = templateFlowList.get(0).getTemplateId();
                         String jumpUrl ="";
                         Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                         Map<String, Object> first = new HashMap<String, Object>();

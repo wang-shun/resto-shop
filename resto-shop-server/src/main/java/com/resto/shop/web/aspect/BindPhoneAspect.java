@@ -133,8 +133,8 @@ public class BindPhoneAspect {
 					map.put("content", "系统向用户:"+sc.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
 					doPostAnsc(LogUtils.url, map);
 				}else{
-					TemplateFlow templateFlow=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
-					String templateId = templateFlow.getTemplateId();
+					List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
+					String templateId = templateFlowList.get(0).getTemplateId();
 					String jumpUrl ="";
 					Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
 					Map<String, Object> first = new HashMap<String, Object>();
