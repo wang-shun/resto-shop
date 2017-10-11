@@ -142,15 +142,15 @@
                 },
                 {
                     title : "联系人 ",
-                    data : "contact"
+                    data : "topContact"
                 },
                 {
                     title : "电话",
-                    data : "mobile"
+                    data : "topMobile"
                 },
                 {
                     title : "邮件",
-                    data : "email"
+                    data : "topEmail"
                 },
                 {
                     title : "产品",
