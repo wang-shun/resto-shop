@@ -76,7 +76,7 @@
 										   required="required">
 								</div>
 
-								<label class="col-md-2 control-label">规格</label>
+								<label class="col-md-2 control-label">库存单位</label>
 								<div class="col-md-3">
 									<select name="specList" v-model="specList" class="bs-select form-control" >
 										<option disabled selected value>请选择</option>
@@ -87,12 +87,12 @@
 								</div>
 							</div>
 							<div class="form-group row">
-								<label class="col-md-2 control-label">规格的核算单位值</label>
+								<label class="col-md-2 control-label">核算规格</label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="measureUnit" v-model="m.measureUnit" @change="com"
 										   required="required">
 								</div>
-								<label class="col-md-2 control-label">标准单位</label>
+								<label class="col-md-2 control-label">核算单位</label>
 								<div class="col-md-3">
 									<select name="unitList" v-model="unitList" class="bs-select form-control" >
 										<option disabled selected value>请选择</option>
@@ -103,13 +103,13 @@
 								</div>
 							</div>
 							<div class="form-group row">
-								<label class="col-md-2 control-label">转换率</label>
+								<label class="col-md-2 control-label">转化规格</label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="rate" v-model="m.rate" @change="com"
 										   required="required">
 								</div>
 
-								<label class="col-md-2 control-label">转换单位</label>
+								<label class="col-md-2 control-label">转化单位</label>
 								<div class="col-md-3">
 									<select name="convertUnitList" v-model="convertUnitList" class="bs-select form-control" >
 										<option disabled selected value>请选择</option>
@@ -121,13 +121,13 @@
 							</div>
 							<div class="form-group row">
 
-								<label class="col-md-2 control-label">核算最小单位值</label>
+								<label class="col-md-2 control-label">最小单位</label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="minMeasureUnit" v-model="m.minMeasureUnit"  required="required" @change="com"
 										   style="display: inline-block;text-align: center;width:70%;">
 									<span style="text-align: center">{{m.convertUnitName}}</span>
 								</div>
-								<label class="col-md-2 control-label">转换系数</label>
+								<label class="col-md-2 control-label">最小单位份数</label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="coefficient" :value="coefficients"  v-model="m.coefficient" readOnly="true">
 								</div>
