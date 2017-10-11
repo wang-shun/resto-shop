@@ -435,6 +435,12 @@
                         minMeasureUnit:'',
                         coefficient:'',
                     };
+                    this.provinceNameList='';//绑定省
+                    this.cityNameList='';//绑定市
+                    this.districtNameList='';//绑定区
+                    this.specList='';//规格
+                    this.unitList='';//标准单位
+                    this.convertUnitList='';//转换单位
                     this.showform=true;
                 },
                 edit:function(model){//编辑
@@ -473,8 +479,7 @@
                     this.specList=model.specName+','+model.specId;//规格
                     this.unitList=model.unitName+','+model.unitId;//标准单位
                     this.convertUnitList=model.convertUnitName+','+model.convertUnitId;//转换单位
-                    this.materReadonly=true;
-//                    this.showform=false;
+                    this.openForm();
                 },
                 save:function(){
 					if(this.m.id) C.systemButton('scmMaterial/modify',this.m,['编辑成功','编辑失败']);
