@@ -23,6 +23,7 @@
                                 <label class="col-md-4 control-label">一级分类</label>
                                 <div class="col-md-3">
                                     <select class="bs-select form-control" name="categoryOneId" v-model="m.categoryOneId">
+                                        <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="categoryOnes in categoryOne" value="{{categoryOnes.id}} ">
                                             {{categoryOnes.categoryName}}
                                         </option>
@@ -33,6 +34,7 @@
                                 <label class="col-md-4 control-label">二级分类</label>
                                 <div class="col-md-3">
                                     <select name="categoryTwoId" v-model="parameter.parentId" class="bs-select form-control" >
+                                        <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="categoryTwos in categoryTwo" value="{{categoryTwos.id}}" v-if="m.categoryOneId == categoryTwos.parentId">
                                             {{categoryTwos.categoryName}}
                                         </option>
@@ -42,7 +44,7 @@
                             <div class="form-group row" >
                             <label class="col-md-4 control-label">排序</label>
                             <div class="col-md-3">
-                                <input type="text" class="form-control" name="sort" v-model="parameter.sort"  required="required">
+                                <input type="number" class="form-control" name="sort" v-model="parameter.sort"  required="required">
                             </div>
                             </div>
                             <div class="form-group row" >
@@ -96,7 +98,6 @@
                                 <td>{{finds.sort}}</td>
                                 <td>{{finds.keyword}}</td>
                                 <td>{{finds.categoryDesc}}</td>
-                                <td></td>
                                 <%--<td><button class="btn btn-xs btn-primary" style="margin-right:10px;">编辑</button><button class="btn btn-xs btn-danger">删除</button></td>--%>
                             </tr>
                             </tbody>
