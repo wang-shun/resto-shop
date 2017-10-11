@@ -439,6 +439,8 @@
 						description :model.description,
 						minMeasureUnit:model.minMeasureUnit,
 						coefficient:model.coefficient,
+                        measureUnit:model.measureUnit,//规格的核算单位值
+                        rate:model.rate,//转换率
                     };
                     this.provinceNameList=model.provinceName+','+model.provinceId;//绑定省
                     this.cityNameList=model.cityName+','+model.cityId;//绑定市
