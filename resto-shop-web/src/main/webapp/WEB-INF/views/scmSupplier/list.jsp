@@ -243,7 +243,7 @@
                         note:'',//备注
                         bankName: "",
                         bankAccount: "",
-                        version: "",
+                        version: "1",
                         topContact: "",
                         topMobile: "",
                         topEmail: "",
@@ -259,7 +259,9 @@
                     });
                     this.parameter.materialTypes=model.materialIds.split(',');
                     this.showform=true;
-                    $('#supplierContacts div').removeClass('radio');
+                    setTimeout(function () {
+                        $('#supplierContacts div').removeClass('radio');
+                    },200)
                 },
                 save:function(){//提交
                     var _this=this;

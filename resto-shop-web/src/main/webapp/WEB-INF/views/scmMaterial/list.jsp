@@ -28,7 +28,7 @@
 								</div>
 								<label class="col-md-2 control-label">一级类别</label>
 								<div class="col-md-3">
-									<select name="categoryOneId" v-model="m.categoryOneId" class="bs-select form-control" >
+									<select name="categoryOneId" v-model="m.categoryOneId" class="bs-select form-control" @change="categoryOneIdCh" >
 										<option disabled selected value>请选择</option>
 										<option  v-for="categoryOne in categoryOnes" value="{{categoryOne.id}}">
 											{{categoryOne.categoryName}}
@@ -39,7 +39,7 @@
 							<div class="form-group row" >
 								<label class="col-md-2 control-label">二级类别</label>
 								<div class="col-md-3">
-									<select name="categoryTwoId" v-model="m.categoryTwoId" class="bs-select form-control" >
+									<select name="categoryTwoId" v-model="m.categoryTwoId" class="bs-select form-control" @change="categoryTwoIdCh">
 										<option disabled selected value>请选择</option>
 										<option  v-for="categoryTwo in categoryTwos" value="{{categoryTwo.id}}" v-if="m.categoryOneId == categoryTwo.parentId">
 											{{categoryTwo.categoryName}}
@@ -138,7 +138,7 @@
 								<input type="hidden" name="provinceName" v-model="m.provinceName" />
 								<input type="hidden" name="provinceId" v-model="m.provinceId" />
 								<div class="col-md-3">
-									<select  v-model="provinceNameList" class="bs-select form-control" >
+									<select  v-model="provinceNameList" class="bs-select form-control" @change="provinceNameListCh">
 										<option disabled selected value>请选择</option>
 										<option  v-for="province in provinceNameLists" value="{{[province.provinceName,province.id]}}">
 											{{province.provinceName}}
@@ -150,7 +150,7 @@
 								<input type="hidden" name="cityName" v-model="m.cityName" />
 								<input type="hidden" name="cityId" v-model="m.cityId" />
 								<div class="col-md-3">
-									<select  v-model="cityNameList" class="bs-select form-control" >
+									<select  v-model="cityNameList" class="bs-select form-control" @change="cityNameListCh">
 										<option disabled selected value>请选择</option>
 										<option  v-for="city in cityNameLists" value="{{[city.cityName,city.id]}}" v-if="city.provinceId == provinceNameList.split(',')[1]">
 											{{city.cityName}}
@@ -215,7 +215,6 @@
                     title : "类型",
                     data : "materialType",
                     createdCell:function (td,tdData) {
-                        console.log(tdData);
                         switch (tdData){
 							case 'INGREDIENTS':tdData='主料';break;
                             case 'ACCESSORIES':tdData='辅料';break;
@@ -360,14 +359,10 @@
                 },
             },
             watch:{ //监控事件
-                m:function (a,b) {//监控m
-                    //m.categoryTwoId=a.categoryOneId;
-                },
                 provinceNameList:function (a,b) {//监控省
                     var provinces=a.split(',');
                     this.m.provinceName=provinces[0];
                     this.m.provinceId=parseInt(provinces[1]);
-                    console.log(this.m);
                 },
                 cityNameList:function (a,b) {//监控市
                     var provinces=a.split(',')
@@ -397,6 +392,20 @@
                 },
             },
             methods:{
+                categoryOneIdCh:function () {//点击监控一级类别
+                    this.m.categoryTwoId='';
+                    this.m.categoryThirdId='';
+                },
+                categoryTwoIdCh:function () {//点击监控二级类别
+                    this.m.categoryThirdId='';
+                },
+                provinceNameListCh:function () {//点击监控省份
+                    this.cityNameList='';
+                    this.districtNameList='';
+                },
+                cityNameListCh:function () {//点击监控省份
+                    this.districtNameList='';
+                },
                 com:function () { //计算系数
                     var Mcoefficient=0;
                     Mcoefficient=parseFloat(this.m.measureUnit)*parseFloat(this.m.rate)/parseFloat(this.m.minMeasureUnit);
@@ -405,10 +414,6 @@
                         this.coefficients=Mcoefficient;
                     }
                 },
-//                closeForm:function(){
-//                    this.materReadonly=true;
-//                    this.showform=false;
-//                },
                 create:function(){//新增
                     this.materReadonly=false;
                     this.m={

@@ -80,7 +80,7 @@
                                 </tr></thead>
                                 <tbody>
                                 <tr v-for="(index,item) in parameter.bomDetailDoList">
-                                    <td>{{index+1}}</td><td>{{item.materialCode}}</td><td v-text="((((item.materialType=='INGREDIENTS')?'主料':item.materialType)=='ACCESSORIES')?'辅料':'其他')"></td><td>{{item.materialName}}{{item.name}}</td><td>{{item.minMeasureUnit}}/{{item.unitName}}</td>
+                                    <td>{{index+1}}</td><td>{{item.materialCode}}</td><td v-text="((((item.materialType=='INGREDIENTS')?'主料':item.materialType)=='ACCESSORIES')?'辅料':'其他')"></td><td>{{item.materialName}}{{item.name}}</td><td>{{item.minMeasureUnit}}{{item.unitName}}/{{item.specName}}</td>
                                     <td><input type="text" v-model="item.materialCount" value="{{(item.materialCount?item.materialCount:1)}}" ></td><td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>
@@ -266,6 +266,7 @@
                 changeType1: function (ele) {
                     this.parameter.productCategory = $(ele.target).find("option:selected").text();
                     this.parameter.articleFamilyId = ele.target.value;
+
                 },
                 changeType2: function (ele) {
                     console.log(this.productNameArr);
@@ -284,6 +285,7 @@
                         bomDetailDeleteIds:[],//删除的list节点
                         bomCode:'',
                         productCode:'',
+                        priority:'1',
                         measurementUnit:'',
                         articleFamilyId:'',
                         articleId:'',
@@ -297,12 +299,15 @@
                 },
                 edit:function(model){ //编辑打开弹窗
                     var that=this;
+                    var articleIdZhi=model.articleId;
                     this.parameter= model;
                     this.parameter.bomDetailDeleteIds=[];
                     this.showform=true;
+                    this.parameter.articleId='';
                     setTimeout(function () {
                         that.tableBodyListsShow=false;
-                    },200);
+                        that.parameter.articleId=articleIdZhi;
+                    },100);
                 },
                 save:function(e){ //新增and编辑保存
                     var _this=this;
@@ -359,13 +364,17 @@
                 bomRawMaterialSub:function () { //添加原料保存
                     var originaldata=$('#assignTree').jstrestwo().get_bottom_checked(true);//拿到树状图中的数组
                     for(var i=0;i<originaldata.length;i++){
-                        this.bomRawMaterial[i]= originaldata[i].original;
+                        if(originaldata[i].original.materialType){
+                            this.bomRawMaterial[i]= originaldata[i].original;
+                        }
+
                     }
                     for(var i=0;i<this.bomRawMaterial.length;i++){
                         this.bomRawMaterial[i].materialId=this.bomRawMaterial[i].id;
                         delete this.bomRawMaterial[i].id;
                     }
                     this.parameter.bomDetailDoList.push.apply(this.parameter.bomDetailDoList,this.bomRawMaterial);//合并数组
+
                     this.treeView=false;
                     $('#assignTree').jstrestwo('deselect_all');//关闭所有选中状态
                 },

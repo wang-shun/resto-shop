@@ -392,7 +392,9 @@
                 bomRawMaterialSub:function () { //添加原材料保存
                     var originaldata=$('#assignTree').jstrestwo().get_bottom_checked(true);//拿到树状图中的数组
                     for(var i=0;i<originaldata.length;i++){
-                        this.bomRawMaterial[i]= originaldata[i].original;
+                        if(originaldata[i].original.materialType){
+                            this.bomRawMaterial[i]= originaldata[i].original;
+                        }
                     }
                     this.parameter.mdSupplierPriceDetailDoList.push.apply(this.parameter.mdSupplierPriceDetailDoList,this.bomRawMaterial);//合并数组
                     this.treeView=false;
@@ -421,9 +423,10 @@
                             _this.showform=false;
                         },
                         success:function(data){ //成功后返回
-                            console.log(data);
+                            C.systemButtonNo('success','成功');
                         },
                         error: function(){ //失败后执行
+                            C.systemButtonNo('error','失败');
                         }
                     });
                 },
