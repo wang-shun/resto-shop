@@ -360,6 +360,9 @@
                 },
             },
             watch:{ //监控事件
+                m:function (a,b) {//监控m
+                    //m.categoryTwoId=a.categoryOneId;
+                },
                 provinceNameList:function (a,b) {//监控省
                     var provinces=a.split(',');
                     this.m.provinceName=provinces[0];
@@ -402,17 +405,39 @@
                         this.coefficients=Mcoefficient;
                     }
                 },
-                closeForm:function(){ //新增
-                    this.materReadonly=true;
-                    this.m={};
-                    this.showform=false;
-                },
-                create:function(){//编辑
+//                closeForm:function(){
+//                    this.materReadonly=true;
+//                    this.showform=false;
+//                },
+                create:function(){//新增
                     this.materReadonly=false;
-                    this.m={};
+                    this.m={
+                        materialType: '',
+                        categoryOneId :'',
+                        categoryTwoId :'',
+                        categoryThirdId :'',
+                        materialName :'',
+                        materialCode :'',
+                        specId:'',//规格
+                        specName:'',//规格
+                        priority:'',
+                        unitId:'',//标准单位
+                        unitName:'',//标准单位
+                        convertUnitId :'',//转换单位
+                        convertUnitName:'',//转换单位
+                        minConvertUnitId  :'',
+                        provinceId :'',//省id
+                        provinceName :'',//省名
+                        cityId:'',//市id
+                        cityName:'',//市id
+                        districtId :'',
+                        description :'',
+                        minMeasureUnit:'',
+                        coefficient:'',
+                    };
                     this.showform=true;
                 },
-                edit:function(model){
+                edit:function(model){//编辑
                     this.m= model;
                     this.m={
                         id:model.id,
@@ -448,8 +473,8 @@
                     this.specList=model.specName+','+model.specId;//规格
                     this.unitList=model.unitName+','+model.unitId;//标准单位
                     this.convertUnitList=model.convertUnitName+','+model.convertUnitId;//转换单位
-                    this.openForm();
-                    debugger
+                    this.materReadonly=true;
+//                    this.showform=false;
                 },
                 save:function(){
 					if(this.m.id) C.systemButton('scmMaterial/modify',this.m,['编辑成功','编辑失败']);
@@ -460,7 +485,6 @@
             ready:function () { //钩子函数
                 var that = this;
                 $.post("scmUnit/list_type?type=1", null, function (data) {
-                    debugger
                     that.unitLists = data.data;
                     that.convertUnitLists = data.data;
                 });
