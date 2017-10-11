@@ -335,7 +335,7 @@
                 materReadonly:false,//编码
 
                 m:{
-                    materialType: 'INGREDIENTS',
+                    materialType: '',
                     categoryOneId :'',
                     categoryTwoId :'',
                     categoryThirdId :'',
@@ -416,30 +416,38 @@
                     this.m= model;
                     this.m={
                         id:model.id,
-                        materialType: 'INGREDIENTS',
-                            categoryOneId :model.categoryOneId,
-                            categoryTwoId :model.categoryTwoId,
-                            categoryThirdId :model.categoryThirdId,
-                            materialName :model.materialName,
-                            materialCode :model.materialCode,
-                            specId:model.specId,//规格
-                            specName:model.specName,//规格
-                            priority:model.priority,
-                            unitId:model.unitId,//标准单位
-                            unitName:model.unitName,//标准单位
-                            convertUnitId :model.convertUnitId,//转换单位
-                            convertUnitName:model.convertUnitName,//转换单位
-                            minConvertUnitId:model.minConvertUnitId,
-                            provinceId :model.provinceId,//省id
-                            provinceName :model.provinceName,//省名
-                            cityId:model.cityId,//市id
-                            cityName:model.cityName,//市id
-                            districtId :model.districtId,
-                            description :model.description,
-                            minMeasureUnit:model.minMeasureUnit,
-                            coefficient:model.coefficient,
-                    },
+                        materialType: model.materialType,
+						categoryOneId :model.categoryOneId,
+						categoryTwoId :model.categoryTwoId,
+						categoryThirdId :model.categoryThirdId,
+						materialName :model.materialName,
+						materialCode :model.materialCode,
+						specId:model.specId,//规格
+						specName:model.specName,//规格
+						priority:model.priority,
+						unitId:model.unitId,//标准单位
+						unitName:model.unitName,//标准单位
+						convertUnitId :model.convertUnitId,//转换单位
+						convertUnitName:model.convertUnitName,//转换单位
+						minConvertUnitId:model.minConvertUnitId,
+						provinceId :model.provinceId,//省id
+						provinceName:model.provinceName,//省名
+						cityId:model.cityId,//市id
+						cityName:model.cityName,//市id
+						districtId :model.districtId,//市id
+                        districtName:model.districtName,//区
+						description :model.description,
+						minMeasureUnit:model.minMeasureUnit,
+						coefficient:model.coefficient,
+                    };
+                    this.provinceNameList=model.provinceName+','+model.provinceId;//绑定省
+                    this.cityNameList=model.cityName+','+model.cityId;//绑定市
+                    this.districtNameList=model.districtName+','+model.districtId;//绑定区
+                    this.specList=model.specName+','+model.specId;//规格
+                    this.unitList=model.unitName+','+model.unitId;//标准单位
+                    this.convertUnitList=model.convertUnitName+','+model.convertUnitId;//转换单位
                     this.openForm();
+                    debugger
                 },
                 save:function(){
 					if(this.m.id) C.systemButton('scmMaterial/modify',this.m,['编辑成功','编辑失败']);
@@ -450,55 +458,35 @@
             ready:function () { //钩子函数
                 var that = this;
                 $.post("scmUnit/list_type?type=1", null, function (data) {
-                    that.unitLists = data.data
-                    that.convertUnitLists = data.data
-//                    if(!that.m.unitId ) {
-//                        that.m.unitId = data.data[0].id;
-//                    }
-//                    if(that.m.convertUnitId){
-//                        that.m.convertUnitId = data.data[0].id;
-//                    }
+                    debugger
+                    that.unitLists = data.data;
+                    that.convertUnitLists = data.data;
                 });
 
                 $.post("scmUnit/list_type?type=2", null, function (data) {
                     that.specLists = data.data;
-//                    if(!that.m.specId) {
-//                        that.m.specId = data.data[0].id;
-//                    }
                 });
                 $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=1", null, function (data) {
                     that.categoryOnes = data.data;
-//                    if(!that.m.categoryOneId){
-//                        that.m.categoryOneId= data.data[0].id;
-//                    }
                 });
                 $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=2", null, function (data) {
                     that.categoryTwos = data.data;
-//                    if(!that.m.categoryTwoId){
-//                        that.m.categoryTwoId= data.data[0].id;
-//                    }
                 });
 
                 $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=3", null, function (data) {
                     that.categoryThirds = data.data;
-//                    if(!that.m.categoryThirdId){
-//                        that.m.categoryThirdId = data.data[0].id;
-//                    }
                 });
 
                 $.post("province/list_province", null, function (data) {
                     that.provinceNameLists = data;
-                    //that.m.provinceId = data[0].id;
                 });
 
                 $.post("province/list_city", null, function (data) {
                     that.cityNameLists = data;
-                    //that.m.cityId= data[0].id;
                 });
 
                 $.post("province/list_district", null, function (data) {
                     that.districtNameLists = data;
-                    //that.m.districtId = data[0].id;
                 });
             },
 
