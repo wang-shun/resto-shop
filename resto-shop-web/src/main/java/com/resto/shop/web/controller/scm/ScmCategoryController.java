@@ -80,7 +80,6 @@ public class ScmCategoryController extends GenericController {
             Assertion.isPositive(mdCategory.getParentId(),"父类id不能为空");
             Assertion.isPositive(mdCategory.getCategoryHierarchy(),"层级id不能为空");
             Assertion.isPositive(mdCategory.getSort(),"排序不能为空");
-            Assertion.notEmpty(mdCategory.getCategoryDesc(),"分类备注不能为空");
 
             mdCategory.setShopDetailId(this.getCurrentShopId());
             mdCategory.setBrandId(this.getCurrentBrandId());
