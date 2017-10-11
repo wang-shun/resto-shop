@@ -43,13 +43,10 @@
 
                             <div class="form-group row" >
                                 <label class="col-md-2 control-label">菜品编码</label>
-                                <div class="col-md-3">
-                                    <label class="col-md-2 control-label"> {{parameter.articleId}}</label>
+                                <div class="col-md-8">
+                                {{parameter.articleId}}
                                 </div>
-                                    <label class="col-md-2 control-label">计量单位</label>
-                                    <div class="col-md-3">
-                                        <input type="text" class="form-control" name="materialName" v-model="parameter.measurementUnit" required="required">
-                                    </div>
+
                             </div>
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">版本号</label>
@@ -68,6 +65,10 @@
                                 <div class="col-md-3">
                                     <input class="btn btn-default" type="button" value="添加原料" @click="closeTreeView"/>
                                 </div>
+                                <label class="col-md-2 control-label">计量单位</label>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" name="materialName" v-model="parameter.measurementUnit" required="required">
+                                </div>
                             </div>
                         </div>
                         <div style="max-height: 300px;overflow: auto;">
@@ -79,7 +80,7 @@
                                 </tr></thead>
                                 <tbody>
                                 <tr v-for="(index,item) in parameter.bomDetailDoList">
-                                    <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.materialType}}</td><td>{{item.materialName}}{{item.name}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
+                                    <td>{{index+1}}</td><td>{{item.materialCode}}</td><td v-text="((((item.materialType=='INGREDIENTS')?'主料':item.materialType)=='ACCESSORIES')?'辅料':'其他')"></td><td>{{item.materialName}}{{item.name}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
                                     <td><input type="text" v-model="item.materialCount" value="{{(item.materialCount?item.materialCount:1)}}" ></td><td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>
@@ -101,8 +102,8 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
-                    <div class="modal-body" style="display: none;">
-                        <input type="input" class="form-control" id="input-check-node" placeholder="请输入原材料名称" value="">
+                    <div class="modal-body">
+                        <input type="input" class="form-control" id="search_ay" placeholder="请输入原材料名称">
                     </div>
                     <div id="assignTree" style="height: 500px;overflow: auto;"></div>
                     <div id="treeview-checkable" class="" style="height: 500px;overflow: auto;display: none"></div>
@@ -285,7 +286,6 @@
                     this.showform=true;
                 },
                 save:function(e){ //新增and编辑保存
-                    debugger
                     var _this=this;
                     var savearr=[];
                     for(var i=0;i<_this.parameter.bomDetailDoList.length;i++){
@@ -338,8 +338,8 @@
                         delete this.bomRawMaterial[i].id;
                     }
                     this.parameter.bomDetailDoList.push.apply(this.parameter.bomDetailDoList,this.bomRawMaterial);//合并数组
-                    console.log(this.parameter.bomDetailDoList);
                     this.treeView=false;
+                    $('#assignTree').jstrestwo('deselect_all');//关闭所有选中状态
                 },
                 closeTreeView:function () { //添加原料打开
                     this.treeView=true;
@@ -399,17 +399,22 @@
                 }
             }
             $('#assignTree').jstrestwo(
-                {'plugins':["wholerow","checkbox"],
+                {'plugins':["wholerow","checkbox","search"],
                     'core' :{
                         'data':defaultData
                     }
                 }
             );
-            $('#assignTree').on("changed.jstrestwo",function(e,data){
+            //输入框输入定时自动搜索
+            var to = false;
+            $('#search_ay').keyup(function () {
+                if(to) {
+                    clearTimeout(to);
+                }
+                to = setTimeout(function () {
+                    $('#assignTree').jstrestwo(true).search($('#search_ay').val());
 
-            });
-            $("#assignTree").on("ready.jstrestwo",function(e,data){
-
+                }, 250);
             });
         })
     }());

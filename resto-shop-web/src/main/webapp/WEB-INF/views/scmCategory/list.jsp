@@ -12,7 +12,6 @@
                     </div>
                 </div>
                 <div class="portlet-body">
-                    <%--<form role="form" class="form-horizontal"  action="scmCategory/create" @submit.prevent="save" style="text-align:center">--%>
                         <div class="form-body">
                             <div class="form-group row" >
                                 <label class="col-md-4 control-label">分类名称</label>
@@ -63,7 +62,6 @@
                             <input class="btn green"  type="submit" @click="save"  value="提交"/>&nbsp;&nbsp;&nbsp;
                             <a class="btn default" @click="detailsCl">取消</a>
                         </div>
-                    <%--</form>--%>
                 </div>
             </div>
         </div>

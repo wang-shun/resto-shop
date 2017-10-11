@@ -14,7 +14,6 @@
 					</div>
 				</div>
 				<div class="portlet-body">
-					<%--<form role="form" class="form-horizontal" action="{{m.id?'scmMaterial/modify':'scmMaterial/create'}}" @submit.prevent="save">--%>
 						<input type="hidden" name="id" v-model="m.id" />
 						<div class="form-body">
 							<div class="form-group row">
@@ -180,12 +179,9 @@
 							</div>
 						</div>
 						<div class="form-group text-center">
-							<%--<input class="btn green"  type="submit"  value="保存"/>--%>
 							<button class="btn green"  @click="save">保存</button>
-							<%--&nbsp;&nbsp;&nbsp;--%>
 							<a class="btn default" @click="cancel" >取消</a>
 						</div>
-					<%--</form>--%>
 				</div>
 			</div>
 		</div>
@@ -261,22 +257,6 @@
                         $(td).html(rowData.measureUnit+rowData.unitName+'/'+rowData.specName);
                     }
                 },
-//                {
-//                    title : "规格",
-//                    data : "specName",
-//
-//                },
-//                {
-//                    title : "规格核算单位",
-//                    data : "measureUnit",
-//                },
-//
-//                {
-//                    title : "核算单位",
-//                    data : "unitName",
-//                },
-
-
                 {
                     title : "转化率",
                     data : "rate",

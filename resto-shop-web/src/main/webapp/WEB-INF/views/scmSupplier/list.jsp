@@ -214,6 +214,7 @@
                     this.parameter.supContactIds.push(data.id);
                 },
                 supplierContactsRadio:function(item){ //供应商联系默认值
+                    $('#supplierContacts div').removeClass('radio');
                     this.parameter.supplierContacts.forEach(function(element) {
                         element.isTop='1';
                     });
