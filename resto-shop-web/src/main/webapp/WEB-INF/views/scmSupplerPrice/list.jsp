@@ -178,16 +178,15 @@
                                 <th>规格</th>
                                 <th>产地</th>
                                 <th>单价</th>
-
                             </tr>
                             </thead>
                             <tbody>
                             <tr v-for="item in detailsArr.mdSupplierPriceDetailDoList">
-                                <td v-text="((((item.materialType=='INGREDIENTS')?'主料':item.materialType)=='ACCESSORIES')?'辅料':'其他')"></td>
+                                <td>{{item.materialType}}</td>
                                 <td>{{item.categoryOneName}}</td>
                                 <td>{{item.categoryTwoName}}</td>
                                 <td>{{item.categoryThirdName}}</td>
-                                <td>{{item.name}}</td>
+                                <td>{{item.materialName}}</td>
                                 <td>{{item.materialCode}}</td>
                                 <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                 <td>{{item.provinceName+item.cityName+item.districtName}}</td>
@@ -283,6 +282,16 @@
                 {
                     title : "状态",
                     data : "supStatus",
+                    createdCell:function(td,tdData,rowData){
+                        switch(tdData){
+                            case '11':tdData='待审核';break;
+                            case '12':tdData='审核通过';break;
+                            case '13':tdData='已驳回';break;
+                            case '14':tdData='审核失败';break;
+                            case '15':tdData='已失效';break;
+                        }
+                        $(td).html(tdData);
+                    }
                 },
                 {
                     title : "操作",
@@ -329,9 +338,7 @@
                     contactId:4,//联系人id
                     remark:'',//备注
                     priceName:'',//报价单名称
-                    mdSupplierPriceDetailDoList:[
-
-                    ],
+                    mdSupplierPriceDetailDoList:[],
 
                 }
             },
@@ -363,6 +370,13 @@
                 showDetails:function (data) { //查看详情
                     this.details=true;
                     this.detailsArr=data;
+                    for(var i=0;i<this.detailsArr.mdSupplierPriceDetailDoList.length;i++){
+                        switch(this.detailsArr.mdSupplierPriceDetailDoList[i].materialType){
+                            case 'INGREDIENTS':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='主料';break;
+                            case 'ACCESSORIES':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='辅料';break;
+                            case 'SEASONING':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='其他';break;
+                        }
+                    }
                     this.detailsBtn=true;
                 },
                 detailsCli:function () { //关闭查看详情
@@ -383,7 +397,6 @@
                     this.parameter.mdSupplierPriceDetailDoList.push.apply(this.parameter.mdSupplierPriceDetailDoList,this.bomRawMaterial);//合并数组
                     this.treeView=false;
                     $('#assignTree').jstrestwo('deselect_all');//关闭所有选中状态
-                    // this.parameter.mdSupplierPriceDetailDoList.push.apply(this.parameter.mdSupplierPriceDetailDoList,this.bomRawMaterial);//合并数组
                 },
                 save:function(e){
                     var _this=this;
@@ -413,12 +426,6 @@
                         error: function(){ //失败后执行
                         }
                     });
-//                    var that = this;
-//                    var formDom = e.target;
-//                    C.ajaxFormEx(formDom,function(){
-//                        that.cancel();
-//                        tb.ajax.reload();
-//                    });
                 },
             },
             ready:function(){//钩子函数加载后
