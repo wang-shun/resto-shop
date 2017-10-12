@@ -76,7 +76,8 @@
                             <table class="table table-bordered">
                                 <thead><tr>
                                     <th>类型</th><th>一级类别</th><th>二级类别</th>
-                                    <th>品牌名</th><th>材料名</th><th>编码</th>
+                                    <th>品牌名</th><th>材料名</th>
+                                    <%--<th>编码</th>--%>
                                     <th>规格</th><th>产地</th><th>单价</th><th>操作</th>
                                 </tr></thead>
                                 <tbody>
@@ -87,10 +88,10 @@
                                     <td>{{item.categoryTwoName}}</td>
                                     <td>{{item.categoryThirdName}}</td>
                                     <td>{{item.name}}{{item.materialName}}</td>
-                                    <td>{{item.materialCode}}</td>
+                                    <%--<td>{{item.materialCode}}</td>--%>
                                     <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                     <td>{{item.provinceName+item.cityName+item.districtName}}</td>
-                                    <td><input type="text" v-model="item.purchasePrice"></td>
+                                    <td><input style="width: 50px;" type="text" v-model="item.purchasePrice"></td>
                                     <td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>
@@ -116,7 +117,7 @@
                     <div class="modal-body">
                         <input type="input" class="form-control" id="search_ay" placeholder="请输入原材料名称">
                     </div>
-                    <div id="assignTree" style="height: 500px;overflow: auto;"></div>
+                    <div id="assignTree" style="height: 300px;overflow: auto;"></div>
                     <div id="treeview-checkable" class="" style="height: 500px;overflow: auto;display: none"></div>
                 </div>
             </div>
@@ -132,6 +133,7 @@
         <div class="col-md-offset-3 col-md-6" style="background: #FFF;">
             <div class="text-center" style="padding: 20px 0">
                 <span class="caption-subject bold font-blue-hoki">查看详情</span>
+                <button type="button" class="close" @click="closeThis"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -230,7 +232,6 @@
 <script src="assets/treeview/js/jstrestwo.js"></script>
 <script>
     (function(){
-        var cid="#control";
         var $table = $(".table-body>table");
 
         var tb = $table.DataTable({
@@ -238,6 +239,7 @@
                 url : "scmSupplerPrice/list_all",
                 dataSrc : "data"
             },
+            ordering: false,//取消上下排序
             columns : [
                 {
                     title : "报价单号",
@@ -343,6 +345,9 @@
                 }
             },
             methods:{
+                closeThis:function () {//关闭审核
+                    this.details=false;
+                },
                 closeForm:function(){ //关闭新增弹窗
                     this.showform=false;
                 },
@@ -390,13 +395,21 @@
                     this.parameter.mdSupplierPriceDetailDoList.$remove(mealItem);
                 },
                 bomRawMaterialSub:function () { //添加原材料保存
+                    debugger
                     var originaldata=$('#assignTree').jstrestwo().get_bottom_checked(true);//拿到树状图中的数组
                     for(var i=0;i<originaldata.length;i++){
                         if(originaldata[i].original.materialType){
-                            this.bomRawMaterial[i]= originaldata[i].original;
+                            this.bomRawMaterial.push(originaldata[i].original);
                         }
                     }
                     this.parameter.mdSupplierPriceDetailDoList.push.apply(this.parameter.mdSupplierPriceDetailDoList,this.bomRawMaterial);//合并数组
+                    for(var i=0;i<this.parameter.mdSupplierPriceDetailDoList.length;i++){
+                        switch(this.parameter.mdSupplierPriceDetailDoList[i].materialType){
+                            case 'INGREDIENTS':this.parameter.mdSupplierPriceDetailDoList[i].materialType='主料';break;
+                            case 'ACCESSORIES':this.parameter.mdSupplierPriceDetailDoList[i].materialType='辅料';break;
+                            default:this.parameter.mdSupplierPriceDetailDoList[i].materialType='其他';break;
+                        }
+                    }
                     this.treeView=false;
                     $('#assignTree').jstrestwo('deselect_all');//关闭所有选中状态
                 },

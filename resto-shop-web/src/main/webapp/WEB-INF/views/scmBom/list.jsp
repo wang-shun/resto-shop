@@ -105,7 +105,7 @@
                     <div class="modal-body">
                         <input type="input" class="form-control" id="search_ay" placeholder="请输入原材料名称">
                     </div>
-                    <div id="assignTree" style="height: 500px;overflow: auto;"></div>
+                    <div id="assignTree" style="height: 300px;overflow: auto;"></div>
                     <div id="treeview-checkable" class="" style="height: 500px;overflow: auto;display: none"></div>
                 </div>
                 <div class="col-md-6" style="display: none;">
@@ -168,6 +168,7 @@
                     return data;
                 },
             },
+            ordering: false,//取消上下排序
             columns : [
                 {
                     data : "bomDetailDoList",
@@ -365,7 +366,7 @@
                     var originaldata=$('#assignTree').jstrestwo().get_bottom_checked(true);//拿到树状图中的数组
                     for(var i=0;i<originaldata.length;i++){
                         if(originaldata[i].original.materialType){
-                            this.bomRawMaterial[i]= originaldata[i].original;
+                            this.bomRawMaterial.push(originaldata[i].original);
                         }
 
                     }
@@ -374,7 +375,13 @@
                         delete this.bomRawMaterial[i].id;
                     }
                     this.parameter.bomDetailDoList.push.apply(this.parameter.bomDetailDoList,this.bomRawMaterial);//合并数组
-
+                    for(var i=0;i<this.parameter.bomDetailDoList.length;i++){
+                        switch(this.parameter.bomDetailDoList[i].materialType){
+                            case 'INGREDIENTS':this.parameter.bomDetailDoList[i].materialType='主料';break;
+                            case 'ACCESSORIES':this.parameter.bomDetailDoList[i].materialType='辅料';break;
+                            default:this.parameter.bomDetailDoList[i].materialType='其他';break;
+                        }
+                    }
                     this.treeView=false;
                     $('#assignTree').jstrestwo('deselect_all');//关闭所有选中状态
                 },

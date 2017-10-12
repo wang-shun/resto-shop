@@ -210,6 +210,7 @@
                 url : "scmMaterial/list_all",
                 dataSrc : "data"
             },
+            ordering: false,//取消上下排序
             columns : [
                 {
                     title : "类型",
