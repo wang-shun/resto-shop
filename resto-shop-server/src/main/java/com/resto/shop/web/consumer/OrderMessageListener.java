@@ -491,13 +491,47 @@ public class OrderMessageListener implements MessageListener {
         }else{
             msg.append(money +"元红包发送给朋友/分享朋友圈，朋友到店消费后，您将获得"+shareSetting.getMinMoney()+"元-"+shareSetting.getMaxMoney()+"元红包返利\n");
         }
-        msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>立即分享红包</a>");
+        if(setting.getTemplateEdition()==0) {
+            msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId() + "'>立即分享红包</a>");
+        }
         log.info("异步发送分享好评微信通知ID:" + appraise.getId() + " 内容:" + msg);
         log.info("ddddd-"+customer.getWechatId()+"dddd-"+config.getAppid()+"dddd-"+config.getAppsecret());
         ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
-        WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-        //logBaseService.insertLogBaseInfoState(shopDetail, customer, appraise.getId(), LogBaseState.SHARE);
-        log.info("分享完毕:" );
+        if(setting.getTemplateEdition()==0){
+            WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+            //logBaseService.insertLogBaseInfoState(shopDetail, customer, appraise.getId(), LogBaseState.SHARE);
+            log.info("分享完毕:" );
+        }else{
+            List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
+            String templateId = templateFlowList.get(0).getTemplateId();
+            Order order=orderService.selectById(appraise.getOrderId());
+            String jumpUrl =setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId();
+            Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+            Map<String, Object> first = new HashMap<String, Object>();
+            first.put("value", msg.toString());
+            first.put("color", "#00DB00");
+            Map<String, Object> keyword1 = new HashMap<String, Object>();
+            keyword1.put("value", order.getSerialNumber());
+            keyword1.put("color", "#000000");
+            Map<String, Object> keyword2 = new HashMap<String, Object>();
+            keyword2.put("value", msg.toString());
+            keyword2.put("color", "#000000");
+            Map<String, Object> remark = new HashMap<String, Object>();
+            remark.put("value", "立即分享红包");
+            remark.put("color", "#173177");
+            content.put("first", first);
+            content.put("keyword1", keyword1);
+            content.put("keyword2", keyword2);
+            content.put("remark", remark);
+            String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+            Brand brand = brandService.selectById(order.getBrandId());
+            Map map = new HashMap(4);
+            map.put("brandName", brand.getBrandName());
+            map.put("fileName", customer.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(LogUtils.url, map);
+        }
     }
 
     private Action executeChangeProductionState(Message message) throws UnsupportedEncodingException {
