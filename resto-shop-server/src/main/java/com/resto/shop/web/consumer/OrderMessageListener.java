@@ -525,6 +525,7 @@ public class OrderMessageListener implements MessageListener {
             content.put("keyword2", keyword2);
             content.put("remark", remark);
             String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+            log.info("result:---------------->"+result);
             Brand brand = brandService.selectById(order.getBrandId());
             Map map = new HashMap(4);
             map.put("brandName", brand.getBrandName());
