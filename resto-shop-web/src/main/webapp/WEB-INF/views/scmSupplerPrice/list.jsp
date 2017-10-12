@@ -93,7 +93,7 @@
                                     <%--<td>{{item.materialCode}}</td>--%>
                                     <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                     <td>{{item.provinceName+item.cityName+item.districtName}}</td>
-                                    <td><input style="width: 50px;" type="text" v-model="item.purchasePrice"></td>
+                                    <td><input style="width: 50px;" type="number" v-model="item.purchasePrice" value="1"></td>
                                     <td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>

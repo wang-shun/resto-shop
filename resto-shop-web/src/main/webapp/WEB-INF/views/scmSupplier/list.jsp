@@ -66,7 +66,10 @@
                                     </thead>
                                     <tbody>
                                     <tr v-for="(index,item) in parameter.supplierContacts">
-                                        <td>{{index+1}}</td><td><input type="text" v-model="item.contact"></td><td><input type="text" v-model="item.mobile"></td><td><input type="text" v-model="item.email"></td>
+                                        <td>{{index+1}}</td>
+                                        <td><input style="width: 80px" type="text" v-model="item.contact"></td>
+                                        <td><input type="text" v-model="item.mobile"></td>
+                                        <td><input type="text" v-model="item.email"></td>
                                         <td><input name="isTop" type="radio" v-model="isTop" :value="item.isTop" @click="supplierContactsRadio(item)"></td>
                                         <td><span class="btn btn-xs red" @click="removeArticleItem(item)">移除</span></td>
                                     </tr>
@@ -189,6 +192,7 @@
                 ],
                 productTypes:[],//接收所有的产品分类
                 isTop:'0',//单选框绑定
+                isTopWatch:0,//移除默认联系人使用借助监控
                 parameter:{
                     supCode: "",
                     supplierType: "",
@@ -209,11 +213,19 @@
             },
             methods:{
                 addSupplierContacts:function () { //添加供应商联系资料
-                    this.parameter.supplierContacts.push({contact:'',mobile:'',email:'',isTop:'1'});
+                   if(this.parameter.supplierContacts.length==0){
+                       this.parameter.supplierContacts.push({contact:'',mobile:'',email:'',isTop:'0'});
+                   }else {
+                       this.parameter.supplierContacts.push({contact:'',mobile:'',email:'',isTop:'1'});
+                   }
                 },
                 removeArticleItem:function (data) { //移除供应商联系资料
+                    debugger
                     this.parameter.supplierContacts.$remove(data);
                     this.parameter.supContactIds.push(data.id);
+                    if(data.isTop=='0'&&this.parameter.supplierContacts.length!=0){
+                        this.isTopWatch++
+                    }
                 },
                 supplierContactsRadio:function(item){ //供应商联系默认值
                     $('#supplierContacts div').removeClass('radio');
@@ -310,8 +322,16 @@
                         }
                     });
                 }
-              
-            }
+
+            },
+            watch:{
+                isTopWatch:function () {//借助isTopWatch监控移除默认选项
+                    this.parameter.supplierContacts[0].isTop='0';
+                    var supplierContactsTwo=this.parameter.supplierContacts;
+                    this.parameter.supplierContacts=[];
+                    this.parameter.supplierContacts=supplierContactsTwo;
+                }
+            },
        });
         C.vue=vueObj;
     }());
