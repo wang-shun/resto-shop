@@ -502,6 +502,7 @@ public class OrderMessageListener implements MessageListener {
             //logBaseService.insertLogBaseInfoState(shopDetail, customer, appraise.getId(), LogBaseState.SHARE);
             log.info("分享完毕:" );
         }else{
+            log.info("进入微信模板消息...");
             List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
             String templateId = templateFlowList.get(0).getTemplateId();
             Order order=orderService.selectById(appraise.getOrderId());
