@@ -133,6 +133,7 @@ public class MQMessageProducer {
 		obj.put("id", appraise.getId());
 		obj.put("customerId", appraise.getCustomerId());
 		obj.put("shopDetailId", appraise.getShopDetailId());
+		obj.put("orderId", appraise.getOrderId());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SHOW_ORDER,obj.toJSONString().getBytes());
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
