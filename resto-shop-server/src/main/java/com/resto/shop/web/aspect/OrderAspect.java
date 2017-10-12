@@ -256,7 +256,7 @@ public class OrderAspect {
             }
             keyword3.put("color", "#000000");
             Map<String, Object> keyword4 = new HashMap<String, Object>();
-            keyword4.put("value", "￥" + order.getOrderState());
+            keyword4.put("value", "￥" + order.getOrderMoney());
             keyword4.put("color", "#000000");
             Map<String, Object> keyword5 = new HashMap<String, Object>();
             List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
@@ -264,7 +264,7 @@ public class OrderAspect {
             for (int i=0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                 OrderItem item = orderItem.get(i);
                 if(i == 0){
-                    msg.append(" " + item.getArticleName() + "×" + item.getCount() + "\n");
+                    msg.append("\n" + item.getArticleName() + "×" + item.getCount() + "\n");
                 }else{
                     msg.append("\t\t\t" + item.getArticleName() + "×" + item.getCount() + "\n");
                 }
@@ -813,8 +813,13 @@ public class OrderAspect {
                     keyword3.put("value", order.getTableNumber());
                 }
                 keyword3.put("color", "#000000");
+                BigDecimal sum = order.getOrderMoney();
+                List<Order> orders = orderService.selectByParentId(order.getId(), order.getPayType()); //得到子订单
+                for (Order child : orders) { //遍历子订单
+                    sum = sum.add(child.getOrderMoney());
+                }
                 Map<String, Object> keyword4 = new HashMap<String, Object>();
-                keyword4.put("value", "￥" + order.getOrderState());
+                keyword4.put("value", "￥" +sum);
                 keyword4.put("color", "#000000");
                 Map<String, Object> keyword5 = new HashMap<String, Object>();
                 List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
@@ -822,7 +827,7 @@ public class OrderAspect {
                 for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                     OrderItem item = orderItem.get(i);
                     if (i == 0) {
-                        msg.append(" " + item.getArticleName() + "×" + item.getCount() + "\n");
+                        msg.append("\n" + item.getArticleName() + "×" + item.getCount() + "\n");
                     } else {
                         msg.append("\t\t\t" + item.getArticleName() + "×" + item.getCount() + "\n");
                     }
