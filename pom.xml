@@ -38,7 +38,7 @@
 	</dependencyManagement>
 
 	<modules>
-<!-- 		<module>resto-shop-web</module> -->
+       <!--<module>resto-shop-web   测试使用</module> -->
 		<module>resto-shop-server</module>
 		<module>resto-shop-api</module>
 		
