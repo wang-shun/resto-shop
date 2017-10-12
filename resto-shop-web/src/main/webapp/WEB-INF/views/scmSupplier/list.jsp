@@ -15,7 +15,7 @@
                         <input type="hidden" name="id" v-model="parameter.id" />
                         <div class="form-body">
                             <div class="form-group row">
-                                <label class="col-md-2 control-label">供应商类型</label>
+                                <label class="col-md-2 control-label">供应商类型<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
                                 <select class="bs-select form-control" name="supplierType" v-model="parameter.supplierType">
                                     <option disabled="" selected="" value="">请选择</option>
@@ -31,21 +31,20 @@
                                 </div>
                             </div>
                             <div class="form-group row" >
-                                <label class="col-md-2 control-label">公司名</label>
+                                <label class="col-md-2 control-label">公司名<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="materialName" v-model="parameter.supName" required="required">
+                                    <input type="text" class="form-control" name="supName" v-model="parameter.supName">
                                 </div>
 
                                 <label class="col-md-2 control-label">别名</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="supAliasName" v-model="parameter.supAliasName" required="required">
+                                    <input type="text" class="form-control" name="supAliasName" v-model="parameter.supAliasName" >
                                 </div>
                             </div>
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">序号</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="version" v-model="parameter.version"
-                                           required="required">
+                                    <input type="text" class="form-control" name="version" v-model="parameter.version">
                                 </div>
                             </div>
 
@@ -61,7 +60,12 @@
                                 <table class="table table-bordered" id="supplierContacts">
                                     <thead >
                                     <tr>
-                                        <th>编号</th><th>姓名</th><th>电话</th><th>邮箱</th><th>设为默认</th><th>操作</th>
+                                        <th>编号</th>
+                                        <th>姓名<span style="color:#FF0000;">*</span></th>
+                                        <th>电话<span style="color:#FF0000;">*</span></th>
+                                        <th>邮箱</th>
+                                        <th>设为默认<span style="color:#FF0000;">*</span></th>
+                                        <th>操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -306,21 +310,41 @@
                         url='scmSupplier/create';
                         _this.parameter;
                     }
-                    $.ajax({
-                        type:"POST",
-                        url:url,
-                        contentType:"application/json",
-                        datatype: "json",
-                        data:JSON.stringify(saveObj),
-                        success:function(data){ //成功后返回
-                            C.systemButtonNo('success','成功');
-                            _this.showform=false;
-                        },
-                        error: function(){ //失败后执行
-                            C.systemButtonNo('error','失败');
-                            _this.showform=false;
+                    var submit=false;
+                    var message='';
+                    if(!this.parameter.supplierType) message='供应商类型';
+                    else if(!this.parameter.supName) message='公司名';
+                    else if(_this.parameter.supplierContacts.length<=0) message='联系人';
+                    else  submit=true;
+                    for(var i=0;i<_this.parameter.supplierContacts.length;i++) {
+                        if(!_this.parameter.supplierContacts[i].contact){
+                            submit=false;
+                            message='联系人姓名';
                         }
-                    });
+                        else if(!_this.parameter.supplierContacts[i].mobile){
+                            submit=false;
+                            message='联系人电话';
+                        }
+                    }
+                    if(submit){
+                        $.ajax({
+                            type:"POST",
+                            url:url,
+                            contentType:"application/json",
+                            datatype: "json",
+                            data:JSON.stringify(saveObj),
+                            success:function(data){ //成功后返回
+                                C.systemButtonNo('success','成功');
+                                _this.showform=false;
+                            },
+                            error: function(){ //失败后执行
+                                C.systemButtonNo('error','失败');
+                                _this.showform=false;
+                            }
+                        });
+                    }else {
+                        C.systemButtonNo('error','请填写'+message);
+                    }
                 }
 
             },

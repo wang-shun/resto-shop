@@ -17,7 +17,7 @@
 						<input type="hidden" name="id" v-model="m.id" />
 						<div class="form-body">
 							<div class="form-group row">
-								<label class="col-md-2 control-label">类型</label>
+								<label class="col-md-2 control-label">类型<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<select name="materialType" v-model="m.materialType" class="bs-select form-control" >
 										<option disabled selected value>请选择</option>
@@ -26,7 +26,7 @@
 										</option>
 									</select>
 								</div>
-								<label class="col-md-2 control-label">一级类别</label>
+								<label class="col-md-2 control-label">一级类别<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<select name="categoryOneId" v-model="m.categoryOneId" class="bs-select form-control" @change="categoryOneIdCh" >
 										<option disabled selected value>请选择</option>
@@ -37,7 +37,7 @@
 								</div>
 							</div>
 							<div class="form-group row" >
-								<label class="col-md-2 control-label">二级类别</label>
+								<label class="col-md-2 control-label">二级类别<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<select name="categoryTwoId" v-model="m.categoryTwoId" class="bs-select form-control" @change="categoryTwoIdCh">
 										<option disabled selected value>请选择</option>
@@ -46,7 +46,7 @@
 										</option>
 									</select>
 								</div>
-								<label class="col-md-2 control-label">品牌</label>
+								<label class="col-md-2 control-label">品牌<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<select name="categoryThirdId" v-model="m.categoryThirdId" class="bs-select form-control" >
 										<option disabled selected value>请选择</option>
@@ -57,7 +57,7 @@
 								</div>
 							</div>
 							<div class="form-group row">
-								<label class="col-md-2 control-label">原材料名</label>
+								<label class="col-md-2 control-label">原材料名<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="materialName" v-model="m.materialName"
 										   required="required">
@@ -70,13 +70,13 @@
 							</div>
 							<div class="form-group row">
 
-								<label class="col-md-2 control-label">序号</label>
+								<label class="col-md-2 control-label">序号<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="priority" v-model="m.priority"
 										   required="required">
 								</div>
 
-								<label class="col-md-2 control-label">库存单位</label>
+								<label class="col-md-2 control-label">库存单位<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<select name="specList" v-model="specList" class="bs-select form-control" >
 										<option disabled selected value>请选择</option>
@@ -87,12 +87,12 @@
 								</div>
 							</div>
 							<div class="form-group row">
-								<label class="col-md-2 control-label">核算规格</label>
+								<label class="col-md-2 control-label">核算规格<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="measureUnit" v-model="m.measureUnit" @change="com"
 										   required="required">
 								</div>
-								<label class="col-md-2 control-label">核算单位</label>
+								<label class="col-md-2 control-label">核算单位<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<select name="unitList" v-model="unitList" class="bs-select form-control" >
 										<option disabled selected value>请选择</option>
@@ -103,13 +103,13 @@
 								</div>
 							</div>
 							<div class="form-group row">
-								<label class="col-md-2 control-label">转化规格</label>
+								<label class="col-md-2 control-label">转化规格<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="rate" v-model="m.rate" @change="com"
 										   required="required">
 								</div>
 
-								<label class="col-md-2 control-label">转化单位</label>
+								<label class="col-md-2 control-label">转化单位<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<select name="convertUnitList" v-model="convertUnitList" class="bs-select form-control" >
 										<option disabled selected value>请选择</option>
@@ -121,7 +121,7 @@
 							</div>
 							<div class="form-group row">
 
-								<label class="col-md-2 control-label">最小单位</label>
+								<label class="col-md-2 control-label">最小单位<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
 									<input type="text" class="form-control" name="minMeasureUnit" v-model="m.minMeasureUnit"  required="required" @change="com"
 										   style="display: inline-block;text-align: center;width:70%;">
@@ -488,9 +488,29 @@
                     this.openForm();
                 },
                 save:function(){
-					if(this.m.id) C.systemButton('scmMaterial/modify',this.m,['编辑成功','编辑失败']);
-					else C.systemButton('scmMaterial/create',this.m,['新增成功','新增失败']);
-                    this.showform=false;
+                    var submit=false;
+                    var message='';
+					if(!this.m.materialType) message='类型';
+                    else if(!this.m.categoryOneId) message='一级类别';
+                    else if(!this.m.categoryTwoId) message='二级类别';
+                    else if(!this.m.categoryThirdId) message='品牌';
+                    else if(!this.m.materialName) message='原材料名';
+                    else if(!this.m.priority) message='序号';
+                    else if(!this.m.specId) message='库存单位';
+                    else if(!this.m.measureUnit) message='核算规格';
+                    else if(!this.m.unitId) message='核算单位';
+                    else if(!this.m.rate) message='转化规格';
+                    else if(!this.m.convertUnitId) message='转化单位';
+                    else if(!this.m.minMeasureUnit) message='最小单位';
+                    else  submit=true;
+                    if(submit){
+                        if(this.m.id) C.systemButton('scmMaterial/modify',this.m,['编辑成功','编辑失败']);
+                        else C.systemButton('scmMaterial/create',this.m,['新增成功','新增失败']);
+                        this.showform=false;
+					}else {
+                        C.systemButtonNo('error','请填写'+message);
+					}
+
                 }
             },
             ready:function () { //钩子函数

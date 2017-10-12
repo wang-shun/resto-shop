@@ -14,15 +14,15 @@
                 <div class="portlet-body">
                         <div class="form-body">
                             <div class="form-group row" >
-                                <label class="col-md-4 control-label">分类名称</label>
+                                <label class="col-md-4 control-label">分类名称<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
                                     <input type="text" class="form-control" name="categoryName" v-model="parameter.categoryName" required="required">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-md-4 control-label">一级分类</label>
+                                <label class="col-md-4 control-label">一级分类<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <select class="bs-select form-control" name="categoryOneId" v-model="m.categoryOneId">
+                                    <select class="bs-select form-control" name="categoryOneId" v-model="parameter.categoryOneId">
                                         <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="categoryOnes in categoryOne" value="{{categoryOnes.id}} ">
                                             {{categoryOnes.categoryName}}
@@ -31,9 +31,9 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-md-4 control-label">二级分类</label>
+                                <label class="col-md-4 control-label">二级分类<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <select name="categoryTwoId" v-model="parameter.parentId" class="bs-select form-control" >
+                                    <select name="parentId" v-model="parameter.parentId" class="bs-select form-control" >
                                         <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="categoryTwos in categoryTwo" value="{{categoryTwos.id}}" v-if="m.categoryOneId == categoryTwos.parentId">
                                             {{categoryTwos.categoryName}}
@@ -219,36 +219,41 @@
                           parentId:'',//ID
                           sort:'1',//排序
                           keyword:'',//关键词
+                          categoryOneId:'',
                           categoryDesc:"",//备注
                           categoryHierarchy:'3',
                       };
 
                     },
                     save:function(){//新增提交
-                        var that = this;
-//                        var formDom = e.target;
-//                        C.ajaxFormEx(formDom,function(){
-//                            that.cancel();
-//                            tb.ajax.reload();
-//                        });
                         var that=this;
-                        $.ajax({
-                            type:"POST",
-                            url:'scmCategory/create',
-                            contentType:"application/json",
-                            datatype: "json",
-                            data:JSON.stringify(that.parameter),
-                            beforeSend:function(){ //请求之前执行
-                            },
-                            success:function(data){ //成功后返回
-                                C.systemButtonNo('success','成功');
-                                that.showform=false;
-                                that.Find2=false;
-                            },
-                            error: function(){ //失败后执行
-                                C.systemButtonNo('error','失败');
-                            }
-                        });
+                        var submit=false;
+                        var message='';
+                        if(!this.parameter.categoryName) message='分类名称';
+                        else if(!this.parameter.categoryOneId) message='一级类别';
+                        else if(!this.parameter.parentId) message='二级类别';
+                        else submit=true;
+                        if(submit){
+                            $.ajax({
+                                type:"POST",
+                                url:'scmCategory/create',
+                                contentType:"application/json",
+                                datatype: "json",
+                                data:JSON.stringify(that.parameter),
+                                beforeSend:function(){ //请求之前执行
+                                },
+                                success:function(data){ //成功后返回
+                                    C.systemButtonNo('success','成功');
+                                    that.showform=false;
+                                    that.Find2=false;
+                                },
+                                error: function(){ //失败后执行
+                                    C.systemButtonNo('error','失败');
+                                }
+                            });
+                        }else {
+                            C.systemButtonNo('error','请填写'+message);
+                        }
                     },
                     detailsCl:function () {//取消新增
                         this.showform=false;

@@ -15,12 +15,11 @@
                         <input type="hidden" name="id" v-model="parameter.id" />
                         <div class="form-body">
                             <div class="form-group row">
-                                <label class="col-md-2 control-label">报价单名称</label>
+                                <label class="col-md-2 control-label">报价单名称<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="priceName" v-model="parameter.priceName"
-                                           required="required">
+                                    <input type="text" class="form-control" name="priceName" v-model="parameter.priceName">
                                 </div>
-                                <label class="col-md-2 control-label">供应商类型</label>
+                                <label class="col-md-2 control-label">供应商类型<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
                                     <select class="bs-select form-control" name="supplierType" v-model="supplierType">
                                         <option disabled="" selected="" value="">请选择</option>
@@ -31,18 +30,18 @@
                                 </div>
                             </div>
                             <div class="form-group row" >
-                                <label class="col-md-2 control-label">供应商</label>
+                                <label class="col-md-2 control-label">供应商<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <select name="categoryOneId" v-model="parameter.supplierId" class="bs-select form-control">
+                                    <select name="supplierId" v-model="parameter.supplierId" class="bs-select form-control">
                                         <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="supName in supNames" value="{{supName.id}}">
                                             {{supName.supAliasName}}
                                         </option>
                                     </select>
                                 </div>
-                                <label class="col-md-2 control-label">联系人 </label>
+                                <label class="col-md-2 control-label">联系人<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <select name="categoryOneId" v-model="parameter.contactId" class="bs-select form-control" >
+                                    <select name="contactId" v-model="parameter.contactId" class="bs-select form-control" >
                                         <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="contact in contacts" value="{{contact.id}}" v-if="parameter.supplierId==contact.supplierId">
                                             {{contact.contact}}
@@ -51,24 +50,24 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="inputEmail3" class="col-sm-2 control-label">开始时间：</label>
+                                <label for="inputEmail3" class="col-sm-2 control-label">开始时间<span style="color:#FF0000;">*</span></label>
                                 <div class="col-sm-3">
-                                    <input type="text" class="form-control form_datetime" id="beginDate" v-model="parameter.startEffect" name="beginDate" readonly="readonly">
+                                    <input type="text" class="form-control form_datetime" id="beginDate" v-model="parameter.startEffect" name="startEffect" readonly="readonly">
                                 </div>
-                                <label for="inputPassword3" class="col-sm-2 control-label">结束时间：</label>
+                                <label for="inputPassword3" class="col-sm-2 control-label">结束时间<span style="color:#FF0000;">*</span></label>
                                 <div class="col-sm-3">
-                                    <input type="text" class="form-control form_datetime" id="endDate" v-model="parameter.endEffect" name="endDate" readonly="readonly">
+                                    <input type="text" class="form-control form_datetime" id="endDate" v-model="parameter.endEffect" name="endEffect" readonly="readonly">
                                 </div>
                             </div>
 
                             <div class="form-group row">
                                 <label for="inputEmail3" class="col-sm-2 control-label">备注</label>
                                 <div class="col-sm-8">
-                                    <input type="text" class="form-control" name="" v-model="parameter.remark">
+                                    <input type="text" class="form-control" name="remark" v-model="parameter.remark">
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label class="col-md-2 control-label">产品原料</label>
+                                <label class="col-md-2 control-label">原材料清单</label>
                                 <div class="col-md-3">
                                     <input class="btn btn-default" type="button" value="添加原料" @click="closeTreeView"/>
                                 </div>
@@ -80,7 +79,7 @@
                                     <th>类型</th><th>一级类别</th><th>二级类别</th>
                                     <th>品牌名</th><th>材料名</th>
                                     <%--<th>编码</th>--%>
-                                    <th>规格</th><th>产地</th><th>单价</th><th>操作</th>
+                                    <th>规格</th><th>产地</th><th>单价<span style="color:#FF0000;">*</span></th><th>操作</th>
                                 </tr></thead>
                                 <tbody>
 
@@ -433,34 +432,54 @@
                     $('#assignTree').jstrestwo('deselect_all');//关闭所有选中状态
                 },
                 save:function(e){
+                    debugger
                     var _this=this;
-                    var saveObj=[];
-                    var parSup=this.parameter.mdSupplierPriceDetailDoList;
-                    for(var i=0;i<parSup.length;i++){
-                        saveObj[i]={
-                            materialId:parSup[i].idTwo,
-                            materialCode:parSup[i].materialCode,
-                            purchasePrice:parSup[i].purchasePrice,
+                    var submit=false;
+                    var message='';
+                    if(!this.parameter.priceName) message='报价单名称';
+                    else if(!this.supplierType) message='供应商类型';
+                    else if(!this.parameter.supplierId) message='供应商';
+                    else if(!this.parameter.contactId) message='联系人';
+                    else if(!this.parameter.startEffect) message='开始时间';
+                    else if(!this.parameter.endEffect) message='结束时间';
+                    else if(_this.parameter.mdSupplierPriceDetailDoList.length<=0) message='原材料清单';
+                    else  submit=true;
+                    for(var i=0;i<_this.parameter.mdSupplierPriceDetailDoList.length;i++) {
+                        if(!_this.parameter.mdSupplierPriceDetailDoList[i].purchasePrice){
+                            submit=false;
+                            message='单价';
                         }
                     }
-                    _this.parameter.mdSupplierPriceDetailDoList=saveObj;
-                    console.log(_this.parameter);
-                    $.ajax({
-                        type:"POST",
-                        url:'scmSupplerPrice/create',
-                        contentType:"application/json",
-                        datatype: "json",
-                        data:JSON.stringify(_this.parameter),
-                        beforeSend:function(){ //请求之前执行
-                            _this.showform=false;
-                        },
-                        success:function(data){ //成功后返回
-                            C.systemButtonNo('success','成功');
-                        },
-                        error: function(){ //失败后执行
-                            C.systemButtonNo('error','失败');
+                    if(submit){
+                        var saveObj=[];
+                        var parSup=this.parameter.mdSupplierPriceDetailDoList;
+                        for(var i=0;i<parSup.length;i++){
+                            saveObj[i]={
+                                materialId:parSup[i].idTwo,
+                                materialCode:parSup[i].materialCode,
+                                purchasePrice:parSup[i].purchasePrice,
+                            }
                         }
-                    });
+                        _this.parameter.mdSupplierPriceDetailDoList=saveObj;
+                        $.ajax({
+                            type:"POST",
+                            url:'scmSupplerPrice/create',
+                            contentType:"application/json",
+                            datatype: "json",
+                            data:JSON.stringify(_this.parameter),
+                            beforeSend:function(){ //请求之前执行
+                                _this.showform=false;
+                            },
+                            success:function(data){ //成功后返回
+                                C.systemButtonNo('success','成功');
+                            },
+                            error: function(){ //失败后执行
+                                C.systemButtonNo('error','失败');
+                            }
+                        });
+                    }else {
+                        C.systemButtonNo('error','请填写'+message);
+                    }
                 },
             },
             ready:function(){//钩子函数加载后

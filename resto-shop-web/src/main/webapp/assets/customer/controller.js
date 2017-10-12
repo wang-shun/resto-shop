@@ -411,7 +411,7 @@ var Controller = function(controlId,datatable){
             tb.ajax.reload();
             _C.simpleMsg(alertName);
 		}else if(yn=='error') {
-            _C.errorMsg(result.message,alertName);
+            _C.errorMsg(alertName);
 		}
     }
 	this.createBtn = function(model,url,urlData){

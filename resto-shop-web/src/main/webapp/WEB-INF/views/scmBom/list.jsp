@@ -20,9 +20,9 @@
                         <input type="hidden" name="id" v-model="parameter.id" />
                         <div class="form-body">
                             <div class="form-group row">
-                                <label class="col-md-2 control-label">菜品类别</label>
+                                <label class="col-md-2 control-label">菜品类别<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <select name="productCategory" v-model="parameter.articleFamilyId"  class="bs-select form-control" @change='changeType1' >
+                                    <select name="articleFamilyId" v-model="parameter.articleFamilyId"  class="bs-select form-control" @change='changeType1' >
                                         <option disabled selected value>请选择</option>
                                         <option  v-for="articleFamily in articleFamilyIdArr" value="{{articleFamily.articleFamilyId}}">
                                             {{articleFamily.name}}
@@ -30,7 +30,7 @@
                                     </select>
                                 </div>
 
-                                <label class="col-md-2 control-label">菜品名称</label>
+                                <label class="col-md-2 control-label">菜品名称<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
                                 <select name="articleId"  v-model="parameter.articleId"  class="bs-select form-control" @change='changeType2'>
                                     <option disabled selected value>请选择</option>
@@ -51,7 +51,7 @@
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">版本号</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="priority" v-model="parameter.version" required="required">
+                                    <input type="text" class="form-control" name="version" v-model="parameter.version" required="required">
                                 </div>
 
                                 <label class="col-md-2 control-label">序号</label>
@@ -61,13 +61,13 @@
                             </div>
 
                             <div class="form-group row">
-                                <label class="col-md-2 control-label">产品原料</label>
+                                <label class="col-md-2 control-label">产品原料<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
                                     <input class="btn btn-default" type="button" value="添加原料" @click="closeTreeView"/>
                                 </div>
                                 <label class="col-md-2 control-label">计量单位</label>
                                 <div class="col-md-3">
-                                    <input type="text" class="form-control" name="materialName" v-model="parameter.measurementUnit" disabled>
+                                    <input type="text" class="form-control" name="measurementUnit" v-model="parameter.measurementUnit" disabled>
                                 </div>
                             </div>
                         </div>
@@ -80,7 +80,7 @@
                                     <th>原料名称</th>
                                     <th>规格</th>
                                     <th>最小单位</th>
-                                    <th>最小单位数量</th>
+                                    <th>最小单位数量<span style="color:#FF0000;">*</span></th>
                                     <th>操作</th>
                                 </tr></thead>
                                 <tbody>
@@ -186,7 +186,6 @@
                 {
                     data : "bomDetailDoList",
                     createdCell : function(td,tdData){
-                        debugger
                         var html='<tr><th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th><th>规格</th><th>最小单位</th><th>最小单位数量</th></tr>';
                         for(var i=0;i<tdData.length;i++){
                             switch(tdData[i].materialType){
@@ -326,7 +325,6 @@
                 save:function(e){ //新增and编辑保存
                     var _this=this;
                     var savearr=[];
-                    debugger
                     for(var i=0;i<_this.parameter.bomDetailDoList.length;i++){
                         savearr[i]={
                             id:_this.parameter.bomDetailDoList[i].id,
@@ -350,31 +348,47 @@
                         _this.parameter;
                         delete _this.parameter.bomDetailDeleteIds;
                     }
-                    $.ajax({
-                        type:"POST",
-                        url:url,
-                        contentType:"application/json",
-                        datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
-                        data:JSON.stringify(_this.parameter),
-                        beforeSend:function(){ //请求之前执行
-                            console.log("请求之前执行");
-                            _this.showform=false;
-                        },
-                        success:function(data){ //成功后返回
-                            console.log(data);
-                            C.systemButtonNo('success','成功');
-                        },
-                        error: function(){ //失败后执行
-                            C.systemButtonNo('error','失败');
+                    var submit=false;
+                    var message='';
+                    if(!this.parameter.articleFamilyId) message='菜品类别';
+                    else if(!this.parameter.articleId) message='菜品名称';
+                    else if(_this.parameter.bomDetailDoList.length<=0) message='产品原料';
+                    else  submit=true;
+                    for(var i=0;i<_this.parameter.bomDetailDoList.length;i++) {
+                        if(!_this.parameter.bomDetailDoList[i].materialCount){
+                            submit=false;
+                            message='请填写原料数量';
                         }
-                    });
-                    this.parameter= {
-                        bomDetailDoList:[],//bom原材料显示
-                        bomDetailDeleteIds:[],//删除的list节点
-                        bomCode:'',
-                        productCode:'',
-                        measurementUnit:''
-                    };
+                    }
+                    if(submit){
+                        $.ajax({
+                            type:"POST",
+                            url:url,
+                            contentType:"application/json",
+                            datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
+                            data:JSON.stringify(_this.parameter),
+                            beforeSend:function(){ //请求之前执行
+                                console.log("请求之前执行");
+                                _this.showform=false;
+                            },
+                            success:function(data){ //成功后返回
+                                console.log(data);
+                                C.systemButtonNo('success','成功');
+                            },
+                            error: function(){ //失败后执行
+                                C.systemButtonNo('error','失败');
+                            }
+                        });
+                        this.parameter= {
+                            bomDetailDoList:[],//bom原材料显示
+                            bomDetailDeleteIds:[],//删除的list节点
+                            bomCode:'',
+                            productCode:'',
+                            measurementUnit:''
+                        };
+                    }else {
+                        C.systemButtonNo('error','请填写'+message);
+                    }
                 },
                 bomRawMaterialSub:function () { //添加原料保存
                     var originaldata=$('#assignTree').jstrestwo().get_bottom_checked(true);//拿到树状图中的数组
