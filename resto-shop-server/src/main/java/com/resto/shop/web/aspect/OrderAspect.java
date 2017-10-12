@@ -25,6 +25,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1173,6 +1174,7 @@ public class OrderAspect {
                     doPostAnsc(LogUtils.url, map);
                  }
             }else{
+                DecimalFormat df = new DecimalFormat("0.00");
                 Customer customer = customerService.selectById(order.getCustomerId());
                 if(customer != null){
                     WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
@@ -1186,7 +1188,7 @@ public class OrderAspect {
                     first.put("value", "您好，您的订单已被商家取消");
                     first.put("color", "#00DB00");
                     Map<String, Object> keyword1 = new HashMap<String, Object>();
-                    keyword1.put("value", order.getOrderMoney());
+                    keyword1.put("value", df.format(order.getOrderMoney()));
                     keyword1.put("color", "#000000");
                     Map<String, Object> keyword2 = new HashMap<String, Object>();
                     keyword2.put("value", DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm"));
