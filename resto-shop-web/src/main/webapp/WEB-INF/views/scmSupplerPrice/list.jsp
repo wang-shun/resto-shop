@@ -23,6 +23,7 @@
                                 <label class="col-md-2 control-label">供应商类型</label>
                                 <div class="col-md-3">
                                     <select class="bs-select form-control" name="supplierType" v-model="supplierType">
+                                        <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="supplierType in supplierTypes" value="{{supplierType.name}}">
                                             {{supplierType.name}}
                                         </option>
@@ -33,7 +34,7 @@
                                 <label class="col-md-2 control-label">供应商</label>
                                 <div class="col-md-3">
                                     <select name="categoryOneId" v-model="parameter.supplierId" class="bs-select form-control">
-                                        <%--<option  v-for="supName in supNames" value="{{supName.id}}" v-if="supplierType==supName.supplierType">--%>
+                                        <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="supName in supNames" value="{{supName.id}}">
                                             {{supName.supAliasName}}
                                         </option>
@@ -42,6 +43,7 @@
                                 <label class="col-md-2 control-label">联系人 </label>
                                 <div class="col-md-3">
                                     <select name="categoryOneId" v-model="parameter.contactId" class="bs-select form-control" >
+                                        <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="contact in contacts" value="{{contact.id}}" v-if="parameter.supplierId==contact.supplierId">
                                             {{contact.contact}}
                                         </option>
@@ -337,7 +339,7 @@
                     supplierId:'',//供应商id
                     startEffect:'',//生效日期
                     endEffect:'',//失效效日期
-                    contactId:4,//联系人id
+                    contactId:'',//联系人id
                     remark:'',//备注
                     priceName:'',//报价单名称
                     mdSupplierPriceDetailDoList:[],
@@ -353,6 +355,16 @@
                 },
                 create:function(){ //打开新增弹窗
                     this.showform=true;
+                    this.parameter={
+                        supplierId:'',//供应商id
+                            startEffect:'',//生效日期
+                            endEffect:'',//失效效日期
+                            contactId:'',//联系人id
+                            remark:'',//备注
+                            priceName:'',//报价单名称
+                            mdSupplierPriceDetailDoList:[],
+
+                    };
                 },
                 closeTreeView:function () { //添加原料打开
                     this.treeView=true;
@@ -379,7 +391,7 @@
                         switch(this.detailsArr.mdSupplierPriceDetailDoList[i].materialType){
                             case 'INGREDIENTS':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='主料';break;
                             case 'ACCESSORIES':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='辅料';break;
-                            default:this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='其他';break;
+                            case 'SEASONING':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='配料';break;
                         }
                     }
                     this.detailsBtn=true;
@@ -402,12 +414,19 @@
                             this.bomRawMaterial.push(originaldata[i].original);
                         }
                     }
-                    this.parameter.mdSupplierPriceDetailDoList.push.apply(this.parameter.mdSupplierPriceDetailDoList,this.bomRawMaterial);//合并数组
+                    for(var i=0;i<this.bomRawMaterial.length;i++){
+                        var sta=true;
+                        for(var j=0;j<this.parameter.mdSupplierPriceDetailDoList.length;j++){
+                            if(this.bomRawMaterial[i].idTwo==this.parameter.mdSupplierPriceDetailDoList[j].idTwo||this.bomRawMaterial[i].idTwo==this.parameter.mdSupplierPriceDetailDoList[j].materialId) sta=false;
+                        }
+                        if(sta)this.parameter.mdSupplierPriceDetailDoList.push(this.bomRawMaterial[i]);
+                    }
+                    //this.parameter.mdSupplierPriceDetailDoList.push.apply(this.parameter.mdSupplierPriceDetailDoList,this.bomRawMaterial);//合并数组
                     for(var i=0;i<this.parameter.mdSupplierPriceDetailDoList.length;i++){
                         switch(this.parameter.mdSupplierPriceDetailDoList[i].materialType){
                             case 'INGREDIENTS':this.parameter.mdSupplierPriceDetailDoList[i].materialType='主料';break;
                             case 'ACCESSORIES':this.parameter.mdSupplierPriceDetailDoList[i].materialType='辅料';break;
-                            default:this.parameter.mdSupplierPriceDetailDoList[i].materialType='其他';break;
+                            case 'SEASONING':this.parameter.mdSupplierPriceDetailDoList[i].materialType='配料';break;
                         }
                     }
                     this.treeView=false;

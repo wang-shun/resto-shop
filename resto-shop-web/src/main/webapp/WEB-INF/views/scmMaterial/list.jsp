@@ -219,7 +219,7 @@
                         switch (tdData){
 							case 'INGREDIENTS':tdData='主料';break;
                             case 'ACCESSORIES':tdData='辅料';break;
-                            case 'SEASONING':tdData='调料';break;
+                            case 'SEASONING':tdData='配料';break;
 						}
                         $(td).html(tdData);
                     }
@@ -258,7 +258,7 @@
                     }
                 },
                 {
-                    title : "转化率",
+                    title : "转化规格",
                     data : "rate",
                 },
                 {
@@ -266,7 +266,7 @@
                     data : "convertUnitName",
                 },
 				{
-                    title : "最小核算单位",
+                    title : "最小单位",
                     data : "minMeasureUnit",
                     createdCell:function (td,tdData,rowData) {
                         $(td).html(tdData+rowData.convertUnitName);
@@ -274,7 +274,7 @@
                 },
 
                 {
-                    title : "转化系数",
+                    title : "最小单位份数",
                     data : "coefficient",
                 },
 
@@ -314,7 +314,7 @@
                 materialTypes: [ //类型
                     {code:"INGREDIENTS" , name:"主料"},
                     {code:"ACCESSORIES" , name:"辅料"},
-                    {code:"SEASONING" ,name:"调料"},
+                    {code:"SEASONING" ,name:"配料"},
                 ],
                 categoryOnes:[],//一级类别集合
                 categoryTwos:[],//二级类别集合

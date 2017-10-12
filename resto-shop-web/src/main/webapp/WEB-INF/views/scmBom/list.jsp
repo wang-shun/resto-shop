@@ -74,14 +74,25 @@
                         <div style="max-height: 300px;overflow: auto;">
                             <table class="table table-bordered" id="yuanliaolist">
                                 <thead><tr>
-                                    <th>行号</th><th>原料编码</th><th>原料类型</th>
-                                    <th>原料名称</th><th>规格</th>
-                                    <th>所需最小单位数量</th><th>操作</th>
+                                    <th>行号</th>
+                                    <th>原料编码</th>
+                                    <th>原料类型</th>
+                                    <th>原料名称</th>
+                                    <th>规格</th>
+                                    <th>最小单位</th>
+                                    <th>最小单位数量</th>
+                                    <th>操作</th>
                                 </tr></thead>
                                 <tbody>
                                 <tr v-for="(index,item) in parameter.bomDetailDoList">
-                                    <td>{{index+1}}</td><td>{{item.materialCode}}</td><td v-text="((((item.materialType=='INGREDIENTS')?'主料':item.materialType)=='ACCESSORIES')?'辅料':'其他')"></td><td>{{item.materialName}}{{item.name}}</td><td>{{item.minMeasureUnit}}{{item.unitName}}/{{item.specName}}</td>
-                                    <td><input type="text" v-model="item.materialCount" value="{{(item.materialCount?item.materialCount:1)}}" ></td><td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
+                                    <td>{{index+1}}</td>
+                                    <td>{{item.materialCode}}</td>
+                                    <td>{{item.materialTypeShow}}</td>
+                                    <td>{{item.materialName}}{{item.name}}</td>
+                                    <td>{{item.minMeasureUnit}}{{item.unitName}}/{{item.specName}}</td>
+                                    <td>{{item.minMeasureUnit}}/{{item.minUnitName}}</td>
+                                    <td><input style="width: 50px" type="text" v-model="item.materialCount" value="{{(item.materialCount?item.materialCount:1)}}" ></td>
+                                    <td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -112,13 +123,15 @@
                     <div id="checkable-output">
                         <table class="table table-bordered">
                             <thead><tr>
-                                <th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th>
-                                <th>规格</th><th>最小单位</th><th>所需最小单位数量</th><th>操作</th>
+                                <th>行号</th>
+                                <th>原料编码</th>
+                                <th>原料类型</th><th>原料名称</th>
+                                <th>规格</th><th>最小单位</th><th>最小单位数量</th><th>操作</th>
                             </tr></thead>
                             <tbody>
                         <tr v-for="(index,item) in bomRawMaterial">
                             <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.materialType}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
-                            <td><input type="text" v-model="materialCount" value="item.materialCount"></td><td><button class="btn btn-xs red">移除</button></td>
+                            <td><input style="width:50px;" type="text" v-model="materialCount" value="item.materialCount"></td><td><button class="btn btn-xs red">移除</button></td>
                         </tr>
                         </tbody>
                         </table>
@@ -173,13 +186,13 @@
                 {
                     data : "bomDetailDoList",
                     createdCell : function(td,tdData){
-                        var html='<tr><th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th><th>规格</th><th>最小单位</th><th>所需最小单位数量</th></tr>';
-
+                        debugger
+                        var html='<tr><th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th><th>规格</th><th>最小单位</th><th>最小单位数量</th></tr>';
                         for(var i=0;i<tdData.length;i++){
                             switch(tdData[i].materialType){
                                 case 'INGREDIENTS':tdData[i].materialType='主料';break;
                                 case 'ACCESSORIES':tdData[i].materialType='辅料';break;
-                                default:tdData[i].materialType='其他';break;
+                                case 'SEASONING':tdData[i].materialType='辅料';break;
                             }
                             html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialType+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].minMeasureUnit+'/'+tdData[i].minUnitName+'</td><td>'+tdData[i].materialCount+'</td></tr>';
                         }
@@ -320,6 +333,7 @@
                             materialId:_this.parameter.bomDetailDoList[i].idTwo,
                             minMeasureUnit:_this.parameter.bomDetailDoList[i].minMeasureUnit,
                             unitName:_this.parameter.bomDetailDoList[i].unitName,
+                            materialType:_this.parameter.bomDetailDoList[i].materialType,
                             materialName:_this.parameter.bomDetailDoList[i].name,
                             specName:_this.parameter.bomDetailDoList[i].specName,
                             materialCode:_this.parameter.bomDetailDoList[i].materialCode,
@@ -368,18 +382,25 @@
                         if(originaldata[i].original.materialType){
                             this.bomRawMaterial.push(originaldata[i].original);
                         }
-
                     }
                     for(var i=0;i<this.bomRawMaterial.length;i++){
                         this.bomRawMaterial[i].materialId=this.bomRawMaterial[i].id;
                         delete this.bomRawMaterial[i].id;
                     }
-                    this.parameter.bomDetailDoList.push.apply(this.parameter.bomDetailDoList,this.bomRawMaterial);//合并数组
+                    for(var i=0;i<this.bomRawMaterial.length;i++){
+                        var sta=true;
+                        for(var j=0;j<this.parameter.bomDetailDoList.length;j++){
+                            if(this.bomRawMaterial[i].idTwo==this.parameter.bomDetailDoList[j].idTwo||this.bomRawMaterial[i].idTwo==this.parameter.bomDetailDoList[j].materialId) sta=false;
+                        }
+                        if(sta)this.parameter.bomDetailDoList.push(this.bomRawMaterial[i]);
+                    }
+
+                    //this.parameter.bomDetailDoList.push.apply(this.parameter.bomDetailDoList,this.bomRawMaterial);//合并数组
                     for(var i=0;i<this.parameter.bomDetailDoList.length;i++){
                         switch(this.parameter.bomDetailDoList[i].materialType){
-                            case 'INGREDIENTS':this.parameter.bomDetailDoList[i].materialType='主料';break;
-                            case 'ACCESSORIES':this.parameter.bomDetailDoList[i].materialType='辅料';break;
-                            default:this.parameter.bomDetailDoList[i].materialType='其他';break;
+                            case 'INGREDIENTS':this.parameter.bomDetailDoList[i].materialTypeShow='主料';break;
+                            case 'ACCESSORIES':this.parameter.bomDetailDoList[i].materialTypeShow='辅料';break;
+                            case 'SEASONING':this.parameter.bomDetailDoList[i].materialTypeShow='配料';break;
                         }
                     }
                     this.treeView=false;
