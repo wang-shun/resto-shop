@@ -325,8 +325,8 @@
                 }
             },
             createExcel　: function () {
+                var that = this;
                 try {
-                    var that = this;
                     that.object = this.getDate();
                     that.brandCustomer = that.brandCustomerCount;
                     that.memberList = that.memberUserDtos;
