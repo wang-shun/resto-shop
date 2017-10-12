@@ -3315,7 +3315,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
             td.customer_id customerId,
             COUNT(1) orderCount,
             SUM(td.order_money) orderTotal,
-            AVG(td.order_money) avgOrderMoney,
+            ROUND(AVG(td.order_money),2) avgOrderMoney,
             DATE_FORMAT(td.create_time,'%Y-%m-%d %H:%i:%s') lastOrderTime
         FROM
             tb_order td
