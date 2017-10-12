@@ -264,7 +264,7 @@ public class OrderAspect {
             for (int i=0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                 OrderItem item = orderItem.get(i);
                 if(i == 0){
-                    msg.append("\n" + item.getArticleName() + "×" + item.getCount() + "\n");
+                    msg.append("\n\t\t\t" + item.getArticleName() + "×" + item.getCount() + "\n");
                 }else{
                     msg.append("\t\t\t" + item.getArticleName() + "×" + item.getCount() + "\n");
                 }
@@ -827,7 +827,7 @@ public class OrderAspect {
                 for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                     OrderItem item = orderItem.get(i);
                     if (i == 0) {
-                        msg.append("\n" + item.getArticleName() + "×" + item.getCount() + "\n");
+                        msg.append("\n\t\t\t" + item.getArticleName() + "×" + item.getCount() + "\n");
                     } else {
                         msg.append("\t\t\t" + item.getArticleName() + "×" + item.getCount() + "\n");
                     }
