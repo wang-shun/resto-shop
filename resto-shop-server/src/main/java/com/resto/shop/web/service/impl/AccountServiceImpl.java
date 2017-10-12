@@ -317,7 +317,7 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 		Brand brand = brandService.selectById(chargeOrder.getBrandId());
 		Customer customer = customerService.selectById(chargeOrder.getCustomerId());
 		BrandSetting setting = brandSettingService.selectByBrandId(chargeOrder.getBrandId());
-		DecimalFormat df = new DecimalFormat("#.00");
+		DecimalFormat df = new DecimalFormat("0.00");
 		//如果不是立即到账 优先推送一条提醒
 		if(chargeOrder.getNumberDayNow() > 0){
 			if(setting.getTemplateEdition()==0){
