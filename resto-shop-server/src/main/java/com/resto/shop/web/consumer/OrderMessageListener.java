@@ -506,7 +506,7 @@ public class OrderMessageListener implements MessageListener {
             log.info("进入微信模板消息...");
             List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
             String templateId = templateFlowList.get(0).getTemplateId();
-            String jumpUrl =setting.getWechatWelcomeUrl() + "?subpage=my&dialog=myYue";
+            String jumpUrl =setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId();
             log.info("orderid---------------->"+appraise.getOrderId());
             Order order=orderService.selectById(appraise.getOrderId());
             log.info("订单号："+order.getSerialNumber()+"日期："+DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
