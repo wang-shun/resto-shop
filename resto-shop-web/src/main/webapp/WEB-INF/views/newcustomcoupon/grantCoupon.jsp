@@ -228,7 +228,8 @@
                 lastOrderDayType : 1,
                 orderTotalType : 1,
                 avgOrderMoneyType : 1,
-                couponId:couponId
+                couponId : couponId,
+                intoType : intoType
             }, //群体发放查询对象
             personalLoanSelectObject : null, //个人发放查询对象
             currentType : 1, //当前所在模块位置 1：群体发放 2：个人发放
@@ -626,7 +627,7 @@
                             dataType : "JSON",
                             success : function (result) {
                                 if (result.success){
-                                    that.object.path = result.data;
+                                    that.object = {path : result.data};
                                     that.start = that.end;
                                     that.end = that.start + 1000;
                                     that.index++;

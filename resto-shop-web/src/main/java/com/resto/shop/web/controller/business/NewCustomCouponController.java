@@ -237,7 +237,9 @@ public class NewCustomCouponController extends GenericController {
             List<String> customerIds = new ArrayList<>();
             for (Customer customer : customers) {
                 object.put("customerId", customer.getId());
-                object.put("customer", customer);
+                if (!selectMap.get("intoType").equalsIgnoreCase("1")){
+                    object.put("customer", customer);
+                }
                 object.put("customerType", customer.getIsBindPhone() ? "注册" : "未注册");
                 object.put("isValue", "否");
                 object.put("nickname", customer.getNickname());
