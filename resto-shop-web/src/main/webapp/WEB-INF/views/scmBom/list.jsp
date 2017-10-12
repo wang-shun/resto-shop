@@ -71,7 +71,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div style="max-height: 300px;overflow: auto;">
+                        <div style="max-height: 200px;overflow: auto;">
                             <table class="table table-bordered" id="yuanliaolist">
                                 <thead><tr>
                                     <th>行号</th>

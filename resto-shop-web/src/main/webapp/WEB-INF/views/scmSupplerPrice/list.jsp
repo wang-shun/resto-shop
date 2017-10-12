@@ -73,7 +73,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div>
+                        <div style="max-height:200px;overflow: auto;">
                             <table class="table table-bordered">
                                 <thead><tr>
                                     <th>类型</th><th>一级类别</th><th>二级类别</th>
