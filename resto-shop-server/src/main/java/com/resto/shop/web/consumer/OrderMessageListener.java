@@ -507,6 +507,7 @@ public class OrderMessageListener implements MessageListener {
             try {
                 List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
                 String templateId = templateFlowList.get(0).getTemplateId();
+                log.info("templateId----------------------->"+templateId);
                 Order order=orderService.selectById(appraise.getOrderId());
                 String jumpUrl =setting.getWechatWelcomeUrl() + "?shopId=" + customer.getLastOrderShop() + "&subpage=home&dialog=share&appraiseId=" + appraise.getId();
                 Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
@@ -526,6 +527,7 @@ public class OrderMessageListener implements MessageListener {
                 content.put("keyword1", keyword1);
                 content.put("keyword2", keyword2);
                 content.put("remark", remark);
+                log.info("________________--------------->"+content.toString());
                 String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
                 Brand brand = brandService.selectById(order.getBrandId());
                 Map map = new HashMap(4);
