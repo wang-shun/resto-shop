@@ -447,7 +447,7 @@
                     this.cityNameList='';
                     this.districtNameList='';
                 },
-                cityNameListCh:function () {//点击监控省份
+                cityNameListCh:function () {//点击监控市区
                     this.districtNameList='';
                 },
                 com:function () { //计算系数
@@ -547,6 +547,7 @@
                     else if(!this.m.minMeasureUnit) message='最小单位';
                     else  submit=true;
                     if(submit){
+                        debugger
                         if(this.m.id) C.systemButton('scmMaterial/modify',this.m,['编辑成功','编辑失败']);
                         else C.systemButton('scmMaterial/create',this.m,['新增成功','新增失败']);
                         this.showform=false;
