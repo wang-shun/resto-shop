@@ -292,7 +292,11 @@
                     title : "产地",
                     data : "provinceName",
                     createdCell:function (td,tdData,rowData) {
-                        $(td).html(tdData+rowData.cityName+rowData.districtName);
+                        if (tdData === null || tdData === "" || tdData === ''){
+                            $(td).html('');
+						}else {
+                            $(td).html(tdData+rowData.cityName+rowData.districtName);
+						}
                     }
                 },
 
