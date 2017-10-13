@@ -179,7 +179,7 @@
                             C.createEditBtn(rowData),
                             </s:hasPermission>
                             <s:hasPermission name="scmSupplier/delete">
-                            C.createDelBtn(tdData,"scmSupplier/delete"),
+                            C.createDelSupplier(tdData,"scmSupplier/delete",'scmSupplerPrice/findEffectiveSupPriceIds'),
                             </s:hasPermission>
                         ];
                         $(td).html(operator);
@@ -271,7 +271,6 @@
                     };
                 },
                 edit:function(model){ //编辑打开弹窗
-                    debugger
                     var that = this;
                     this.parameter= model;
                     $.get('scmCategory/list_all',function (jsonData) {

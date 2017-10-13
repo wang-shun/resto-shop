@@ -362,37 +362,24 @@ var Controller = function(controlId,datatable){
 		return button;
 	}
 
-    //
-    // this.createDelBtnForSupplier = function(value,delUrl,successCbk){
-    //     var button = $("<button class='btn btn-xs red'>").html(name||"删除");
-    //     button.click(function(){
-    //
-    //         _C.delConfirmDialog(function(){
-    //
-    //
-    //             _C.ajax("",{id:value},function(resultData){
-    //
-    //
-    //                 _C.ajax(delUrl,{id:value},function(result){
-    //                     if(result.success){
-    //                         tb.ajax.reload();
-    //                         _C.simpleMsg("删除成功");
-    //                     }else{
-    //                         _C.errorMsg(result.message,"删除失败");
-    //                     }
-    //                 });
-    //
-    //
-    //             })
-    //
-    //
-    //
-    //
-    //
-    //         });
-    //     });
-    //     return button;
-    // }
+    this.createDelSupplier = function(value,delUrl,checkIsEffectSupplierUrl,successCbk){
+        var button = $("<button class='btn btn-xs red'>").html(name||"删除");
+        button.click(function() {
+            $.get(checkIsEffectSupplierUrl+'?supplierId='+value,function (result) {
+                _C.confirmDialog((result.message == null) ? "你确定要删除吗?":result.message + ",你确定要删除吗?", "提醒", function () {
+                    _C.ajax(delUrl, {id: value}, function (result) {
+                        if (result.success) {
+                            tb.ajax.reload();
+                            _C.simpleMsg("删除成功");
+                        } else {
+                            _C.errorMsg(result.message, "删除失败");
+                        }
+                    });
+                });
+            });
+        })
+        return button;
+    }
 
 
     this.systemButton = function(delUrl,obj,alertName){ //执行ajax，返回
@@ -525,10 +512,10 @@ var Controller = function(controlId,datatable){
 			_C.confirmDialog(o.text,o.title,o.yes,o.no);
 		});
 	}
-	
 	this.delConfirmDialog = function(yes,no){
 		_C.confirmDialog("你确定要删除吗?","提醒",yes,no);
 	}
+
 	this.confirmDialog=function(text,title,successcbk,cancelcbk){
 		var width = text.length*16;
 		width = width>200?width:200;
