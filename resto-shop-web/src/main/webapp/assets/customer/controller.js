@@ -361,7 +361,6 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
-
     this.createDelSupplier = function(value,delUrl,checkIsEffectSupplierUrl,successCbk){
         var button = $("<button class='btn btn-xs red'>").html(name||"删除");
         button.click(function() {
