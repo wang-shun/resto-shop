@@ -1098,7 +1098,7 @@ public class OrderAspect {
             content.put("keyword1", keyword1);
             content.put("keyword2", keyword2);
             content.put("remark", remark);
-            String result1 = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+            String result1 = WeChatUtils.sendTemplate(shareCustomer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
             Map map = new HashMap(4);
             map.put("brandName", brand.getBrandName());
             map.put("fileName", shareCustomer.getId());
