@@ -178,11 +178,4 @@ public interface ArticleService extends GenericService<Article, String> {
 	 */
 	List<Article> selectArticleByShopId(String shopId);
 
-	/**
-	 * 通知本地Pos 手动更新数据
-	 * Pos2.0 		By___lmx
-	 * @param brandId
-	 * @param shopId
-	 */
-	void sendMsgToLocalPosUpdateData(String brandId, String shopId);
 }

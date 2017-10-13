@@ -768,10 +768,4 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         return articleMapper.selectArticleByShopId(shopId);
     }
 
-    @Override
-    public void sendMsgToLocalPosUpdateData(String brandId, String shopId) {
-        log.info("\n\n lmx—更改菜品，发送通知    2");
-        MQMessageProducer.sendUpdateDateToLocalPos(brandId,shopId);
-    }
-
 }
