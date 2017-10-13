@@ -406,10 +406,12 @@ public class MQMessageProducer {
 	}
 
 	public static void sendUpdateDateToLocalPos(String brandId,String shopId){
+		log.info("\n\n lmx—更改菜品，发送通知    3");
 		JSONObject obj  = new JSONObject();
 		obj.put("brandId", brandId);
 		obj.put("shopId", shopId);
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_LOCAL_POS_UPDATE_DATA,obj.toJSONString().getBytes());
 		sendMessageASync(message);
+		log.info("\n\n lmx—更改菜品，发送通知    4");
 	}
 }
