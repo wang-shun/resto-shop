@@ -61,7 +61,7 @@ public class SupplierPriceController extends GenericController{
 	public Result findEffectiveSupPriceIds(Long supplierId ){
 		List<String> effectiveSupPriceIds = supplierpriceService.findEffectiveSupPriceIds(getCurrentShopId(), supplierId);
 		if(ListUtil.isNotEmpty(effectiveSupPriceIds)){
-			return new Result("该供应商存在有效报价单号：["+JSONObject.toJSON(effectiveSupPriceIds)+"]",  5000, true);
+			return new Result("该供应商存在有效报价单号："+JSONObject.toJSON(effectiveSupPriceIds),  0, true);
 		}
 		return Result.getSuccess();
 

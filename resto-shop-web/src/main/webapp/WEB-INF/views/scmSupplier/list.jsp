@@ -280,7 +280,9 @@
                         $('#supplierContacts div').removeClass('radio');
                     },200)
                 },
+
                 save:function(){//提交
+                      debugger
                     var _this=this;
                     var saveObj={};
                     saveObj.id=this.parameter.id;
