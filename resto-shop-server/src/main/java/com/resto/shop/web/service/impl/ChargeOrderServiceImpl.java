@@ -340,7 +340,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msgFrist.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
 				doPostAnsc(LogUtils.url, map);
 			}else{
-				List<TemplateFlow> templateFlowList=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412000235");
+				List<TemplateFlow> templateFlowList=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412427536");
 				String templateId = templateFlowList.get(0).getTemplateId();
 				String jumpUrl ="";
 				Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
@@ -351,10 +351,10 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				keyword1.put("value", df.format(chargeOrder.getChargeMoney()));
 				keyword1.put("color", "#000000");
 				Map<String, Object> keyword2 = new HashMap<String, Object>();
-				keyword2.put("value", df.format(chargeOrder.getRewardMoney()));
+				keyword2.put("value", DateUtil.formatDate(chargeOrder.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
 				keyword2.put("color", "#000000");
 				Map<String, Object> keyword3 = new HashMap<String, Object>();
-				keyword3.put("value", DateUtil.formatDate(chargeOrder.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+				keyword3.put("value", df.format(chargeOrder.getRewardMoney()));
 				keyword3.put("color", "#000000");
 				Map<String, Object> remark = new HashMap<String, Object>();
 				remark.put("value", "充值赠送红包会在"+ (chargeOrder.getNumberDayNow() + 1) +"天内分批返还给您，请注意查收～");
@@ -386,21 +386,33 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
 			doPostAnsc(LogUtils.url, map);
 		}else{
-			List<TemplateFlow> templateFlowList=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412427536");
+			List<TemplateFlow> templateFlowList=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412000235");
 			String templateId = templateFlowList.get(0).getTemplateId();
 			String jumpUrl ="http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
 			Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
 			Map<String, Object> first = new HashMap<String, Object>();
-			first.put("value", "今日充值赠送红包已到账！");
+			if(chargeOrder.getNumberDayNow()==0){
+				first.put("value", "今日充值赠送红包"+chargeOrder.getRewardBalance()+"元已到账！");
+			}else if(chargeOrder.getNumberDayNow()==1){
+				first.put("value", "今日充值赠送红包"+chargeOrder.getArrivalAmount()+"元已到账！");
+			}else{
+				first.put("value", "今日充值赠送红包"+chargeOrder.getEndAmount()+"元已到账！");
+			}
 			first.put("color", "#00DB00");
 			Map<String, Object> keyword1 = new HashMap<String, Object>();
-			keyword1.put("value", df.format(chargeOrder.getChargeMoney()));
+			keyword1.put("value",df.format(chargeOrder.getChargeMoney()));
 			keyword1.put("color", "#000000");
 			Map<String, Object> keyword2 = new HashMap<String, Object>();
-			keyword2.put("value", df.format(chargeOrder.getRewardMoney()));
+			if(chargeOrder.getNumberDayNow()==0){
+				keyword2.put("value",df.format(chargeOrder.getRewardBalance()));
+			}else if(chargeOrder.getNumberDayNow()==1){
+				keyword2.put("value",df.format(chargeOrder.getArrivalAmount()));
+			}else{
+				keyword2.put("value",df.format(chargeOrder.getEndAmount()));
+			}
 			keyword2.put("color", "#000000");
 			Map<String, Object> keyword3 = new HashMap<String, Object>();
-			keyword3.put("value", DateUtil.formatDate(chargeOrder.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+			keyword3.put("value",DateUtil.formatDate(chargeOrder.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
 			keyword3.put("color", "#000000");
 			Map<String, Object> remark = new HashMap<String, Object>();
 			remark.put("value", "点击这里查看账户余额");
