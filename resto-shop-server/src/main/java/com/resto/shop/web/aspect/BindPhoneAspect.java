@@ -133,6 +133,7 @@ public class BindPhoneAspect {
 					map.put("content", "系统向用户:"+sc.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
 					doPostAnsc(LogUtils.url, map);
 				}else{
+					log.info("发送注册模板消息:订单id"+shareOrderId);
 					List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
 					String templateId = templateFlowList.get(0).getTemplateId();
 					String jumpUrl ="";
