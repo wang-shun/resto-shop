@@ -397,10 +397,10 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			keyword1.put("value", df.format(chargeOrder.getChargeMoney()));
 			keyword1.put("color", "#000000");
 			Map<String, Object> keyword2 = new HashMap<String, Object>();
-			keyword2.put("value", df.format(chargeOrder.getCreateTime()));
+			keyword2.put("value", df.format(chargeOrder.getRewardMoney()));
 			keyword2.put("color", "#000000");
 			Map<String, Object> keyword3 = new HashMap<String, Object>();
-			keyword3.put("value", chargeOrder.getRewardMoney());
+			keyword3.put("value", DateUtil.formatDate(chargeOrder.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
 			keyword3.put("color", "#000000");
 			Map<String, Object> remark = new HashMap<String, Object>();
 			remark.put("value", "点击这里查看账户余额");
