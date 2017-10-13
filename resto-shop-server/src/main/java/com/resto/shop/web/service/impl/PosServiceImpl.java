@@ -415,19 +415,21 @@ public class PosServiceImpl implements PosService {
             }
             orderService.update(refundOrder);
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("dataType","updatePayment");
-        jsonObject.put("orderId",order.getId());
-        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
-        if(!CollectionUtils.isEmpty(payItemsList)){
-            List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
-            for(OrderPaymentItem orderPaymentItem : payItemsList){
-                OrderPaymentDto orderPaymentDto = new OrderPaymentDto(orderPaymentItem);
-                orderPaymentDtos.add(orderPaymentDto);
-            }
-            jsonObject.put("orderPayment", orderPaymentDtos);
-        }
-        return jsonObject.toString();
+        // TODO: 2017/10/13  需统一回调格式 
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("dataType","updatePayment");
+//        jsonObject.put("orderId",order.getId());
+//        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+//        if(!CollectionUtils.isEmpty(payItemsList)){
+//            List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
+//            for(OrderPaymentItem orderPaymentItem : payItemsList){
+//                OrderPaymentDto orderPaymentDto = new OrderPaymentDto(orderPaymentItem);
+//                orderPaymentDtos.add(orderPaymentDto);
+//            }
+//            jsonObject.put("orderPayment", orderPaymentDtos);
+//        }
+//        return jsonObject.toString();
+        return null;
     }
 
     private void refundOrderArticleNull(Order refundOrder) {
