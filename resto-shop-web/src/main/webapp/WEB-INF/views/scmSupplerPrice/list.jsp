@@ -392,6 +392,7 @@
                 },
                 showDetails:function (data) { //查看详情
                     this.details=true;
+                    this.approveBtn=false;
                     this.detailsArr=data;
                     for(var i=0;i<this.detailsArr.mdSupplierPriceDetailDoList.length;i++){
                         switch(this.detailsArr.mdSupplierPriceDetailDoList[i].materialType){
