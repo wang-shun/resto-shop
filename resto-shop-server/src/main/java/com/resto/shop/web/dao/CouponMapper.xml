@@ -206,7 +206,8 @@
         from tb_coupon tc
         where tc.add_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
         and tc.add_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
-        GROUP BY tc.new_custom_coupon_id, tc.`name`
+        GROUP BY tc.`name`
+--         GROUP BY tc.new_custom_coupon_id, tc.`name`
     </select>
 
     <select id="usedCouponBeforeByOrderId" resultType="Coupon">
