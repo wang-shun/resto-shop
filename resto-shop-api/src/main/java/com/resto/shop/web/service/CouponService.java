@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
@@ -14,14 +15,14 @@ import com.resto.shop.web.model.Order;
 
 public interface CouponService extends GenericService<Coupon, String> {
 
-    List<Coupon> listCoupon(Coupon coupon,String brandId,String shopId);
+	List<Coupon> listCoupon(Coupon coupon,String brandId,String shopId);
 
-    void insertCoupon(Coupon coupon);
+	void insertCoupon(Coupon coupon);
 
 	Coupon useCoupon(BigDecimal totalMoney, Order order) throws AppException;
 
 	void refundCoupon(String id);
-    
+
 	/**
 	 * 根据 状态 查询 优惠劵列表
 	 * @param status
@@ -33,15 +34,19 @@ public interface CouponService extends GenericService<Coupon, String> {
 
 	List<Coupon> getListByCustomerId(String customerId);
 
-    List<CouponDto> selectCouponDto(Map<String, Object> selectMap);
+	List<CouponDto> selectCouponDto(Map<String, Object> selectMap);
 
 	List<Coupon> usedCouponBeforeByOrderId(String orderId);
 
-    List<Coupon> addRealTimeCoupon(List<NewCustomCoupon> newCustomCoupons, Customer customer);
+	List<Coupon> addRealTimeCoupon(List<NewCustomCoupon> newCustomCoupons, Customer customer);
 
-    Coupon selectPosPayOrderCanUseCoupon(Map<String, Object> selectMap);
+	Coupon selectPosPayOrderCanUseCoupon(Map<String, Object> selectMap);
 
-    List<Coupon> getCouponByShopId(String shopId,Integer day,Integer type);
+	List<Coupon> getCouponByShopId(String shopId,Integer day,Integer type);
 
 	List<Coupon> listCouponUsed(Coupon coupon);
+
+	void addCoupon(NewCustomCoupon newCustomCoupon, Customer customer);
+
+	void addCouponBatch(List<Customer> customerList,NewCustomCoupon newCustomCoupon,String brandId) throws SQLException;
 }

@@ -368,7 +368,7 @@
         });
         
         function createGrantBtn(rowData) {
-            var button = (rowData.isActivty == 1 && rowData.couponType == 5) ? $("<a href='newcustomcoupon/goToGrant?couponId="+rowData.id+"' class='btn btn-xs btn-success ajaxify '>发放</a>") : "";
+            var button = (rowData.isActivty == 1 && rowData.couponType == 5) ? $("<a href='newcustomcoupon/goToGrant?couponId="+rowData.id+"&intoType=2' class='btn btn-xs btn-success ajaxify '>发放</a>") : "";
             return button;
         }
 

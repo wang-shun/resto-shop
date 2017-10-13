@@ -474,6 +474,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                return jsonResult;
 //            }
         }
+        Date now = new Date();
+        //判断这比订单是否属于   1:1 消费返利的订单
+        if(brandSetting.getConsumptionRebate() == 1 && shopDetail.getConsumptionRebate() == 1
+                && shopDetail.getRebateTime().compareTo(now) == 1){
+            order.setIsConsumptionRebate(2);
+        }
 //        List<OrderItem> orderItems = new ArrayList<OrderItem>();
         List<Article> articles = articleService.selectList(order.getShopDetailId());
         List<ArticlePrice> articlePrices = articlePriceService.selectList(order.getShopDetailId());
@@ -573,9 +579,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        org_price = item.getPrice();
 //                    }
                     if(item.getDiscount() < 100){
-                        org_price = item.getPrice().divide(new BigDecimal(item.getDiscount())).multiply(new BigDecimal(100));
-                    }else{
+                        org_price = item.getPrice().divide(new BigDecimal(item.getDiscount()), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100));
+                    }else if(a.getFansPrice() != null && a.getFansPrice().doubleValue() > 0){
                         org_price = item.getPrice().subtract(a.getFansPrice()).add(a.getPrice());
+                    }else{
+                        org_price = item.getPrice();
                     }
                     price = item.getPrice();
                     fans_price = item.getPrice();
@@ -1474,6 +1482,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
+                case PayMode.REBATE_MONEY_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
+                    break;
                 case PayMode.CHARGE_PAY:
                     chargeOrderService.refundCharge(item.getPayValue(), item.getResultData(), order.getShopDetailId());
                     item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
@@ -1680,6 +1692,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     break;
                 case PayMode.THIRD_MONEY_RED_PAY:
                     redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    break;
+                case PayMode.REBATE_MONEY_RED_PAY:
+                    redPacketService.refundRedPacket(item.getPayValue(), item.getResultData());
+                    item.setPayValue(item.getPayValue().multiply(new BigDecimal(-1)));
                     break;
             }
         }
@@ -5865,7 +5881,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 Map<String, Object> canceledMap = new HashMap<>();
                 Order canceledOrder = orderMapper.selectOrderDetails(map.getKey());
                 canceledMap.put("ORDER_NUMBER", map.getKey());
-                canceledMap.put("TEL", StringUtils.isBlank(canceledOrder.getCustomer().getTelephone()) ? "--" : canceledOrder.getCustomer().getTelephone());
+                if (canceledOrder.getCustomer() != null) {
+                    canceledMap.put("TEL", StringUtils.isBlank(canceledOrder.getCustomer().getTelephone()) ? "--" : canceledOrder.getCustomer().getTelephone());
+                }else {
+                    canceledMap.put("TEL", "--");
+                }
                 canceledMap.put("SUBTOTAL", map.getValue());
                 canceledOrders.add(canceledMap);
                 canceledProductAmount = canceledProductAmount.add(new BigDecimal(map.getValue().toString()));
@@ -7410,16 +7430,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (orders.containsKey(orderItem.getOrderId())) {
                     orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
                 } else {
-                    MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", 0);
+                    RedisUtil.set(orderItem.getOrderId() + "ItemCount", 0);
                     orders.put(orderItem.getOrderId(), itemValue);
                 }
             }else{
                 BigDecimal itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
                 if (orders.containsKey(orderItem.getOrderId())) {
                     orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
-                    MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", Integer.parseInt(MemcachedUtils.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
+                    RedisUtil.set(orderItem.getOrderId() + "ItemCount", Integer.parseInt(RedisUtil.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
                 } else {
-                    MemcachedUtils.put(orderItem.getOrderId() + "ItemCount", orderItem.getCount());
+                    RedisUtil.set(orderItem.getOrderId() + "ItemCount", orderItem.getCount());
                     orders.put(orderItem.getOrderId(), itemValue);
                 }
             }
@@ -7668,18 +7688,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
-        o.setArticleCount(o.getArticleCount() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
+        o.setArticleCount(o.getArticleCount() - Integer.parseInt(RedisUtil.get(o.getId() + "ItemCount").toString()));
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
         o.setOriginalAmount(origin.add(shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount() != null ? o.getCustomerCount() : 0))));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
-            o.setCountWithChild(o.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
+            o.setCountWithChild(o.getCountWithChild() - Integer.parseInt(RedisUtil.get(o.getId() + "ItemCount").toString()));
         }
         if (o.getParentOrderId() != null) {
             Order parent = selectById(o.getParentOrderId());
             parent.setAmountWithChildren(parent.getAmountWithChildren().subtract(order.getRefundMoney()));
-            parent.setCountWithChild(parent.getCountWithChild() - Integer.parseInt(MemcachedUtils.get(o.getId() + "ItemCount").toString()));
+            parent.setCountWithChild(parent.getCountWithChild() - Integer.parseInt(RedisUtil.get(o.getId() + "ItemCount").toString()));
             update(parent);
             Map map = new HashMap(4);
             map.put("brandName", brandSetting.getBrandName());

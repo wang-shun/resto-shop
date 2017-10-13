@@ -110,4 +110,11 @@ public interface CustomerService extends GenericService<Customer, String> {
 	List<Customer> selectBySelectMap(Map<String, Object> selectMap);
 
 	 int updateCustomerWechatId(Customer customer);
+
+	/**
+	 * 根据账户余额Id查询用户信息
+	 * @param accountId
+	 * @return
+	 */
+	Customer selectByAccountId(String accountId);
 }

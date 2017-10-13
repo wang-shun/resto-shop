@@ -676,7 +676,7 @@
     </select>
 
     <select id="selectCustomerAccount" parameterType="String" resultType="com.resto.shop.web.model.Customer">
-		select tc.id,tc.nickname,tc.telephone,tc.account_id,IFNULL(ta.remain,0) remain from tb_customer tc 
+		select tc.id,tc.nickname,tc.telephone,tc.account_id,IFNULL(ta.remain,0) remain from tb_customer tc
 		left join tb_account ta
 		on tc.account_id = ta.id
 		where tc.telephone = #{telephone}
@@ -775,5 +775,9 @@ and wechat_id != '0'
                 and tc.nickname like CONCAT('%',#{text},'%') or tc.telephone like CONCAT('%',#{text},'%')
             </if>
         </where>
+    </select>
+
+    <select id="selectByAccountId" resultType="com.resto.shop.web.model.Customer" parameterType="java.lang.String">
+        select * from tb_customer where account_id = #{accountId}
     </select>
 </mapper>
