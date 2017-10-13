@@ -250,7 +250,7 @@ public class GetNumberAspect {
             if(shop.getWaitRemindSwitch() == 1 && shop.getWaitRemindNumber() > 0 &&
                     (getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ONE || getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_TWO)){
                 List<GetNumber> getNumberList = getNumberService.selectAfterNumberByCodeId(getNumber.getShopDetailId(), getNumber.getCodeId(), getNumber.getCreateTime());
-                if(getNumberList.size() > 1 && (getNumberList.size() + 1) >= shop.getWaitRemindNumber()){
+                if(getNumberList.size() > (shop.getWaitRemindNumber() - 1) && (getNumberList.size() + 1) >= shop.getWaitRemindNumber()){
                     GetNumber gn = getNumberList.get(shop.getWaitRemindNumber() - 1);
                     Customer c = customerService.selectById(gn.getCustomerId());
                     StringBuffer msg = new StringBuffer();
