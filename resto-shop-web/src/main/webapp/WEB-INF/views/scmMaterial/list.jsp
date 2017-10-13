@@ -205,6 +205,7 @@
 <script>
     (function(){
         var $table = $(".table-body>table");
+        var allArticles = [];
         var tb = $table.DataTable({
             ajax : {
                 url : "scmMaterial/list_all",
@@ -222,21 +223,32 @@
                             case 'SEASONING':tdData='配料';break;
 						}
                         $(td).html(tdData);
+                    },
+                    s_filter: true,
+                    s_render: function (tdData) {
+                        switch (tdData){
+                            case 'INGREDIENTS':tdData='主料';break;
+                            case 'ACCESSORIES':tdData='辅料';break;
+                            case 'SEASONING':tdData='配料';break;
+                        }
+                        return tdData;
                     }
-
                 },
                 {
                     title : "一级类别",
                     data : "categoryOneName",
+                    s_filter: true,
                 },
                 {
                     title : "二级类别",
                     data : "categoryTwoName",
+                    s_filter: true,
                 }
                 ,
                 {
                     title : "品牌",
                     data : "categoryThirdName",
+                    s_filter: true,
                 },
                 {
                     title : "材料名",
@@ -272,12 +284,10 @@
                         $(td).html(tdData+rowData.convertUnitName);
                     }
                 },
-
                 {
                     title : "最小单位份数",
                     data : "coefficient",
                 },
-
                 {
                     title : "产地",
                     data : "provinceName",
@@ -305,6 +315,39 @@
                         $(td).html(operator);
                     }
                 }],
+            initComplete: function () {
+                var api = this.api();
+                api.search('');
+                var data = api.data();
+                for (var i = 0; i < data.length; i++) {
+                    switch (data[i].materialType){
+                        case 'INGREDIENTS':data[i].materialTypeShow='主料';break;
+                        case 'ACCESSORIES':data[i].materialTypeShow='辅料';break;
+                        case 'SEASONING':data[i].materialTypeShow='配料';break;
+                    }
+                    allArticles.push(data[i]);
+                }
+                debugger
+                var columnsSetting = api.settings()[0].oInit.columns;
+                $(columnsSetting).each(function (i) {
+                    if (this.s_filter) {
+                        var column = api.column(i);
+                        var title = this.title;
+                        var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+                        var that = this;
+                        column.data().unique().each(function (d) {
+                            select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
+                        });
+
+                        select.appendTo($(column.header()).empty()).on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                            );
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+                    }
+                });
+            }
         });
         var C = new Controller(null,tb);
         var vueObj = new Vue({
@@ -316,6 +359,7 @@
                     {code:"ACCESSORIES" , name:"辅料"},
                     {code:"SEASONING" ,name:"配料"},
                 ],
+                allArticles: allArticles,
                 categoryOnes:[],//一级类别集合
                 categoryTwos:[],//二级类别集合
                 categoryThirds:[],//品牌类别集合
