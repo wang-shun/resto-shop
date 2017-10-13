@@ -20,6 +20,7 @@ import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.dao.FreeDayMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.model.*;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -765,6 +766,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> selectArticleByShopId(String shopId) {
         return articleMapper.selectArticleByShopId(shopId);
+    }
+
+    @Override
+    public void sendMsgToLocalPosUpdateData(String brandId, String shopId) {
+        MQMessageProducer.sendUpdateDateToLocalPos(brandId,shopId);
     }
 
 }

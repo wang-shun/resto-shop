@@ -159,6 +159,7 @@ public class ArticleController extends GenericController {
         }
         //articleService.initStock();
         posService.shopMsgChange(getCurrentShopId());
+        articleService.sendMsgToLocalPosUpdateData(getCurrentBrandId(),getCurrentShopId());
         Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
         LogTemplateUtils.articleEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());

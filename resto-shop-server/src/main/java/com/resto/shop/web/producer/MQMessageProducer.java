@@ -404,4 +404,12 @@ public class MQMessageProducer {
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_ORDER_CANCEL,obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
+
+	public static void sendUpdateDateToLocalPos(String brandId,String shopId){
+		JSONObject obj  = new JSONObject();
+		obj.put("brandId", brandId);
+		obj.put("shopId", shopId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_LOCAL_POS_UPDATE_DATA,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
 }
