@@ -168,8 +168,8 @@
                             {{detailsArr.remark}}
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <table class="table table-bordered" >
+                    <div class="form-group row" style="max-height:300px;overflow: auto;">
+                        <table class="table table-bordered">
                             <thead>
                             <tr>
                                 <th>类型</th>
