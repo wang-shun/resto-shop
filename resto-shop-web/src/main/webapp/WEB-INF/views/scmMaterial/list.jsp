@@ -320,11 +320,6 @@
                 api.search('');
                 var data = api.data();
                 for (var i = 0; i < data.length; i++) {
-                    switch (data[i].materialType){
-                        case 'INGREDIENTS':data[i].materialTypeShow='主料';break;
-                        case 'ACCESSORIES':data[i].materialTypeShow='辅料';break;
-                        case 'SEASONING':data[i].materialTypeShow='配料';break;
-                    }
                     allArticles.push(data[i]);
                 }
                 debugger
