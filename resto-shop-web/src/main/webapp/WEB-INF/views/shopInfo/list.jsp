@@ -629,7 +629,7 @@
 						</div>
 					</div>
 
-					<div class="form-group">
+					<div class="form-group" v-if="b.consumptionRebate==1">
 						<label class="col-md-4 control-label">是否开启消费返利(1:1)：</label>
 						<div  class="col-md-6 radio-list">
 							<label class="radio-inline">
@@ -641,7 +641,7 @@
 						</div>
 					</div>
 
-					<div class="form-group" v-if="m.consumptionRebate==1">
+					<div class="form-group" v-if="m.consumptionRebate==1 && b.consumptionRebate==1">
 						<label class="col-md-4 control-label">消费返利解冻时间:</label>
 						<div class="col-md-6 radio-list">
 							<div class="input-group date form_datetime">
