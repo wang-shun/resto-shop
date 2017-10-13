@@ -216,7 +216,7 @@
                 {
                     title : "类型",
                     data : "materialType",
-                    createdCell:function (td,tdData) {
+                    createdCell:function (td,tdData) {//td中的数据
                         switch (tdData){
 							case 'INGREDIENTS':tdData='主料';break;
                             case 'ACCESSORIES':tdData='辅料';break;
@@ -224,8 +224,8 @@
 						}
                         $(td).html(tdData);
                     },
-                    s_filter: true,
-                    s_render: function (tdData) {
+                    s_filter: true,//标题中select--value和内容相同
+                    s_render: function (tdData) {//标题中select--value中的数据
                         switch (tdData){
                             case 'INGREDIENTS':tdData='主料';break;
                             case 'ACCESSORIES':tdData='辅料';break;
@@ -242,7 +242,7 @@
                 {
                     title : "二级类别",
                     data : "categoryTwoName",
-                    s_filter: true,
+                    s_filter: true,//标题中select--value和内容相同
                 }
                 ,
                 {
