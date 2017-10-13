@@ -271,12 +271,15 @@
                     };
                 },
                 edit:function(model){ //编辑打开弹窗
+                    debugger
                     var that = this;
                     this.parameter= model;
                     $.get('scmCategory/list_all',function (jsonData) {
                         that.productTypes=jsonData.data;
                     });
-                    this.parameter.materialTypes=model.materialIds.split(',');
+                    if(model.materialIds=='') this.parameter.materialTypes=[];
+                    else this.parameter.materialTypes=model.materialIds.split(',');
+
                     this.showform=true;
                     setTimeout(function () {
                         $('#supplierContacts div').removeClass('radio');
@@ -285,6 +288,7 @@
                 save:function(){//提交
                     var _this=this;
                     var saveObj={};
+                    debugger
                     saveObj.id=this.parameter.id;
                     saveObj.supCode=this.parameter.supCode;
                     saveObj.supplierType=this.parameter.supplierType;
