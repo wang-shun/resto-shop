@@ -55,7 +55,6 @@
 		                        <th>使用总额</th>
 		                        <th>优惠券使用占比</th>
                                 <th>拉动订单总数</th>
-                                <th>拉动订单总额</th>
                                 <th>拉动注册用户数</th>
 							</tr>
 						</thead>
@@ -69,7 +68,6 @@
                                     <td>{{brandCouponInfo.useCouponMoney}}</td>
                                     <td>{{brandCouponInfo.useCouponCountRatio}}</td>
                                     <td>{{brandCouponInfo.useCouponOrderCount}}</td>
-                                    <td>{{brandCouponInfo.useCouponOrderMoney}}</td>
                                     <td>{{brandCouponInfo.customerCount}}</td>
                                 </tr>
                             </template>
@@ -194,10 +192,6 @@
                         {
                             title : "拉动订单总数",
                             data : "useCouponOrderCount"
-                        },
-                        {
-                            title : "拉动订单总额" ,
-                            data : "useCouponOrderMoney"
                         },
                         {
                             title : "拉动注册用户数" ,

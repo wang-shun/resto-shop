@@ -409,5 +409,9 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			doPostAnsc(LogUtils.url, map);
 		}
 	}
-	
+
+	@Override
+	public List<Account> selectRebate() {
+		return accountMapper.selectRebate();
+	}
 }

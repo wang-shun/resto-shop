@@ -427,22 +427,12 @@ public class BrandMarketingController extends GenericController{
                     couponDto.setUseCouponMoney(new BigDecimal(0));
                     couponDto.setUseCouponCountRatio("0.00%");
                 }
-                selectMap.put("couponTypeInt",couponDto.getCouponTypeInt());
-                Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
-                if(useOrder == null){
-                    couponDto.setUseCouponOrderCount(BigDecimal.ZERO);
-                    couponDto.setUseCouponOrderMoney(BigDecimal.ZERO);
-                }else{
-                    String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
-                    couponDto.setUseCouponOrderCount(new BigDecimal(useRedOrder[0]));
-                    couponDto.setUseCouponOrderMoney(new BigDecimal(useRedOrder[1]));
-                }
+                couponDto.setUseCouponOrderCount(couponDto.getUseCouponCount());
                 couponCount = couponCount.add(couponDto.getCouponCount());
                 couponMoney = couponMoney.add(couponDto.getCouponMoney());
                 useCouponCount = useCouponCount.add(couponDto.getUseCouponCount() == null ? BigDecimal.ZERO : couponDto.getUseCouponCount());
                 useCouponMoney = useCouponMoney.add(couponDto.getUseCouponMoney() == null ? BigDecimal.ZERO : couponDto.getUseCouponMoney());
                 useCouponOrderCount = useCouponOrderCount.add(couponDto.getUseCouponOrderCount());
-                useCouponOrderMoney = useCouponOrderMoney.add(couponDto.getUseCouponOrderMoney());
                 customerCount = customerCount.add(couponDto.getCustomerCount());
             }
             object.put("shopCouponInfoList",couponDtos);
@@ -453,7 +443,6 @@ public class BrandMarketingController extends GenericController{
             brandCouponInfo.put("useCouponCount",useCouponCount);
             brandCouponInfo.put("useCouponMoney",useCouponMoney);
             brandCouponInfo.put("useCouponOrderCount",useCouponOrderCount);
-            brandCouponInfo.put("useCouponOrderMoney",useCouponOrderMoney);
             brandCouponInfo.put("customerCount",customerCount);
             if (!couponCount.equals(BigDecimal.ZERO)){
                 useCouponCountRatio = useCouponCount.divide(couponCount,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%";
@@ -487,7 +476,7 @@ public class BrandMarketingController extends GenericController{
         String path = request.getSession().getServletContext().getRealPath(fileName);
         //定义列
         String[]columns={"brandName","couponType","couponSoure","couponShopName","couponName","couponCount","couponMoney","useCouponCount","useCouponMoney",
-                "useCouponCountRatio","useCouponOrderCount","useCouponOrderMoney","customerCount"};
+                "useCouponCountRatio","useCouponOrderCount","customerCount"};
         //定义数据
         List<CouponDto> result = new ArrayList<>();
         if (couponDto.getBrandCouponInfo() != null) {
@@ -503,7 +492,6 @@ public class BrandMarketingController extends GenericController{
             brandCouponInfo.setUseCouponMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponMoney").toString()));
             brandCouponInfo.setUseCouponCountRatio(couponDto.getBrandCouponInfo().get("useCouponCountRatio").toString());
             brandCouponInfo.setUseCouponOrderCount(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponOrderCount").toString()));
-            brandCouponInfo.setUseCouponOrderMoney(new BigDecimal(couponDto.getBrandCouponInfo().get("useCouponOrderMoney").toString()));
             brandCouponInfo.setCustomerCount(new BigDecimal(couponDto.getBrandCouponInfo().get("customerCount").toString()));
             result.add(brandCouponInfo);
         }
@@ -535,7 +523,7 @@ public class BrandMarketingController extends GenericController{
         map.put("timeType", "yyyy-MM-dd");
 
         String[][] headers = {{"品牌名称","35"},{"优惠券类型","35"},{"优惠券所属","35"},{"所属店铺","35"},{"优惠券名称","35"},{"发放总数","35"},{"发放总额","35"},{"使用总数","35"},
-                {"使用总额","35"},{"优惠券使用占比","35"},{"拉动订单总数","35"},{"拉动订单总额","35"},{"拉动注册用户数","35"}};
+                {"使用总额","35"},{"优惠券使用占比","35"},{"拉动订单总数","35"},{"拉动注册用户数","35"}};
         //定义excel工具类对象
         ExcelUtil<CouponDto> excelUtil=new ExcelUtil<CouponDto>();
         try{
