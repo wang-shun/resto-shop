@@ -162,10 +162,7 @@
         </table>
     </div>
 </div>
-<!--树状图-->
-<%--<link href="assets/treeview/bower_components/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
-<script src="assets/treeview/bower_components/jquery/dist/jquery.js"></script>--%>
-<%--<script src="assets/treeview/js/bootstrap-treeview.js"></script>--%>
+<!--树状图--><!--处理过的-->
 <link href="assets/treeview/themes/default/style.min.css" rel="stylesheet">
 <script src="assets/treeview/js/jstrestwo.js"></script>
 
@@ -432,7 +429,7 @@
                     this.parameter.bomDetailDeleteIds.push(mealItem.id);
                 },
             },
-            ready:function(){//钩子加载后
+            ready:function(){//钩子加载后---*vue挂载之后执行*
                 var that = this;
                 $('#tableBodyList').on('click','table tbody tr',function () {//显示详情
                     that.tableBodyListsShow=true;
@@ -453,8 +450,8 @@
             },
         });
         C.vue=vueObj;
-        $.get('scmCategory/query',function (jsonData) {
-            var defaultData=jsonData.data;
+        $.get('scmCategory/query',function (jsonData) { //得到数据
+            var defaultData=jsonData.data;//处理数据
             for(var i=0;i<defaultData.length;i++){
                 defaultData[i].idTwo = defaultData[i].id;
                 delete defaultData[i].id;
@@ -500,7 +497,6 @@
                 }
                 to = setTimeout(function () {
                     $('#assignTree').jstrestwo(true).search($('#search_ay').val());
-
                 }, 250);
             });
         })

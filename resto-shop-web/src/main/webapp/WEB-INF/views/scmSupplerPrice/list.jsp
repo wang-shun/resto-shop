@@ -168,8 +168,8 @@
                             {{detailsArr.remark}}
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <table class="table table-bordered" >
+                    <div class="form-group row" style="max-height:300px;overflow: auto;">
+                        <table class="table table-bordered">
                             <thead>
                             <tr>
                                 <th>类型</th>
@@ -308,6 +308,13 @@
                             C.findBtn(rowData),
                             </s:hasPermission>
                         ];
+                        if(rowData.supStatus==12||rowData.supStatus==13||rowData.supStatus==15){
+                            operator=[
+                                <s:hasPermission name="scmSupplerPrice/showDetails">
+                                C.findBtn(rowData),
+                                </s:hasPermission>
+                            ];
+                        }
                         $(td).html(operator);
                     }
                 },
@@ -322,7 +329,7 @@
                 detailsBtn:false,//查看详情返回按钮
                 approveBtn:false,//查看详情（审核）-审核按钮
                 showform:false,//弹窗
-                treeView:false,//树状图
+                treeView:false,//树状图弹窗是否隐藏
                 bomRawMaterial:[],//树状图原材料
                 detailsArr:'',//查看详情对象
                 supplierTypes: [ //供应商类型数组
@@ -385,6 +392,7 @@
                 },
                 showDetails:function (data) { //查看详情
                     this.details=true;
+                    this.approveBtn=false;
                     this.detailsArr=data;
                     for(var i=0;i<this.detailsArr.mdSupplierPriceDetailDoList.length;i++){
                         switch(this.detailsArr.mdSupplierPriceDetailDoList[i].materialType){
@@ -406,7 +414,6 @@
                     this.parameter.mdSupplierPriceDetailDoList.$remove(mealItem);
                 },
                 bomRawMaterialSub:function () { //添加原材料保存
-                    debugger
                     var originaldata=$('#assignTree').jstrestwo().get_bottom_checked(true);//拿到树状图中的数组
                     for(var i=0;i<originaldata.length;i++){
                         if(originaldata[i].original.materialType){

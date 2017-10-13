@@ -50,11 +50,13 @@
 
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">产品(可多选)</label>
-                                <div class="col-md-7 checkbox-list" id="checkboxs">
-                                    <label class="checkbox-inline" v-for="materialType in productTypes">
+                                <div class="col-md-10 checkbox-list" id="checkboxs">
+                                    <p class="col-md-3" v-for="materialType in productTypes">
+                                    <label class="checkbox-inline" >
                                         <input type="checkbox" name="checkbox" v-model="parameter.materialTypes" value="{{materialType.id}}">
                                         <span>{{materialType.categoryName}}</span>
                                     </label>
+                                    </p>
                                 </div>
                             </div>
                                 <table class="table table-bordered" id="supplierContacts">
@@ -64,7 +66,7 @@
                                         <th>姓名<span style="color:#FF0000;">*</span></th>
                                         <th>电话<span style="color:#FF0000;">*</span></th>
                                         <th>邮箱</th>
-                                        <th>设为默认<span style="color:#FF0000;">*</span></th>
+                                        <th>默认<span style="color:#FF0000;">*</span></th>
                                         <th>操作</th>
                                     </tr>
                                     </thead>
@@ -72,8 +74,8 @@
                                     <tr v-for="(index,item) in parameter.supplierContacts">
                                         <td>{{index+1}}</td>
                                         <td><input style="width: 80px" type="text" v-model="item.contact"></td>
-                                        <td><input type="text" v-model="item.mobile"></td>
-                                        <td><input type="text" v-model="item.email"></td>
+                                        <td><input style="width: 145px" type="text" v-model="item.mobile"></td>
+                                        <td><input style="width: 145px" type="text" v-model="item.email"></td>
                                         <td><input name="isTop" type="radio" v-model="isTop" :value="item.isTop" @click="supplierContactsRadio(item)"></td>
                                         <td><span class="btn btn-xs red" @click="removeArticleItem(item)">移除</span></td>
                                     </tr>
@@ -177,7 +179,7 @@
                             C.createEditBtn(rowData),
                             </s:hasPermission>
                             <s:hasPermission name="scmSupplier/delete">
-                            C.createDelBtn(tdData,"scmSupplier/delete"),
+                            C.createDelSupplier(tdData,"scmSupplier/delete",'scmSupplerPrice/findEffectiveSupPriceIds'),
                             </s:hasPermission>
                         ];
                         $(td).html(operator);
@@ -274,7 +276,9 @@
                     $.get('scmCategory/list_all',function (jsonData) {
                         that.productTypes=jsonData.data;
                     });
-                    this.parameter.materialTypes=model.materialIds.split(',');
+                    if(model.materialIds=='') this.parameter.materialTypes=[];
+                    else this.parameter.materialTypes=model.materialIds.split(',');
+
                     this.showform=true;
                     setTimeout(function () {
                         $('#supplierContacts div').removeClass('radio');
@@ -285,6 +289,7 @@
                       debugger
                     var _this=this;
                     var saveObj={};
+                    debugger
                     saveObj.id=this.parameter.id;
                     saveObj.supCode=this.parameter.supCode;
                     saveObj.supplierType=this.parameter.supplierType;

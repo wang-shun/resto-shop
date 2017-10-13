@@ -205,6 +205,7 @@
 <script>
     (function(){
         var $table = $(".table-body>table");
+        var allArticles = [];
         var tb = $table.DataTable({
             ajax : {
                 url : "scmMaterial/list_all",
@@ -215,28 +216,39 @@
                 {
                     title : "类型",
                     data : "materialType",
-                    createdCell:function (td,tdData) {
+                    createdCell:function (td,tdData) {//td中的数据
                         switch (tdData){
 							case 'INGREDIENTS':tdData='主料';break;
                             case 'ACCESSORIES':tdData='辅料';break;
                             case 'SEASONING':tdData='配料';break;
 						}
                         $(td).html(tdData);
+                    },
+                    s_filter: true,//标题中select--value和内容相同
+                    s_render: function (tdData) {//标题中select--value中的数据
+                        switch (tdData){
+                            case 'INGREDIENTS':tdData='主料';break;
+                            case 'ACCESSORIES':tdData='辅料';break;
+                            case 'SEASONING':tdData='配料';break;
+                        }
+                        return tdData;
                     }
-
                 },
                 {
                     title : "一级类别",
                     data : "categoryOneName",
+                    s_filter: true,
                 },
                 {
                     title : "二级类别",
                     data : "categoryTwoName",
+                    s_filter: true,//标题中select--value和内容相同
                 }
                 ,
                 {
                     title : "品牌",
                     data : "categoryThirdName",
+                    s_filter: true,
                 },
                 {
                     title : "材料名",
@@ -272,17 +284,19 @@
                         $(td).html(tdData+rowData.convertUnitName);
                     }
                 },
-
                 {
                     title : "最小单位份数",
                     data : "coefficient",
                 },
-
                 {
                     title : "产地",
                     data : "provinceName",
                     createdCell:function (td,tdData,rowData) {
-                        $(td).html(tdData+rowData.cityName+rowData.districtName);
+                        if (tdData === null || tdData === "" || tdData === ''){
+                            $(td).html('');
+						}else {
+                            $(td).html(tdData+rowData.cityName+rowData.districtName);
+						}
                     }
                 },
 
@@ -305,6 +319,34 @@
                         $(td).html(operator);
                     }
                 }],
+            initComplete: function () {
+                var api = this.api();
+                api.search('');
+                var data = api.data();
+                for (var i = 0; i < data.length; i++) {
+                    allArticles.push(data[i]);
+                }
+                debugger
+                var columnsSetting = api.settings()[0].oInit.columns;
+                $(columnsSetting).each(function (i) {
+                    if (this.s_filter) {
+                        var column = api.column(i);
+                        var title = this.title;
+                        var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+                        var that = this;
+                        column.data().unique().each(function (d) {
+                            select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
+                        });
+
+                        select.appendTo($(column.header()).empty()).on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                            );
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+                    }
+                });
+            }
         });
         var C = new Controller(null,tb);
         var vueObj = new Vue({
@@ -316,6 +358,7 @@
                     {code:"ACCESSORIES" , name:"辅料"},
                     {code:"SEASONING" ,name:"配料"},
                 ],
+                allArticles: allArticles,
                 categoryOnes:[],//一级类别集合
                 categoryTwos:[],//二级类别集合
                 categoryThirds:[],//品牌类别集合
@@ -404,7 +447,7 @@
                     this.cityNameList='';
                     this.districtNameList='';
                 },
-                cityNameListCh:function () {//点击监控省份
+                cityNameListCh:function () {//点击监控市区
                     this.districtNameList='';
                 },
                 com:function () { //计算系数
@@ -504,6 +547,7 @@
                     else if(!this.m.minMeasureUnit) message='最小单位';
                     else  submit=true;
                     if(submit){
+                        debugger
                         if(this.m.id) C.systemButton('scmMaterial/modify',this.m,['编辑成功','编辑失败']);
                         else C.systemButton('scmMaterial/create',this.m,['新增成功','新增失败']);
                         this.showform=false;
