@@ -641,6 +641,18 @@
 						</div>
 					</div>
 
+					<div class="form-group" v-show="m.openBadWarning==1">
+						<label class="col-md-4 control-label" :class="{ formBox : m.openBadWarning == 1}">预警通知方式：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="checkbox" name="warningSms"v-model="m.warningSms" value="1">短信推送
+							</label>
+							<label class="radio-inline">
+								<input type="checkbox" name="warningWechat" v-model="m.warningWechat" value="1">微信推送
+							</label>
+						</div>
+					</div>
+
 					<div class="form-group" v-show="m.openBadWarning == 1">
 						<label class="col-md-4 control-label" :class="{ formBox : m.openBadWarning == 1}">差评预警关键词：</label>
 						<div  class="col-md-6">

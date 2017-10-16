@@ -130,6 +130,12 @@ public class ShopInfoController extends GenericController{
         }else  if(shopDetail.getIsOpenSms()==1){
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
         }
+        if (shopDetail.getWarningWechat() == null){
+            shopDetail.setWarningWechat(Common.NO);
+        }
+        if (shopDetail.getWarningSms() == null){
+            shopDetail.setWarningSms(Common.NO);
+        }
 //        shopDetailService.updateWithDatong(shopDetail,getCurrentBrandId(),getBrandName());
         shopDetailService.update(shopDetail);
         ShopDetail shopDetail1 =(ShopDetail) RedisUtil.get(getCurrentShopId()+"info");
