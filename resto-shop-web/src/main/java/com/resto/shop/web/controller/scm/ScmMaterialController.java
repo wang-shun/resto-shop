@@ -1,17 +1,21 @@
  package com.resto.shop.web.controller.scm;
 
  import com.resto.brand.core.entity.Result;
+ import com.resto.brand.web.model.BrandSetting;
+ import com.resto.brand.web.service.BrandSettingService;
  import com.resto.scm.web.dto.MaterialDo;
  import com.resto.scm.web.dto.MdSupplierPriceHeadDo;
  import com.resto.scm.web.model.MdMaterial;
  import com.resto.scm.web.service.MaterialService;
  import com.resto.scm.web.service.SupplierMaterialPriceService;
+ import com.resto.shop.web.constant.Common;
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
+ import javax.annotation.Resource;
  import javax.validation.Valid;
  import java.util.List;
 
@@ -26,9 +30,19 @@
 	 SupplierMaterialPriceService supplierpriceService;
 
 
+	 @Resource
+	 BrandSettingService brandSettingService;
 
 	 @RequestMapping("/list")
-	 public void list(){
+	 public String list(){
+
+		 BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+		 if (brandSetting.getIsOpenScm().equals(Common.YES)){
+			 return "scmMaterial/list";
+		 }else {
+			 return "notopen";
+		 }
+
 	 }
 
 	 @RequestMapping("/list_all")

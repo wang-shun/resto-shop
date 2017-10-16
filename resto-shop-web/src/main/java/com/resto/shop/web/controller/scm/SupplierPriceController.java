@@ -3,8 +3,11 @@
  import cn.restoplus.common.utils.ListUtil;
  import com.alibaba.fastjson.JSONObject;
  import com.resto.brand.core.entity.Result;
+ import com.resto.brand.web.model.BrandSetting;
+ import com.resto.brand.web.service.BrandSettingService;
  import com.resto.scm.web.dto.MdSupplierPriceHeadDo;
  import com.resto.scm.web.service.SupplierMaterialPriceService;
+ import com.resto.shop.web.constant.Common;
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestBody;
@@ -21,11 +24,19 @@ public class SupplierPriceController extends GenericController{
 
 	@Resource
 	SupplierMaterialPriceService supplierpriceService;
-	
-	@RequestMapping("/list")
-    public void list(){
-    }
+	@Resource
+	BrandSettingService brandSettingService;
 
+
+	@RequestMapping("/list")
+	public String list(){
+		BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+		if (brandSetting.getIsOpenScm().equals(Common.YES)){
+			return "scmSupplerPrice/list";
+		}else {
+			return "notopen";
+		}
+	}
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public Result listData(){

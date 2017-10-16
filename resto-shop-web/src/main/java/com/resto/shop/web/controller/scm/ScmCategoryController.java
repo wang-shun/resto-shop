@@ -1,9 +1,12 @@
 package com.resto.shop.web.controller.scm;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.scm.web.dto.CategoryOne;
 import com.resto.scm.web.model.MdCategory;
 import com.resto.scm.web.service.CategoryService;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.util.Assertion;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -22,8 +26,19 @@ public class ScmCategoryController extends GenericController {
     @Autowired
     private CategoryService categoryService;
 
+    @Resource
+    BrandSettingService brandSettingService;
+
     @RequestMapping("/list")
-    public void list() {
+    public String list(){
+
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+        if (brandSetting.getIsOpenScm().equals(Common.YES)){
+            return "scmCategory/list";
+        }else {
+            return "notopen";
+        }
+
     }
 
     @RequestMapping("/query")

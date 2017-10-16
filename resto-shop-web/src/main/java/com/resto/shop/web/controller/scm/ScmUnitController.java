@@ -1,16 +1,20 @@
  package com.resto.shop.web.controller.scm;
 
  import com.resto.brand.core.entity.Result;
+ import com.resto.brand.web.model.BrandSetting;
+ import com.resto.brand.web.service.BrandSettingService;
  import com.resto.common.dao.domain.PageResult;
  import com.resto.scm.web.model.MdCategory;
  import com.resto.scm.web.model.MdUnit;
  import com.resto.scm.web.service.ScmUnitService;
+ import com.resto.shop.web.constant.Common;
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
+ import javax.annotation.Resource;
  import javax.validation.Valid;
  import java.util.List;
 
@@ -20,11 +24,20 @@
 
 	 @Autowired
      ScmUnitService unitService;
+	 @Resource
+	 BrandSettingService brandSettingService;
 
 	 @RequestMapping("/list")
-	 public void list(){
-	 }
+	 public String list(){
 
+		 BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+		 if (brandSetting.getIsOpenScm().equals(Common.YES)){
+			 return "scmStockCount/list";
+		 }else {
+			 return "notopen";
+		 }
+
+	 }
 	 @RequestMapping("/list_all")
 	 @ResponseBody
 	 public Result listData(MdUnit mdUnit){

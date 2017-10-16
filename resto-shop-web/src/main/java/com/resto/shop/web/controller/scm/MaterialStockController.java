@@ -1,8 +1,11 @@
 package com.resto.shop.web.controller.scm;
 
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.scm.web.dto.MaterialStockDo;
 import com.resto.scm.web.service.MaterialStockService;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.controller.GenericController;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,8 +27,20 @@ public class MaterialStockController extends GenericController {
     @Resource
     private MaterialStockService materialstockService;
 
+    @Resource
+    BrandSettingService brandSettingService;
+
+
     @RequestMapping("/list")
-    public void list(){
+    public String list(){
+
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+        if (brandSetting.getIsOpenScm().equals(Common.YES)){
+            return "scmMaterialStock/list";
+        }else {
+            return "notopen";
+        }
+
     }
 
     @RequestMapping("/list_all")

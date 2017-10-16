@@ -1,11 +1,14 @@
  package com.resto.shop.web.controller.scm;
 
  import com.resto.brand.core.entity.Result;
+ import com.resto.brand.web.model.BrandSetting;
+ import com.resto.brand.web.service.BrandSettingService;
  import com.resto.scm.web.dto.MdSupplierAndContactDo;
  import com.resto.scm.web.dto.MdSupplierDo;
  import com.resto.scm.web.model.MdSupplier;
  import com.resto.scm.web.service.SupplierService;
  import com.resto.shop.web.config.SessionKey;
+ import com.resto.shop.web.constant.Common;
  import com.resto.shop.web.controller.GenericController;
  import org.apache.shiro.session.Session;
  import org.springframework.stereotype.Controller;
@@ -24,10 +27,20 @@ public class SupplierController extends GenericController{
 
 	@Resource
 	SupplierService supplierService;
+	@Resource
+	BrandSettingService brandSettingService;
 
 	@RequestMapping("/list")
-    public void list(){
-    }
+	public String list(){
+
+		BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
+		if (brandSetting.getIsOpenScm().equals(Common.YES)){
+			return "scmSupplier/list";
+		}else {
+			return "notopen";
+		}
+
+	}
 
 	@RequestMapping("/list_all")
 	@ResponseBody
