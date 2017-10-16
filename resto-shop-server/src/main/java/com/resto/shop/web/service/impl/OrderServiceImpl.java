@@ -399,6 +399,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setId(orderId);
         order.setPosDiscount(new BigDecimal(1));
         Customer customer = customerService.selectById(order.getCustomerId());
+        if(customer != null) {
+            if (!MemcachedUtils.add(customer.getId() + "createOrder", 1, 30)) {
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("下单过于频繁，请稍后再试！");
+                return jsonResult;
+            }
+        }
+
         if(!StringUtils.isEmpty(order.getGroupId())){
             Boolean bool = (Boolean) RedisUtil.get(order.getCustomerId()+order.getGroupId());
             if(!bool){
@@ -410,8 +418,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //如果这个订单已经被组里的人买单了，那么其他人不能在
             if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30)){
                 jsonResult.setSuccess(false);
-                jsonResult.setMessage("该订单正在被"+customer.getNickname()+"支付中，请勿重复买单！");
+                jsonResult.setMessage("该订单正在被"+RedisUtil.get(order.getGroupId()+"pay")+"支付中，请勿重复买单！");
                 return jsonResult;
+            }else{
+                RedisUtil.set(order.getGroupId()+"pay",customer.getNickname());
             }
         }
 
@@ -419,13 +429,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             throw new AppException(AppException.CUSTOMER_NOT_EXISTS);
         } else if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
-        }
-        if(customer != null) {
-            if (!MemcachedUtils.add(customer.getId() + "createOrder", 1, 30)) {
-                jsonResult.setSuccess(false);
-                jsonResult.setMessage("下单过于频繁，请稍后再试！");
-                return jsonResult;
-            }
         }
 
         if (!StringUtils.isEmpty(order.getTableNumber()) && order.getTableNumber().length() > 5) {
