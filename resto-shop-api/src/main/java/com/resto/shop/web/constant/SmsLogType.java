@@ -23,6 +23,8 @@ public class SmsLogType {
 
     public static final int WAKELOSS=8;//流失唤醒短信(阿里)
 
+    public static final int WARNING=9;//差评预警短信(阿里)
+
 
 
 	public static String getSmsLogTypeName(int state){
@@ -35,9 +37,11 @@ public class SmsLogType {
             case  DAYMESSGAGE:
                 typeName = "日结短信";
                 break;
-
             case WAKELOSS:
                 typeName = "流失唤醒短信";
+                break;
+            case WARNING:
+                typeName = "差评预警短信";
                 break;
             default:
                 return "未知";
