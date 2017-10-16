@@ -399,13 +399,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setId(orderId);
         order.setPosDiscount(new BigDecimal(1));
         Customer customer = customerService.selectById(order.getCustomerId());
-        if(customer != null) {
-            if (!MemcachedUtils.add(customer.getId() + "createOrder", 1, 30)) {
-                jsonResult.setSuccess(false);
-                jsonResult.setMessage("下单过于频繁，请稍后再试！");
-                return jsonResult;
-            }
-        }
+
 
         if(!StringUtils.isEmpty(order.getGroupId())){
             Boolean bool = (Boolean) RedisUtil.get(order.getCustomerId()+order.getGroupId());
@@ -422,6 +416,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 return jsonResult;
             }else{
                 RedisUtil.set(order.getGroupId()+"pay",customer.getNickname());
+            }
+        }
+
+        if(customer != null) {
+            if (!MemcachedUtils.add(customer.getId() + "createOrder", 1, 15)) {
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("下单过于频繁，请稍后再试！");
+                return jsonResult;
             }
         }
 
