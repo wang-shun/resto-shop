@@ -2,6 +2,7 @@ package com.resto.shop.web.aspect;
 
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.*;
+import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
@@ -12,6 +13,7 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
+import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -95,6 +97,10 @@ public class OrderAspect {
         String time = DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
+            if(!org.apache.commons.lang3.StringUtils.isEmpty(order.getGroupId()) && order.getOrderState() == OrderState.PAYMENT){
+                //如果是多人点餐已支付
+                MemcachedUtils.delete(order.getShopDetailId()+order.getGroupId());
+            }
             log.info("(createOrderAround)创建订单时候订单状态为：orderstate：" + order.getOrderState() + "production：" + order.getProductionStatus() + "订单id：" + order.getId() + "当前时间为：" + time);
             if (order.getCustomerId().equals("0")) {
                 //pos端点餐

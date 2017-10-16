@@ -52,7 +52,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.resto.brand.core.util.HttpClient.doPost;
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
 import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
@@ -402,10 +401,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Customer customer = customerService.selectById(order.getCustomerId());
         if(!StringUtils.isEmpty(order.getGroupId())){
             Boolean bool = (Boolean) RedisUtil.get(order.getCustomerId()+order.getGroupId());
-            log.info(order.getCustomerId()+"check = "+bool);
             if(!bool){
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("万分抱歉，菜品发生变动，请重新变动！");
+                return jsonResult;
+            }
+
+            //如果这个订单已经被组里的人买单了，那么其他人不能在
+            if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30)){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("该订单正在被"+customer.getNickname()+"支付中，请勿重复买单！");
                 return jsonResult;
             }
         }
@@ -1474,7 +1479,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         customerMap.put("fileName", order.getCustomerId());
         customerMap.put("type", "UserAction");
         customerMap.put("content", "用户:"+order.getCustomerId()+"取消微信支付，订单Id:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, customerMap);
+        doPostAnsc(url, customerMap);
+        if(!StringUtils.isEmpty(order.getGroupId())){
+           MemcachedUtils.delete(order.getShopDetailId()+order.getGroupId());
+        }
         return result;
     }
 
@@ -1792,6 +1800,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 update(order);
             }
             payOrderSuccess(order);
+            if(!StringUtils.isEmpty(order.getGroupId())){
+                //如果多人点餐支付成功
+                MemcachedUtils.delete(order.getShopDetailId()+order.getGroupId());
+            }
         } else {
             log.warn("该笔支付记录已经处理过:" + item.getId());
         }
@@ -7593,7 +7605,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         map.put("fileName", order.getCustomerId());
                         map.put("type", "UserAction");
                         map.put("content", "用户:"+order.getCustomerId()+"发起银联支付："+item.getPayValue()+",订单号为："+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                        doPost(url, map);
+                        doPostAnsc(url, map);
                         break;
                     case OrderPayMode.XJ_PAY:
                         order.setPaymentAmount(pay);
@@ -7615,7 +7627,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         map1.put("fileName", order.getCustomerId());
                         map1.put("type", "UserAction");
                         map1.put("content", "用户:"+order.getCustomerId()+"发起现金支付："+item.getPayValue()+",订单号为："+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                        doPost(url, map1);
+                        doPostAnsc(url, map1);
                         break;
                     case OrderPayMode.JF_PAY:
                         order.setPaymentAmount(pay);
@@ -8223,7 +8235,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map1.put("fileName", order.getCustomerId());
         map1.put("type", "UserAction");
         map1.put("content", "用户:"+order.getCustomerId()+"的订单："+order.getId()+"在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
-        doPost(url, map1);
+        doPostAnsc(url, map1);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
         return order;
     }
@@ -8484,7 +8496,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         msg.append("请求服务器地址为:"+MQSetting.getLocalIP());
         map.put("content", msg.toString());
-        doPost(url, map);
+        doPostAnsc(url, map);
 
         //yz 计费系统 后付款 pos端 结算时计费
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
