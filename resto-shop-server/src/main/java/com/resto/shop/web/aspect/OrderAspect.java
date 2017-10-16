@@ -1,5 +1,7 @@
 package com.resto.shop.web.aspect;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.model.*;
@@ -13,6 +15,8 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -26,8 +30,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
+import java.text.SimpleDateFormat;
 
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
@@ -71,6 +75,8 @@ public class OrderAspect {
     AccountLogService accountLogService;
     @Resource
     TemplateService templateService;
+    @Resource
+    SmsLogService smsLogService;
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
     public void createOrder() {
@@ -1501,13 +1507,97 @@ public class OrderAspect {
         if (appraise != null) {
             log.info("订单评论完成");
             ShopDetail shopDetail = shopDetailService.selectById(appraise.getShopDetailId());
-            //判断是否开启差评打单
-            if (shopDetail.getOpenBadAppraisePrintOrder()) {
-                //如满足差评条件则打印订单
-                if (appraise.getLevel() <= 4) {
-                    log.info("订单评论满足差评推送消息队列");
-                    //发送队列消息
-                    MQMessageProducer.sendBadAppraisePrintOrderMessage(appraise.getOrderId(), appraise.getShopDetailId());
+            Brand brand = brandService.selectById(shopDetail.getBrandId());
+            //判断是否开启差评打单且满足差评条件则打印订单
+            if (shopDetail.getOpenBadAppraisePrintOrder() && appraise.getLevel() <= 4) {
+                log.info("订单评论满足差评推送消息队列");
+                //发送队列消息
+                MQMessageProducer.sendBadAppraisePrintOrderMessage(appraise.getOrderId(), appraise.getShopDetailId());
+            }
+            //差评预警
+            if (shopDetail.getOpenBadWarning().equals(Common.YES)){
+                badWarning(brand, shopDetail ,appraise);
+            }
+        }
+    }
+
+    /**
+     * 差评预警
+     * @param shopDetail
+     * @param appraise
+     */
+    private final void badWarning(Brand brand, ShopDetail shopDetail,Appraise appraise){
+        //得到所有差评预警的关键字
+        String[] warningKeys = shopDetail.getWarningKey().split(",");
+        //标记评价内容当中是否产生预警关键字
+        Boolean flg = false;
+        //评价当中存在的关键字
+        StringBuffer useWarningKeys = new StringBuffer();
+        for (String warningKey : warningKeys){
+            //判断评价内容当中是否存在关键字
+            if (appraise.getContent().indexOf(warningKey) != -1){
+                flg = true;
+                useWarningKeys.append("\""+warningKey+"\"").append("、");
+            }
+        }
+        if (flg) {
+            //发送信息
+            sendNotificationMessage(brand, shopDetail, appraise, useWarningKeys.toString());
+        }
+    }
+
+    /**
+     * 发送通知信息
+     * @param shopDetail
+     * @param appraise
+     */
+    private final void sendNotificationMessage(Brand brand, ShopDetail shopDetail,Appraise appraise, String warningKey){
+        //信息模板
+        String sendMessage = "餐加提醒您：${customer}为${telephone}的${sex}用户，评价了${datetime}在${shopname}消费的订单，评价内容包含${warningkey}关键词，请及时处理！";
+        //存储关键信息
+        com.alibaba.fastjson.JSONObject stringMap = new com.alibaba.fastjson.JSONObject();
+        //查询相关信息
+        Customer customer = customerService.selectById(appraise.getCustomerId());
+        Order order = orderService.selectById(appraise.getOrderId());
+        WechatConfig wechatConfig = wechatConfigService.selectByBrandId(shopDetail.getBrandId());
+        //封装数据
+        stringMap.put("customer", customer.getTelephone() != null ? "手机号" : "微信昵称");
+        stringMap.put("telephone", customer.getTelephone() != null ? customer.getTelephone() : customer.getNickname());
+        if (customer.getSex().equals(1)){
+            stringMap.put("sex", "男");
+        }else if (customer.getSex().equals(2)){
+            stringMap.put("sex", "女");
+        }else {
+            stringMap.put("sex", "未知");
+        }
+        SimpleDateFormat format = new SimpleDateFormat("yyyy年MM月dd日");
+        stringMap.put("datetime", format.format(order.getCreateTime()));
+        stringMap.put("shopname", shopDetail.getName());
+        stringMap.put("warningkey", warningKey);
+        //格式转换
+        //模板转换工具类
+        StrSubstitutor substitutor = new StrSubstitutor(stringMap);
+        sendMessage = substitutor.replace(sendMessage);
+        //获取结店录入的电话号码
+        if (StringUtils.isNotBlank(shopDetail.getnoticeTelephone())) {
+            //将各个电话号码截取出来
+            String[] telephones = shopDetail.getnoticeTelephone().split(",");
+            //如果开通了预警微信推送
+            if (shopDetail.getWarningWechat().equals(Common.YES)) {
+                //将电话号码转换为JSON字符串
+                String jsonString = JSON.toJSONString(telephones);
+                //得到电话号码在系统所对应的微信用户
+                List<String> customerTelephones = JSON.parseObject(jsonString, new TypeReference<List<String>>(){});
+                List<Customer> customers = customerService.selectByTelePhones(customerTelephones);
+                for (Customer shopCustomer : customers) {
+                    //发送推送
+                    WeChatUtils.sendCustomerMsg(sendMessage, shopCustomer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
+                }
+            }
+            //如果开通了预警短信推送
+            if (shopDetail.getWarningSms().equals(Common.YES)) {
+                for (String telephone : telephones) {
+                    smsLogService.sendMessage(brand.getId(), shopDetail.getId(), SmsLogType.WARNING, SMSUtils.SIGN, SMSUtils.SMS_BAD_WARNING, telephone, stringMap);
                 }
             }
         }
