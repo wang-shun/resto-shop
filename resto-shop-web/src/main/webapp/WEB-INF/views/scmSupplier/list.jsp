@@ -127,52 +127,63 @@
                 url : "scmSupplier/list_all",
                 dataSrc : "data"
             },
-            ordering: false,//取消上下排序
+            //ordering: false,//取消上下排序
             columns : [
                 {
                     title : "序号",
-                    data : "id"
+                    data : "version",
+                    orderable:true,
                 },
                 {
                     title : "编码",
-                    data : "supCode"
+                    data : "supCode",
+                    orderable:false,
                 },
                 {
                     title : "供应商类型",
-                    data : "supplierTypeShow"
+                    data : "supplierTypeShow",
+                    orderable:false,
                 }
                 ,
                 {
                     title : "公司全称",
-                    data : "supName"
+                    data : "supName",
+                    orderable:false,
                 },
                 {
                     title : "别称",
-                    data : "supAliasName"
+                    data : "supAliasName",
+                    orderable:false,
                 },
                 {
                     title : "联系人 ",
-                    data : "topContact"
+                    data : "topContact",
+                    orderable:false,
                 },
                 {
                     title : "电话",
-                    data : "topMobile"
+                    data : "topMobile",
+                    orderable:false,
                 },
                 {
                     title : "邮件",
-                    data : "topEmail"
+                    data : "topEmail",
+                    orderable:false,
                 },
                 {
                     title : "产品",
-                    data : "materialTypes"
+                    data : "materialTypes",
+                    orderable:false,
                 },
                 {
                     title : "备注",
-                    data : "note"
+                    data : "note",
+                    orderable:false,
                 },
                 {
                     title : "操作",
                     data : "id",
+                    orderable:false,
                     createdCell:function(td,tdData,rowData){
                         var operator=[
                             <s:hasPermission name="scmSupplier/create">
@@ -301,6 +312,7 @@
                     saveObj.bankAccount=this.parameter.bankAccount;
                     saveObj.supplierContacts=[];
                     saveObj.supContactIds =this.parameter.supContactIds;
+                    saveObj.version =this.parameter.version;
                     var parSup=this.parameter.supplierContacts;
                     for(var i=0;i<parSup.length;i++){
                         saveObj.supplierContacts[i]={

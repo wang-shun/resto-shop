@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <style>
-    #tableBodyList table tr th:first-of-type,#tableBodyList table tr td:first-of-type{display: none;}
+    #tableBodyList table tr th:last-of-type,#tableBodyList table tr td:last-of-type{display: none;}
     th,td{text-align: center;}
     #tableBodyLists th,#tableBodyLists td{line-height:2.5;}
 </style>
@@ -178,8 +178,62 @@
                     return data;
                 },
             },
-            ordering: false,//取消上下排序
+            //ordering: false,//取消上下排序
             columns : [
+                {
+                    title : "序号",
+                    data : "priority",
+                    orderable:true,
+                },
+                {
+                    title: "菜品编码",
+                    data : "articleId",
+                    orderable:false,
+                },
+                {
+                    title: "版本号",
+                    data: "version",
+                    orderable:false,
+                },
+                {
+                    title : "菜品类别",
+                    data : "familyName",
+                    orderable:false,
+                },
+                {
+                    title : "菜品名称",
+                    data : "articleName",
+                    orderable:false,
+                },
+                {
+                    title : "计量单位 ",
+                    data : "measurementUnit",
+                    orderable:false,
+                },
+                {
+                    title : "原料种类",
+                    data : "size",
+                    orderable:false,
+                    createdCell : function(td,tdData){
+                        $(td).html(tdData+'种');
+                    }
+                },
+                {
+                    title : "操作",
+                    data : "id",
+                    orderable:false,
+                    createdCell:function(td,tdData,rowData){
+                        var operator=[
+                            <s:hasPermission name="scmBom/edit">
+                            C.createEditBtn(rowData),
+                            </s:hasPermission>
+                            <s:hasPermission name="scmBom/delete">
+                            C.createDelBtn(tdData,"scmBom/delete"),
+                            </s:hasPermission>
+                        ];
+                        $(td).html(operator);
+                    }
+                },
                 {
                     data : "bomDetailDoList",
                     createdCell : function(td,tdData){
@@ -196,52 +250,7 @@
                         $(td).html(html);
                     }
                 },
-                {
-                    title : "序号",
-                    data : "priority",
-                },
-                {
-                    title: "菜品编码",
-                    data : "articleId"
-                },
-                {
-                    title: "版本号",
-                    data: "version",
-                },
-                {
-                    title : "菜品类别",
-                    data : "familyName",
-                },
-                {
-                    title : "菜品名称",
-                    data : "articleName",
-                },
-                {
-                    title : "计量单位 ",
-                    data : "measurementUnit",
-                },
-                {
-                    title : "原料种类",
-                    data : "size",
-                    createdCell : function(td,tdData){
-                        $(td).html(tdData+'种');
-                    }
-                },
-                {
-                    title : "操作",
-                    data : "id",
-                    createdCell:function(td,tdData,rowData){
-                        var operator=[
-                            <s:hasPermission name="scmBom/edit">
-                            C.createEditBtn(rowData),
-                            </s:hasPermission>
-                            <s:hasPermission name="scmBom/delete">
-                            C.createDelBtn(tdData,"scmBom/delete"),
-                            </s:hasPermission>
-                        ];
-                        $(td).html(operator);
-                    }
-                }],
+                ],
         });
         var C = new Controller(null,tb);
         var vueObj = new Vue({
