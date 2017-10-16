@@ -415,7 +415,7 @@ public class PosServiceImpl implements PosService {
             }
             orderService.update(refundOrder);
         }
-        // TODO: 2017/10/13  需统一回调格式 
+        // TODO: 2017/10/13  需统一回调格式
 //        JSONObject jsonObject = new JSONObject();
 //        jsonObject.put("dataType","updatePayment");
 //        jsonObject.put("orderId",order.getId());

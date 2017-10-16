@@ -1,19 +1,17 @@
  package com.resto.shop.web.controller.business;
 
- import com.google.zxing.WriterException;
  import com.resto.brand.core.entity.Result;
  import com.resto.brand.core.util.FileToZip;
- import com.resto.brand.core.util.MemcachedUtils;
- import com.resto.brand.core.util.QRCodeUtil;
  import com.resto.brand.core.util.WeChatUtils;
  import com.resto.brand.web.model.Brand;
  import com.resto.brand.web.model.ShopDetail;
- import com.resto.brand.web.model.TableQrcode;
  import com.resto.brand.web.service.BrandService;
  import com.resto.brand.web.service.ShopDetailService;
  import com.resto.shop.web.controller.GenericController;
+ import com.resto.shop.web.service.PosService;
  import com.resto.shop.web.util.LogTemplateUtils;
  import com.resto.shop.web.util.RedisUtil;
+ import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
@@ -27,7 +25,6 @@
  import java.text.SimpleDateFormat;
  import java.util.Date;
  import java.util.List;
- import java.util.UUID;
 
  @Controller
  @RequestMapping("shopDetailManage")
@@ -37,9 +34,10 @@
 
      @Resource
      ShopDetailService shopDetailService;
-
      @Resource
      BrandService brandService;
+     @Autowired
+     private PosService posService;
 
      @RequestMapping("/list")
          public void list(){
@@ -76,6 +74,7 @@
          Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
          shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
          LogTemplateUtils.shopDeatilEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
+         posService.shopMsgChange(getCurrentShopId());
          return Result.getSuccess();
      }
 
