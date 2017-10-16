@@ -585,21 +585,72 @@
 						</div>
 					</div>
 
-					<div class="form-group">
-						<label class="col-md-4 control-label" >菜品图片展现：</label>
-						<div  class="col-md-6 radio-list">
-							<label class="radio-inline">
-								<input type="radio" name="articlePhoto"v-model="m.articlePhoto" value="0">大图
-							</label>
-							<label class="radio-inline">
-								<input type="radio" name="articlePhoto" v-model="m.articlePhoto" value="1">小图
-							</label>
-						</div>
-					</div>
+					<%--<div class="form-group">--%>
+						<%--<label class="col-md-4 control-label" :class="{ formBox : m.openConsumerRebate == 1}">消费返利功能：</label>--%>
+						<%--<div  class="col-md-6 radio-list">--%>
+							<%--<label class="radio-inline">--%>
+								<%--<input type="radio" name="openConsumerRebate"v-model="m.openConsumerRebate" value="1">开启--%>
+							<%--</label>--%>
+							<%--<label class="radio-inline">--%>
+								<%--<input type="radio" name="openConsumerRebate" v-model="m.openConsumerRebate" value="0">关闭--%>
+							<%--</label>--%>
+						<%--</div>--%>
+					<%--</div>--%>
+
+					<%--<div class="form-group" v-show="m.openConsumerRebate == 1">--%>
+						<%--<label class="col-md-4 control-label" :class="{ formBox : m.openConsumerRebate == 1}">用户参与次数：</label>--%>
+						<%--<div class="col-sm-6">--%>
+							<%--<input type="number"  name="rebateParticipation"  class="form-control"  v-model="m.rebateParticipation" required="required" min="0">--%>
+						<%--</div>--%>
+					<%--</div>--%>
+
+					<%--<div class="form-group" v-show="m.openConsumerRebate == 1">--%>
+						<%--<label class="col-md-4 control-label" :class="{ formBox : m.openConsumerRebate == 1}">返利延迟发放时间：</label>--%>
+						<%--<div class="col-sm-6">--%>
+							<%--<input type="number"  name="rebateDelayDeliveryTime"  class="form-control"  v-model="m.rebateDelayDeliveryTime" required="required" min="0">--%>
+						<%--</div>--%>
+					<%--</div>--%>
+
+					<%--<div class="form-group">--%>
+						<%--<label class="col-md-4 control-label" >菜品图片展现：</label>--%>
+						<%--<div  class="col-md-6 radio-list">--%>
+							<%--<label class="radio-inline">--%>
+								<%--<input type="radio" name="articlePhoto"v-model="m.articlePhoto" value="0">大图--%>
+							<%--</label>--%>
+							<%--<label class="radio-inline">--%>
+								<%--<input type="radio" name="articlePhoto" v-model="m.articlePhoto" value="1">小图--%>
+							<%--</label>--%>
+						<%--</div>--%>
+					<%--</div>--%>
 					<div class="form-group">
 						<label class="col-md-4 control-label">R+外卖最大配送范围(单位km)：</label>
 						<div  class="col-md-6">
 							<input type="text" class="form-control" name="apart" :value="m.apart" >
+						</div>
+					</div>
+
+					<div class="form-group" v-if="b.consumptionRebate==1">
+						<label class="col-md-4 control-label">是否开启消费返利(1:1)：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="consumptionRebate"v-model="m.consumptionRebate" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="consumptionRebate" v-model="m.consumptionRebate" value="0"> 否
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group" v-if="m.consumptionRebate==1 && b.consumptionRebate==1">
+						<label class="col-md-4 control-label">消费返利解冻时间:</label>
+						<div class="col-md-6 radio-list">
+							<div class="input-group date form_datetime">
+								<input type="text" readonly class="form-control" name="rebateTime" v-model="m.rebateTime" @focus="initCouponTime"> <span class="input-group-btn">
+											<button class="btn default date-set" type="button">
+												<i class="fa fa-calendar" @click="initCouponTime"></i>
+											</button>
+										</span>
+							</div>
 						</div>
 					</div>
 
@@ -661,9 +712,10 @@
                             this.daySmsTypeWx = 2;
                             this.daySmsTypeSms = 1;
                         }else if(this.m.daySmsType==2){
-                            this.daySmsTypeWx=2
+                            this.daySmsTypeWx=2;
                             this.daySmsTypeSms=false;
                         }
+						this.m.rebateTime = new Date(this.m.rebateTime).format("yyyy-MM-dd");
                     },
 					methods : {
                         weChatPaySetting: function (name) {
@@ -736,6 +788,18 @@
 								}
 							})
 
+						},
+						initCouponTime: function(){
+							$('.form_datetime').datetimepicker({
+								format: "yyyy-mm-dd",
+								autoclose: true,
+								todayBtn: true,
+								todayHighlight: true,
+								showMeridian: true,
+								language: 'zh-CN',//中文，需要引用zh-CN.js包
+								startView: 2,//月视图
+								minView: 2//日期时间选择器所能够提供的最精确的时间选择视图
+							});
 						},
 						cancel : function() {
 							this.initContent();

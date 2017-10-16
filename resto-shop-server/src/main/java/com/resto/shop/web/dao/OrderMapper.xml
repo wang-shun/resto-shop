@@ -190,6 +190,7 @@
         <result column="pos_discount" property="posDiscount"/>
         <result column="erase_money" property="eraseMoney"/>
         <result column="no_discount_money" property="noDiscountMoney"/>
+        <result column="is_consumption_rebate" property="isConsumptionRebate"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -388,7 +389,7 @@
         count_with_child,
         last_order_time,customer_count,service_price,pay_mode,base_money,base_order_money,base_customer_count,meal_fee_price,meal_all_number
         ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
-        print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money
+        print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, is_consumption_rebate
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -621,6 +622,9 @@
             <if test="posDiscount != null">
                 pos_discount,
             </if>
+            <if test="isConsumptionRebate != null">
+                is_consumption_rebate,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -785,6 +789,9 @@
             </if>
             <if test="posDiscount != null">
                 #{posDiscount},
+            </if>
+            <if test="isConsumptionRebate != null">
+                #{isConsumptionRebate},
             </if>
         </trim>
     </insert>
@@ -956,6 +963,9 @@
             </if>
             <if test="baseOrderMoney != null">
                 base_order_money = #{baseOrderMoney},
+            </if>
+            <if test="isConsumptionRebate != null">
+                is_consumption_rebate = #{isConsumptionRebate},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -2445,7 +2455,7 @@ on o.id = oi.order_id
         from tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
-        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND oi.payment_mode_id not in (13,14,15,20)
+        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND oi.payment_mode_id not in (13,14,15,20,21)
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}
         ]]>
     </select>
@@ -2740,7 +2750,7 @@ AND o.brand_id = #{brandId}
 
     <select id="selectPayBefore" resultType="java.math.BigDecimal">
     select sum(pay_value) from tb_order_payment_item
-    where order_id = #{orderId} and payment_mode_id not in (13,14,15,20)
+    where order_id = #{orderId} and payment_mode_id not in (13,14,15,20,21)
 </select>
 
     <select id="getPayHoufu" resultType="java.math.BigDecimal">
@@ -2930,7 +2940,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
-opi.payment_mode_id not in (13,14,15,20) AND
+opi.payment_mode_id not in (13,14,15,20,21) AND
 o.production_status in(2,3,6)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
@@ -2964,7 +2974,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
-opi.payment_mode_id not in (13,14,15,20) AND
+opi.payment_mode_id not in (13,14,15,20,21) AND
 o.production_status in(2,3,6)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
@@ -3305,7 +3315,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
             td.customer_id customerId,
             COUNT(1) orderCount,
             SUM(td.order_money) orderTotal,
-            AVG(td.order_money) avgOrderMoney,
+            ROUND(AVG(td.order_money),2) avgOrderMoney,
             DATE_FORMAT(td.create_time,'%Y-%m-%d %H:%i:%s') lastOrderTime
         FROM
             tb_order td

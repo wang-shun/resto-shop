@@ -527,6 +527,11 @@ public class SpringContextConfig {
 	}
 
     @Bean
+    public MealItemService mealItemService(){
+        return proxy.create(MealItemService.class);
+    }
+
+    @Bean
     public ProvinceService provinceService(){
         return proxy.create(ProvinceService.class);
     }
@@ -540,20 +545,7 @@ public class SpringContextConfig {
     public DistrictService districtService(){
         return proxy.create(DistrictService.class);
     }
-
-
-
-
-
-
-
-
-
-
-
-
     //------------scm server config start-----------
-
 
     @Bean
     public ScmUnitService scmUnitService(){
@@ -608,7 +600,6 @@ public class SpringContextConfig {
     public GoodTopService goodTopService(){
 	    return proxy.create(GoodTopService.class);
     }
-
 
 
     public <T> T getProxy(Class<T> clazz) {

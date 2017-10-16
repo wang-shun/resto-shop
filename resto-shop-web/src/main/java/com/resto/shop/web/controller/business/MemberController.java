@@ -8,6 +8,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.AppendToExcelUtil;
 import com.resto.brand.core.util.ExcelUtil;
  import com.resto.brand.core.util.UserOrderExcelUtil;
+import com.resto.brand.web.dto.MemberSelectionDto;
 import com.resto.brand.web.dto.MemberUserDto;
  import com.resto.brand.web.dto.OrderDetailDto;
  import com.resto.brand.web.model.ShopDetail;
@@ -27,8 +28,10 @@ import com.resto.brand.web.dto.MemberUserDto;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
- import org.springframework.web.bind.annotation.RequestMapping;
- import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
  import javax.annotation.Resource;
  import javax.servlet.http.HttpServletRequest;
@@ -276,4 +279,80 @@ public class MemberController extends GenericController{
 		request.setAttribute("customerId", customerId);
 		return "orderReport/shopReport";
 	}
+
+    //下载会员信息报表
+    @RequestMapping("/createMemberSelectionDto")
+    @ResponseBody
+    public Result createMemberSelectionDto(@RequestBody List<MemberSelectionDto> memberSelectionDtos, HttpServletRequest request){
+        List<ShopDetail> shopDetailList = getCurrentShopDetails();
+        if(shopDetailList==null){
+            shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
+        }
+        //导出文件名
+        String fileName = "会员筛选信息.xls";
+        //定义读取文件的路径
+        String path = request.getSession().getServletContext().getRealPath(fileName);
+        //定义列
+        String[]columns={"customerType","isValue","nickname","sex","telephone","birthday","orderCount","orderMoney"
+                ,"avgOrderMoney"};
+        //定义数据
+        List<MemberSelectionDto>  result = memberSelectionDtos;
+        String shopName = "";
+        for (ShopDetail shopDetail : shopDetailList) {
+            shopName += shopDetail.getName()+",";
+        }
+        shopName = shopName.substring(0,shopName.length() - 1);
+        Map<String,String> map = new HashMap<>();
+        map.put("brandName", getBrandName());
+        map.put("shops", shopName);
+        map.put("beginDate", "--");
+        map.put("reportType", "会员筛选信息报表");//表的头，第一行内容
+        map.put("endDate", "--");
+        map.put("num", "8");//显示的位置
+        map.put("reportTitle", "会员筛选信息报表");//表的名字
+        map.put("timeType", "yyyy-MM-dd");
+
+        String[][] headers = {{"用户类型","25"},{"储值","25"},{"昵称","25"},{"性别","25"},{"手机号","25"},{"生日","25"},
+                {"订单总数","25"},{"订单总额","25"},{"平均消费金额","25"}};
+        //定义excel工具类对象
+        ExcelUtil<MemberSelectionDto> excelUtil=new ExcelUtil<>();
+        try{
+            OutputStream out = new FileOutputStream(path);
+            excelUtil.ExportExcel(headers, columns, result, out, map);
+            out.close();
+        }catch(Exception e){
+            log.error("生成会员筛选信息报表");
+            e.printStackTrace();
+            return new Result(false);
+        }
+        return getSuccessResult(path);
+    }
+
+    @RequestMapping("/appendMemberSelectionExcel")
+    @ResponseBody
+    public Result appendMemberSelectionExcel(String path, Integer startPosition, MemberSelectionDto memberSelectionDto){
+        try {
+            String[][] items = new String[memberSelectionDto.getMemberSelectionDtos().size()][];
+            int i = 0;
+            for (Map map : memberSelectionDto.getMemberSelectionDtos()){
+                items[i] = new String[9];
+                items[i][0] = map.get("customerType").toString();
+                items[i][1] = map.get("isValue").toString();
+                items[i][2] = map.get("nickname").toString();
+                items[i][3] = map.get("sex").toString();
+                items[i][4] = map.get("telephone").toString();
+                items[i][5] = map.get("birthday").toString();
+                items[i][6] = map.get("orderCount").toString();
+                items[i][7] = map.get("orderMoney").toString();
+                items[i][8] = map.get("avgOrderMoney").toString();
+                i++;
+            }
+            AppendToExcelUtil.insertRows(path,startPosition,items);
+        } catch (Exception e){
+            log.error("追加筛选的会员信息报表出错！");
+            e.printStackTrace();
+            return new Result(false);
+        }
+        return getSuccessResult();
+    }
 }

@@ -22,6 +22,7 @@ public class PayMode {
     public static final int GIVE_CHANGE = 18; //找零
     public static final int REFUND_CRASH = 19; //现金退款
     public static final int THIRD_MONEY_RED_PAY = 20; //第三方储值余额支付
+    public static final int REBATE_MONEY_RED_PAY = 21; //消费返利余额支付
 
     public static String getPayModeName(int state){
 	    switch (state) {
@@ -65,6 +66,8 @@ public class PayMode {
                 return "现金退款";
             case THIRD_MONEY_RED_PAY:
                 return "第三方储值余额支付";
+            case REBATE_MONEY_RED_PAY:
+                return "消费返利余额支付";
             default:
                 return "";
             }

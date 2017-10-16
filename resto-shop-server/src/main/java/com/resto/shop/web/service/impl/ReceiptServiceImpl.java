@@ -30,6 +30,7 @@ import org.json.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -92,6 +93,12 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
 
     @Override
     public int updateReceiptOrderNumber(Receipt record){
+        if(!record.getOrderMoney().equals(new BigDecimal("0.00"))){
+            ReceiptOrder r=receiptMapper.selectReceiptOrderOneMoney(record.getOrderNumber());
+            record.setReceiptMoney(record.getReceiptMoney().intValue() <= r.getReceiptMoney().intValue()? record.getReceiptMoney() : r.getReceiptMoney());
+            return receiptMapper.updateReceiptOrderNumber(record);
+        }
+        record.setReceiptMoney(record.getOrderMoney());
         return receiptMapper.updateReceiptOrderNumber(record);
     }
 
@@ -169,7 +176,7 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "发票订单:" + receiptPosOrder.getOrderNumber() + "返回打印发票模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "发票订单:" + receiptPosOrder.getOrderNumber() + "返回(手动)打印发票模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
         return printTask;
     }
@@ -194,7 +201,7 @@ public class ReceiptServiceImpl extends GenericServiceImpl<Receipt,String> imple
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "发票订单:" + receiptPosOrder.getOrderNumber() + "返回打印发票模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        map.put("content", "发票订单:" + receiptPosOrder.getOrderNumber() + "返回(自动)打印发票模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
         return printTask;
     }

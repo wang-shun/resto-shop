@@ -81,8 +81,9 @@ public class BindPhoneAspect {
 		boolean isFirstBind = !cus.getIsBindPhone();
 		Object obj = pj.proceed();
 		Brand brand = brandService.selectById(cus.getBrandId());
-
+		log.info("当前用户注册的状态" + !isFirstBind);
 		if(isFirstBind){
+			log.info("进入用户注册发放优惠券" + isFirstBind);
 			newCustomerCouponService.giftCoupon(cus,couponType,shopId);
 			//如果有分享者，那么给分享者发消息
 //			if(!StringUtils.isEmpty(cus.getShareCustomer())){

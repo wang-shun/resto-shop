@@ -15,7 +15,9 @@
         max-height: 80vh;
         overflow-y: auto;
     }
-
+    .form-group.isHidden {
+        visibility: hidden;
+    }
     .print-sort {
 
     }
@@ -183,7 +185,7 @@
                                 <div class="col-md-7">无图</div>
                             </div>
 
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-5">
                                 <label class="col-md-5 control-label">菜品图片显示类型</label>
                                 <div  class="col-md-7">
                                     <label class="radio-inline">
@@ -198,8 +200,8 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-5">
-                                <label class="col-md-3 control-label">描述</label>
+                            <div class="form-group col-md-4">
+                                <label class="col-md-3 control-label" style="text-align: left;">描述</label>
                                 <div class="col-md-7">
                                     <textarea rows="3" class="form-control" name="description"
                                               v-model="m.description"></textarea>

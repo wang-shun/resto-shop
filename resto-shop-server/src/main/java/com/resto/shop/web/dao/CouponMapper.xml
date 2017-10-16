@@ -194,23 +194,20 @@
         tc.`name` couponName,
         COUNT(1) couponCount,
         SUM(tc.`value`) couponMoney,
-        IFNULL((select r.useCount from (select COUNT(1) useCount,coupon_type from tb_coupon
-        where using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59')
-        and is_used = 1 GROUP BY coupon_type) r where r.coupon_type = tc.coupon_type),0) useCouponCount,
-        IFNULL((select r.useMoney from (select SUM(`value`) useMoney,coupon_type from tb_coupon
-        where using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59')
-        and is_used = 1 GROUP BY coupon_type) r where r.coupon_type = tc.coupon_type),0) useCouponMoney,
         CASE tc.coupon_type
-        WHEN 0 THEN COUNT(1)
-        WHEN 1 THEN COUNT(1)
+        WHEN 0 THEN COUNT(DISTINCT tc.customer_id)
+        WHEN 1 THEN COUNT(DISTINCT tc.customer_id)
         ELSE 0
         END customerCount,
         tc.shop_detail_id shopDetailId,
-        tc.coupon_type couponTypeInt
+        tc.coupon_type couponTypeInt,
+        SUM(IF(tc.is_used = 1 and using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59'),1,0)) useCouponCount,
+        SUM(IF(tc.is_used = 1 and using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59'),tc.value,0)) useCouponMoney
         from tb_coupon tc
         where tc.add_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
         and tc.add_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
-        GROUP BY tc.coupon_type
+        GROUP BY tc.`name`
+--         GROUP BY tc.new_custom_coupon_id, tc.`name`
     </select>
 
     <select id="usedCouponBeforeByOrderId" resultType="Coupon">
@@ -220,11 +217,10 @@
 
     <select id="selectPosPayOrderCanUseCoupon" parameterType="java.util.Map" resultMap="BaseResultMap">
         select * from tb_coupon where
-        DATE_FORMAT(NOW(),'%Y-%m-%d') between DATE_FORMAT(begin_date,'%Y-%m-%d') and DATE_ADD(DATE_FORMAT(end_date,'%Y-%m-%d'),interval 1 day)
+        NOW() between begin_date and DATE_ADD(end_date,interval 1 day)
         and IF(recommend_delay_time > 0,
-        (DATE_FORMAT(NOW(),'%H:%i:%s') >= DATE_FORMAT(DATE_ADD(add_time,INTERVAL (recommend_delay_time/3600) HOUR),'%H:%i:%s'))
-        and (DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(begin_time,'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s')),
-        DATE_FORMAT(NOW(),'%H:%i:%s') between DATE_FORMAT(begin_time,'%H:%i:%s') and DATE_FORMAT(end_time,'%H:%i:%s'))
+        NOW() >= DATE_ADD(add_time,INTERVAL (recommend_delay_time/3600) HOUR),true)
+        and DATE_FORMAT(NOW(),'%H:%i:%s') between begin_time and end_time
         and is_used = 0
         <if test="useWithAccount != null and useWithAccount == 1">
           and use_with_account = 1
@@ -265,4 +261,19 @@
         ORDER BY
         c.using_time DESC
     </select>
+
+
+    <insert id="insertCouponBatch">
+        insert into tb_coupon
+        (id,name,value,min_amount,begin_date,end_date,begin_time,end_time,coupon_source,use_with_account,remark,distribution_mode_id,customer_id,
+        add_time,shop_detail_id,brand_id,coupon_type,push_day,recommend_delay_time)
+        values
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (#{item.id},#{item.name},#{item.value},#{item.minAmount},#{item.beginDate},#{item.endDate},#{item.beginTime},#{item.endTime},
+            #{item.couponSource},#{item.useWithAccount},#{item.remark},#{item.distributionModeId},#{item.customerId},#{item.addTime},
+            #{item.shopDetailId},#{item.brandId},#{item.couponType},#{item.pushDay},#{item.recommendDelayTime}
+            )
+        </foreach>
+    </insert>
 </mapper>

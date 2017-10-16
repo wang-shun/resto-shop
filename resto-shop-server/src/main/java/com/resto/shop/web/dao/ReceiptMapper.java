@@ -42,5 +42,7 @@ public interface ReceiptMapper extends GenericDao<Receipt,String> {
 
     ReceiptOrder selectReceiptMoney(@Param("orderNumber")String orderNumber);
 
+    ReceiptOrder selectReceiptOrderOneMoney(@Param("orderNumber")String orderNumber);
+
     int getReceiptOrderNumberCount(@Param("orderNumber")String orderNumber);
 }

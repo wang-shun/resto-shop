@@ -234,7 +234,7 @@
     <select id="selectPaymentCountByOrderId" parameterType="java.lang.String"
             resultType="com.resto.shop.web.model.OrderPaymentItem">
         select payment_mode_id paymentModeId, SUM(pay_value) payValue from tb_order_payment_item where order_id = #{orderId}
-        and payment_mode_id not in (13,14,15,20)
+        and payment_mode_id not in (13,14,15,20,21)
         group by payment_mode_id
     </select>
 
