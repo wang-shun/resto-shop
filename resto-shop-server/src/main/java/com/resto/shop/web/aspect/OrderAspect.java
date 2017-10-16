@@ -1564,9 +1564,9 @@ public class OrderAspect {
         stringMap.put("customer", customer.getTelephone() != null ? "手机号" : "微信昵称");
         stringMap.put("telephone", customer.getTelephone() != null ? customer.getTelephone() : customer.getNickname());
         if (customer.getSex().equals(1)){
-            stringMap.put("sex", "男");
+            stringMap.put("sex", "男性");
         }else if (customer.getSex().equals(2)){
-            stringMap.put("sex", "女");
+            stringMap.put("sex", "女性");
         }else {
             stringMap.put("sex", "未知");
         }
