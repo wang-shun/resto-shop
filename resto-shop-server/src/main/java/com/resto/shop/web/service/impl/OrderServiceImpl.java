@@ -8995,7 +8995,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         //得到最小的菜品名称的长度
-        Integer minLength = orderItemList[0].getArticleName().length();
+        Integer minLength = orderItemList.length > 0 ? orderItemList[0].getArticleName().length() : 0;
         Map<String, Object> item = new HashMap<>();
         for (OrderItem article : orderItemList){
             if (article.getArticleName().length() > minLength){
