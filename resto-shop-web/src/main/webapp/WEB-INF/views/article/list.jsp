@@ -1043,7 +1043,6 @@
 //                                virtualId:this.virtualList[0].id,
                                 supportTimes: [],
                                 kitchenList: [],
-                                virtualList:[],
                                 mealAttrs: [],
                                 isRemind: false,
                                 activated: true,
