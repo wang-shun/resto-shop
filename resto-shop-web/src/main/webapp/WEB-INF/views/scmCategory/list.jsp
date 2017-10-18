@@ -22,7 +22,7 @@
                             <div class="form-group row">
                                 <label class="col-md-4 control-label">一级分类<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <select class="bs-select form-control" name="categoryOneId" v-model="parameter.categoryOneId">
+                                    <select class="bs-select form-control" name="categoryOneId" v-model="parameter.categoryOneId" @change="categoryOneCh">
                                         <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="categoryOnes in categoryOne" value="{{categoryOnes.id}} ">
                                             {{categoryOnes.categoryName}}
@@ -35,7 +35,7 @@
                                 <div class="col-md-3">
                                     <select name="parentId" v-model="parameter.parentId" class="bs-select form-control" >
                                         <option disabled="" selected="" value="">请选择</option>
-                                        <option  v-for="categoryTwos in categoryTwo" value="{{categoryTwos.id}}" v-if="m.categoryOneId == categoryTwos.parentId">
+                                        <option  v-for="categoryTwos in categoryTwo" value="{{categoryTwos.id}}" v-if="parameter.categoryOneId == categoryTwos.parentId">
                                             {{categoryTwos.categoryName}}
                                         </option>
                                     </select>
@@ -203,15 +203,14 @@
                     showform:false,
                     showOne:'',
                     showTwo:'',
-                    parameter:{},
                     categoryOne:[],//一级分类
                     categoryTwo:[],//二级分类
-                    m:{
-                        categoryOneId:'',//一级分类ID
-                        categoryTwoId:'',//二级分类ID
-                    }
+                    parameter:{},
                 },
                 methods: {
+                    categoryOneCh:function(){
+                        this.parameter.parentId='';
+                    },
                     create:function () { //新增分类
                       this.showform=true;
                       this.parameter={
@@ -234,6 +233,7 @@
                         else if(!this.parameter.parentId) message='二级类别';
                         else submit=true;
                         if(submit){
+                            delete this.parameter.categoryOneId;
                             $.ajax({
                                 type:"POST",
                                 url:'scmCategory/create',
