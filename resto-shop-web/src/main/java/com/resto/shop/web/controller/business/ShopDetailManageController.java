@@ -214,10 +214,12 @@
          } catch (Exception e) {
              e.printStackTrace();
          } finally {
-             if (bis != null)
+             if (bis != null){
                  bis.close();
-             if (bos != null)
+             }
+             if (bos != null){
                  bos.close();
+             }
          }
          return null;
      }

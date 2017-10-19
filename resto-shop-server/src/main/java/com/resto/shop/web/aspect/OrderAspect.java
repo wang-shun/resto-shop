@@ -587,7 +587,7 @@ public class OrderAspect {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         //订单不为空  已支付   桌号不为空或者外带   坐下点餐模式或者大Boss模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
-                && (order.getTableNumber() != null || (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan() == Common.NO))
+                && (order.getTableNumber() != null || (order.getDistributionModeId() == DistributionType.TAKE_IT_SELF && shopDetail.getContinueOrderScan().equals(Common.NO)))
                 && (order.getOrderMode() == ShopMode.TABLE_MODE || order.getOrderMode() == ShopMode.BOSS_ORDER)) {
             if (order.getPayType() == PayType.NOPAY) {
                 order.setPrintTimes(1);
@@ -715,7 +715,7 @@ public class OrderAspect {
 //		MQMessageProducer.sendCallMessage(order.getBrandId(),order.getId(),order.getCustomerId());
 
         LogTemplateUtils.getCallNumber(brand.getBrandName(), order.getId());
-        if (shopDetail.getIsPush() == Common.YES) { //开启就餐提醒
+        if (shopDetail.getIsPush().equals(Common.YES) ) { //开启就餐提醒
             MQMessageProducer.sendRemindMsg(order, shopDetail.getPushTime() * 1000);
         }
 

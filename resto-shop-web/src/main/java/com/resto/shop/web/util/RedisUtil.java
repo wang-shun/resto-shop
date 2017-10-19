@@ -116,11 +116,11 @@ public class RedisUtil {
 
     public void setRedisTemplate(
             RedisTemplate<Serializable, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
+        RedisUtil.redisTemplate = redisTemplate;
     }
 
 
     public static void main(String[] args) {
-        set("test","1",100l);
+        set("test","1",100L);
     }
 }

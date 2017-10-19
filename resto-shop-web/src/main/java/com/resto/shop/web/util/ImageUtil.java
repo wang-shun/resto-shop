@@ -64,7 +64,7 @@ public class ImageUtil {
         byte[] bytes = out.toByteArray();
         String uuId = UUID.randomUUID().toString() + ".jpg";
         String savePath = systemPath + filePath + uuId;
-        if (bytes.length < 3 || savePath.equals("")) {
+        if (bytes.length < 3 || "".equals(savePath)) {
             return null;
         }
         File file = new File(savePath);

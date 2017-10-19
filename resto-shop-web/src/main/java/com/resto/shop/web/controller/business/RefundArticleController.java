@@ -99,9 +99,9 @@ public class RefundArticleController extends GenericController{
             //组装退款详情
             for (OrderPaymentItem paymentItem : orderPaymentItems){
                 if (paymentItem.getPaymentModeId().equals(PayMode.WEIXIN_PAY)){
-                    paymentItem.setId(jsonObject.parseObject(paymentItem.getResultData()).getString("out_refund_no"));
+                    paymentItem.setId(JSONObject.parseObject(paymentItem.getResultData()).getString("out_refund_no"));
                 }else if (paymentItem.getPaymentModeId().equals(PayMode.ALI_PAY)){
-                    paymentItem.setId(jsonObject.parseObject(paymentItem.getResultData()).getString("out_trade_no"));
+                    paymentItem.setId(JSONObject.parseObject(paymentItem.getResultData()).getString("out_trade_no"));
                 }
                 paymentItem.setPayValue(paymentItem.getPayValue().abs());
                 paymentItem.setPaymentModeVal(PayMode.getPayModeName(paymentItem.getPaymentModeId()));
@@ -123,7 +123,7 @@ public class RefundArticleController extends GenericController{
             }
             //查看是否有退服务费
             if (order.getBaseCustomerCount() != null && order.getCustomerCount() != null
-                    && order.getBaseCustomerCount() != order.getCustomerCount()
+                    && !order.getBaseCustomerCount().equals(order.getCustomerCount())
                     && order.getBaseCustomerCount() > order.getCustomerCount()){
                 jsonObject = new JSONObject();
                 jsonObject.put("articleName", shopDetail.getServiceName());
@@ -136,7 +136,7 @@ public class RefundArticleController extends GenericController{
             }
             //查看是否有退餐盒费
             if (order.getBaseMealAllCount() != null && order.getMealAllNumber() != null
-                    && order.getBaseMealAllCount() != order.getMealAllNumber()
+                    && !order.getBaseMealAllCount().equals(order.getMealAllNumber())
                     && order.getBaseMealAllCount() > order.getMealAllNumber()){
                 jsonObject = new JSONObject();
                 jsonObject.put("articleName", shopDetail.getMealFeeName());

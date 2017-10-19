@@ -6,11 +6,14 @@ package com.resto.shop.web.constant;
  */
 public class XunType {
 
-    public static final Integer EARLY = 1;    //上旬
+    //上旬
+    public static final Integer EARLY = 1;
 
-    public static final Integer MIDDLE = 2;    //中旬
+    //中旬
+    public static final Integer MIDDLE = 2;
 
-    public static final Integer LAST = 3;//下旬
+    //下旬
+    public static final Integer LAST = 3;
 
 
 }

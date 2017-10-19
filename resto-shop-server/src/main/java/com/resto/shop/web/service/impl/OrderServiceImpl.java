@@ -426,7 +426,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
         }
 
-        if (brandSetting.getIsUseServicePrice() == Common.YES && shopDetail.getIsUseServicePrice() == Common.YES
+        if (brandSetting.getIsUseServicePrice().equals(Common.YES) && shopDetail.getIsUseServicePrice().equals(Common.YES)
                 && (order.getCustomerCount() == null || order.getCustomerCount() == 0)
                 && order.getDistributionModeId() == DistributionType.RESTAURANT_MODE_ID) {
             jsonResult.setSuccess(false);

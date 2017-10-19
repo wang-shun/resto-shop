@@ -92,6 +92,8 @@ public class ShopInfoController extends GenericController{
                 case 3 :
                     shopDetail.setConsumeConfineTime(Integer.MAX_VALUE);
                     break;
+                default:
+                    break;
             }
         }
         if(shopDetail.getIsTurntable()==1){
