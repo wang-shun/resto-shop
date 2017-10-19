@@ -7810,6 +7810,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Brand brand = brandService.selectById(o.getBrandId());
             WechatConfig config = wechatConfigService.selectByBrandId(o.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
+            // ------------------拼msg 推送消息start
             StringBuilder msg = new StringBuilder("亲，您");
             msg.append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("的订单已完成退菜，相关款项")
                     .append("会在24小时内退还至您的微信账户，请注意查收！\n");
@@ -7861,6 +7862,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
             msg.append("退菜金额:").append(order.getRefundMoney()).append("\n");
+            // ------------------拼msg 推送消息end
             for(Customer customer : customerList){
                 WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
                 Map customerMap = new HashMap(4);
