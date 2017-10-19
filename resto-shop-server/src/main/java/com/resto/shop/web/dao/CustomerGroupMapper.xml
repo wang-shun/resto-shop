@@ -95,7 +95,7 @@
     select * from tb_customer_group
     INNER JOIN  tb_table_group on tb_customer_group.group_id = tb_table_group.group_id and tb_table_group.state != 2
     where customer_id = #{customerId}
-    and table_number  = #{tableNumber} and shop_detail_id = #{shopId}
+    and tb_customer_group.table_number  = #{tableNumber} and tb_customer_group.shop_detail_id = #{shopId}
   </select>
 
   <select id="getGroupByShopCart" resultType="CustomerGroup" >
