@@ -11,8 +11,10 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.controller.GenericController;
+import com.resto.shop.web.service.PosService;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -34,6 +36,8 @@ public class ShopInfoController extends GenericController{
     BrandService brandService;
     @Resource
     BrandSettingService brandSettingService;
+    @Autowired
+    private PosService posService;
 
     @RequestMapping("/list")
     public void list(){
@@ -139,6 +143,7 @@ public class ShopInfoController extends GenericController{
         Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
         shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
         LogTemplateUtils.shopDeatilEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
+        posService.shopMsgChange(getCurrentShopId());
         return Result.getSuccess();
     }
 
