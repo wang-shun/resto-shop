@@ -4322,7 +4322,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
                 tableGroup.setState(TableGroup.FINISH);
                 tableGroupService.update(tableGroup);
-                customerGroupService.removeByGroupId(order.getGroupId());
+//                customerGroupService.removeByGroupId(order.getGroupId());
                 shopCartService.resetGroupId(order.getGroupId());
             }
             return order;

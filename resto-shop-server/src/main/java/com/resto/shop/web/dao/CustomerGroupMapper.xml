@@ -92,13 +92,16 @@
   </select>
 
   <select id="getGroupByCustomerId" resultType="CustomerGroup">
-    select * from tb_customer_group where customer_id = #{customerId}
+    select * from tb_customer_group
+    INNER JOIN  tb_table_group on tb_customer_group.group_id = tb_table_group.group_id and tb_table_group.state != 2
+    where customer_id = #{customerId}
     and table_number  = #{tableNumber} and shop_detail_id = #{shopId}
   </select>
 
   <select id="getGroupByShopCart" resultType="CustomerGroup" >
       select t.customer_id,t.customer_name,ifnull(sum(t2.number),0) as articleCount ,t.is_leader,t.head_photo from tb_customer_group t
 inner join tb_shop_cart t2 on t2.group_id = t.group_id and t.customer_id = t2.customer_id and t2.shop_type != 3
+INNER join tb_table_group t3 on t3.group_id = t.group_id and t3.state != 2
 where t.group_id = #{groupId}
 and t2.article_id != '' and t2.article_id is not null
 and t2.pid = 0

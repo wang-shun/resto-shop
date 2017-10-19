@@ -62,7 +62,7 @@ public class TableGroupServiceImpl extends GenericServiceImpl<TableGroup, Long> 
             tableGroup.setState(TableGroup.FINISH);
             update(tableGroup);
             //删除组和组员的关系
-            customerGroupService.removeByGroupId(tableGroup.getGroupId());
+//            customerGroupService.removeByGroupId(tableGroup.getGroupId());
             //把组内所有人的购物车重置为自己的
             shopCartService.resetGroupId(tableGroup.getGroupId());
         }
