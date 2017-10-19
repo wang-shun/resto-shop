@@ -7810,17 +7810,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Brand brand = brandService.selectById(o.getBrandId());
             WechatConfig config = wechatConfigService.selectByBrandId(o.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
-            for(Customer customer : customerList){
-                StringBuilder msg = new StringBuilder("亲，您");
-                msg.append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("的订单已完成退菜，相关款项")
-                        .append("会在24小时内退还至您的微信账户，请注意查收！\n");
-                msg.append("订单编号:\n");
-                msg.append(o.getSerialNumber()).append("\n");
-                msg.append("桌号:").append(o.getTableNumber()).append("\n");
-                msg.append("店铺名:").append(shopDetail.getName()).append("\n");
-                msg.append("订单时间:").append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("\n");
+            StringBuilder msg = new StringBuilder("亲，您");
+            msg.append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("的订单已完成退菜，相关款项")
+                    .append("会在24小时内退还至您的微信账户，请注意查收！\n");
+            msg.append("订单编号:\n");
+            msg.append(o.getSerialNumber()).append("\n");
+            msg.append("桌号:").append(o.getTableNumber()).append("\n");
+            msg.append("店铺名:").append(shopDetail.getName()).append("\n");
+            msg.append("订单时间:").append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("\n");
 //        msg.append("订单明细:").append("\n");
-                BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
+            BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
 //        if (o.getCustomerCount() != null && o.getCustomerCount() != 0) {
 //            msg.append("\t").append(brandSetting.getServiceName()).append("X").append(o.getBaseCustomerCount()).append("\n");
 //        }
@@ -7836,7 +7835,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                msg.append("\t").append(orderItem.getArticleName()).append("X").append(orderItem.getCount()).append("\n");
 //        }
 //        msg.append("订单金额:").append(o.getAmountWithChildren().doubleValue() != 0.0 ? o.getAmountWithChildren() : o.getOrderMoney()).append("\n");
-                msg.append("退菜明细:").append("\n");
+            msg.append("退菜明细:").append("\n");
 //        if (o.getBaseCustomerCount() != null && o.getBaseCustomerCount() != o.getCustomerCount()) {
 //            msg.append("\t").append(brandSetting.getServiceName()).append("X").append(o.getBaseCustomerCount() - o.getCustomerCount()).append("\n");
 //        }
@@ -7845,23 +7844,24 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                msg.append("\t").append(orderItem.getArticleName()).append("X").append(orderItem.getRefundCount()).append("\n");
 //            }
 //        }
-                for (OrderItem orderItem : order.getOrderItems()) {
-                    if (orderItem.getType().equals(ArticleType.ARTICLE)) {
-                        OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
-                        msg.append("\t").append(item.getArticleName()).append("X").append(orderItem.getCount()).append("\n");
-                        if (item.getType() == OrderItemType.SETMEALS) {
-                            List<OrderItem> child = orderitemMapper.getListByParentId(item.getId());
-                            for (OrderItem c : child) {
-                                //                childItem.setArticleName("|__" + childItem.getArticleName());
-                                msg.append("\t").append("|__").append(c.getArticleName()).append("X").append(c.getRefundCount()).append("\n");
-                            }
+            for (OrderItem orderItem : order.getOrderItems()) {
+                if (orderItem.getType().equals(ArticleType.ARTICLE)) {
+                    OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
+                    msg.append("\t").append(item.getArticleName()).append("X").append(orderItem.getCount()).append("\n");
+                    if (item.getType() == OrderItemType.SETMEALS) {
+                        List<OrderItem> child = orderitemMapper.getListByParentId(item.getId());
+                        for (OrderItem c : child) {
+                            //                childItem.setArticleName("|__" + childItem.getArticleName());
+                            msg.append("\t").append("|__").append(c.getArticleName()).append("X").append(c.getRefundCount()).append("\n");
                         }
-
-                    } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
-                        msg.append("\t").append(shopDetail.getServiceName()).append("X").append(orderItem.getCount()).append("\n");
                     }
+
+                } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
+                    msg.append("\t").append(shopDetail.getServiceName()).append("X").append(orderItem.getCount()).append("\n");
                 }
-                msg.append("退菜金额:").append(order.getRefundMoney()).append("\n");
+            }
+            msg.append("退菜金额:").append(order.getRefundMoney()).append("\n");
+            for(Customer customer : customerList){
                 WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
                 Map customerMap = new HashMap(4);
                 customerMap.put("brandName", brand.getBrandName());
