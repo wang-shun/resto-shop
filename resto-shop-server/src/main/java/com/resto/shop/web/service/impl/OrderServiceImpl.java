@@ -809,6 +809,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 // 使用余额
                 if (payMoney.doubleValue() > 0 && order.isUseAccount() && order.getPayType() != PayType.NOPAY) {
                     BigDecimal payValue = accountService.payOrder(order, payMoney, customer, brand, shopDetail);
+                    log.info("这里用户使用了余额");
 //			    BigDecimal payValue = accountService.useAccount(payMoney, account,AccountLog.SOURCE_PAYMENT);
                     if (payValue.doubleValue() > 0) {
                         payMoney = payMoney.subtract(payValue.setScale(2, BigDecimal.ROUND_HALF_UP));
