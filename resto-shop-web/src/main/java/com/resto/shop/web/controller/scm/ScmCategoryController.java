@@ -51,7 +51,14 @@ public class ScmCategoryController extends GenericController {
     @RequestMapping("/list_categoryHierarchy")
     @ResponseBody
     public Result list_categoryHierarchy(Integer categoryHierarchy) {
-        List<MdCategory> list = categoryService.queryByCategoryHierarchy(categoryHierarchy);
+        String shopId = this.getCurrentShopId();
+        List<MdCategory> list;
+        if (categoryHierarchy==3){
+           list = categoryService.queryByCategoryHierarchy(categoryHierarchy,shopId);
+        }else {
+            list = categoryService.queryByCategoryHierarchy(categoryHierarchy,null);
+        }
+
         return getSuccessResult(list);
     }
 
@@ -72,13 +79,18 @@ public class ScmCategoryController extends GenericController {
     @RequestMapping("look_down")
     @ResponseBody
     public Result look_down(Integer hierarchyId,Long id) {
+        List<MdCategory> list;
         try{
+            String shopId = this.getCurrentShopId();
             Assertion.isPositive(id,"id不能为空");
             Assertion.isPositive(hierarchyId,"hierarchyId不能为空");
             if (hierarchyId >= 3) {
                 return new Result("已经是最小层级", 5000, false);
-            } else {
-                List<MdCategory> list = categoryService.queryDown(hierarchyId + 1,id);
+            } else if (hierarchyId == 2){
+                list = categoryService.queryDown(hierarchyId + 1,id,shopId);
+                return getSuccessResult(list);
+            }else {
+                list = categoryService.queryDown(hierarchyId + 1,id,null);
                 return getSuccessResult(list);
             }
         }catch (Exception e){
