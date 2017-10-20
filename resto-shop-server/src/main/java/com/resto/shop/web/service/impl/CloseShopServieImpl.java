@@ -126,7 +126,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		//短信第一版用来发日结短信
 		Map<String, String> dayMapByFirstEdtion = querryDateDataByFirstEdtion(shopDetail, offLineOrder);
 		//3发短信推送/微信推送
-		//pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand);
+		pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand);
 		//3判断是否需要发送旬短信
 		int temp = DateUtil.getEarlyMidLate();
 		switch (temp){
@@ -282,26 +282,28 @@ public class CloseShopServieImpl implements CloseShopService{
 		int monthDeliverOrder = 0;
 		//本月外卖订单总额
 		BigDecimal monthOrderBooks = BigDecimal.ZERO;
-		//查询pos端店铺录入信息(线下订单+外卖订单都是pos端录入的)
-		List<OffLineOrder> offLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), begin, end, OfflineOrderSource.OFFLINE_POS);
-		if (!offLineOrderList.isEmpty()) {
-			for (OffLineOrder of : offLineOrderList) {
-				List<Integer> getTime = DateUtil.getDayByToday(of.getCreateTime());
-				//本日中
-				if (getTime.contains(2)) {
-					todayEnterCount += of.getEnterCount();
-					todayEnterTotal = todayEnterTotal.add(of.getEnterTotal());
-					todayDeliverOrders += of.getDeliveryOrders();
-					todayOrderBooks = todayOrderBooks.add(of.getOrderBooks());
-				}
-				if (getTime.contains(10)) {
-					monthEnterCount += of.getEnterCount();
-					monthEnterTotal = monthEnterTotal.add(of.getEnterTotal());
-					monthDeliverOrder += of.getDeliveryOrders();
-					monthOrderBooks = monthOrderBooks.add(of.getOrderBooks());
-				}
+
+		List<OffLineOrder> todayOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), todayBegin,todayEnd, OfflineOrderSource.OFFLINE_POS);
+		if (!todayOffLineOrderList.isEmpty()) {
+			for (OffLineOrder of : todayOffLineOrderList) {
+				todayEnterCount += of.getEnterCount();
+				todayEnterTotal = todayEnterTotal.add(of.getEnterTotal());
+				todayDeliverOrders += of.getDeliveryOrders();
+				todayOrderBooks = todayOrderBooks.add(of.getOrderBooks());
 			}
 		}
+
+		List<OffLineOrder> monthOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), begin, end, OfflineOrderSource.OFFLINE_POS);
+		if (!monthOffLineOrderList.isEmpty()) {
+			for (OffLineOrder of : monthOffLineOrderList) {
+				monthEnterCount += of.getEnterCount();
+				monthEnterTotal = monthEnterTotal.add(of.getEnterTotal());
+				monthDeliverOrder += of.getDeliveryOrders();
+				monthOrderBooks = monthOrderBooks.add(of.getOrderBooks());
+			}
+		}
+
+
 		//查询当日新增用户的订单
 		List<Order> newCustomerOrders = orderService.selectNewCustomerOrderByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
 		//新增用户的订单总数
