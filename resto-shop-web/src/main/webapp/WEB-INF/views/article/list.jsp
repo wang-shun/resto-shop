@@ -1251,7 +1251,7 @@
                                         break;
                                     }
                                 }
-                                if (!has && (this.choiceArtreicleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
+                                if (!has && (this.choiceArticleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
                                     arts.push(art);
                                 }
                             }
