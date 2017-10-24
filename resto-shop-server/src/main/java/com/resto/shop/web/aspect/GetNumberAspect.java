@@ -69,7 +69,7 @@ public class GetNumberAspect {
             Customer customer = customerService.selectById(getNumber.getCustomerId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             BrandSetting setting = brandSettingService.selectByBrandId(customer.getBrandId());
-            if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ZERO){
+            if(getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_ZERO) ){
             	log.info("发送叫号提示");
                 if(setting.getTemplateEdition()==0){
                     StringBuffer msg = new StringBuffer();
@@ -127,7 +127,7 @@ public class GetNumberAspect {
                     map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                     doPostAnsc(LogUtils.url, map);
                 }
-            } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ONE) {
+            } else if(getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_ONE) ) {
             	log.info("发送就餐提示");
                 if(setting.getTemplateEdition()==0){
                     StringBuffer msg = new StringBuffer();
@@ -187,7 +187,7 @@ public class GetNumberAspect {
                     map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                     doPostAnsc(LogUtils.url, map);
                 }
-            } else if(getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_TWO) {
+            } else if(getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_TWO)) {
             	log.info("发送过号提示");
                 if(setting.getTemplateEdition()==0){
                     StringBuffer msg = new StringBuffer();
@@ -248,7 +248,7 @@ public class GetNumberAspect {
             }
 
             if(shop.getWaitRemindSwitch() == 1 && shop.getWaitRemindNumber() > 0 &&
-                    (getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_ONE || getNumber.getState() == WaitModerState.WAIT_MODEL_NUMBER_TWO)){
+                    (getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_ONE) || getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_TWO))){
                 List<GetNumber> getNumberList = getNumberService.selectAfterNumberByCodeId(getNumber.getShopDetailId(), getNumber.getCodeId(), getNumber.getCreateTime());
                 if(getNumberList.size() > (shop.getWaitRemindNumber() - 1) && (getNumberList.size() + 1) >= shop.getWaitRemindNumber()){
                     GetNumber gn = getNumberList.get(shop.getWaitRemindNumber() - 1);

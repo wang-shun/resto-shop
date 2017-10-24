@@ -85,6 +85,8 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
                 case RedType.REBATE_MONEY:
                     item.setPaymentModeId(PayMode.REBATE_MONEY_RED_PAY);
                     break;
+                 default:
+                     break;
             }
 			item.setPayTime(new Date());
 			item.setPayValue(redPacket.getRedRemainderMoney());
@@ -120,6 +122,8 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
                 case RedType.REBATE_MONEY:
                     item.setPaymentModeId(PayMode.REBATE_MONEY_RED_PAY);
                     break;
+                 default:
+                     break;
             }
             item.setPayTime(new Date());
             item.setPayValue(redPay);
