@@ -176,7 +176,6 @@ where t.id = #{articleId} order by t3.sort
     </select>
 
     <select id="selectUnitDetailByShopId" resultType="UnitDetail">
-        SELECT ud.id,ud.`name`,ud.sort,ud.create_time,ud.is_used,ud.unit_id from tb_unit_detail ud LEFT JOIN
-         tb_unit u on ud.unit_id = u.id where u.shop_detail_id = #{shopId}
+        SELECT ud.* from tb_unit u LEFT JOIN tb_unit_detail ud on u.id = ud.unit_id where u.shop_detail_id = #{shopId}
     </select>
 </mapper>
