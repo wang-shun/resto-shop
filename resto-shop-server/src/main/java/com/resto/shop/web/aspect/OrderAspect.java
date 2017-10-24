@@ -660,13 +660,13 @@ public class OrderAspect {
         }
     }
 
-    public static void main(String[] args) {
-        Order order = new Order();
-        order.setId("00b8a27437cf460c93910bdc2489d061");
-        order.setBrandId("31946c940e194311b117e3fff5327215");
-        order.setShopDetailId("31164cebcc4b422685e8d9a32db12ab8");
-        MQMessageProducer.sendPlaceOrderMessage(order);
-    }
+//    public static void main(String[] args) {
+//        Order order = new Order();
+//        order.setId("00b8a27437cf460c93910bdc2489d061");
+//        order.setBrandId("31946c940e194311b117e3fff5327215");
+//        order.setShopDetailId("31164cebcc4b422685e8d9a32db12ab8");
+//        MQMessageProducer.sendPlaceOrderMessage(order);
+//    }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.pushOrder(..))")
     public void pushOrder() {
