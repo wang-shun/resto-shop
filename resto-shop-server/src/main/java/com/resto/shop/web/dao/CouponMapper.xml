@@ -21,8 +21,9 @@
         <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
         <result column="shop_det" property="customerId" jdbcType="VARCHAR"/>
         <result column="coupon_type" property="couponType"/>
+        <result column="new_custom_coupon_id" property="newCustomCouponId"/>
     </resultMap>
-    <sql id="Base_Column_List">id, name, value, min_amount, begin_date, end_date, begin_time, end_time, is_used, using_time, coupon_source, use_with_account, remark, distribution_mode_id, customer_id</sql>
+    <sql id="Base_Column_List">id, name, value, min_amount, begin_date, end_date, begin_time, end_time, is_used, using_time, coupon_source, use_with_account, remark, distribution_mode_id, customer_id, new_custom_coupon_id</sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">select
         <include refid="Base_Column_List"/>
         from tb_coupon where id = #{id,jdbcType=VARCHAR}
@@ -54,6 +55,7 @@
             <if test="brandId != null">brand_id,</if>
             <if test="pushDay !=null">push_day,</if>
             <if test="recommendDelayTime != null">recommend_delay_time,</if>
+            <if test="newCustomCouponId != null">new_custom_coupon_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=VARCHAR},</if>
@@ -76,6 +78,7 @@
             <if test="brandId != null">#{brandId,jdbcType=VARCHAR},</if>
             <if test="pushDay != null">#{pushDay,jdbcType=INTEGER},</if>
             <if test="recommendDelayTime != null">#{recommendDelayTime},</if>
+            <if test="newCustomCouponId != null">#{newCustomCouponId},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Coupon">update tb_coupon
@@ -194,23 +197,20 @@
         tc.`name` couponName,
         COUNT(1) couponCount,
         SUM(tc.`value`) couponMoney,
-        IFNULL((select r.useCount from (select COUNT(1) useCount,coupon_type from tb_coupon
-        where using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59')
-        and is_used = 1 GROUP BY coupon_type) r where r.coupon_type = tc.coupon_type),0) useCouponCount,
-        IFNULL((select r.useMoney from (select SUM(`value`) useMoney,coupon_type from tb_coupon
-        where using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59')
-        and is_used = 1 GROUP BY coupon_type) r where r.coupon_type = tc.coupon_type),0) useCouponMoney,
         CASE tc.coupon_type
-        WHEN 0 THEN COUNT(1)
-        WHEN 1 THEN COUNT(1)
+        WHEN 0 THEN COUNT(DISTINCT tc.customer_id)
+        WHEN 1 THEN COUNT(DISTINCT tc.customer_id)
         ELSE 0
         END customerCount,
         tc.shop_detail_id shopDetailId,
-        tc.coupon_type couponTypeInt
+        tc.coupon_type couponTypeInt,
+        SUM(IF(tc.is_used = 1 and using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59'),1,0)) useCouponCount,
+        SUM(IF(tc.is_used = 1 and using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59'),tc.value,0)) useCouponMoney
         from tb_coupon tc
         where tc.add_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
         and tc.add_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
-        GROUP BY tc.coupon_type
+        GROUP BY tc.`name`
+--         GROUP BY tc.new_custom_coupon_id, tc.`name`
     </select>
 
     <select id="usedCouponBeforeByOrderId" resultType="Coupon">

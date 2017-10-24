@@ -80,27 +80,27 @@
          return getSuccessResult(lists);
      }
 
-     @RequestMapping("/download")
-     @ResponseBody
-     public Result run(String id, HttpServletRequest request , HttpServletResponse response)
-             throws Exception {
-         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(id);
-         Brand brand = brandService.selectById(shopDetail.getBrandId());
-
-         String photoUrl = WeChatUtils.waitRedQRcodeUrl(brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret(), id);
-         String fileSavePath = getFilePath(request,null);
-//         deleteFile(new File(fileSavePath));//删除历史生成的文件
-         String filepath = getFilePath(request,shopDetail.getName());
-         String localHeadPhotoPath = download(shopDetail.getName(), photoUrl, request);
-         Date data = new Date();
-         String now = myDate.format(data);
-         //打包
-         FileToZip.fileToZip(filepath, fileSavePath, ("等位二维码" + now));
-         Result result = new Result(true);
-         result.setMessage("等位二维码" + now +".zip");
-         System.gc();//手动回收垃圾，清空文件占用情况，解决无法删除文件
-         return result;
-     }
+//     @RequestMapping("/download")
+//     @ResponseBody
+//     public Result run(String id, HttpServletRequest request , HttpServletResponse response)
+//             throws Exception {
+//         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(id);
+//         Brand brand = brandService.selectById(shopDetail.getBrandId());
+//
+//         String photoUrl = WeChatUtils.waitRedQRcodeUrl(brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret(), id);
+//         String fileSavePath = getFilePath(request,null);
+////         deleteFile(new File(fileSavePath));//删除历史生成的文件
+//         String filepath = getFilePath(request,shopDetail.getName());
+//         String localHeadPhotoPath = download(shopDetail.getName(), photoUrl, request);
+//         Date data = new Date();
+//         String now = myDate.format(data);
+//         //打包
+//         FileToZip.fileToZip(filepath, fileSavePath, ("等位二维码" + now));
+//         Result result = new Result(true);
+//         result.setMessage("等位二维码" + now +".zip");
+//         System.gc();//手动回收垃圾，清空文件占用情况，解决无法删除文件
+//         return result;
+//     }
 
      /**
       * 得到要 保存 二维码文件夹的路径
@@ -208,10 +208,12 @@
          } catch (Exception e) {
              e.printStackTrace();
          } finally {
-             if (bis != null)
+             if (bis != null){
                  bis.close();
-             if (bos != null)
+             }
+             if (bos != null){
                  bos.close();
+             }
          }
          return null;
      }

@@ -158,7 +158,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
         String dateNowStr = sdf.format(d);
         for (Article article : articleList) {
-            article.setMonthlySales(articleMapper.selectSumByMonthlySales(article.getId(), dateNowStr));
+//            article.setMonthlySales(articleMapper.selectSumByMonthlySales(article.getId(), dateNowStr));
 //            Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
             Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
             if (count != null) {

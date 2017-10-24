@@ -23,7 +23,7 @@ public interface CustomerService extends GenericService<Customer, String> {
 
     void updateCustomer(Customer customer);
 
-	Customer bindPhone(String phone, String currentCustomerId,Integer couponType,String shopId,String shareCustomer) throws AppException;
+	Customer bindPhone(String phone, String currentCustomerId,Integer couponType,String shopId,String shareCustomer,String shareOrderId) throws AppException;
     
 	/**
 	 * 根据ID才查询用户昵称和手机号码
@@ -110,4 +110,11 @@ public interface CustomerService extends GenericService<Customer, String> {
 	List<Customer> selectBySelectMap(Map<String, Object> selectMap);
 
 	 int updateCustomerWechatId(Customer customer);
+
+	/**
+	 * 根据账户余额Id查询用户信息
+	 * @param accountId
+	 * @return
+	 */
+	Customer selectByAccountId(String accountId);
 }

@@ -284,6 +284,16 @@ public class Order implements Serializable {
 
     private Integer refundType;
 
+    private Integer isConsumptionRebate;    //是否参与消费返利
+
+    public Integer getIsConsumptionRebate() {
+        return isConsumptionRebate;
+    }
+
+    public void setIsConsumptionRebate(Integer isConsumptionRebate) {
+        this.isConsumptionRebate = isConsumptionRebate;
+    }
+
     public Integer getRefundType() {
         return refundType;
     }

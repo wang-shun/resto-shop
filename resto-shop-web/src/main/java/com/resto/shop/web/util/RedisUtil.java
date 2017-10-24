@@ -31,8 +31,10 @@ public class RedisUtil {
      */
     public void removePattern(final String pattern) {
         Set<Serializable> keys = redisTemplate.keys(pattern);
-        if (keys.size() > 0)
+        if (keys.size() > 0){
             redisTemplate.delete(keys);
+        }
+
     }
 
     /**
@@ -114,11 +116,11 @@ public class RedisUtil {
 
     public void setRedisTemplate(
             RedisTemplate<Serializable, Object> redisTemplate) {
-        this.redisTemplate = redisTemplate;
+        RedisUtil.redisTemplate = redisTemplate;
     }
 
 
     public static void main(String[] args) {
-        set("test","1",100l);
+        set("test","1",100L);
     }
 }

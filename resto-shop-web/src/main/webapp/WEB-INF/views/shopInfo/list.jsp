@@ -629,6 +629,62 @@
 						</div>
 					</div>
 
+					<div class="form-group" v-if="b.consumptionRebate==1">
+						<label class="col-md-4 control-label">是否开启消费返利(1:1)：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="consumptionRebate"v-model="m.consumptionRebate" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="consumptionRebate" v-model="m.consumptionRebate" value="0"> 否
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group" v-if="m.consumptionRebate==1 && b.consumptionRebate==1">
+						<label class="col-md-4 control-label">消费返利解冻时间:</label>
+						<div class="col-md-6 radio-list">
+							<div class="input-group date form_datetime">
+								<input type="text" readonly class="form-control" name="rebateTime" v-model="m.rebateTime" @focus="initCouponTime"> <span class="input-group-btn">
+											<button class="btn default date-set" type="button">
+												<i class="fa fa-calendar" @click="initCouponTime"></i>
+											</button>
+										</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-md-4 control-label" :class="{ formBox : m.openBadWarning == 1}">开启差评预警：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="openBadWarning"v-model="m.openBadWarning" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="openBadWarning" v-model="m.openBadWarning" value="0"> 否
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group" v-show="m.openBadWarning==1">
+						<label class="col-md-4 control-label" :class="{ formBox : m.openBadWarning == 1}">预警通知方式：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="checkbox" name="warningSms"v-model="m.warningSms" value="1">短信推送
+							</label>
+							<label class="radio-inline">
+								<input type="checkbox" name="warningWechat" v-model="m.warningWechat" value="1">微信推送
+							</label>
+						</div>
+					</div>
+
+					<div class="form-group" v-show="m.openBadWarning == 1">
+						<label class="col-md-4 control-label" :class="{ formBox : m.openBadWarning == 1}">差评预警关键词：</label>
+						<div  class="col-md-6">
+							<textarea class="form-control" v-model="m.warningKey" name="warningKey">
+							</textarea><font color="red">*多个关键词中间以英文状态下的逗号(,)隔开</font>
+						</div>
+					</div>
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>
@@ -687,9 +743,10 @@
                             this.daySmsTypeWx = 2;
                             this.daySmsTypeSms = 1;
                         }else if(this.m.daySmsType==2){
-                            this.daySmsTypeWx=2
+                            this.daySmsTypeWx=2;
                             this.daySmsTypeSms=false;
                         }
+						this.m.rebateTime = new Date(this.m.rebateTime).format("yyyy-MM-dd");
                     },
 					methods : {
                         weChatPaySetting: function (name) {
@@ -762,6 +819,18 @@
 								}
 							})
 
+						},
+						initCouponTime: function(){
+							$('.form_datetime').datetimepicker({
+								format: "yyyy-mm-dd",
+								autoclose: true,
+								todayBtn: true,
+								todayHighlight: true,
+								showMeridian: true,
+								language: 'zh-CN',//中文，需要引用zh-CN.js包
+								startView: 2,//月视图
+								minView: 2//日期时间选择器所能够提供的最精确的时间选择视图
+							});
 						},
 						cancel : function() {
 							this.initContent();

@@ -96,6 +96,8 @@ public class ShopInfoController extends GenericController{
                 case 3 :
                     shopDetail.setConsumeConfineTime(Integer.MAX_VALUE);
                     break;
+                default:
+                    break;
             }
         }
         if(shopDetail.getIsTurntable()==1){
@@ -133,6 +135,12 @@ public class ShopInfoController extends GenericController{
             shopDetail.setnoticeTelephone("");
         }else  if(shopDetail.getIsOpenSms()==1){
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
+        }
+        if (shopDetail.getWarningWechat() == null){
+            shopDetail.setWarningWechat(Common.NO);
+        }
+        if (shopDetail.getWarningSms() == null){
+            shopDetail.setWarningSms(Common.NO);
         }
 //        shopDetailService.updateWithDatong(shopDetail,getCurrentBrandId(),getBrandName());
         shopDetailService.update(shopDetail);
