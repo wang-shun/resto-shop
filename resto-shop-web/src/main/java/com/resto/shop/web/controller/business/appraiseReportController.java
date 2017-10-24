@@ -114,8 +114,10 @@ public class appraiseReportController extends GenericController{
 					fiveStart++;
 				}
 			}
-			//消费的总单数
-			totalNum++;
+			//消费的总单数(只计算父订单)
+			if (o.getParentOrderId() == null){
+				totalNum++;
+			}
 			//消费的总金额
 			orderMoney = add(orderMoney,o.getOrderMoney());
 		}
@@ -180,7 +182,10 @@ public class appraiseReportController extends GenericController{
 					}
 					//消费的总金额
 					orderMoney2 = add(orderMoney2,o.getOrderMoney());
-					totalNum2++;
+					//消费的总订单(只计算父订单)
+					if (o.getParentOrderId() == null){
+						totalNum2++;
+					}
 				}
 			}
 			//设置评价单数

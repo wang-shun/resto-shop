@@ -371,6 +371,10 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				map.put("type", "UserAction");
 				map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
 				doPostAnsc(LogUtils.url, map);
+				//发送短信
+				com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+				smsParam.put("key1",chargeOrder.getNumberDayNow() + 1);
+				com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105745023");
 			}
         }
         if(setting.getTemplateEdition()==0){
@@ -429,6 +433,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 			map.put("type", "UserAction");
 			map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
 			doPostAnsc(LogUtils.url, map);
+			//发送短信
+			com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+			com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105805058");
 		}
     }
 
