@@ -5,6 +5,7 @@
 	th,td{text-align: center;}
 </style>
 <div id="control">
+	<%-- 新增原料开始--%>
 	<div class="row form-div" v-show="showform">
 		<div class="col-md-offset-3 col-md-6" >
 			<div class="portlet light bordered">
@@ -38,6 +39,7 @@
 							</div>
 							<div class="form-group row" >
 								<label class="col-md-2 control-label">二级类别<span style="color:#FF0000;">*</span></label>
+
 								<div class="col-md-3">
 									<select name="categoryTwoId" v-model="m.categoryTwoId" class="bs-select form-control" @change="categoryTwoIdCh">
 										<option disabled selected value>请选择</option>
@@ -47,6 +49,7 @@
 									</select>
 								</div>
 								<label class="col-md-2 control-label">品牌<span style="color:#FF0000;">*</span></label>
+								<button type="button" class="add" @click="addThirdCategory"><span aria-hidden="true">+</span></button>
 								<div class="col-md-3">
 									<select name="categoryThirdId" v-model="m.categoryThirdId" class="bs-select form-control" >
 										<option disabled selected value>请选择</option>
@@ -186,20 +189,96 @@
 			</div>
 		</div>
 	</div>
+		<%--新建原料结束--%>
 
-	<div class="table-div">
-		<div class="table-operator">
-			<s:hasPermission name="scmMaterial/add">
-				<button class="btn green pull-right" @click="create">新建</button>
-			</s:hasPermission>
+		<%--新建品牌开始--%>
+
+		<div class="row form-div" v-show="showCategoryForm" style="z-index:100;">
+			<div class="col-md-offset-3 col-md-6" style="text-align:center">
+				<div class="portlet light bordered">
+					<div class="portlet-title">
+						<div class="caption">
+							<span class="caption-subject bold font-blue-hoki">新增品牌</span>
+						</div>
+					</div>
+					<div class="portlet-body">
+						<div class="form-body">
+							<div class="form-group row" >
+								<label class="col-md-4 control-label">分类名称<span style="color:#FF0000;">*</span></label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" name="categoryName" v-model="parameter.categoryName" required="required">
+								</div>
+							</div>
+
+
+							<div class="form-group row">
+								<label class="col-md-4 control-label">一级分类<span style="color:#FF0000;">*</span></label>
+								<div class="col-md-3">
+
+									<select class="bs-select form-control" name="categoryOneId" v-model="parameter.categoryOneId"   @change="categoryOneCh">
+										<option disabled="" selected="" value="">请选择</option>
+										<option  v-for="categoryOne in categoryOnes" value="{{categoryOne.id}}">
+											{{categoryOne.categoryName}}
+										</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group row">
+								<label class="col-md-4 control-label">二级分类<span style="color:#FF0000;">*</span></label>
+
+								<div class="col-md-3">
+									<select name="parentId" v-model="parameter.id" class="bs-select form-control" >
+										<option disabled="" selected="" value="">请选择</option>
+										<option  v-for="categoryTwo in categoryTwos" value="{{categoryTwo.id}}" v-if="parameter.categoryOneId == categoryTwo.parentId">
+											{{categoryTwo.categoryName}}
+										</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-md-4 control-label">排序</label>
+								<div class="col-md-3">
+									<input type="number" class="form-control" name="sort" v-model="parameter.sort"  required="required">
+								</div>
+							</div>
+							<div class="form-group row" >
+								<label class="col-md-4 control-label" >关键词</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" name="keyword" v-model="parameter.keyword"  required="required">
+								</div>
+							</div>
+						</div>
+						<div class="form-group row">
+							<label class="col-md-2 control-label" >备注</label>
+							<div class="col-sm-8">
+								<textarea class="form-control" name="categoryDesc" v-model="parameter.categoryDesc"></textarea>
+							</div>
+						</div>
+						<div class="form-group text-center">
+							<input class="btn green"  type="submit" @click="saveThirdCategory"  value="提交"/>&nbsp;&nbsp;&nbsp;
+							<a class="btn default" @click="detailsCl">取消</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--新增分类结束-->
 		</div>
-		<div class="clearfix"></div>
-		<div class="table-filter"></div>
-		<div class="table-body">
-			<table class="table table-striped table-hover table-bordered "></table>
+
+		<%--新建品牌结束--%>
+		<div class="table-div">
+			<div class="table-operator">
+				<s:hasPermission name="scmMaterial/add">
+					<button class="btn green pull-right" @click="create">新建</button>
+				</s:hasPermission>
+			</div>
+			<div class="clearfix"></div>
+			<div class="table-filter"></div>
+			<div class="table-body">
+				<table class="table table-striped table-hover table-bordered "></table>
+			</div>
 		</div>
-	</div>
-</div>
+
+    </div>
 
 
 <script>
@@ -376,6 +455,7 @@
                 districtNameList:'',//接收区
                 coefficients:'',//计算的值
                 materReadonly:false,//编码
+                showCategoryForm:false,
 
                 m:{
                     materialType: '',
@@ -491,6 +571,7 @@
                     this.unitList='';//标准单位
                     this.convertUnitList='';//转换单位
                     this.showform=true;
+
                 },
                 edit:function(model){//编辑
                     this.m= model;
@@ -555,7 +636,64 @@
                         C.systemButtonNo('error','请填写'+message);
 					}
 
+                },
+                addThirdCategory:function(){
+                    debugger;
+                    this.showCategoryForm=true;
+                    this.parameter={
+                        categoryName:'',//分类名称
+                        parentId:this.m.categoryTwoId,//ID
+                        sort:'1',//排序
+                        keyword:'',//关键词
+                        categoryOneId:this.m.categoryOneId,
+                        categoryDesc:"",//备注
+                        categoryHierarchy:'3',
+                    };
+
+				},
+                detailsCl:function () {//取消新增
+                    this.showCategoryForm=false;
+                },
+                saveThirdCategory:function(){//新增分类提交
+                    var that=this;
+                    var submit=false;
+                    var message='';
+                    if(!this.parameter.categoryName) message='分类名称';
+                    else if(!this.parameter.categoryOneId) message='一级类别';
+                    else if(!this.parameter.parentId) message='二级类别';
+                    else submit=true;
+                    if(submit){
+                        delete this.parameter.categoryOneId;
+                        $.ajax({
+                            type:"POST",
+                            url:'scmCategory/create',
+                            contentType:"application/json",
+                            datatype: "json",
+                            data:JSON.stringify(that.parameter),
+                            beforeSend:function(){ //请求之前执行
+                            },
+                            success:function(data){ //成功后返回
+                                C.systemButtonNo('success','成功');
+                                that.showCategoryForm=false;
+                                $.post("scmCategory/list_categoryHierarchy?categoryHierarchy=3", null, function (data) {
+                                    that.categoryThirds = data.data;
+                                });
+                            },
+                            error: function(){ //失败后执行
+                                C.systemButtonNo('error','失败');
+                            }
+                        });
+                    }else {
+                        C.systemButtonNo('error','请填写'+message);
+                    }
                 }
+				
+				
+            },
+            categoryOneCh:function(){
+                debugger
+                this.parameter.parentId='';
+
             },
             ready:function () { //钩子函数
                 var that = this;

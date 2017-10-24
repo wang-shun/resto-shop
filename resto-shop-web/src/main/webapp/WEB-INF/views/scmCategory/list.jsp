@@ -8,7 +8,7 @@
             <div class="portlet light bordered">
                 <div class="portlet-title">
                     <div class="caption">
-                        <span class="caption-subject bold font-blue-hoki">新增分类</span>
+                        <span class="caption-subject bold font-blue-hoki">新增品牌</span>
                     </div>
                 </div>
                 <div class="portlet-body">
