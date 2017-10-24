@@ -90,7 +90,7 @@
 
     <select id="listUserShopCart" resultType="com.resto.shop.web.model.ShopCart">
         select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_article_id,unit_new_id,uuid,group_id from tb_shop_cart
-        where  user_id=#{0} and shop_detail_id=#{1} and distribution_mode_id=#{2} order by id
+        where  customer_id =#{0} and shop_detail_id=#{1} and distribution_mode_id=#{2} order by id
     </select>
 
     <select id="selectByUuId" resultType="com.resto.shop.web.model.ShopCart">
