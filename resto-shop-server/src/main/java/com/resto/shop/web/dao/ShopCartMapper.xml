@@ -105,7 +105,11 @@
         article_id = #{articleId} and
         customer_id =#{customerId} and
         pid = 0 and shop_type = #{shopType} and
-        shop_detail_id =#{shopDetailId} limit 1
+        shop_detail_id =#{shopDetailId}
+        <if test="groupId != null and groupId != ''">
+            and group_id = #{groupId}
+        </if>
+         limit 1
     </select>
 
     <update id="updateShopCartItem" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart
