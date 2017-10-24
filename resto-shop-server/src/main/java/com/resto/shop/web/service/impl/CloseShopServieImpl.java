@@ -283,6 +283,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		//本月外卖订单总额
 		BigDecimal monthOrderBooks = BigDecimal.ZERO;
 
+
 		List<OffLineOrder> todayOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), todayBegin,todayEnd, OfflineOrderSource.OFFLINE_POS);
 		if (!todayOffLineOrderList.isEmpty()) {
 			for (OffLineOrder of : todayOffLineOrderList) {
@@ -292,6 +293,7 @@ public class CloseShopServieImpl implements CloseShopService{
 				todayOrderBooks = todayOrderBooks.add(of.getOrderBooks());
 			}
 		}
+
 
 		List<OffLineOrder> monthOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), begin, end, OfflineOrderSource.OFFLINE_POS);
 		if (!monthOffLineOrderList.isEmpty()) {
@@ -303,8 +305,6 @@ public class CloseShopServieImpl implements CloseShopService{
 			}
 		}
 
-
-		//查询当日新增用户的订单
 		List<Order> newCustomerOrders = orderService.selectNewCustomerOrderByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
 		//新增用户的订单总数
 		int newCustomerOrderNum = 0;
