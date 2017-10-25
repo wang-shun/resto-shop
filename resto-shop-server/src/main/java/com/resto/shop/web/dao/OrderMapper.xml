@@ -2420,6 +2420,13 @@ GROUP BY r.table_number
         order by create_time desc limit 1
     </select>
 
+    <select id="getGroupOrderByGroupId" resultType="Order">
+        select * from tb_order where group_id = #{groupId}
+        and table_number is not null and  allow_continue_order = 1
+        and parent_order_id is null
+        order by create_time desc limit 1
+    </select>
+
 
     <select id="selectExceptionOrderListBybrandId" resultType="Order">
         SELECT  o.id FROM tb_order o

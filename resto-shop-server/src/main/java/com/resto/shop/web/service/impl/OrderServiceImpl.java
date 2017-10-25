@@ -6686,10 +6686,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public Order getLastOrderByCustomer(String customerId, String shopId) {
+    public Order getLastOrderByCustomer(String customerId, String shopId,String groupId) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
-        Order order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime());
+        //得到自己购买的最新的一比允许加菜的订单
+        Order order = null;
+        if(!StringUtils.isEmpty(groupId)){
+            //如果店铺开启了多人点餐
+            //获取这个人在这个组内的订单
+            order = orderMapper.getGroupOrderByGroupId(groupId);
+        }else{
+            order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime());
+        }
         if (order != null && order.getParentOrderId() != null) {
             Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
             if (parent != null && parent.getAllowContinueOrder()) {
