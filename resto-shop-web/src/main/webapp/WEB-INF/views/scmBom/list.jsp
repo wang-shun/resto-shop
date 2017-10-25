@@ -41,18 +41,34 @@
                                 </div>
                             </div>
 
-                            <div class="form-group row" >
-                                <label class="col-md-2 control-label">菜品编码</label>
-                                <div class="col-md-8">
-                                {{parameter.articleId}}
-                                </div>
-
-                            </div>
                             <div class="form-group row">
-                                <label class="col-md-2 control-label">版本号</label>
-                                <div class="col-md-3">
-                                    <input type="text" class="form-control" name="version" v-model="parameter.version" required="required">
+                                <label for="inputEmail3" class="col-sm-2 control-label">开始时间<span style="color:#FF0000;">*</span></label>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control form_datetime" id="beginDate" v-model="parameter.startEffect" name="startEffect" readonly="readonly">
                                 </div>
+                                <label for="inputPassword3" class="col-sm-2 control-label">结束时间<span style="color:#FF0000;">*</span></label>
+                                <div class="col-sm-3">
+                                    <input type="text" class="form-control form_datetime" id="endDate" v-model="parameter.endEffect" name="endEffect" readonly="readonly">
+                                </div>
+                            </div>
+
+                            <%--<div class="form-group row" >--%>
+                                <%--<label class="col-md-2 control-label">菜品编码</label>--%>
+                                <%--<div class="col-md-8">--%>
+                                <%--{{parameter.articleId}}--%>
+                                <%--</div>--%>
+
+                            <%--</div>--%>
+                            <div class="form-group row">
+                                <%--<label class="col-md-2 control-label">版本号</label>--%>
+                                <%--<div class="col-md-3">--%>
+                                    <%--<input type="text" class="form-control" name="version" v-model="parameter.version" required="required">--%>
+                                <%--</div>--%>
+
+                                    <label class="col-md-2 control-label">计量单位</label>
+                                    <div class="col-md-3">
+                                        <input type="text" class="form-control" name="measurementUnit" v-model="parameter.measurementUnit" disabled>
+                                    </div>
 
                                 <label class="col-md-2 control-label">序号</label>
                                 <div class="col-md-3">
@@ -60,15 +76,29 @@
                                 </div>
                             </div>
 
+
+                            <div class="form-group row">
+                                <label class="col-md-2 control-label">制作人</label>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" name="producer" v-model="parameter.producer" required="required">
+                                </div>
+
+                                <label class="col-md-2 control-label">是否启用</label>
+                                <div class="col-md-3">
+                                    <div class="col-md-3">
+                                        <input name="state" type="checkbox"  v-model="parameter.state"  :value="0">
+                                    </div>
+                                </div>
+                            </div>
+
+
+
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">产品原料<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
                                     <input class="btn btn-default" type="button" value="添加原料" @click="closeTreeView"/>
                                 </div>
-                                <label class="col-md-2 control-label">计量单位</label>
-                                <div class="col-md-3">
-                                    <input type="text" class="form-control" name="measurementUnit" v-model="parameter.measurementUnit" disabled>
-                                </div>
+
                             </div>
                         </div>
                         <div style="max-height: 200px;overflow: auto;">
@@ -191,8 +221,13 @@
                     orderable:false,
                 },
                 {
-                    title: "版本号",
+                    title: "当前版本号",
                     data: "version",
+                    orderable:false,
+                },
+                {
+                    title: "最大版本号",
+                    data: "maxVersion",
                     orderable:false,
                 },
                 {
@@ -200,6 +235,35 @@
                     data : "familyName",
                     orderable:false,
                 },
+
+                {
+                    title: "开始时间",
+                    data: "startEffect",
+                    orderable:false,
+                },
+                {
+                    title : "结束时间",
+                    data : "endEffect",
+                    orderable:false,
+                },
+                {
+                    title : "是否启用",
+                    data : "state",
+                    createdCell:function (td,tdData) {//td中的数据
+                        switch (tdData){
+                            case 0:tdData='未启用';break;
+                            case 1:tdData='已启用';break;
+                        }
+                        $(td).html(tdData);
+                    },
+                    orderable:false,
+                },
+                {
+                    title : "制作人",
+                    data : "producer",
+                    orderable:false,
+                }
+                ,
                 {
                     title : "菜品名称",
                     data : "articleName",
@@ -243,6 +307,7 @@
                                 case 'INGREDIENTS':tdData[i].materialType='主料';break;
                                 case 'ACCESSORIES':tdData[i].materialType='辅料';break;
                                 case 'SEASONING':tdData[i].materialType='辅料';break;
+                                case 'MATERIEL':tdData[i].materialType='物料';break;
                             }
                             html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialType+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].minMeasureUnit+'/'+tdData[i].minUnitName+'</td><td>'+tdData[i].materialCount+'</td></tr>';
                         }
@@ -275,6 +340,10 @@
                     productName:'',//菜品名称
                     articleFamilyId:'',//菜品类别id
                     articleId:'',//菜品id
+                    startEffect:'',//生效日期
+                    endEffect:'',//失效效日期
+                    producer:'',//制作人
+                    state:'',//是否启用
                     measurementUnit:'',//计量单位
                     size:'',//原料种类
                     bomDetailDoList:[],//bom原材料显示
@@ -308,6 +377,10 @@
                         measurementUnit:'',
                         articleFamilyId:'',
                         articleId:'',
+                        startEffect:'',//生效日期
+                        endEffect:'',//失效效日期
+                        producer:'',//制作人
+                        state:'',//是否启用
                     };
                     this.showform=true;
                 },
@@ -359,7 +432,18 @@
                     if(!this.parameter.articleFamilyId) message='菜品类别';
                     else if(!this.parameter.articleId) message='菜品名称';
                     else if(_this.parameter.bomDetailDoList.length<=0) message='产品原料';
+                    else if(!this.parameter.startEffect) message='开始时间';
+                    else if(!this.parameter.endEffect) message='结束时间';
+                    else if(!this.parameter.producer) message='制作人';
                     else  submit=true;
+                     debugger
+                    if(this.parameter.state ='' ||!this.parameter.state){
+                        this.parameter.state =0;
+                    }else{
+                        this.parameter.state =1;
+                    }
+
+
                     for(var i=0;i<_this.parameter.bomDetailDoList.length;i++) {
                         if(!_this.parameter.bomDetailDoList[i].materialCount){
                             submit=false;
@@ -421,11 +505,14 @@
                             case 'INGREDIENTS':this.parameter.bomDetailDoList[i].materialTypeShow='主料';break;
                             case 'ACCESSORIES':this.parameter.bomDetailDoList[i].materialTypeShow='辅料';break;
                             case 'SEASONING':this.parameter.bomDetailDoList[i].materialTypeShow='配料';break;
+                            case 'MATERIEL':this.parameter.bomDetailDoList[i].materialTypeShow='物料';break;
                         }
                     }
                     this.treeView=false;
                     $('#assignTree').jstrestwo('deselect_all');//关闭所有选中状态
                 },
+
+
                 closeTreeView:function () { //添加原料打开
                     this.treeView=true;
                 },
@@ -437,6 +524,26 @@
                     console.log(mealItem);
                     this.parameter.bomDetailDeleteIds.push(mealItem.id);
                 },
+            },
+
+            //vue实例化之后执行的方法
+            created : function(){
+                //初始化多选框按钮 和 时间插件
+                //时间默认值
+                $('.form_datetime').val(new Date().format("yyyy-mm-dd"));
+                //this.initTime();
+                $('.form_datetime').datetimepicker({
+                    //endDate : new Date(),
+                    //minView : "month",
+                    //maxView : "month",
+                    autoclose : true,//选择后自动关闭时间选择器
+                    todayBtn : true,//在底部显示 当天日期
+                    todayHighlight : true,//高亮当前日期
+                    format : "yyyy-mm-dd",
+                    //startView : "month",
+                    language : "zh-CN"
+                });
+
             },
             ready:function(){//钩子加载后---*vue挂载之后执行*
                 var that = this;

@@ -64,10 +64,10 @@
 									<input type="text" class="form-control" name="materialName" v-model="m.materialName"
 										   required="required">
 								</div>
-								<label class="col-md-2 control-label">原材编码</label>
+								<label class="col-md-2 control-label">原材别名</label>
 								<div class="col-md-3">
-									<input type="text" class="form-control" name="materialCode" v-model="m.materialCode" disabled
-										   :readonly="materReadonly" >
+									<input type="text" class="form-control" name="printName" v-model="m.printName">
+
 								</div>
 							</div>
 							<div class="form-group row">
@@ -179,6 +179,20 @@
 									<input type="text" class="form-control" name="description" v-model="m.description">
 								</div>
 							</div>
+							<div class="form-group row">
+								<label class="col-md-2 control-label">是否启用</label>
+								<div class="col-md-3">
+								   <input name="state" type="checkbox"  v-model="m.state"  :value="0">
+								</div>
+
+								<label class="col-md-2 control-label">原材编码</label>
+								<div class="col-md-3">
+									<input type="text" class="form-control" name="materialCode" v-model="m.materialCode" disabled
+										   :readonly="materReadonly" >
+								</div>
+							</div>
+
+
 						</div>
 						<div class="form-group text-center">
 							<button class="btn green"  @click="save">保存</button>
@@ -303,6 +317,7 @@
 							case 'INGREDIENTS':tdData='主料';break;
                             case 'ACCESSORIES':tdData='辅料';break;
                             case 'SEASONING':tdData='配料';break;
+                            case 'MATERIEL':tdData='物料';break;
 						}
                         $(td).html(tdData);
                     },
@@ -312,6 +327,8 @@
                             case 'INGREDIENTS':tdData='主料';break;
                             case 'ACCESSORIES':tdData='辅料';break;
                             case 'SEASONING':tdData='配料';break;
+                            case 'MATERIEL':tdData='物料';break;
+
                         }
                         return tdData;
                     }
@@ -335,6 +352,21 @@
                 {
                     title : "材料名",
                     data : "materialName",
+                },
+                {
+                    title : "材料别名",
+                    data : "printName",
+                },
+				{
+                    title : "是否启用",
+                    data : "state",
+                    createdCell:function (td,tdData) {//td中的数据
+                        switch (tdData){
+                            case 0:tdData='未启用';break;
+                            case 1:tdData='已启用';break;
+                        }
+                        $(td).html(tdData);
+                    },
                 },
                 {
                     title : "序号 ",
@@ -439,6 +471,7 @@
                     {code:"INGREDIENTS" , name:"主料"},
                     {code:"ACCESSORIES" , name:"辅料"},
                     {code:"SEASONING" ,name:"配料"},
+                    {code:"MATERIEL" ,name:"物料"},
                 ],
                 allArticles: allArticles,
                 categoryOnes:[],//一级类别集合
@@ -483,6 +516,8 @@
                     description :'',
                     minMeasureUnit:'',
                     coefficient:'',
+                    state:'',//状态 0-未启用 1-启用
+                    printName:'',//原料别名
                 },
             },
           //过滤二级分类不可以绑定
@@ -551,6 +586,7 @@
                         this.coefficients=Mcoefficient;
                     }
                 },
+
                 create:function(){//新增
                     this.materReadonly=false;
                     this.m={
@@ -576,6 +612,8 @@
                         description :'',
                         minMeasureUnit:'',
                         coefficient:'',
+                        state:'',//状态 0-未启用 1-启用
+                        printName:'',//原料别名
                     };
                     this.provinceNameList='';//绑定省
                     this.cityNameList='';//绑定市
@@ -615,6 +653,8 @@
 						coefficient:model.coefficient,
                         measureUnit:model.measureUnit,//规格的核算单位值
                         rate:model.rate,//转换率
+                        state:model.state,//状态 0-未启用 1-启用
+                        printName:model.printName,//原料别名
                     };
                     this.provinceNameList=model.provinceName+','+model.provinceId;//绑定省
                     this.cityNameList=model.cityName+','+model.cityId;//绑定市
@@ -640,6 +680,17 @@
                     else if(!this.m.convertUnitId) message='转化单位';
                     else if(!this.m.minMeasureUnit) message='最小单位';
                     else  submit=true;
+                  debugger
+                     if(!this.m.printName){
+                         this.m.printName = this.m.materialName
+					 }
+
+                    if(this.m.state ='' ||!this.m.state){
+                        this.m.state =0;
+					}else{
+                        this.m.state =1;
+					}
+
                     if(submit){
                         if(this.m.id) C.systemButton('scmMaterial/modify',this.m,['编辑成功','编辑失败']);
                         else C.systemButton('scmMaterial/create',this.m,['新增成功','新增失败']);
