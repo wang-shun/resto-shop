@@ -46,6 +46,11 @@
                                 <div class="col-md-3">
                                     <input type="text" class="form-control" name="version" v-model="parameter.version">
                                 </div>
+
+                                <label class="col-md-2 control-label">纳税人识别号</label>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" name="taxNumber" v-model="parameter.taxNumber">
+                                </div>
                             </div>
 
                             <div class="form-group row">
@@ -64,6 +69,7 @@
                                     <tr>
                                         <th>编号</th>
                                         <th>姓名<span style="color:#FF0000;">*</span></th>
+                                        <th>职位<span style="color:#FF0000;">*</span></th>
                                         <th>电话<span style="color:#FF0000;">*</span></th>
                                         <th>邮箱</th>
                                         <th>默认<span style="color:#FF0000;">*</span></th>
@@ -74,6 +80,7 @@
                                     <tr v-for="(index,item) in parameter.supplierContacts">
                                         <td>{{index+1}}</td>
                                         <td><input style="width: 80px" type="text" v-model="item.contact"></td>
+                                        <td><input style="width: 80px" type="text" v-model="item.position"></td>
                                         <td><input style="width: 145px" type="text" v-model="item.mobile"></td>
                                         <td><input style="width: 145px" type="text" v-model="item.email"></td>
                                         <td><input name="isTop" type="radio" v-model="isTop" :value="item.isTop" @click="supplierContactsRadio(item)"></td>
@@ -161,6 +168,11 @@
                     orderable:false,
                 },
                 {
+                    title : "职务 ",
+                    data : "position",
+                    orderable:false,
+                },
+                {
                     title : "电话",
                     data : "topMobile",
                     orderable:false,
@@ -221,9 +233,11 @@
                     bankName: "",
                     bankAccount: "",
                     version: "",
+                    taxNumber:"",
                     topContact: "",
                     topMobile: "",
                     topEmail: "",
+                    position:"",
                     supplierContacts:[],//详情
                     supContactIds:[],
                 }
@@ -231,13 +245,12 @@
             methods:{
                 addSupplierContacts:function () { //添加供应商联系资料
                    if(this.parameter.supplierContacts.length==0){
-                       this.parameter.supplierContacts.push({contact:'',mobile:'',email:'',isTop:'0'});
+                       this.parameter.supplierContacts.push({contact:'',position:'',mobile:'',email:'',isTop:'0'});
                    }else {
-                       this.parameter.supplierContacts.push({contact:'',mobile:'',email:'',isTop:'1'});
+                       this.parameter.supplierContacts.push({contact:'',position:'',mobile:'',email:'',isTop:'1'});
                    }
                 },
                 removeArticleItem:function (data) { //移除供应商联系资料
-                    debugger
                     this.parameter.supplierContacts.$remove(data);
                     this.parameter.supContactIds.push(data.id);
                     if(data.isTop=='0'&&this.parameter.supplierContacts.length!=0){
@@ -274,6 +287,7 @@
                         bankName: "",
                         bankAccount: "",
                         version: "1",
+                        taxNumber:"",
                         topContact: "",
                         topMobile: "",
                         topEmail: "",
@@ -297,10 +311,8 @@
                 },
 
                 save:function(){//提交
-                      debugger
                     var _this=this;
                     var saveObj={};
-                    debugger
                     saveObj.id=this.parameter.id;
                     saveObj.supCode=this.parameter.supCode;
                     saveObj.supplierType=this.parameter.supplierType;
@@ -313,6 +325,7 @@
                     saveObj.supplierContacts=[];
                     saveObj.supContactIds =this.parameter.supContactIds;
                     saveObj.version =this.parameter.version;
+                    saveObj.taxNumber =this.parameter.taxNumber;
                     var parSup=this.parameter.supplierContacts;
                     for(var i=0;i<parSup.length;i++){
                         saveObj.supplierContacts[i]={
@@ -320,7 +333,8 @@
                             contact:parSup[i].contact,
                             mobile:parSup[i].mobile,
                             email:parSup[i].email,
-                            isTop:parSup[i].isTop
+                            isTop:parSup[i].isTop,
+                            position:parSup[i].position
                         }
                     }
                     var url='scmSupplier/modify';
