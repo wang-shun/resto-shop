@@ -10,6 +10,7 @@ import com.resto.shop.web.constant.ShopCarType;
 import com.resto.shop.web.dao.ShopCartMapper;
 import com.resto.shop.web.model.ShopCart;
 import com.resto.shop.web.service.ShopCartService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
@@ -37,7 +38,7 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     @Override
     public List<ShopCart> listUserAndShop(ShopCart shopcart) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopcart.getShopDetailId());
-        if(shopDetail.getOpenManyCustomerOrder() == Common.YES && shopcart.getGroupId() != null){
+        if(shopDetail.getOpenManyCustomerOrder() == Common.YES && !StringUtils.isEmpty(shopcart.getGroupId())){
             //开启多人点餐
             return shopcartMapper.getListByGroupId(shopcart.getGroupId());
         }else{
