@@ -402,6 +402,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
         if(!StringUtils.isEmpty(order.getGroupId())){
+            TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
+            if(tableGroup.getState() == TableGroup.FINISH){
+                jsonResult.setSuccess(false);
+                jsonResult.setMessage("该组已经释放，请重新选择桌位！");
+                return jsonResult;
+            }
             Boolean bool = (Boolean) RedisUtil.get(order.getCustomerId()+order.getGroupId());
             if(!bool){
                 jsonResult.setSuccess(false);
