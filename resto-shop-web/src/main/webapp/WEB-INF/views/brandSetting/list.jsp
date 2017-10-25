@@ -283,7 +283,7 @@
                             <input type="hidden" name="loadingLogo" v-model="m.loadingLogo">
                             <img-file-upload class="form-control" @success="uploadSuccessLogo"
                                              @error="uploadError"></img-file-upload>
-                            <img v-if="m.loadingLogo" :src="m.wechatWelcomeImg"
+                            <img v-if="m.loadingLogo" :src="m.loadingLogo"
                                  onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px"
                                  class="img-rounded">
                         </div>
@@ -293,7 +293,7 @@
                             <input type="hidden" name="loadingBackground" v-model="m.loadingBackground">
                             <img-file-upload class="form-control" @success="uploadSuccessBackground"
                                              @error="uploadError"></img-file-upload>
-                            <img v-if="m.loadingBackground" :src="m.wechatWelcomeImg"
+                            <img v-if="m.loadingBackground" :src="m.uploadSuccessBackground"
                                  onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px"
                                  class="img-rounded">
                         </div>
