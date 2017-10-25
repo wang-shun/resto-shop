@@ -269,6 +269,34 @@
                                 短信推送
                             </label>
                         </div>
+
+                        <div class="form-group">
+                            <label>loading页面的文字底色</label>
+                            <div>
+                                <input type="text" class="form-control color-mini" name="loadingTextColor"
+                                       data-position="bottom left" v-model="m.loadingTextColor">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>loading页面的logo图</label>
+                            <input type="hidden" name="loadingLogo" v-model="m.loadingLogo">
+                            <img-file-upload class="form-control" @success="uploadSuccessLogo"
+                                             @error="uploadError"></img-file-upload>
+                            <img v-if="m.loadingLogo" :src="m.wechatWelcomeImg"
+                                 onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px"
+                                 class="img-rounded">
+                        </div>
+
+                        <div class="form-group">
+                            <label>loading页面的背景图片</label>
+                            <input type="hidden" name="loadingBackground" v-model="m.loadingBackground">
+                            <img-file-upload class="form-control" @success="uploadSuccessBackground"
+                                             @error="uploadError"></img-file-upload>
+                            <img v-if="m.loadingBackground" :src="m.wechatWelcomeImg"
+                                 onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px"
+                                 class="img-rounded">
+                        </div>
                     </div>
                     <input type="hidden" name="id" v-model="m.id"/>
                     <input class="btn green" type="submit" value="保存"/>
@@ -309,6 +337,22 @@
                 'm.autoConfirmTime': 'timeTips',
                 'm.closeContinueTime': 'timeTips'
 
+            },
+            created: function () {
+                var n = $('.color-mini').minicolors({
+                    change: function (hex, opacity) {
+                        if (!hex) return;
+                        if (typeof console === 'object') {
+                            $(this).attr("value", hex);
+                        }
+                    },
+                    theme: 'bootstrap'
+                });
+                this.$watch("m", function () {
+                    if (this.m.id) {
+                        $('.color-mini').minicolors("value", this.m.loadingTextColor);
+                    }
+                });
             },
             methods: {
                 timeTips: function () {
@@ -352,6 +396,14 @@
                 setRedPackage: function (url) {
                     $("[name='redPackageLogo']").val(url).trigger("change");
                     toastr.success("上传logo成功！");
+                },
+                uploadSuccessLogo: function (url) {
+                    $("[name='loadingLogo']").val(url).trigger("change");
+                    toastr.success("上传成功！");
+                },
+                uploadSuccessBackground: function (url) {
+                    $("[name='loadingBackground']").val(url).trigger("change");
+                    toastr.success("上传成功！");
                 },
                 uploadError: function (msg) {
                     toastr.error("上传失败");
