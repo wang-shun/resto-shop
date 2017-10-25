@@ -271,7 +271,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label>loading页面的文字底色</label>
+                            <label>loading页面的文字颜色/label>
                             <div>
                                 <input type="text" class="form-control color-mini" name="loadingTextColor"
                                        data-position="bottom left" v-model="m.loadingTextColor">
