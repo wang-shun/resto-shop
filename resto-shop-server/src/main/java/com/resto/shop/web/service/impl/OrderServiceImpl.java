@@ -7129,7 +7129,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 maxWxRefund = maxWxRefund.add(item.getPayValue());
             }
         }
-        if(order.getRefundType().equals(RefundType.OFFLINE_PAY)){
+        if(RefundType.OFFLINE_PAY.equals(order.getRefundType())){
             OrderPaymentItem back = new OrderPaymentItem();
             back.setId(ApplicationUtils.randomUUID());
             back.setOrderId(order.getId());
