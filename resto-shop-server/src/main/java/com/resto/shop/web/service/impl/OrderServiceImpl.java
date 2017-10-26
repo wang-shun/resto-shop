@@ -7783,7 +7783,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return;
         }
         if (customer != null) {
-            System.out.println("\n\n\n  lmx：" + order.getBrandId());
             Brand brand = brandService.selectById(o.getBrandId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
