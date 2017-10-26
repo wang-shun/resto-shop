@@ -69,7 +69,7 @@
                                     <tr>
                                         <th>编号</th>
                                         <th>姓名<span style="color:#FF0000;">*</span></th>
-                                        <th>职位<span style="color:#FF0000;">*</span></th>
+                                        <th>职位</th>
                                         <th>电话<span style="color:#FF0000;">*</span></th>
                                         <th>邮箱</th>
                                         <th>默认<span style="color:#FF0000;">*</span></th>
