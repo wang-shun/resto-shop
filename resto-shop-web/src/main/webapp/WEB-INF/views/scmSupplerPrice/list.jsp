@@ -68,9 +68,9 @@
 
                                 <label for="inputEmail3" class="col-sm-2 control-label">税率</label>
                                 <div class="col-md-3">
-                                    <select class="bs-select form-control" name="tax" v-model="tax">
+                                    <select class="bs-select form-control" name="tax" v-model="parameter.tax">
                                         <option disabled="" selected="" value="">请选择</option>
-                                        <option  v-for="tax in taxs" value="{{tax.name}}">
+                                        <option  v-for="tax in taxs" value="{{tax.code}}">
                                         {{tax.name}}
                                         </option>
                                     </select>
@@ -155,7 +155,7 @@
                         </div>
                         <label class="col-md-2 control-label">有效期</label>
                         <div class="col-md-4">
-                            {{detailsArr.startEffect}}--{{detailsArr.endEffect}}
+                            {{detailsArr.startEffect}}至{{detailsArr.endEffect}}
                         </div>
                     </div>
                     <div class="form-group row">
@@ -170,18 +170,18 @@
                     </div>
                     <div class="form-group row">
                         <label class="col-md-2 control-label">联系人</label>
-                        <div class="col-md-4">
-                            {{detailsArr.contact}}
-                        </div>
-                        <label class="col-md-2 control-label">税率</label>
-                        <div class="col-md-4">
-                            {{detailsArr.tax}}
+                        <div class="col-md-10">
+                            {{detailsArr.contact}}({{detailsArr.position}}/{{detailsArr.mobile}}/{{detailsArr.email}})
                         </div>
                     </div>
                     <div class="form-group row">
                         <label class="col-md-2 control-label">备注</label>
                         <div class="col-md-4">
                             {{detailsArr.remark}}
+                        </div>
+                        <label class="col-md-2 control-label">税率</label>
+                        <div class="col-md-4">
+                            {{detailsArr.tax}}
                         </div>
                     </div>
                     <div class="form-group row" style="max-height:300px;overflow: auto;">
@@ -392,6 +392,7 @@
                         contactId:'',//联系人id
                         remark:'',//备注
                         priceName:'',//报价单名称
+                        tax:'',
                         mdSupplierPriceDetailDoList:[],
 
                     };
@@ -418,6 +419,11 @@
                     this.details=true;
                     this.approveBtn=false;
                     this.detailsArr=data;
+                    console.info(data);
+                    var tax_new = this.detailsArr.tax.toString();
+                    if (tax_new.indexOf("%") === -1){
+                        this.detailsArr.tax = Math.round(parseFloat(tax_new)*100) + "%";
+                    }
                     for(var i=0;i<this.detailsArr.mdSupplierPriceDetailDoList.length;i++){
                         switch(this.detailsArr.mdSupplierPriceDetailDoList[i].materialType){
                             case 'INGREDIENTS':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='主料';break;
