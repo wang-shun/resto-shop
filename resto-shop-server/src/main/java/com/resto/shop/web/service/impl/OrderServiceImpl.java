@@ -7475,7 +7475,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orders.put(orderItem.getOrderId(), itemValue);
                 }
             } else {
-                BigDecimal itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(orderItem.getExtraPrice());
+                BigDecimal extraPrice = orderItem.getExtraPrice() != null ? orderItem.getExtraPrice() : BigDecimal.ZERO;
+                BigDecimal itemValue = BigDecimal.valueOf(orderItem.getCount()).multiply(orderItem.getUnitPrice()).add(extraPrice);
                 if (orders.containsKey(orderItem.getOrderId())) {
                     orders.put(orderItem.getOrderId(), orders.get(orderItem.getOrderId()).add(itemValue));
                     RedisUtil.set(orderItem.getOrderId() + "ItemCount", Integer.parseInt(RedisUtil.get(orderItem.getOrderId() + "ItemCount").toString()) + orderItem.getCount());
