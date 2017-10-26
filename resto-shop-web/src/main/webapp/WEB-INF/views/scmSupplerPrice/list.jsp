@@ -598,26 +598,6 @@
                 }).on("click",function(){
                     $("#endDate").datetimepicker("setStartDate",$("#beginDate").val())
                 });
-//                $('.form_datetime').val(new Date().format("yyyy-mm-dd"));
-                //this.initTime();
-//                $('.form_datetime').datetimepicker({
-//                    //endDate : new Date(),
-//                    //minView : "month",
-//                    //maxView : "month",
-//                    autoclose : true,//选择后自动关闭时间选择器
-//                    todayBtn : true,//在底部显示 当天日期
-//                    todayHighlight : true,//高亮当前日期
-//                    format : "yyyy-mm-dd",
-//                    //startView : "month",
-//                    language : "zh-CN"
-//                });
-//                $('.form_datetime').datetimepicker({
-//                    minView: "month", //选择日期后，不会再跳转去选择时分秒
-//                    language:  'zh-CN',
-//                    format: 'yyyy-mm-dd',
-//                    todayBtn:  1,
-//                    autoclose: 1,
-//                });
             },
         });
         C.vue=vueObj;
