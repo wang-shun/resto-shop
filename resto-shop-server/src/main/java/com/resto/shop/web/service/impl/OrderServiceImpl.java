@@ -7782,10 +7782,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             return;
         }
         if (customer != null) {
+            System.out.println("\n\n\n  lmx：" + order.getBrandId());
             Brand brand = brandService.selectById(o.getBrandId());
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
-            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+            BrandSetting setting = brandSettingService.selectByBrandId(o.getBrandId());
             if(setting.getTemplateEdition()==0){
                 StringBuilder msg = new StringBuilder("亲，您");
                 msg.append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("的订单已完成退菜，相关款项")
