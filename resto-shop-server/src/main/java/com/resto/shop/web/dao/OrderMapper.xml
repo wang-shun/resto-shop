@@ -267,6 +267,7 @@
         <result column="order_mode" property="orderMode"/>
         <result column="pay_type" property="payType"/>
         <result column="amount_with_children" property="amountWithChildren"/>
+        <result column="create_time" property="createTime"/>
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
             <id column="orderPaymentItemId" property="id"/>
             <result column="payment_mode_id" property="paymentModeId"/>
@@ -2331,9 +2332,11 @@ GROUP BY r.table_number
 
     </select>
 
+
+
     <select id="selectListByShopId" resultMap="consumedOrderByshopId">
         SELECT
-        o.id,o.order_money,oi.payment_mode_id ,oi.pay_value
+        o.id,o.order_money,oi.payment_mode_id ,oi.pay_value,o.create_time
         FROM
         tb_order o
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
@@ -2342,6 +2345,9 @@ GROUP BY r.table_number
         and o.production_status in (2,3) AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
     </select>
+
+
+
 
     <!-- 根据订单状态和生产状态查询指定店铺的订单   不包含包含外卖订单-->
     <select id="selectByOrderSatesAndProductionStates" resultType="Order">
@@ -3337,4 +3343,23 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <select id="selectAfterValidOrderByCustomerId" resultType="Order">
         select * from tb_order where customer_id = #{customerId} and order_state in (2,10,11,12) and production_status != 6 order by create_time desc limit 1
     </select>
+
+    <select id="selectOrderNumByTimeAndBrandId" resultType="com.resto.shop.web.dto.OrderNumDto">
+
+        SELECT
+        COUNT(DISTINCT o.id) num,
+        o.shop_detail_id shopId
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item opi ON o.id = opi.order_id
+        WHERE
+        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        AND o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND o.brand_id = #{brandId}
+        GROUP BY
+        o.shop_detail_id;
+    </select>
+
+
 </mapper>
