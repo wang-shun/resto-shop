@@ -180,9 +180,9 @@
 								</div>
 							</div>
 							<div class="form-group row">
-								<label class="col-md-2 control-label">是否启用</label>
+								<label class="col-md-2 control-label">是否启用<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">
-								   <input name="state" type="checkbox"  v-model="m.state"  :value="0">
+								   是<input name="state" type="radio"  v-model="m.state"  :value="1">   否<input name="state" type="radio"  v-model="m.state"  :value="0">
 								</div>
 
 								<label class="col-md-2 control-label">原材编码</label>

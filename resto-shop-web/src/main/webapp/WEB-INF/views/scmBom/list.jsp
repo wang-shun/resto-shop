@@ -83,11 +83,10 @@
                                     <input type="text" class="form-control" name="producer" v-model="parameter.producer" required="required">
                                 </div>
 
-                                <label class="col-md-2 control-label">是否启用</label>
+                                <label class="col-md-2 control-label">是否启用<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <div class="col-md-3">
-                                        <input name="state" type="checkbox"  v-model="parameter.state"  :value="0">
-                                    </div>
+                                        是<input name="state" type="radio"  v-model="parameter.state"  :value="1">
+                                        否<input name="state" type="radio"  v-model="parameter.state"  :value="0">
                                 </div>
                             </div>
 
@@ -381,6 +380,7 @@
                         endEffect:'',//失效效日期
                         producer:'',//制作人
                         state:'',//是否启用
+                        version:'',//版本号
                     };
                     this.showform=true;
                 },
@@ -392,7 +392,9 @@
                 edit:function(model){ //编辑打开弹窗
                     var that=this;
                     var articleIdZhi=model.articleId;
+                    debugger
                     this.parameter= model;
+                    this.parameter.state=model.state;//状态 0-未启用 1-启用
                     this.parameter.bomDetailDeleteIds=[];
                     this.showform=true;
                     this.parameter.articleId='';
@@ -418,6 +420,7 @@
                             actLossFactor:_this.parameter.bomDetailDoList[i].actLossFactor,
                             materialCount:_this.parameter.bomDetailDoList[i].materialCount,
                             measurementUnit:_this.parameter.bomDetailDoList[i].measurementUnit,
+                            version:_this.parameter.bomDetailDoList[i].version,
                         }
                     }
                     _this.parameter.bomDetailDoList=savearr;
@@ -474,7 +477,8 @@
                             bomDetailDeleteIds:[],//删除的list节点
                             bomCode:'',
                             productCode:'',
-                            measurementUnit:''
+                            measurementUnit:'',
+                            state:'',
                         };
                     }else {
                         C.systemButtonNo('error','请填写'+message);
@@ -524,7 +528,31 @@
                     console.log(mealItem);
                     this.parameter.bomDetailDeleteIds.push(mealItem.id);
                 },
+
+
             },
+            ready:function(){//钩子加载后---*vue挂载之后执行*
+                var that = this;
+                $('#tableBodyList').on('click','table tbody tr',function () {//显示详情
+                    debugger
+                    that.tableBodyListsShow=true;
+                    $('#tableBodyLists table').html('');
+                    $('#tableBodyLists table').html($(this).find('.bomDetailDoList').html());
+                });
+                $.get('articlefamily/list_all',function (data) { //菜品类别选项
+                    debugger;
+                    for(var i=0;i<data.length;i++){
+                        that.articleFamilyIdArr.push({articleFamilyId:data[i].id , name:data[i].name});
+                    }
+                });
+                $.get('article/list_all',function (data) { //菜品名称选项
+                    console.log(data);
+                    for(var i=0;i<data.length;i++){
+                        that.productNameArr.push({articleId:data[i].id, name:data[i].name,articleFamilyId:data[i].articleFamilyId,unit:data[i].unit});
+                    }
+                })
+            },
+
 
             //vue实例化之后执行的方法
             created : function(){
@@ -544,25 +572,6 @@
                     language : "zh-CN"
                 });
 
-            },
-            ready:function(){//钩子加载后---*vue挂载之后执行*
-                var that = this;
-                $('#tableBodyList').on('click','table tbody tr',function () {//显示详情
-                    that.tableBodyListsShow=true;
-                    $('#tableBodyLists table').html('');
-                    $('#tableBodyLists table').html($(this).find('.bomDetailDoList').html());
-                });
-                $.get('articlefamily/list_all',function (data) { //菜品类别选项
-                    for(var i=0;i<data.length;i++){
-                        that.articleFamilyIdArr.push({articleFamilyId:data[i].id , name:data[i].name});
-                    }
-                });
-                $.get('article/list_all',function (data) { //菜品名称选项
-                    console.log(data);
-                    for(var i=0;i<data.length;i++){
-                        that.productNameArr.push({articleId:data[i].id, name:data[i].name,articleFamilyId:data[i].articleFamilyId,unit:data[i].unit});
-                    }
-                })
             },
         });
         C.vue=vueObj;
