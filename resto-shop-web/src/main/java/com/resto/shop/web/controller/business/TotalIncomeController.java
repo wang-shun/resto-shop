@@ -359,7 +359,7 @@ public class TotalIncomeController extends GenericController {
                      */
                     List<Order> orderList = orderService.selectListByShopId(beginTime,endTime,shopDetail.getId());
                     //查询线下订单
-                    List<OffLineOrder> offLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(),beginTime,endTime,OfflineOrderSource.OFFLINE_POS);
+                    List<OffLineOrder> offLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(),new Date(beginTime),new Date(endTime),OfflineOrderSource.OFFLINE_POS);
 
                     for (int day = 0; day < monthDay; day++) {
                         Date beginDate = getBeginDay(year, month, day);
