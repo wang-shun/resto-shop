@@ -62,8 +62,18 @@
 
                             <div class="form-group row">
                                 <label for="inputEmail3" class="col-sm-2 control-label">备注</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-3">
                                     <input type="text" class="form-control" name="remark" v-model="parameter.remark">
+                                </div>
+
+                                <label for="inputEmail3" class="col-sm-2 control-label">税率</label>
+                                <div class="col-md-3">
+                                    <select class="bs-select form-control" name="tax" v-model="tax">
+                                        <option disabled="" selected="" value="">请选择</option>
+                                        <option  v-for="tax in taxs" value="{{tax.name}}">
+                                        {{tax.name}}
+                                        </option>
+                                    </select>
                                 </div>
                             </div>
                             <div class="form-group row">
@@ -163,6 +173,12 @@
                         <div class="col-md-4">
                             {{detailsArr.contact}}
                         </div>
+                        <label class="col-md-2 control-label">税率</label>
+                        <div class="col-md-4">
+                            {{detailsArr.tax}}
+                        </div>
+                    </div>
+                    <div class="form-group row">
                         <label class="col-md-2 control-label">备注</label>
                         <div class="col-md-4">
                             {{detailsArr.remark}}
@@ -337,6 +353,13 @@
                     {code:"2",name:"服务类"},
                     {code:"3" , name:"工程类"}
                 ],
+                taxs: [ //供应商类型数组
+                    {code:"0",name:"0%"},
+                    {code:"0.03",name:"3%"},
+                    {code:"0.06" , name:"6%"},
+                    {code:"0.07" , name:"7%"},
+                    {code:"0.11" , name:"11%"}
+                ],
                 supplierType:'物料类',//供应商类型
                 supNames:[],//供应商数组
                 contacts:[],//联系人数组
@@ -348,6 +371,7 @@
                     contactId:'',//联系人id
                     remark:'',//备注
                     priceName:'',//报价单名称
+                    tax:'',
                     mdSupplierPriceDetailDoList:[],
 
                 }
@@ -363,12 +387,12 @@
                     this.showform=true;
                     this.parameter={
                         supplierId:'',//供应商id
-                            startEffect:'',//生效日期
-                            endEffect:'',//失效效日期
-                            contactId:'',//联系人id
-                            remark:'',//备注
-                            priceName:'',//报价单名称
-                            mdSupplierPriceDetailDoList:[],
+                        startEffect:'',//生效日期
+                        endEffect:'',//失效效日期
+                        contactId:'',//联系人id
+                        remark:'',//备注
+                        priceName:'',//报价单名称
+                        mdSupplierPriceDetailDoList:[],
 
                     };
                 },
@@ -441,7 +465,6 @@
                     $('#assignTree').jstrestwo('deselect_all');//关闭所有选中状态
                 },
                 save:function(e){
-                    debugger
                     var _this=this;
                     var submit=false;
                     var message='';
@@ -557,22 +580,44 @@
             },
             //vue实例化之后执行的方法
             created : function(){
-                //初始化多选框按钮 和 时间插件
-                //时间默认值
-                $('.form_datetime').val(new Date().format("yyyy-mm-dd"));
-                //this.initTime();
-                $('.form_datetime').datetimepicker({
-                    //endDate : new Date(),
-                    //minView : "month",
-                    //maxView : "month",
-                    autoclose : true,//选择后自动关闭时间选择器
-                    todayBtn : true,//在底部显示 当天日期
-                    todayHighlight : true,//高亮当前日期
-                    format : "yyyy-mm-dd",
-                    //startView : "month",
-                    language : "zh-CN"
+                $("#beginDate").datetimepicker({
+                    format: 'yyyy-mm-dd',
+                    minView:'month',
+                    language: 'zh-CN',
+                    autoclose:true,
+                    startDate:new Date()
+                }).on("click",function(){
+                    $("#beginDate").datetimepicker("setEndDate",$("#endDate").val())
                 });
-
+                $("#endDate").datetimepicker({
+                    format: 'yyyy-mm-dd',
+                    minView:'month',
+                    language: 'zh-CN',
+                    autoclose:true,
+                    startDate:new Date()
+                }).on("click",function(){
+                    $("#endDate").datetimepicker("setStartDate",$("#beginDate").val())
+                });
+//                $('.form_datetime').val(new Date().format("yyyy-mm-dd"));
+                //this.initTime();
+//                $('.form_datetime').datetimepicker({
+//                    //endDate : new Date(),
+//                    //minView : "month",
+//                    //maxView : "month",
+//                    autoclose : true,//选择后自动关闭时间选择器
+//                    todayBtn : true,//在底部显示 当天日期
+//                    todayHighlight : true,//高亮当前日期
+//                    format : "yyyy-mm-dd",
+//                    //startView : "month",
+//                    language : "zh-CN"
+//                });
+//                $('.form_datetime').datetimepicker({
+//                    minView: "month", //选择日期后，不会再跳转去选择时分秒
+//                    language:  'zh-CN',
+//                    format: 'yyyy-mm-dd',
+//                    todayBtn:  1,
+//                    autoclose: 1,
+//                });
             },
         });
         C.vue=vueObj;
