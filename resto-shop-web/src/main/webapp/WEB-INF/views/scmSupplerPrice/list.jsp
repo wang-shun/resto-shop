@@ -399,6 +399,7 @@
                             case 'INGREDIENTS':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='主料';break;
                             case 'ACCESSORIES':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='辅料';break;
                             case 'SEASONING':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='配料';break;
+                            case 'MATERIEL':this.detailsArr.mdSupplierPriceDetailDoList[i].materialType='物料';break;
                         }
                     }
                     this.detailsBtn=true;
@@ -433,6 +434,7 @@
                             case 'INGREDIENTS':this.parameter.mdSupplierPriceDetailDoList[i].materialType='主料';break;
                             case 'ACCESSORIES':this.parameter.mdSupplierPriceDetailDoList[i].materialType='辅料';break;
                             case 'SEASONING':this.parameter.mdSupplierPriceDetailDoList[i].materialType='配料';break;
+                            case 'MATERIEL':this.parameter.mdSupplierPriceDetailDoList[i].materialType='物料';break;
                         }
                     }
                     this.treeView=false;
@@ -557,7 +559,7 @@
             created : function(){
                 //初始化多选框按钮 和 时间插件
                 //时间默认值
-                $('.form_datetime').val(new Date().format("yyyy-mm-dd HH:mm:ss"));
+                $('.form_datetime').val(new Date().format("yyyy-mm-dd"));
                 //this.initTime();
                 $('.form_datetime').datetimepicker({
                     //endDate : new Date(),
@@ -566,7 +568,7 @@
                     autoclose : true,//选择后自动关闭时间选择器
                     todayBtn : true,//在底部显示 当天日期
                     todayHighlight : true,//高亮当前日期
-                    format : "yyyy-mm-dd HH:mm:ss",
+                    format : "yyyy-mm-dd",
                     //startView : "month",
                     language : "zh-CN"
                 });
