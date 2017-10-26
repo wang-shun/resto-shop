@@ -20,6 +20,7 @@ import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
+import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
@@ -9118,6 +9119,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         return order;
+    }
+
+    @Override
+    public List<OrderNumDto> selectOrderNumByTimeAndBrandId(String brandId, String begin, String end) {
+        Date beginDate = DateUtil.getformatBeginDate(begin);
+        Date endDate = DateUtil.getformatEndDate(end);
+        return orderMapper.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
     }
 
     public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, BigDecimal posDiscount, Order order, BigDecimal eraseMoney,

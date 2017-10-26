@@ -19,11 +19,10 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.constant.Common;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.service.ChargeOrderService;
+import com.resto.shop.web.service.OffLineOrderService;
 import com.resto.shop.web.service.OrderService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -34,7 +33,6 @@ import com.resto.brand.web.dto.ShopIncomeDto;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
-import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.service.OrderPaymentItemService;
 
@@ -56,6 +54,9 @@ public class TotalIncomeController extends GenericController {
 
     @Resource
     OrderService orderService;
+
+    @Resource
+    OffLineOrderService offLineOrderService;
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -88,10 +89,15 @@ public class TotalIncomeController extends GenericController {
         ShopIncomeDto brandIncomeDto = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, getBrandName(), getCurrentBrandId(),BigDecimal.ZERO,BigDecimal.ZERO, BigDecimal.ZERO);
         //封装店铺的信息
         List<ShopIncomeDto> shopIncomeDtos = new ArrayList<>();
+
+        //初始化连接率
+        Map<String,String> mapRatio = new HashMap<>(16);
         //给每个店铺赋初始值
         for (ShopDetail s : shopDetailList) {
             ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, s.getName(), s.getId(),BigDecimal.ZERO,BigDecimal.ZERO, BigDecimal.ZERO);
             shopIncomeDtos.add(sin);
+            mapRatio.put(s.getId(),"");
+
         }
         //用来接收分段查询出来的订单金额信息
         List<ShopIncomeDto> shopIncomeDtosItem = new ArrayList<>();
@@ -114,8 +120,37 @@ public class TotalIncomeController extends GenericController {
             shopIncomeDtosItems.addAll(shopIncomeDtosItem);
             shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
         }
+
+
+        //查询店铺Resto交易笔数
+        List<OrderNumDto> orderNumDtoRestoList = orderService.selectOrderNumByTimeAndBrandId(getCurrentBrandId(),beginDate,endDate);
+
+        //查询店铺线下交易笔数
+        List<OrderNumDto> orderNumDtoOffLineList = offLineOrderService.selectOrderNumByTimeAndBrandId(getCurrentBrandId(),beginDate,endDate);
+
+
         //得到店铺营业信息
         for (ShopIncomeDto shopIncomeDto : shopIncomeDtos) {
+                if(orderNumDtoRestoList !=null && !orderNumDtoRestoList.isEmpty()){
+                    for(OrderNumDto orderNumDto:orderNumDtoRestoList){
+                        if(shopIncomeDto.getShopDetailId().equals(orderNumDto.getShopId())){
+                            shopIncomeDto.setRestoOrderNum(orderNumDto.getNum());
+                            break;
+                        }
+
+                    }
+                }
+
+                if(orderNumDtoOffLineList !=null && !orderNumDtoOffLineList.isEmpty()){
+                    for(OrderNumDto orderNumDto:orderNumDtoOffLineList){
+                        if(orderNumDto.getShopId().equals(shopIncomeDto.getShopDetailId())){
+                            shopIncomeDto.setOffLineOrderNum(orderNumDto.getNum());
+                            break;
+                        }
+                    }
+                }
+
+
             //循环累加店铺订单总额、原价金额
             for (ShopIncomeDto shopIncomeDtoItem : shopIncomeDtosItems){
                 if (shopIncomeDto.getShopDetailId().equalsIgnoreCase(shopIncomeDtoItem.getShopDetailId())){
@@ -157,6 +192,17 @@ public class TotalIncomeController extends GenericController {
             brandIncomeDto.setArticleBackPay(brandIncomeDto.getArticleBackPay().add(shopIncomeDto.getArticleBackPay()));
             brandIncomeDto.setOtherPayment(brandIncomeDto.getOtherPayment().add(shopIncomeDto.getOtherPayment()));
         }
+
+
+        for(ShopIncomeDto shopIncomeDto:shopIncomeDtos){
+            BigDecimal restoOrderNum = new BigDecimal(shopIncomeDto.getRestoOrderNum() == null ? 0 : shopIncomeDto.getRestoOrderNum());
+            BigDecimal offLineOrderNum = new BigDecimal(shopIncomeDto.getOffLineOrderNum() == null ? 0 : shopIncomeDto.getOffLineOrderNum());
+            BigDecimal totalOrderNum = restoOrderNum.add(offLineOrderNum);
+            String connectRatio = totalOrderNum.compareTo(BigDecimal.ZERO) == 0? "无" : restoOrderNum.divide(totalOrderNum, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))+"%";
+            shopIncomeDto.setConnctRatio(connectRatio);
+        }
+
+
         List<ShopIncomeDto> brandIncomeDtos = new ArrayList<>();
         brandIncomeDtos.add(brandIncomeDto);
         Map<String, Object> map = new HashMap<>();
@@ -401,10 +447,10 @@ public class TotalIncomeController extends GenericController {
             map.put("reportTitle", shopNames);// 表的名字
             String[][] headers = {{"日期", "20"}, {"原价销售总额(元)", "20"}, {"订单总额(元)", "16"}, {"微信支付(元)", "16"}, {"充值账户支付(元)", "19"}, {"红包支付(元)", "16"}, {"优惠券支付(元)", "17"},
                     {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"支付宝支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金实收(元)", "23"}, {"闪惠支付(元)", "23"}, {"会员支付(元)", "23"}
-                    , {"退菜返还红包(元)", "23"}, {"其它支付(元)", "23"}};
+                    , {"退菜返还红包(元)", "23"}, {"其它支付(元)", "23"},{"连接率","23"}};
             String[] columns = {"date", "originalAmount", "totalIncome", "wechatIncome", "chargeAccountIncome", "redIncome", "couponIncome",
                     "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment"
-                    ,"articleBackPay", "otherPayment"};
+                    ,"articleBackPay", "otherPayment",""};
             ExcelUtil<ShopIncomeDto> excelUtil = new ExcelUtil<>();
             OutputStream out = new FileOutputStream(path);
             excelUtil.createMonthDtoExcel(headers, columns, result, out, map);

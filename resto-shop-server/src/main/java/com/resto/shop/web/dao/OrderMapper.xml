@@ -3337,4 +3337,23 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <select id="selectAfterValidOrderByCustomerId" resultType="Order">
         select * from tb_order where customer_id = #{customerId} and order_state in (2,10,11,12) and production_status != 6 order by create_time desc limit 1
     </select>
+
+    <select id="selectOrderNumByTimeAndBrandId" resultType="com.resto.shop.web.dto.OrderNumDto">
+
+        SELECT
+        COUNT(DISTINCT o.id) num,
+        o.shop_detail_id shopId
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item opi ON o.id = opi.order_id
+        WHERE
+        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        AND o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND o.brand_id = #{brandId}
+        GROUP BY
+        o.shop_detail_id;
+    </select>
+
+
 </mapper>
