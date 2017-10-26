@@ -169,7 +169,7 @@
                 },
                 {
                     title : "职务 ",
-                    data : "position",
+                    data : "topPosition",
                     orderable:false,
                 },
                 {
