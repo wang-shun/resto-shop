@@ -57,7 +57,7 @@ public class TableGroupServiceImpl extends GenericServiceImpl<TableGroup, Long> 
     @Override
     public void removeTableGroup(String groupId) {
         TableGroup tableGroup = tableGroupMapper.selectByGroupId(groupId);
-        if(tableGroup.getState() == TableGroup.NOT_PAY ){
+        if(tableGroup != null && tableGroup.getState() == TableGroup.NOT_PAY ){
             //如果15分钟后 还没买单的组 自动取消
             tableGroup.setState(TableGroup.FINISH);
             update(tableGroup);

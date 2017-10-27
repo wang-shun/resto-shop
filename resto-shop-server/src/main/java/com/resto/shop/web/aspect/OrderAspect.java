@@ -329,6 +329,9 @@ public class OrderAspect {
         RedisUtil.set(order.getShopDetailId() + "shopOrderCount", o.getOrderCount());
         RedisUtil.set(order.getShopDetailId() + "shopOrderTotal", o.getOrderTotal());
         MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
+        if(order.getParentOrderId() == null){
+            MQMessageProducer.sendPlaceOrderMessage(order);
+        }
         //在pos端确认的情况下无需再去修改订单了
 //        if (order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY) {
 //            orderService.pushOrder(order.getId());
