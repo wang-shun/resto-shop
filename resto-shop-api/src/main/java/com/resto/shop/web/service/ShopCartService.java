@@ -55,4 +55,9 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
      * @return
      */
     List<String>  getListByGroupIdDistinctCustomerId(String groupId);
+
+    /**
+     * 将购物车中groupId为空的更新groupid
+     */
+    void updateShopCartByGroupId(String groupId);
 }
