@@ -19,7 +19,10 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.constant.Common;
+import com.resto.shop.web.constant.OfflineOrderSource;
 import com.resto.shop.web.dto.OrderNumDto;
+import com.resto.shop.web.model.OffLineOrder;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.service.ChargeOrderService;
 import com.resto.shop.web.service.OffLineOrderService;
 import com.resto.shop.web.service.OrderService;
@@ -311,6 +314,8 @@ public class TotalIncomeController extends GenericController {
                 + year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)) + ".xls";
         String path = request.getSession().getServletContext().getRealPath(str);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String beginTime = year.concat("-").concat(month).concat("-01") ;
+        String endTime = year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay));
         try {
             List<ShopDetail> shopDetails = getCurrentShopDetails();
             if (shopDetails == null) {
@@ -319,13 +324,15 @@ public class TotalIncomeController extends GenericController {
             String[] shopNames = new String[1];
             ShopIncomeDto[][] result = new ShopIncomeDto[1][monthDay];
             Map<String, Object> selectMap = new HashMap<>();
-            selectMap.put("beginDate", year.concat("-").concat(month).concat("-01"));
-            selectMap.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
+            selectMap.put("beginDate",beginTime);
+            selectMap.put("endDate",endTime);
             if (type.equals(Common.YES)) {
                 shopNames = new String[shopDetails.size()];
                 result = new ShopIncomeDto[shopDetails.size()][monthDay];
                 int i = 0;
                 int j = 0;
+
+                //todo 需要优化
                 for (ShopDetail shopDetail : shopDetails) {
                     selectMap.put("shopId", shopDetail.getId());
                     //用来接收分段查询出来的订单金额信息
@@ -346,6 +353,14 @@ public class TotalIncomeController extends GenericController {
                         shopIncomeDtosItems.addAll(shopIncomeDtosItem);
                         shopIncomeDtosPayMents.addAll(shopIncomeDtosPayMent);
                     }
+
+                    /**
+                     * 查询resto订单
+                     */
+                    List<Order> orderList = orderService.selectListByShopId(beginTime,endTime,shopDetail.getId());
+                    //查询线下订单
+                    List<OffLineOrder> offLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(),beginTime,endTime,OfflineOrderSource.OFFLINE_POS);
+
                     for (int day = 0; day < monthDay; day++) {
                         Date beginDate = getBeginDay(year, month, day);
                         Date endDate = getEndDay(year, month, day);
@@ -373,6 +388,32 @@ public class TotalIncomeController extends GenericController {
                                 shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(incomeDto.getOtherPayment()));
                             }
                         }
+                        int restoNum = 0;
+                        int offlineNum = 0;
+
+                        if(orderList != null && !orderList.isEmpty()){
+                            for(Order o:orderList){
+                                if(endDate.getTime() >= o.getCreateTime().getTime() && beginDate.getTime() <= o.getCreateTime().getTime()){
+                                   restoNum++;
+                                }
+                            }
+                        }
+                        shopIncomeDto.setRestoOrderNum(restoNum);
+
+                        if(offLineOrderList !=null && !offLineOrderList.isEmpty()){
+                            for(OffLineOrder offLineOrder : offLineOrderList){
+                                if(endDate.getTime() >= offLineOrder.getCreateTime().getTime() && beginDate.getTime() <= offLineOrder.getCreateTime().getTime()){
+                                    offlineNum += offLineOrder.getEnterCount();
+                                }
+                            }
+                        }
+                        shopIncomeDto.setOffLineOrderNum(offlineNum);
+                        BigDecimal restoOrderNum = new BigDecimal(shopIncomeDto.getRestoOrderNum() == null ? 0 : shopIncomeDto.getRestoOrderNum());
+                        BigDecimal offLineOrderNum = new BigDecimal(shopIncomeDto.getOffLineOrderNum() == null ? 0 : shopIncomeDto.getOffLineOrderNum());
+                        BigDecimal totalOrderNum = restoOrderNum.add(offLineOrderNum);
+                        String connectRatio = totalOrderNum.compareTo(BigDecimal.ZERO) == 0? "无" : restoOrderNum.divide(totalOrderNum, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))+"%";
+                        shopIncomeDto.setConnctRatio(connectRatio);
+
                         result[i][j] = shopIncomeDto;
                         j++;
                     }
@@ -450,7 +491,7 @@ public class TotalIncomeController extends GenericController {
                     , {"退菜返还红包(元)", "23"}, {"其它支付(元)", "23"},{"连接率","23"}};
             String[] columns = {"date", "originalAmount", "totalIncome", "wechatIncome", "chargeAccountIncome", "redIncome", "couponIncome",
                     "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment"
-                    ,"articleBackPay", "otherPayment",""};
+                    ,"articleBackPay", "otherPayment","connctRatio"};
             ExcelUtil<ShopIncomeDto> excelUtil = new ExcelUtil<>();
             OutputStream out = new FileOutputStream(path);
             excelUtil.createMonthDtoExcel(headers, columns, result, out, map);

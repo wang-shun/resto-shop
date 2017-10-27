@@ -47,6 +47,13 @@ public class OffLineOrderServiceImpl extends GenericServiceImpl<OffLineOrder, St
     }
 
     @Override
+    public List<OffLineOrder> selectlistByTimeSourceAndShopId(String id, String beginTime, String endTime, int offlinePos) {
+        Date beginDate = DateUtil.getformatBeginDate(beginTime);
+        Date endDate = DateUtil.getformatEndDate(endTime);
+        return offlineorderMapper.selectlistByTimeSourceAndShopId(id,beginDate,endDate,offlinePos);
+    }
+
+    @Override
     public OffLineOrder selectSumByTimeSourceAndShopId(int offlinePos, String id, Date begin, Date end) {
         return offlineorderMapper.selectSumByTimeSourceAndShopId(offlinePos,id,begin,end);
     }

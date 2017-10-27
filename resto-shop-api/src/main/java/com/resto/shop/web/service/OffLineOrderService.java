@@ -14,6 +14,9 @@ public interface OffLineOrderService extends GenericService<OffLineOrder, String
 
     List<OffLineOrder> selectlistByTimeSourceAndShopId(String id, Date begin, Date end, int offlinePos);
 
+    List<OffLineOrder> selectlistByTimeSourceAndShopId(String id, String beginTime, String endTime, int offlinePos);
+
+
     /**
      * 查询一段时间内的订单的各项之和
      * @param offlinePos
@@ -34,4 +37,6 @@ public interface OffLineOrderService extends GenericService<OffLineOrder, String
      * @return
      */
     List<OrderNumDto> selectOrderNumByTimeAndBrandId(String currentBrandId, String beginDate, String endDate);
+
+
 }
