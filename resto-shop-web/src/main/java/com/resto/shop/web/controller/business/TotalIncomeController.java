@@ -201,7 +201,7 @@ public class TotalIncomeController extends GenericController {
             BigDecimal restoOrderNum = new BigDecimal(shopIncomeDto.getRestoOrderNum() == null ? 0 : shopIncomeDto.getRestoOrderNum());
             BigDecimal offLineOrderNum = new BigDecimal(shopIncomeDto.getOffLineOrderNum() == null ? 0 : shopIncomeDto.getOffLineOrderNum());
             BigDecimal totalOrderNum = restoOrderNum.add(offLineOrderNum);
-            String connectRatio = totalOrderNum.compareTo(BigDecimal.ZERO) == 0? "无" : restoOrderNum.divide(totalOrderNum, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))+"%";
+            String connectRatio = totalOrderNum.compareTo(BigDecimal.ZERO) == 0? "无" : restoOrderNum.divide(totalOrderNum, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(2,BigDecimal.ROUND_HALF_UP)+"%";
             shopIncomeDto.setConnctRatio(connectRatio);
         }
 
@@ -411,7 +411,7 @@ public class TotalIncomeController extends GenericController {
                         BigDecimal restoOrderNum = new BigDecimal(shopIncomeDto.getRestoOrderNum() == null ? 0 : shopIncomeDto.getRestoOrderNum());
                         BigDecimal offLineOrderNum = new BigDecimal(shopIncomeDto.getOffLineOrderNum() == null ? 0 : shopIncomeDto.getOffLineOrderNum());
                         BigDecimal totalOrderNum = restoOrderNum.add(offLineOrderNum);
-                        String connectRatio = totalOrderNum.compareTo(BigDecimal.ZERO) == 0? "无" : restoOrderNum.divide(totalOrderNum, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100))+"%";
+                        String connectRatio = totalOrderNum.compareTo(BigDecimal.ZERO) == 0? "无" : restoOrderNum.divide(totalOrderNum, 4, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).setScale(2,BigDecimal.ROUND_HALF_UP)+"%";
                         shopIncomeDto.setConnctRatio(connectRatio);
 
                         result[i][j] = shopIncomeDto;
