@@ -15,6 +15,8 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
 
 	void clearShopCart(String currentCustomerId, String currentShopId);
 
+	void deleteByGroup(String groupId);
+
     void clearShopCartGeekPos(String userId, String shopId);
 
     List<ShopCart> listUserShopCart(String userId, String shopId, Integer distributionModeId);
@@ -25,5 +27,37 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
 
     ShopCart selectByUuId(String uuid);
 
+    void clearGroupId(Integer id);
+
+    void resetGroupId(String groupId);
+
+
     void deleteCustomerArticle(String customerId,String articleId);
+
+    /**
+     * 把用户在这家店铺的购物车同步给某个组
+     * @param customerId
+     * @param shopId
+     * @param groupId
+     */
+    void groupNew(String customerId,String shopId,String groupId);
+
+    /**
+     * 判断菜品是否重复
+     */
+    Integer checkRepeat(String articleId,String groupId,String customerId);
+
+    List<ShopCart> getListByGroupId(String groupId);
+
+    /**
+     * 去重该组下不同点餐的人员
+     * @param groupId
+     * @return
+     */
+    List<String>  getListByGroupIdDistinctCustomerId(String groupId);
+
+    /**
+     * 将购物车中groupId为空的更新groupid
+     */
+    void updateShopCartByGroupId(String groupId);
 }

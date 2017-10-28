@@ -20,6 +20,7 @@ import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -78,6 +79,9 @@ public class OrderMessageListener implements MessageListener {
 
     @Resource
     TemplateService templateService;
+    @Autowired
+    TableGroupService tableGroupService;
+
 
     @Resource
     LogBaseService logBaseService;
@@ -123,8 +127,24 @@ public class OrderMessageListener implements MessageListener {
             return executeBossOrderMsg(message);
         }else if(tag.equals(MQSetting.TAG_BRAND_ACCOUNT_SEND)){
         	return excuteBrandAccountMsg(message);
-		}
+		}else if (tag.equals(MQSetting.TAG_REMOVE_TABLE_GROUP)){
+            return excuteRemoveGroup(message);
+        }
         return Action.ReconsumeLater;
+    }
+
+    private Action excuteRemoveGroup(Message message){
+        try {
+            String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
+            JSONObject obj = JSONObject.parseObject(msg);
+            String brandId = obj.getString("brandId");
+            DataSourceContextHolder.setDataSourceName(brandId);
+            tableGroupService.removeTableGroup(obj.getString("groupId"));
+        }catch (Exception e){
+            e.printStackTrace();
+            return Action.ReconsumeLater;
+        }
+        return Action.CommitMessage;
     }
 
 	private Action excuteBrandAccountMsg(Message message) {
@@ -448,8 +468,8 @@ public class OrderMessageListener implements MessageListener {
         try {
             String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
             Order order = JSON.parseObject(msg, Order.class);
-            Brand brand = brandService.selectById(order.getBrandId());
-            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+//            Brand brand = brandService.selectById(order.getBrandId());
+//            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             DataSourceContextHolder.setDataSourceName(order.getBrandId());
             orderService.updateAllowContinue(order.getId(), false);
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
@@ -573,8 +593,9 @@ public class OrderMessageListener implements MessageListener {
             log.info("执行自动确认逻辑" + order.getId());
             if(order.getProductionStatus()==4){
                 orderService.confirmWaiMaiOrder(order);
-            }else
-            orderService.confirmOrder(order);
+            }else{
+                orderService.confirmOrder(order);
+            }
         }catch (Exception e){
             e.printStackTrace();
             return Action.ReconsumeLater;

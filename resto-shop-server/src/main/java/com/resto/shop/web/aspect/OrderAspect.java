@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.*;
+import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
@@ -15,8 +16,8 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.text.StrSubstitutor;
+import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -77,6 +78,8 @@ public class OrderAspect {
     TemplateService templateService;
     @Resource
     SmsLogService smsLogService;
+    @Resource
+    ParticipantService participantService;
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
     public void createOrder() {
@@ -106,6 +109,10 @@ public class OrderAspect {
         String time = DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
         if (jsonResult.isSuccess() == true) {
             Order order = (Order) jsonResult.getData();
+            if(!org.apache.commons.lang3.StringUtils.isEmpty(order.getGroupId()) && order.getOrderState() == OrderState.PAYMENT){
+                //如果是多人点餐已支付
+                MemcachedUtils.delete(order.getShopDetailId()+order.getGroupId());
+            }
             log.info("(createOrderAround)创建订单时候订单状态为：orderstate：" + order.getOrderState() + "production：" + order.getProductionStatus() + "订单id：" + order.getId() + "当前时间为：" + time);
             if (order.getCustomerId().equals("0")) {
                 //pos端点餐
@@ -127,8 +134,12 @@ public class OrderAspect {
                 return;
             }
 
+            if(order.getPayMode() != PayMode.WEIXIN_PAY && !StringUtils.isEmpty(order.getGroupId())){
+                //如果多人买的 一起清空购物车
+                shopCartService.deleteByGroup(order.getGroupId());
+            }
 
-            if (order.getPayMode() != PayMode.WEIXIN_PAY) {
+            if (order.getPayMode() != PayMode.WEIXIN_PAY && StringUtils.isEmpty(order.getGroupId())){
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
 //            现金银联闪惠支付应该在pos上确认订单已收款后在进行出单
@@ -535,6 +546,9 @@ public class OrderAspect {
         RedisUtil.set(order.getShopDetailId() + "shopOrderCount", o.getOrderCount());
         RedisUtil.set(order.getShopDetailId() + "shopOrderTotal", o.getOrderTotal());
         MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
+        if(order.getParentOrderId() == null){
+            MQMessageProducer.sendPlaceOrderMessage(order);
+        }
         //在pos端确认的情况下无需再去修改订单了
 //        if (order.getPayMode() == OrderPayMode.XJ_PAY || order.getPayMode() == OrderPayMode.YL_PAY || order.getPayMode() == OrderPayMode.SHH_PAY || order.getPayMode() == OrderPayMode.JF_PAY) {
 //            orderService.pushOrder(order.getId());
@@ -621,10 +635,13 @@ public class OrderAspect {
             }
             MQMessageProducer.sendPlaceOrderMessage(order);
         }
-
-        if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
+        if(StringUtils.isEmpty(order.getGroupId())){
             shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
+        }else{
+            shopCartService.deleteByGroup(order.getGroupId());
         }
+
+
 
         //订单不为空  已支付  电视叫号模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
@@ -1102,6 +1119,18 @@ public class OrderAspect {
                 map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);
             }
+            str.append("<a href='" + jumpurl + "'>打开邀请二维码</a>");
+            if(order.getGroupId() == null || "".equals(order.getGroupId())){
+                String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + str.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(LogUtils.url, map);
+            }else{
+                sendToGroupCustomerListMsg(order, str.toString(), config, brand.getBrandName());
+            }
         }
     }
 
@@ -1205,6 +1234,19 @@ public class OrderAspect {
                     com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105945069");
                 }
 //            log.info("发送评论通知成功:" + msg + result);
+                if(order.getGroupId() == null || "".equals(order.getGroupId())){
+                    String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+//                    "订单发送推送：" + msg.toString());
+                    Map map = new HashMap(4);
+                    map.put("brandName", brand.getBrandName());
+                    map.put("fileName", customer.getId());
+                    map.put("type", "UserAction");
+                    map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                    doPostAnsc(LogUtils.url, map);
+                }else{
+                    sendToGroupCustomerListMsg(order, msg.toString(), config, brand.getBrandName());
+                }
                 scanaQRcode(config, customer, setting, order);
             }
             try {
@@ -1647,6 +1689,20 @@ public class OrderAspect {
                     smsLogService.sendMessage(brand.getId(), shopDetail.getId(), SmsLogType.WARNING, SMSUtils.SIGN, SMSUtils.SMS_BAD_WARNING, telephone, stringMap);
                 }
             }
+        }
+    }
+
+    public void sendToGroupCustomerListMsg(Order order, String msg, WechatConfig config, String brandName){
+        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+        for(Participant p : participants){
+            Customer c = customerService.selectById(p.getCustomerId());
+            String result = WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());
+            Map map = new HashMap(4);
+            map.put("brandName", brandName);
+            map.put("fileName", c.getId());
+            map.put("type", "UserAction");
+            map.put("content", "系统向用户:" + c.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(LogUtils.url, map);
         }
     }
 }

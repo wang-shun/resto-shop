@@ -622,6 +622,18 @@
 							<%--</label>--%>
 						<%--</div>--%>
 					<%--</div>--%>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" >菜品图片展现：</label>
+                        <div  class="col-md-6 radio-list">
+                            <label class="radio-inline">
+                                <input type="radio" name="articlePhoto"v-model="m.articlePhoto" value="0">大图
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="articlePhoto" v-model="m.articlePhoto" value="1">小图
+                            </label>
+                        </div>
+                    </div>
 					<div class="form-group">
 						<label class="col-md-4 control-label">R+外卖最大配送范围(单位km)：</label>
 						<div  class="col-md-6">
@@ -685,6 +697,19 @@
 							</textarea><font color="red">*多个关键词中间以英文状态下的逗号(,)隔开</font>
 						</div>
 					</div>
+
+					<div class="form-group">
+						<label class="col-md-4 control-label">是否开启多人点餐：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="openManyCustomerOrder"v-model="m.openManyCustomerOrder" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="openManyCustomerOrder" v-model="m.openManyCustomerOrder" value="0">否
+							</label>
+						</div>
+					</div>
+
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>

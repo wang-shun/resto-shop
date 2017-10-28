@@ -191,6 +191,7 @@
         <result column="erase_money" property="eraseMoney"/>
         <result column="no_discount_money" property="noDiscountMoney"/>
         <result column="is_consumption_rebate" property="isConsumptionRebate"/>
+        <result column="group_id" property="groupId"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -390,7 +391,7 @@
         count_with_child,
         last_order_time,customer_count,service_price,pay_mode,base_money,base_order_money,base_customer_count,meal_fee_price,meal_all_number
         ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
-        print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, is_consumption_rebate
+        print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, is_consumption_rebate, group_id
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -626,6 +627,9 @@
             <if test="isConsumptionRebate != null">
                 is_consumption_rebate,
             </if>
+            <if test="groupId != null">
+                group_id,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -692,7 +696,6 @@
                 #{customerId,jdbcType=VARCHAR},
             </if>
             <if test="customerAddressId != null">
-
                 #{customerAddressId,jdbcType=VARCHAR},
             </if>
             <if test="distributionDate != null">
@@ -793,6 +796,9 @@
             </if>
             <if test="isConsumptionRebate != null">
                 #{isConsumptionRebate},
+            </if>
+            <if test="groupId != null">
+                #{groupId},
             </if>
         </trim>
     </insert>
@@ -956,6 +962,9 @@
             <if test="posDiscount != null">
                 pos_discount = #{posDiscount},
             </if>
+            <if test="groupId != null">
+                group_id = #{groupId},
+            </if>
             <if test="eraseMoney != null">
                 erase_money = #{eraseMoney},
             </if>
@@ -1017,7 +1026,7 @@
 
     <!-- 根据 店铺ID 和 用户ID 分页查询订单列表 -->
     <select id="orderList" resultType="Order">
-        SELECT * from tb_order where shop_detail_id = #{shopId} and
+        ( SELECT * from tb_order where shop_detail_id = #{shopId} and
         customer_id = #{customerId}
         and ( (order_state != 1 and parent_order_id is null and order_mode != 5)
         or (order_state = 1 and order_mode != 5 and parent_order_id is null)
@@ -1030,8 +1039,11 @@
                      separator="," close=")">
                 #{state}
             </foreach>
-        </if>
-
+        </if> )
+        UNION ALL
+        (select * from tb_order where id in (
+          select order_id from tb_participant where customer_id = #{customerId}
+        ) and customer_id != #{customerId})
         ORDER BY create_time DESC LIMIT
         #{start},#{datalength}
     </select>
@@ -2421,6 +2433,13 @@ GROUP BY r.table_number
           or(order_mode = 6 ))
         and table_number is not null
         and allow_continue_order = 1
+        order by create_time desc limit 1
+    </select>
+
+    <select id="getGroupOrderByGroupId" resultType="Order">
+        select * from tb_order where group_id = #{groupId}
+        and table_number is not null and  allow_continue_order = 1
+        and parent_order_id is null
         order by create_time desc limit 1
     </select>
 

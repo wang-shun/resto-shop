@@ -80,4 +80,12 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 	 * @return
 	 */
 	List<Appraise> selectByTimeAndBrandId( Date begin, Date end);
+
+	/**
+	 * 该订单下某人的评论记录
+	 * @param orderId
+	 * @param customerId
+     * @return
+     */
+	Appraise selectByOrderIdCustomerId(String orderId, String customerId);
 }
