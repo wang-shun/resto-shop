@@ -174,5 +174,10 @@ public class ServerConfig {
 		return proxy.create(CloseShopService.class);
 	}
 
+    @Bean
+    public TemplateService templateService(){
+        return proxy.create(TemplateService.class);
+    }
+
 
 }

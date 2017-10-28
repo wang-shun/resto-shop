@@ -65,6 +65,12 @@ public class BindPhoneAspect {
 	@Resource
 	AccountNoticeService accountNoticeService;
 
+	@Resource
+	TemplateService templateService;
+
+	@Resource
+	OrderService orderService;
+
 	@Pointcut("execution(* com.resto.shop.web.service.CustomerService.bindPhone(..))")
 	public void bindPhone(){};
 
@@ -74,6 +80,7 @@ public class BindPhoneAspect {
 		Integer couponType = (Integer) pj.getArgs()[2];
         String shopId = (String) pj.getArgs()[3];
 		String shareCustomer = (String) pj.getArgs()[4];
+		String shareOrderId = (String) pj.getArgs()[5];
 		if(customerId.equals(shareCustomer)){
 			shareCustomer = null;
 		}
@@ -116,13 +123,55 @@ public class BindPhoneAspect {
 				}
 				WechatConfig config = wechatConfigService.selectByBrandId(cus.getBrandId());
 				log.info("异步发送分享注册微信通知ID:" + shareCustomer + " 内容:" + msg);
-				WeChatUtils.sendCustomerMsg(msg.toString(), sc.getWechatId(), config.getAppid(), config.getAppsecret());
-                Map map = new HashMap(4);
-                map.put("brandName", brand.getBrandName());
-                map.put("fileName", sc.getId());
-                map.put("type", "UserAction");
-                map.put("content", "系统向用户:"+sc.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPostAnsc(LogUtils.url, map);
+				BrandSetting setting = brandSettingService.selectByBrandId(cus.getBrandId());
+				if(setting.getTemplateEdition()==0){
+					WeChatUtils.sendCustomerMsg(msg.toString(), sc.getWechatId(), config.getAppid(), config.getAppsecret());
+					Map map = new HashMap(4);
+					map.put("brandName", brand.getBrandName());
+					map.put("fileName", sc.getId());
+					map.put("type", "UserAction");
+					map.put("content", "系统向用户:"+sc.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+					doPostAnsc(LogUtils.url, map);
+				}else{
+					log.info("发送注册模板消息:订单id"+shareOrderId);
+					List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
+					String templateId = templateFlowList.get(0).getTemplateId();
+					String jumpUrl ="";
+					Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+					Map<String, Object> first = new HashMap<String, Object>();
+					first.put("value", msg.toString());
+					first.put("color", "#00DB00");
+					Map<String, Object> keyword1 = new HashMap<String, Object>();
+					if(!StringUtils.isEmpty(shareOrderId)){
+						Order order=orderService.selectById(shareOrderId);
+						keyword1.put("value", order.getSerialNumber());
+					}else{
+						keyword1.put("value", "-");
+					}
+					keyword1.put("color", "#000000");
+					Map<String, Object> keyword2 = new HashMap<String, Object>();
+					if(!StringUtils.isEmpty(shareOrderId)){
+						Order order=orderService.selectById(shareOrderId);
+						keyword2.put("value",DateUtil.formatDate(order.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+					}else{
+						keyword2.put("value","-");
+					}
+					keyword2.put("color", "#000000");
+					Map<String, Object> remark = new HashMap<String, Object>();
+					remark.put("value", "立即分享好友");
+					remark.put("color", "#173177");
+					content.put("first", first);
+					content.put("keyword1", keyword1);
+					content.put("keyword2", keyword2);
+					content.put("remark", remark);
+					String result = WeChatUtils.sendTemplate(sc.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+					Map map = new HashMap(4);
+					map.put("brandName", brand.getBrandName());
+					map.put("fileName", sc.getId());
+					map.put("type", "UserAction");
+					map.put("content", "系统向用户:" + sc.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+					doPostAnsc(LogUtils.url, map);
+				}
 			}
 			//yz 2017/07/28 计费系统 注册收费
 			BrandSetting brandSetting = brandSettingService.selectByBrandId(cus.getBrandId());

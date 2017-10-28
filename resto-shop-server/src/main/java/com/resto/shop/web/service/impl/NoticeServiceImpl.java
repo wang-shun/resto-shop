@@ -104,7 +104,7 @@ public class NoticeServiceImpl extends GenericServiceImpl<Notice, String> implem
 	private Boolean checkTime(List<Integer> list,List<SupportTime> supportTimes){
     	for(SupportTime supportTime : supportTimes){
     		for(Integer id : list){
-    			if(id == supportTime.getId()){
+    			if(id.equals(supportTime.getId())){
     				return true;
 				}
 			}
