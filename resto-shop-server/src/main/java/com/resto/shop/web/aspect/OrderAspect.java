@@ -228,9 +228,9 @@ public class OrderAspect {
             }
             try {
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-    //            log.info("订单支付完成后，发送客服消息:" + order.getId() + " -- " + result);
-    //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-    //                    "订单发送推送：" + msg.toString());
+                //            log.info("订单支付完成后，发送客服消息:" + order.getId() + " -- " + result);
+                //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                //                    "订单发送推送：" + msg.toString());
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
                 map.put("fileName", customer.getId());
@@ -646,7 +646,7 @@ public class OrderAspect {
         //订单不为空  已支付  电视叫号模式
         if (order != null && order.getOrderState() == OrderState.PAYMENT
                 && order.getOrderMode() == ShopMode.CALL_NUMBER) {
-                MQMessageProducer.sendPlaceOrderMessage(order);
+            MQMessageProducer.sendPlaceOrderMessage(order);
         }
 
         //稍后支付  大Boss模式  支付宝或微信支付
@@ -711,8 +711,8 @@ public class OrderAspect {
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             if(setting.getTemplateEdition()==0){
                 WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
-    //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-    //                "订单发送推送：您的餐品已经准备好了，请尽快到吧台取餐！");
+                //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                //                "订单发送推送：您的餐品已经准备好了，请尽快到吧台取餐！");
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
                 map.put("fileName", customer.getId());
@@ -963,8 +963,8 @@ public class OrderAspect {
                     msg.append("<a href='" + url + "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
                 }
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-    //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-    //                    "订单发送推送：" + msg.toString());
+                //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                //                    "订单发送推送：" + msg.toString());
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
                 map.put("fileName", customer.getId());
@@ -1083,8 +1083,8 @@ public class OrderAspect {
             if(setting.getTemplateEdition()==0){
                 str.append("<a href='" + jumpurl + "'>打开邀请二维码</a>");
                 String result = WeChatUtils.sendCustomerMsg(str.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-    //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-    //                "订单发送推送：" + str.toString());
+                //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                //                "订单发送推送：" + str.toString());
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
                 map.put("fileName", customer.getId());
@@ -1190,16 +1190,19 @@ public class OrderAspect {
                     StringBuffer msg = new StringBuffer();
                     msg.append("您有一个红包未领取，红包是" + brand.getBrandName() + "送您的一片心意xoxo");
                     msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&dialog=redpackage&orderId=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>点击领取</a>");
-
-                    String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-    //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-    //                    "订单发送推送：" + msg.toString());
-                    Map map = new HashMap(4);
-                    map.put("brandName", brand.getBrandName());
-                    map.put("fileName", customer.getId());
-                    map.put("type", "UserAction");
-                    map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(LogUtils.url, map);
+                    if(order.getGroupId() == null || "".equals(order.getGroupId())) {
+                        String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                        //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                        //                    "订单发送推送：" + msg.toString());
+                        Map map = new HashMap(4);
+                        map.put("brandName", brand.getBrandName());
+                        map.put("fileName", customer.getId());
+                        map.put("type", "UserAction");
+                        map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPostAnsc(LogUtils.url, map);
+                    }else{
+                        sendToGroupCustomerListMsg(order, msg.toString(), config, brand.getBrandName());
+                    }
                 }else {
                     List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM207012446");
                     String templateId = templateFlowList.get(0).getTemplateId();
@@ -1221,32 +1224,39 @@ public class OrderAspect {
                     content.put("keyword1", keyword1);
                     content.put("keyword2", keyword2);
                     content.put("remark", remark);
-                    String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
-                    Map map = new HashMap(4);
-                    map.put("brandName", brand.getBrandName());
-                    map.put("fileName", customer.getId());
-                    map.put("type", "UserAction");
-                    map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(LogUtils.url, map);
-                    //发送短信
-                    com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                    smsParam.put("name", brand.getBrandName());
-                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105945069");
+                    if(order.getGroupId() == null || "".equals(order.getGroupId())) {
+                        String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                        Map map = new HashMap(4);
+                        map.put("brandName", brand.getBrandName());
+                        map.put("fileName", customer.getId());
+                        map.put("type", "UserAction");
+                        map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPostAnsc(LogUtils.url, map);
+                        //发送短信
+                        com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                        smsParam.put("name", brand.getBrandName());
+                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105945069");
+                    }else{
+                        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+                        for(Participant p : participants){
+                            Customer c = customerService.selectById(p.getCustomerId());
+                            String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                            Map map = new HashMap(4);
+                            map.put("brandName", brand.getBrandName());
+                            map.put("fileName", customer.getId());
+                            map.put("type", "UserAction");
+                            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                            doPostAnsc(LogUtils.url, map);
+                            //发送短信
+                            com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                            smsParam.put("name", brand.getBrandName());
+                            com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105945069");
+                        }
+                    }
+
                 }
 //            log.info("发送评论通知成功:" + msg + result);
-                if(order.getGroupId() == null || "".equals(order.getGroupId())){
-                    String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "订单发送推送：" + msg.toString());
-                    Map map = new HashMap(4);
-                    map.put("brandName", brand.getBrandName());
-                    map.put("fileName", customer.getId());
-                    map.put("type", "UserAction");
-                    map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(LogUtils.url, map);
-                }else{
-                    sendToGroupCustomerListMsg(order, msg.toString(), config, brand.getBrandName());
-                }
+
                 scanaQRcode(config, customer, setting, order);
             }
             try {
@@ -1434,16 +1444,16 @@ public class OrderAspect {
                     msg.append("订单金额：" + order.getOrderMoney() + "\n");
 
                     String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-    //            log.info("发送订单取消通知成功:" + msg + result);
-    //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-    //                    "订单发送推送：" + msg.toString());
+                    //            log.info("发送订单取消通知成功:" + msg + result);
+                    //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
+                    //                    "订单发送推送：" + msg.toString());
                     Map map = new HashMap(4);
                     map.put("brandName", brand.getBrandName());
                     map.put("fileName", customer.getId());
                     map.put("type", "UserAction");
                     map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                     doPostAnsc(LogUtils.url, map);
-                 }
+                }
             }else{
                 DecimalFormat df = new DecimalFormat("0.00");
                 Customer customer = customerService.selectById(order.getCustomerId());
