@@ -448,6 +448,25 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
+    // this.showHistoryFind = function(rowData,url,urlData){
+    //     var button = $("<button class='btn btn-xs btn-primary'>历史BOM</button>");
+    //    // var button = $("<a href='scmBomHistory/list_all?articleId="+articleId+"&&shopId="+shopDetailId+"' class='btn green ajaxify'>历史BOM</a>");
+    //     button.click(function(){
+    //         if(_C.vue){
+    //             _C.vue.showHistoryDetailFind(rowData);
+    //         }else{
+    //             _C.loadForm({
+    //                 url:url,
+    //                 data:{articleId:rowData.articleId,shopDetailId:rowData.shopDetailId},
+    //                 formaction:urlData
+    //             });
+    //         }
+    //     });
+    //     return button;
+    // }
+
+
+
     this.createFind = function(model,url,urlData){
         var button = $("<button class='btn btn-xs btn-primary'>新增下级</button>");
         button.click(function(){

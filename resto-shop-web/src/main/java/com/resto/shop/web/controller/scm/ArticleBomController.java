@@ -29,14 +29,12 @@ public class ArticleBomController extends GenericController{
 
 	@RequestMapping("/list")
     public String list(){
-
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
 		if (brandSetting.getIsOpenScm().equals(Common.YES)){
 			return "scmBom/list";
 		}else {
 			return "notopen";
 		}
-
     }
 
 	@RequestMapping("/list_all")
@@ -67,13 +65,17 @@ public class ArticleBomController extends GenericController{
 
 	}
 
+
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid @RequestBody MdRulArticleBomHeadDo articlebom){
 		articlebom.setShopDetailId(this.getCurrentShopId());
+		articlebom.setCreaterId(this.getCurrentUserId());
+		articlebom.setCreaterName(getCurrentBrandUser().getName());
   		articlebomService.updateRulArticleBomHead(articlebom);
 		return Result.getSuccess();
 	}
+
 
 	@RequestMapping("delete")
 	@ResponseBody

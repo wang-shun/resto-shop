@@ -191,18 +191,18 @@
         </table>
     </div>
 </div>
+
 <!--树状图--><!--处理过的-->
 <link href="assets/treeview/themes/default/style.min.css" rel="stylesheet">
 <script src="assets/treeview/js/jstrestwo.js"></script>
 
 <script>
     (function(){
-
         var that = this;
         var tableBodyList = $("#tableBodyList>table");
         var tb = tableBodyList.DataTable({
             ajax : {
-                url : "scmBom/list_all",
+                url : "scmBomHistory/list_all",
                 dataSrc : "data",
                 type : "post",
                 data : function(data) {
@@ -288,13 +288,10 @@
                     data : "id",
                     orderable:false,
                     createdCell:function(td,tdData,rowData){
-                        console.info("ssss----:"+rowData)
-                        var button = $("<a href='scmBomHistory/list?articleId="+rowData.articleId+"' class='btn btn-xs btn-primary ajaxify'>历史BOM</a>");
                         var operator=[
                             <s:hasPermission name="scmBom/edit">
                             C.createEditBtn(rowData),
                             </s:hasPermission>
-                            button,
                         ];
                         $(td).html(operator);
 
@@ -427,7 +424,7 @@
                         }
                     }
                     _this.parameter.bomDetailDoList=savearr;
-                    var url='scmBom/modify';
+                    var url='scmBomHistory/modify';
                     if(!this.parameter.id) {
                         url='scmBom/create';
                         _this.parameter;
