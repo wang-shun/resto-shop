@@ -1104,6 +1104,13 @@
                             $("#photoLittle").attr("src", "/" + url);
                         }
                         ,
+                        uploadSuccessGif: function (url) {
+                            console.log(url);
+                            $("[name='gifUrl']").val(url).trigger("change");
+                            C.simpleMsg("上传成功");
+                            $("#gifUrl").attr("src", "/" + url);
+                        }
+                        ,
                         uploadError: function (msg) {
                             C.errorMsg(msg);
                         }

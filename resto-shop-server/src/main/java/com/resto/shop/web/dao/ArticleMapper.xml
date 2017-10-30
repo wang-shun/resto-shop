@@ -49,6 +49,8 @@
         <result column="initials" property="initials"></result>
         <result column="photo_type" property="photoType"></result>
         <result column="photo_little" property="photoLittle"></result>
+        <result column="open_catty" property="openCatty"></result>
+        <result column="catty_money" property="cattyMoney"></result>
     </resultMap>
     <sql id="Base_Column_List">
         id, name, name_alias, name_short, photo_big, photo_small, ingredients, description,
@@ -57,7 +59,7 @@
         fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc,
         is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,
         recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id,initials,
-        photo_type,photo_little
+        photo_type,photo_little,open_catty,catty_money
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -233,6 +235,12 @@
             <if test="photoLittle != null">
                 photo_little,
             </if>
+            <if test="openCatty != null">
+                open_catty,
+            </if>
+            <if test="cattyMoney != null">
+                catty_money,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -367,6 +375,12 @@
             <if test="photoLittle != null">
                 #{photoLittle},
             </if>
+            <if test="openCatty != null">
+                #{openCatty},
+            </if>
+            <if test="cattyMoney != null">
+                #{cattyMoney},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article">
@@ -500,6 +514,12 @@
             <if test="photoLittle != null">
                 photo_little = #{photoLittle},
             </if>
+            <if test="openCatty != null">
+                open_catty = #{openCatty},
+            </if>
+            <if test="cattyMoney != null">
+                catty_money = #{cattyMoney},
+            </if>
             photo_square = null
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -572,7 +592,7 @@
         a.show_big,	a.description,a.photo_small,a.is_empty,a.meal_fee_number,
         a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,a.virtual_id,
         a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock,
-        a.photo_type,a.photo_little,
+        a.photo_type,a.photo_little,a.open_catty,a.catty_money,
         (select  count(1) from tb_article_unit_new where article_id = a.id) as newUnit,
         if(a.recommend_id is not null,1,0) as recommendCount
         FROM tb_article a,tb_article_family f
@@ -606,6 +626,8 @@
             a.likes,
             a.photo_type,
             a.photo_little,
+            a.open_catty,
+            a.catty_money,
             a.current_working_stock,
           f.recommend_sort,
             (
