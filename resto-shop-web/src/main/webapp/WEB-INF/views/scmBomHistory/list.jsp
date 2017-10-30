@@ -221,32 +221,23 @@
             },
             //ordering: false,//取消上下排序
             columns : [
-                {
-                    title : "序号",
-                    data : "priority",
-                    orderable:true,
-                },
-                {
-                    title: "菜品编码",
-                    data : "articleId",
-                    orderable:false,
-                },
-                {
-                    title: "当前版本号",
-                    data: "version",
-                    orderable:false,
-                },
-                {
-                    title: "最大版本号",
-                    data: "maxVersion",
-                    orderable:false,
-                },
+
                 {
                     title : "菜品类别",
                     data : "familyName",
                     orderable:false,
                 },
+                {
+                    title : "菜品名称",
+                    data : "articleName",
+                    orderable:false,
+                },
 
+                {
+                    title: "版本号",
+                    data: "version",
+                    orderable:false,
+                },
                 {
                     title: "开始时间",
                     data: "startEffect",
@@ -275,11 +266,7 @@
                     orderable:false,
                 }
                 ,
-                {
-                    title : "菜品名称",
-                    data : "articleName",
-                    orderable:false,
-                },
+
                 {
                     title : "计量单位 ",
                     data : "measurementUnit",
@@ -555,13 +542,6 @@
                     this.parameter.bomDetailDeleteIds.push(mealItem.id);
                 },
 
-//                showHistoryFind: function (rowData) {
-//
-//                },
-
-                showHistoryDetailFind:function (rowData) {
-
-                },
 
 
             },

@@ -154,12 +154,21 @@
                             <thead><tr>
                                 <th>行号</th>
                                 <th>原料编码</th>
-                                <th>原料类型</th><th>原料名称</th>
-                                <th>规格</th><th>最小单位</th><th>最小单位数量</th><th>操作</th>
+                                <th>原料类型</th>
+                                <th>原料名称</th>
+                                <th>规格</th>
+                                <th>最小单位</th>
+                                <th>最小单位数量</th>
+                                <th>操作</th>
                             </tr></thead>
                             <tbody>
                         <tr v-for="(index,item) in bomRawMaterial">
-                            <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.materialType}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
+                            <td>{{index+1}}</td>
+                            <td>{{item.materialCode}}</td>
+                            <td>{{item.materialType}}</td>
+                            <td>{{item.materialName}}{{item.name}}</td>
+                            <td>{{item.unitName}}</td>
+                            <td>{{item.minMeasureUnit}}</td>
                             <td><input style="width:50px;" type="text" v-model="materialCount" value="item.materialCount"></td><td><button class="btn btn-xs red">移除</button></td>
                         </tr>
                         </tbody>
@@ -211,31 +220,37 @@
             },
             //ordering: false,//取消上下排序
             columns : [
-                {
-                    title : "序号",
-                    data : "priority",
-                    orderable:true,
-                },
-                {
-                    title: "菜品编码",
-                    data : "articleId",
-                    orderable:false,
-                },
-                {
-                    title: "当前版本号",
-                    data: "version",
-                    orderable:false,
-                },
-                {
-                    title: "最大版本号",
-                    data: "maxVersion",
-                    orderable:false,
-                },
+//                {
+//                    title : "序号",
+//                    data : "priority",
+//                    orderable:true,
+//                },
+//                {
+//                    title: "菜品编码",
+//                    data : "articleId",
+//                    orderable:false,
+//                },
                 {
                     title : "菜品类别",
                     data : "familyName",
                     orderable:false,
                 },
+
+                {
+                    title : "菜品名称",
+                    data : "articleName",
+                    orderable:false,
+                },
+                {
+                    title: "版本号",
+                    data: "version",
+                    orderable:false,
+                },
+//                {
+//                    title: "最大版本号",
+//                    data: "maxVersion",
+//                    orderable:false,
+//                },
 
                 {
                     title: "开始时间",
@@ -266,11 +281,6 @@
                 }
                 ,
                 {
-                    title : "菜品名称",
-                    data : "articleName",
-                    orderable:false,
-                },
-                {
                     title : "计量单位 ",
                     data : "measurementUnit",
                     orderable:false,
@@ -288,7 +298,6 @@
                     data : "id",
                     orderable:false,
                     createdCell:function(td,tdData,rowData){
-                        console.info("ssss----:"+rowData)
                         var button = $("<a href='scmBomHistory/list?articleId="+rowData.articleId+"' class='btn btn-xs btn-primary ajaxify'>历史BOM</a>");
                         var operator=[
                             <s:hasPermission name="scmBom/edit">
@@ -433,7 +442,7 @@
                             minMeasureUnit:_this.parameter.bomDetailDoList[i].minMeasureUnit,
                             unitName:_this.parameter.bomDetailDoList[i].unitName,
                             materialType:_this.parameter.bomDetailDoList[i].materialType,
-                            materialName:_this.parameter.bomDetailDoList[i].name,
+                            materialName:_this.parameter.bomDetailDoList[i].name ?_this.parameter.bomDetailDoList[i].name:_this.parameter.bomDetailDoList[i].materialName,
                             specName:_this.parameter.bomDetailDoList[i].specName,
                             materialCode:_this.parameter.bomDetailDoList[i].materialCode,
                             lossFactor:_this.parameter.bomDetailDoList[i].lossFactor,
@@ -457,7 +466,6 @@
                     else if(_this.parameter.bomDetailDoList.length<=0) message='产品原料';
                     else if(!this.parameter.startEffect) message='开始时间';
                     else if(!this.parameter.endEffect) message='结束时间';
-                    else if(!this.parameter.producer) message='制作人';
                     else  submit=true;
                      debugger
                     if(this.parameter.state ='' ||!this.parameter.state){
@@ -598,6 +606,7 @@
         C.vue=vueObj;
         $.get('scmCategory/query',function (jsonData) { //得到数据
             var defaultData=jsonData.data;//处理数据
+
             for(var i=0;i<defaultData.length;i++){
                 defaultData[i].idTwo = defaultData[i].id;
                 delete defaultData[i].id;

@@ -369,10 +369,10 @@
                         $(td).html(tdData);
                     },
                 },
-                {
-                    title : "序号 ",
-                    data : "priority",
-                },
+//                {
+//                    title : "序号 ",
+//                    data : "priority",
+//                },
                 {
                     title : "编码",
                     data : "materialCode",
@@ -582,7 +582,6 @@
                 com:function () { //计算系数
                     var Mcoefficient=0;
                     Mcoefficient=parseFloat(this.m.measureUnit)*parseFloat(this.m.rate)/parseFloat(this.m.minMeasureUnit);
-                    console.log(Mcoefficient);
                     if(Mcoefficient){
                         this.coefficients=Mcoefficient;
                     }
@@ -605,11 +604,11 @@
                         convertUnitId :'',//转换单位
                         convertUnitName:'',//转换单位
                         minConvertUnitId  :'',
-                        provinceId :'',//省id
+                        provinceId :null,//省id
                         provinceName :'',//省名
-                        cityId:'',//市id
+                        cityId:null,//市id
                         cityName:'',//市id
-                        districtId :'',
+                        districtId :null,
                         description :'',
                         minMeasureUnit:'',
                         coefficient:'',
@@ -643,11 +642,11 @@
 						convertUnitId :model.convertUnitId,//转换单位
 						convertUnitName:model.convertUnitName,//转换单位
 						minConvertUnitId:model.minConvertUnitId,
-						provinceId :model.provinceId,//省id
+						provinceId :model.provinceId?model.provinceId:null,//省id
 						provinceName:model.provinceName,//省名
-						cityId:model.cityId,//市id
+						cityId:model.cityId?model.cityId:null,//市id
 						cityName:model.cityName,//市id
-						districtId :model.districtId,//市id
+						districtId :model.districtId?model.districtId:null,//市id
                         districtName:model.districtName,//区
 						description :model.description,
 						minMeasureUnit:model.minMeasureUnit,
