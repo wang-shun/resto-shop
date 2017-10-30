@@ -381,51 +381,53 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			doPostAnsc(LogUtils.url, map);
 		}else{
 			List<TemplateFlow> templateFlowList=templateService.selectTemplateId(brand.getWechatConfig().getAppid(),"OPENTM412000235");
-			String templateId = templateFlowList.get(0).getTemplateId();
-			String jumpUrl ="http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
-			Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
-			Map<String, Object> first = new HashMap<String, Object>();
-			if(chargeOrder.getNumberDayNow()==0){
-				first.put("value", "今日充值赠送红包"+chargeOrder.getRewardBalance()+"元已到账！");
-			}else if(chargeOrder.getNumberDayNow()==1){
-				first.put("value", "今日充值赠送红包"+chargeOrder.getArrivalAmount()+"元已到账！");
-			}else{
-				first.put("value", "今日充值赠送红包"+chargeOrder.getEndAmount()+"元已到账！");
+			if(templateFlowList!=null&&templateFlowList.size()!=0){
+				String templateId = templateFlowList.get(0).getTemplateId();
+				String jumpUrl ="http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
+				Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+				Map<String, Object> first = new HashMap<String, Object>();
+				if(chargeOrder.getNumberDayNow()==0){
+					first.put("value", "今日充值赠送红包"+chargeOrder.getRewardBalance()+"元已到账！");
+				}else if(chargeOrder.getNumberDayNow()==1){
+					first.put("value", "今日充值赠送红包"+chargeOrder.getArrivalAmount()+"元已到账！");
+				}else{
+					first.put("value", "今日充值赠送红包"+chargeOrder.getEndAmount()+"元已到账！");
+				}
+				first.put("color", "#00DB00");
+				Map<String, Object> keyword1 = new HashMap<String, Object>();
+				keyword1.put("value",df.format(chargeOrder.getChargeMoney()));
+				keyword1.put("color", "#000000");
+				Map<String, Object> keyword2 = new HashMap<String, Object>();
+				if(chargeOrder.getNumberDayNow()==0){
+					keyword2.put("value",df.format(chargeOrder.getRewardBalance()));
+				}else if(chargeOrder.getNumberDayNow()==1){
+					keyword2.put("value",df.format(chargeOrder.getArrivalAmount()));
+				}else{
+					keyword2.put("value",df.format(chargeOrder.getEndAmount()));
+				}
+				keyword2.put("color", "#000000");
+				Map<String, Object> keyword3 = new HashMap<String, Object>();
+				keyword3.put("value",DateUtil.formatDate(chargeOrder.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
+				keyword3.put("color", "#000000");
+				Map<String, Object> remark = new HashMap<String, Object>();
+				remark.put("value", "点击这里查看账户余额");
+				remark.put("color", "#173177");
+				content.put("first", first);
+				content.put("keyword1", keyword1);
+				content.put("keyword2", keyword2);
+				content.put("keyword3", keyword3);
+				content.put("remark", remark);
+				String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
+				Map map = new HashMap(4);
+				map.put("brandName", brand.getBrandName());
+				map.put("fileName", customer.getId());
+				map.put("type", "UserAction");
+				map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+				doPostAnsc(LogUtils.url, map);
+				//发送短信
+				com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+				com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105805058");
 			}
-			first.put("color", "#00DB00");
-			Map<String, Object> keyword1 = new HashMap<String, Object>();
-			keyword1.put("value",df.format(chargeOrder.getChargeMoney()));
-			keyword1.put("color", "#000000");
-			Map<String, Object> keyword2 = new HashMap<String, Object>();
-			if(chargeOrder.getNumberDayNow()==0){
-				keyword2.put("value",df.format(chargeOrder.getRewardBalance()));
-			}else if(chargeOrder.getNumberDayNow()==1){
-				keyword2.put("value",df.format(chargeOrder.getArrivalAmount()));
-			}else{
-				keyword2.put("value",df.format(chargeOrder.getEndAmount()));
-			}
-			keyword2.put("color", "#000000");
-			Map<String, Object> keyword3 = new HashMap<String, Object>();
-			keyword3.put("value",DateUtil.formatDate(chargeOrder.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
-			keyword3.put("color", "#000000");
-			Map<String, Object> remark = new HashMap<String, Object>();
-			remark.put("value", "点击这里查看账户余额");
-			remark.put("color", "#173177");
-			content.put("first", first);
-			content.put("keyword1", keyword1);
-			content.put("keyword2", keyword2);
-			content.put("keyword3", keyword3);
-			content.put("remark", remark);
-			String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, brand.getWechatConfig().getAppid(), brand.getWechatConfig().getAppsecret());
-			Map map = new HashMap(4);
-			map.put("brandName", brand.getBrandName());
-			map.put("fileName", customer.getId());
-			map.put("type", "UserAction");
-			map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-			doPostAnsc(LogUtils.url, map);
-			//发送短信
-			com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-			com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105805058");
 		}
 	}
 
