@@ -129,6 +129,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 //	}
 
     public List<Coupon> giftCoupon(Customer cus, Integer couponType, String shopId) {
+        log.info("brandId:"+cus.getBrandId()+"couponType:"+couponType+"shopId:"+shopId);
         List<Coupon> coupons = new ArrayList<>();
         try {
             String shareCoupinIds = "";
@@ -176,7 +177,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             }
         } catch (Exception e) {
             e.printStackTrace();
-            log.error("发放优惠券出错！");
+            log.error("发放优惠券出错！"+e.getMessage());
             return new ArrayList<>();
         }
         return coupons;
@@ -184,6 +185,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
 
     public void addCoupon(NewCustomCoupon cfg, String shopId, Integer couponType, Customer cus, Date beginDate, ShopDetail shopDetail, List<Coupon> coupons) {
         //如果是品牌优惠券设置或者是当前店铺的优惠券设置
+       try{
         if (cfg.getIsBrand() == 1 || shopId.equals(cfg.getShopDetailId())) {
             Coupon coupon = new Coupon();
             coupon.setName(cfg.getCouponName());
@@ -201,6 +203,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             coupon.setCustomerId(cus.getId());
             coupon.setPushDay(cfg.getPushDay());
             coupon.setRecommendDelayTime(cfg.getRecommendDelayTime() * 3600);
+            coupon.setNewCustomCouponId(cfg.getId());
             //如果是店铺专有的优惠券设置 设置该优惠券的shopId表示只有这个店铺可以用
             if (cfg.getShopDetailId() != null && shopId.equals(cfg.getShopDetailId())) {
                 coupon.setShopDetailId(cfg.getShopDetailId());
@@ -229,6 +232,10 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
             long end = coupon.getEndDate().getTime();
 //            timedPush(begin, end, coupon.getCustomerId(), coupon.getName(), coupon.getValue(), shopDetail, null);
         }
+       } catch (Exception e) {
+           e.printStackTrace();
+           log.error(e.getMessage());
+       }
     }
 
     @Override
@@ -263,6 +270,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
         coupon.setCouponSource("4");
         coupon.setCustomerId(customer.getId());
         coupon.setRecommendDelayTime(0);
+        coupon.setNewCustomCouponId(customCoupon.getId());
         for (int i = 0; i < customCoupon.getCouponNumber(); i++) {
             couponService.insertCoupon(coupon);
         }

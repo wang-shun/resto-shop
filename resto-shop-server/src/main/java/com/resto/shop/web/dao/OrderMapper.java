@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.resto.brand.web.dto.*;
+import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.model.Article;
 import org.apache.ibatis.annotations.Param;
 
@@ -779,4 +780,13 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
      */
 	Order selectAfterValidOrderByCustomerId(String customerId);
+
+	/**
+	 * 每个店铺的交易笔数
+	 * @param brandId
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+    List<OrderNumDto> selectOrderNumByTimeAndBrandId(@Param("brandId") String brandId, @Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
 }

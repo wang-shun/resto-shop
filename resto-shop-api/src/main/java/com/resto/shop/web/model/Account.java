@@ -10,7 +10,9 @@ public class Account implements Serializable {
     private BigDecimal remain;
 
     private Byte status;
-    
+
+    private BigDecimal frozenRemain;
+
     /**
      * 用于保存 用户的交易明细
      */
@@ -47,4 +49,12 @@ public class Account implements Serializable {
 	public void setAccountLogs(List<AccountLog> accountLogs) {
 		this.accountLogs = accountLogs == null ? null : accountLogs;
 	}
+
+    public BigDecimal getFrozenRemain() {
+        return frozenRemain;
+    }
+
+    public void setFrozenRemain(BigDecimal frozenRemain) {
+        this.frozenRemain = frozenRemain;
+    }
 }

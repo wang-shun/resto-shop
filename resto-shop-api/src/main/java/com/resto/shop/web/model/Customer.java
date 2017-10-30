@@ -63,6 +63,10 @@ public class Customer implements Serializable{
      */
     private BigDecimal remain;
 
+    private BigDecimal frozenRemain;
+
+    private BigDecimal sumRemain;
+
     private Integer isShare;
 
     private String registerShopId;
@@ -447,6 +451,22 @@ public class Customer implements Serializable{
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    public BigDecimal getFrozenRemain() {
+        return frozenRemain;
+    }
+
+    public void setFrozenRemain(BigDecimal frozenRemain) {
+        this.frozenRemain = frozenRemain;
+    }
+
+    public BigDecimal getSumRemain() {
+        return sumRemain;
+    }
+
+    public void setSumRemain(BigDecimal sumRemain) {
+        this.sumRemain = sumRemain;
     }
 
     @Override

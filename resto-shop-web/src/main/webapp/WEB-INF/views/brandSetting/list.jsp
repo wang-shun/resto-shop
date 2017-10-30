@@ -58,6 +58,11 @@
                                    v-model="m.wechatWelcomeUrl">
                         </div>
                         <div class="form-group">
+                            <label>领取会员卡地址</label>
+                            <input type="text" class="form-control" name="memberCardUrl"
+                                   v-model="m.memberCardUrl">
+                        </div>
+                        <div class="form-group">
                             <label>微信欢迎文本</label>
                             <input type="text" class="form-control" name="wechatWelcomeContent"
                                    v-model="m.wechatWelcomeContent">
@@ -226,6 +231,17 @@
                                    v-model="m.couponCD" required="required" min="0">
                         </div>
                         <div class="form-group">
+                            <div class="control-label">礼品优惠券提醒方式：</div>
+                            <label>
+                                <input type="checkbox" name="wechatPushGiftCoupons" v-model="m.wechatPushGiftCoupons" value="1" >
+                                微信推送
+                            </label>
+                            <label>
+                                <input type="checkbox" name="smsPushGiftCoupons" v-model="m.smsPushGiftCoupons" value="1">
+                                短信推送
+                            </label>
+                        </div>
+                        <div class="form-group">
                             <div class="control-label">是否启动评论红包提醒：</div>
 
                             <label>
@@ -258,6 +274,7 @@
                                 </label>
                             </div>
                         </div>
+
                         <div class="form-group">
                             <div class="control-label">礼品优惠券提醒方式：</div>
                             <label>
@@ -310,7 +327,6 @@
 <script>
     $(document).ready(function () {
 
-        initcontent();
 
         toastr.options = {
             "closeButton": true,
@@ -339,6 +355,15 @@
 
             },
             created: function () {
+                var that = this;
+                $.ajax({
+                    url: "brandSetting/list_one",
+                    success: function (result) {
+                        console.log(result.data);
+                        vueObj.m = result.data;
+                        that.initEditor();
+                    }
+                });
                 var n = $('.color-mini').minicolors({
                     change: function (hex, opacity) {
                         if (!hex) return;
@@ -387,7 +412,15 @@
                 },
 
                 cancel: function () {
-                    initcontent();
+                    var that = this;
+                    $.ajax({
+                        url: "brandSetting/list_one",
+                        success: function (result) {
+                            console.log(result.data);
+                            vueObj.m = result.data;
+                            that.initEditor();
+                        }
+                    });
                 },
                 uploadSuccess: function (url) {
                     $("[name='wechatWelcomeImg']").val(url).trigger("change");
@@ -407,20 +440,16 @@
                 },
                 uploadError: function (msg) {
                     toastr.error("上传失败");
+                },
+                initEditor : function () {
+                    Vue.nextTick(function(){
+                        var editor = new wangEditor('shareText');
+                        editor.config.menus = [];
+                        editor.create();
+                    });
                 }
             }
         });
-
-        function initcontent() {
-            $.ajax({
-                url: "brandSetting/list_one",
-                success: function (result) {
-                    console.log(result.data);
-                    vueObj.m = result.data;
-                }
-            })
-        }
-
     }());
 
 </script>

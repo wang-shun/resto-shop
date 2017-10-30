@@ -15,6 +15,7 @@ public class AccountLog implements Serializable {
 	public static final Integer REWARD_PAY_REFUND = 7;  //取消订单返回充值赠送的金额
     public static final Integer REFUND_ARTICLE_RED_PACKAGE = 7;  //退菜红包返回余额
     public static final Integer THIRD_MONEY = 8;  //第三方账户储值余额
+    public static final Integer FREEZE_RED_MONEY = 9;  //消费1:1返利 红包余额   有冻结期
 	
     private String id;
 
@@ -33,6 +34,10 @@ public class AccountLog implements Serializable {
     private Integer source;
     
     private String shopDetailId;
+
+    private Date freezeReturnDate;
+
+    private String orderId;
 
     public String getId() {
         return id;
@@ -105,4 +110,20 @@ public class AccountLog implements Serializable {
 	public void setShopDetailId(String shopDetailId) {
 		this.shopDetailId = shopDetailId;
 	}
+
+    public Date getFreezeReturnDate() {
+        return freezeReturnDate;
+    }
+
+    public void setFreezeReturnDate(Date freezeReturnDate) {
+        this.freezeReturnDate = freezeReturnDate;
+    }
+
+    public String getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(String orderId) {
+        this.orderId = orderId;
+    }
 }

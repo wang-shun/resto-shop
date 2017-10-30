@@ -249,6 +249,26 @@ public class Order implements Serializable{
 
     private BigDecimal noDiscountMoney;
 
+    private Integer refundType;
+
+    private Integer isConsumptionRebate;    //是否参与消费返利
+
+    public Integer getIsConsumptionRebate() {
+        return isConsumptionRebate;
+    }
+
+    public void setIsConsumptionRebate(Integer isConsumptionRebate) {
+        this.isConsumptionRebate = isConsumptionRebate;
+    }
+
+    public Integer getRefundType() {
+        return refundType;
+    }
+
+    public void setRefundType(Integer refundType) {
+        this.refundType = refundType;
+    }
+
     private String groupId;
 
     public Integer getTag() {

@@ -24,15 +24,15 @@ import org.dom4j.io.XMLWriter;
 
 @SuppressWarnings({"resource","unused"})
 public class CodeGenerateFromJavaTemp {
-    final  static  String bathPath = "C:/yz/resto/resto-shop/";//项目存放的基础位置";
+    final  static  String bathPath = "C:/0821/resto-shop/";//项目存放的基础位置";
 
-	final  static  String BasePath = "C:/yz/resto/resto-shop/";
+	final  static  String BasePath = "C:/0821/resto-shop/";
 
 	final static String DaoPath = BasePath+"resto-shop-server/src/main/java/com/resto/shop/web/dao/";
 	final static String ServicePath = BasePath+"resto-shop-api/src/main/java/com/resto/shop/web/service/";
 	final static String ServiceImpl = BasePath+"resto-shop-server/src/main/java/com/resto/shop/web/service/impl/";
 	final static String JspPath = BasePath+"resto-shop-web/src/main/webapp/WEB-INF/views/";
-	final static String ControllerPath = BasePath+"resto-shop-web/src/main/java/com/resto/shop/web/controller/business/";
+	final static String ControllerPath = BasePath+"resto-shop-web/src/main/java/com/resto/shop/web/controller/scm/";
 	final static String DaoMapperPath = DaoPath;
 	final static String TempPath = BasePath+"resto-shop-api/source-temps/";
 	final static String ModelClassName =BasePath+"resto-shop-api/src/main/java/com/resto/shop/web/model/";
@@ -46,7 +46,12 @@ public class CodeGenerateFromJavaTemp {
 		 * 实体类型 主键  和  表名
 		 */
 		String [][]  classPrimay = new String[][]{
-		new String[]{"DayAppraiseMessage","String","tb_day_appraise_message"},
+		new String[]{"MaterialStock","Long","doc_material_stock"},
+		new String[]{"ArticleBom","Long","md_rul_article_bom_head"},
+		new String[]{"upplier","Long","md_supplier"},
+		new String[]{"SupplierPrice","Long","md_supplier_price_head"},
+		new String[]{"MaterialStock","Long","doc_material_stock"},
+		new String[]{"StockInPlan","Long","doc_stk_in_plan_header"},
 		};
 
 
@@ -59,21 +64,21 @@ public class CodeGenerateFromJavaTemp {
 			String tableName = cp[2];
 			String mapperDir = DaoMapperPath+modelName+"Mapper.xml";
 			
-			Class<?> className = Class.forName(ModelClassPackage+"."+modelName);
+			//Class<?> className = Class.forName(ModelClassPackage+"."+modelName);
 			//generaterJspFile(className);
 			
 			generaterControllerFile(modelName,primaryKey);
 
-			generaterSelectListSqlMapper(mapperDir,tableName,modelName);
+			//generaterSelectListSqlMapper(mapperDir,tableName,modelName);
 			/**
 			 * 生成 service 和 impl
 			 */
-			generaterServiceAndImpl(modelName,primaryKey);
+			//generaterServiceAndImpl(modelName,primaryKey);
 
 			/**
 			 * 让所有的Mapper 继承 GenericDao
 			 */
-			extendGenericDao(modelName,primaryKey);
+			//extendGenericDao(modelName,primaryKey);
 		}
 	}
 	

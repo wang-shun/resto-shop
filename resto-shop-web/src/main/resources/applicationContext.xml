@@ -13,7 +13,7 @@
     http://www.springframework.org/schema/aop/spring-aop.xsd
   http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
     <!-- 自动扫描resto包 ,将带有注解的类 纳入spring容器管理 -->
-    <context:component-scan base-package="com.resto.shop.web"></context:component-scan>
+    <context:component-scan base-package="com.resto"></context:component-scan>
 
     <!-- 对JDBC配置进行解密  -->
     <bean id="placeholderConfigurer" class="com.resto.brand.core.util.DecryptPropertyPlaceholderConfigurer">

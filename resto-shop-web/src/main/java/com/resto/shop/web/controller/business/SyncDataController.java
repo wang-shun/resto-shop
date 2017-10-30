@@ -154,6 +154,8 @@ public class SyncDataController extends GenericController {
                                 shopIncomeMap.put("charge_reward_pay",  getBigDecimal(in.getPayValue()));
                                 total_income = total_income.add(getBigDecimal(in.getPayValue()));
                                 break;
+                            default:
+                                break;
                         }
                     }
                 }

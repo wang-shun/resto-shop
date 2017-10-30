@@ -9,6 +9,7 @@ import com.resto.brand.web.model.AccountSetting;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
+import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.OffLineOrder;
@@ -754,4 +755,13 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	Order selectAfterValidOrderByCustomerId(String customerId);
 
 	Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type);
+
+	/**
+	 * 查询每个店铺的交易笔数
+	 * @param currentBrandId
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	List<OrderNumDto> selectOrderNumByTimeAndBrandId(String currentBrandId, String beginDate, String endDate);
 }

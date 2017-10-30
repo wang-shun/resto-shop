@@ -73,16 +73,17 @@ public class MQMessageProducer {
 		obj.put("orderId", orderId);
 		obj.put("customerId",customerId);
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.SEND_CALL_MESSAGE, obj.toJSONString().getBytes());
-		message.setStartDeliverTime(new Date().getTime());
+		message.setStartDeliverTime(System.currentTimeMillis());
 		sendMessageASync(message);
 	}
+
 
 	public static void sendQueueOrder(GetNumber getNumber){
 		JSONObject obj = new JSONObject();
 		obj.put("id", getNumber.getId());
 		obj.put("shopId", getNumber.getShopDetailId());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_QUEUE_ORDER, obj.toJSONString().getBytes());
-		message.setStartDeliverTime(new Date().getTime());
+		message.setStartDeliverTime(System.currentTimeMillis());
 		sendMessageASync(message);
 	}
 
@@ -130,6 +131,7 @@ public class MQMessageProducer {
 		obj.put("id", appraise.getId());
 		obj.put("customerId", appraise.getCustomerId());
 		obj.put("shopDetailId", appraise.getShopDetailId());
+		obj.put("orderId", appraise.getOrderId());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SHOW_ORDER,obj.toJSONString().getBytes());
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
@@ -137,6 +139,7 @@ public class MQMessageProducer {
 
 
 	public static void sendMessageASync(final Message message) {
+
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -335,7 +338,8 @@ public class MQMessageProducer {
 		JSONObject obj  = new JSONObject();
         obj.put("shopId",shopId);
         obj.put("orderNumber",orderNumber);
-		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_RECEIPT_PRINT_SUCCESS,obj.toJSONString().getBytes());
+		//Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_RECEIPT_PRINT_SUCCESS,obj.toJSONString().getBytes());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,"",obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
 
@@ -361,6 +365,8 @@ public class MQMessageProducer {
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
 	}
+
+
 
 
 

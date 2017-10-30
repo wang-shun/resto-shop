@@ -19,6 +19,7 @@ import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.dao.FreeDayMapper;
 import com.resto.shop.web.dao.OrderMapper;
+import com.resto.shop.web.dto.ArticleSellCountDto;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
@@ -157,7 +158,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM");
         String dateNowStr = sdf.format(d);
         for (Article article : articleList) {
-            article.setMonthlySales(articleMapper.selectSumByMonthlySales(article.getId(), dateNowStr));
+//            article.setMonthlySales(articleMapper.selectSumByMonthlySales(article.getId(), dateNowStr));
 //            Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
             Integer count = (Integer) RedisUtil.get(article.getId() + Common.KUCUN);
             if (count != null) {
@@ -761,5 +762,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public Boolean setEmptyFail(String articleId) {
         return articleMapper.setEmptyFail(articleId);
+    }
+
+    @Override
+    public List<ArticleSellCountDto> findArticleByLastCountTime(String shopId,String lastCountTime) {
+        return articleMapper.findArticleByLastCountTime(shopId,lastCountTime);
     }
 }

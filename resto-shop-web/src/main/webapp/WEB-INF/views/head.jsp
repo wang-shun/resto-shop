@@ -46,7 +46,7 @@
 								class="icon-user"></i>个人信息
 						</a></li>
 						<li id="updateManagerPwd"><a href="javascript:;"> <i
-								class="icon-user"></i>退菜口令
+								class="icon-user"></i>操作口令
 						</a></li>
 						<li class="divider"></li>
 						<li><a href="branduser/logout"> <i class="icon-key"></i>
