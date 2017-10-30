@@ -6,14 +6,24 @@
     th,td{text-align: center;}
     #tableBodyLists th,#tableBodyLists td{line-height:2.5;}
 </style>
+
+
+
 <div id="control">
+
+        <a class="btn btn-info ajaxify" href="scmBom/list">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+
+
     <div class="row form-div" v-show="showform">
         <div class="col-md-offset-3 col-md-6" >
             <div class="portlet light bordered">
                 <div class="portlet-title">
-                    <div class="caption">
-                        <span class="caption-subject bold font-blue-hoki">新增BOM</span>
-                    </div>
+                    <%--<div class="caption">--%>
+                        <%--<span class="caption-subject bold font-blue-hoki">新增BOM</span>--%>
+                    <%--</div>--%>
                 </div>
 
                 <div class="portlet-body">
@@ -176,9 +186,9 @@
     </div>
     <div class="table-div">
         <div class="table-operator">
-            <s:hasPermission name="scmBom/add">
-                <button class="btn green pull-right" @click="create">新建BOM</button>
-            </s:hasPermission>
+            <%--<s:hasPermission name="scmBom/add">--%>
+                <%--<button class="btn green pull-right" @click="create">新建BOM</button>--%>
+            <%--</s:hasPermission>--%>
         </div>
         <div class="clearfix"></div>
         <div class="table-filter"></div>
@@ -283,20 +293,20 @@
                         $(td).html(tdData+'种');
                     }
                 },
-                {
-                    title : "操作",
-                    data : "id",
-                    orderable:false,
-                    createdCell:function(td,tdData,rowData){
-                        var operator=[
-                            <s:hasPermission name="scmBom/edit">
-                            C.createEditBtn(rowData),
-                            </s:hasPermission>
-                        ];
-                        $(td).html(operator);
+                <%--{--%>
+                    <%--title : "操作",--%>
+                    <%--data : "id",--%>
+                    <%--orderable:false,--%>
+                    <%--createdCell:function(td,tdData,rowData){--%>
+                        <%--var operator=[--%>
+                            <%--<s:hasPermission name="scmBom/edit">--%>
+                            <%--C.createEditBtn(rowData),--%>
+                            <%--</s:hasPermission>--%>
+                        <%--];--%>
+                        <%--$(td).html(operator);--%>
 
-                    }
-                },
+                    <%--}--%>
+                <%--},--%>
                 {
                     data : "bomDetailDoList",
                     createdCell : function(td,tdData){
