@@ -48,7 +48,8 @@
 									</select>
 								</div>
 								<label class="col-md-2 control-label">品牌<span style="color:#FF0000;">*</span></label>
-								<button type="button" class="add" @click="addThirdCategory"><span aria-hidden="true">+</span></button>
+
+								<button type="button" class="add btn green" @click="addThirdCategory">新增品牌</button>
 								<div class="col-md-3">
 									<select name="categoryThirdId" v-model="m.categoryThirdId" class="bs-select form-control" >
 										<option disabled selected value>请选择</option>

@@ -310,7 +310,15 @@
                 {
                     data : "bomDetailDoList",
                     createdCell : function(td,tdData){
-                        var html='<tr><th>行号</th><th>原料编码</th><th>原料类型</th><th>原料名称</th><th>规格</th><th>最小单位</th><th>最小单位数量</th></tr>';
+                        var html='<tr><th>行号</th>' +
+                            '<th>原料编码</th>' +
+                            '<th>原料类型</th>' +
+                            '<th>原料名称</th>' +
+                            '<th>规格</th>' +
+                            '<th>最小单位</th>' +
+                            '<th>最小单位数量</th>' +
+                            '<th>主计量单位换算量</th>' +
+                            '</tr>';
                         for(var i=0;i<tdData.length;i++){
                             switch(tdData[i].materialType){
                                 case 'INGREDIENTS':tdData[i].materialType='主料';break;
@@ -318,7 +326,15 @@
                                 case 'SEASONING':tdData[i].materialType='辅料';break;
                                 case 'MATERIEL':tdData[i].materialType='物料';break;
                             }
-                            html+='<tr><td>'+(i+1)+'</td><td>'+tdData[i].materialCode+'</td><td>'+tdData[i].materialType+'</td><td>'+tdData[i].materialName+'</td><td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td><td>'+tdData[i].minMeasureUnit+'/'+tdData[i].minUnitName+'</td><td>'+tdData[i].materialCount+'</td></tr>';
+                            html+='<tr><td>'+(i+1)+'</td>' +
+                                '<td>'+tdData[i].materialCode+'</td>' +
+                                '<td>'+tdData[i].materialType+'</td>' +
+                                '<td>'+tdData[i].materialName+'</td>' +
+                                '<td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td>' +
+                                '<td>'+tdData[i].minMeasureUnit+'/'+tdData[i].minUnitName+'</td>' +
+                                '<td>'+tdData[i].materialCount+'</td>' +
+                                '<td>'+(tdData[i].materialCount/tdData[i].coefficient).toFixed(4)+'</td>' +
+                                '</tr>';
                         }
                         $(td).addClass('bomDetailDoList');
                         $(td).html(html);
