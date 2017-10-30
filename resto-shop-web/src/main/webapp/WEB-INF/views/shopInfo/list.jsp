@@ -665,7 +665,18 @@
 							</div>
 						</div>
 					</div>
+					<div class="form-group">
+						<div class="control-label">餐品预点餐：</div>
 
+						<label>
+							<input type="radio" name="orderBefore" v-model="m.orderBefore" value="1">
+							开启
+						</label>
+						<label>
+							<input type="radio" name="orderBefore" v-model="m.orderBefore" value="0">
+							未开启
+						</label>
+					</div>
 					<div class="form-group">
 						<label class="col-md-4 control-label" :class="{ formBox : m.openBadWarning == 1}">开启差评预警：</label>
 						<div  class="col-md-6 radio-list">
