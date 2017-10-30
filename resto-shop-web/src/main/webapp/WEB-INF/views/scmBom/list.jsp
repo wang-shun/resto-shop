@@ -567,22 +567,22 @@
 
             //vue实例化之后执行的方法
             created : function(){
-                //初始化多选框按钮 和 时间插件
-                //时间默认值
-                $('.form_datetime').val(new Date().format("yyyy-mm-dd"));
-                //this.initTime();
-                $('.form_datetime').datetimepicker({
-                    //endDate : new Date(),
-                    //minView : "month",
-                    //maxView : "month",
-                    autoclose : true,//选择后自动关闭时间选择器
-                    todayBtn : true,//在底部显示 当天日期
-                    todayHighlight : true,//高亮当前日期
-                    format : "yyyy-mm-dd",
-                    //startView : "month",
-                    language : "zh-CN"
+                $("#beginDate").datetimepicker({
+                    format: 'yyyy-mm-dd',
+                    minView:'month',
+                    language: 'zh-CN',
+                    autoclose:true
+                }).on("click",function(){
+                    $("#beginDate").datetimepicker("setEndDate",$("#endDate").val())
                 });
-
+                $("#endDate").datetimepicker({
+                    format: 'yyyy-mm-dd',
+                    minView:'month',
+                    language: 'zh-CN',
+                    autoclose:true
+                }).on("click",function(){
+                    $("#endDate").datetimepicker("setStartDate",$("#beginDate").val())
+                });
             },
         });
         C.vue=vueObj;
