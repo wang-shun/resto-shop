@@ -443,9 +443,9 @@
                 },
                 initEditor : function () {
                     Vue.nextTick(function(){
-                        var editor = new wangEditor('shareText');
-                        editor.config.menus = [];
-                        editor.create();
+//                        var editor = new wangEditor('shareText');
+//                        editor.config.menus = [];
+//                        editor.create();
                     });
                 }
             }
