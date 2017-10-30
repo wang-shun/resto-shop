@@ -185,6 +185,26 @@
                                 <div class="col-md-7">无图</div>
                             </div>
 
+                            <div class="form-group col-md-4">
+                                <label class="col-md-5 control-label">开启提醒</label>
+                                <div class="col-md-7 radio-list">
+                                    <label class="radio-inline">
+                                        <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
+                                               v-model="m.needRemind">提示
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label class="col-md-5 control-label">gif动图</label>
+                                <div class="col-md-7">
+                                    <input type="hidden" name="gifUrl" v-model="m.gifUrl">
+                                    <img-file-upload cut="false" class="form-control" @success="uploadSuccessGif"
+                                                     @error="uploadError"></img-file-upload>
+                                    <img v-if="m.gifUrl" :src="m.gifUrl" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
+                                </div>
+                            </div>
+
                             <div class="form-group col-md-5">
                                 <label class="col-md-5 control-label">菜品图片显示类型</label>
                                 <div  class="col-md-7">
