@@ -99,8 +99,8 @@
 
                                 <label class="col-md-2 control-label">是否启用<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-2">
-                                    是<input name="state" type="radio"  v-model="parameter.state"  :value="0">
-                                    否<input name="state" type="radio"  v-model="parameter.state"  :value="1">
+                                    是<input name="state" type="radio"  v-model="parameter.state"  :value="1">
+                                    否<input name="state" type="radio"  v-model="parameter.state"  :value="0">
                                 </div>
                             </div>
                         </div>
@@ -198,8 +198,8 @@
                     data : "state",
                     createdCell:function (td,tdData) {//td中的数据
                         switch (tdData){
-                            case 0:tdData='启用';break;
-                            case 1:tdData='未启用';break;
+                            case 0:tdData='未启用';break;
+                            case 1:tdData='启用';break;
                         }
                         $(td).html(tdData);
                     },
@@ -380,9 +380,9 @@
                         }
                     }
                     if(this.parameter.state ='' ||!this.parameter.state){
-                        this.parameter.state =0;
-                    }else{
                         this.parameter.state =1;
+                    }else{
+                        this.parameter.state =0;
                     }
                     if(submit){
                         $.ajax({
