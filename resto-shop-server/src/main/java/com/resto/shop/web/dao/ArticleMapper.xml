@@ -1106,5 +1106,8 @@ GROUP BY article_id
 
 
 
+    <select id="getArticleBefore" resultType="Article">
+        select * from tb_article where need_remind = 1 and shop_detail_id = #{shopId}
+    </select>
 
 </mapper>

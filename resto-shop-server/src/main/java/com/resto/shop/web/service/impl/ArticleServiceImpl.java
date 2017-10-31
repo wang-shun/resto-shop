@@ -768,4 +768,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public List<ArticleSellCountDto> findArticleByLastCountTime(String shopId,String lastCountTime) {
         return articleMapper.findArticleByLastCountTime(shopId,lastCountTime);
     }
+
+    @Override
+    public List<Article> getArticleBefore(String shopId) {
+        return articleMapper.getArticleBefore(shopId);
+    }
 }

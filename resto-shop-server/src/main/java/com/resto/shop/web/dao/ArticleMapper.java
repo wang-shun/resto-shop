@@ -192,4 +192,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	Integer selectSumByMonthlySales(@Param("articleId") String articleId, @Param("time") String time);
 
     List<ArticleSellCountDto> findArticleByLastCountTime(@Param("shopId")String shopId ,@Param("lastCountTime") String lastCountTime);
+
+	List<Article> getArticleBefore(String shopId);
 }
