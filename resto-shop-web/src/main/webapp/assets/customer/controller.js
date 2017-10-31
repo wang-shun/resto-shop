@@ -361,6 +361,7 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
+
     this.createDelSupplier = function(value,delUrl,checkIsEffectSupplierUrl,successCbk){
         var button = $("<button class='btn btn-xs red'>").html(name||"删除");
         button.click(function() {
@@ -433,6 +434,28 @@ var Controller = function(controlId,datatable){
         });
         return button;
     }
+
+    this.createScmBomEditBtn = function(model,url,urlData){
+        var button = $("<button class='btn btn-xs btn-primary'>编辑</button>");
+        debugger
+        button.click(function() {
+
+            if(_C.vue){
+                _C.vue.edit(model);
+            }else{
+                _C.loadForm({
+                    url:url,
+                    data:{id:model},
+                    formaction:urlData
+                });
+            }
+
+
+
+        })
+        return button;
+    }
+
 	this.showFind = function(model,url,urlData){
 		var button = $("<button class='btn btn-xs btn-primary'>查看下级</button>");
 		button.click(function(){
@@ -448,23 +471,6 @@ var Controller = function(controlId,datatable){
 		});
 		return button;
 	}
-    // this.showHistoryFind = function(rowData,url,urlData){
-    //     var button = $("<button class='btn btn-xs btn-primary'>历史BOM</button>");
-    //    // var button = $("<a href='scmBomHistory/list_all?articleId="+articleId+"&&shopId="+shopDetailId+"' class='btn green ajaxify'>历史BOM</a>");
-    //     button.click(function(){
-    //         if(_C.vue){
-    //             _C.vue.showHistoryDetailFind(rowData);
-    //         }else{
-    //             _C.loadForm({
-    //                 url:url,
-    //                 data:{articleId:rowData.articleId,shopDetailId:rowData.shopDetailId},
-    //                 formaction:urlData
-    //             });
-    //         }
-    //     });
-    //     return button;
-    // }
-
 
 
     this.createFind = function(model,url,urlData){

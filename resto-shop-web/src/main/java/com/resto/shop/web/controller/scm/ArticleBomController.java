@@ -1,5 +1,7 @@
  package com.resto.shop.web.controller.scm;
 
+ import cn.restoplus.common.utils.ListUtil;
+ import com.alibaba.fastjson.JSONObject;
  import com.resto.brand.core.entity.Result;
  import com.resto.brand.web.model.BrandSetting;
  import com.resto.brand.web.service.BrandSettingService;
@@ -15,8 +17,9 @@
 
  import javax.annotation.Resource;
  import javax.validation.Valid;
+ import java.util.List;
 
-@Controller
+ @Controller
 @RequestMapping("scmBom")
 public class ArticleBomController extends GenericController{
 
@@ -49,6 +52,18 @@ public class ArticleBomController extends GenericController{
 		MdRulArticleBomHead articlebom = articlebomService.queryById(id);
 		return getSuccessResult(articlebom);
 	}
+	@RequestMapping("effectiveBomHead")
+	@ResponseBody
+	public Result effectiveBomHead(String articleId){
+		List<MdRulArticleBomHead> articleboms = articlebomService.findEffectiveBomHeadByState(getCurrentShopId(),articleId);
+
+		if(ListUtil.isNotEmpty(articleboms)){
+			return new Result("该供菜品存在有效的BOM清单："+articleboms.get(0).getBomCode(), 0, true);
+		}
+
+		return getSuccessResult(articleboms);
+	}
+
 
 	@RequestMapping("create")
 	@ResponseBody
