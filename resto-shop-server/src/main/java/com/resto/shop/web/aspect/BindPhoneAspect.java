@@ -172,6 +172,13 @@ public class BindPhoneAspect {
 						map.put("type", "UserAction");
 						map.put("content", "系统向用户:" + sc.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
 						doPostAnsc(LogUtils.url, map);
+					}else{
+						Map map = new HashMap(4);
+						map.put("brandName", brand.getBrandName());
+						map.put("fileName", sc.getId());
+						map.put("type", "UserAction");
+						map.put("content", "系统数据库表tb_template_flow不存在模板消息的template_id,请求服务器地址为:" + MQSetting.getLocalIP());
+						doPostAnsc(LogUtils.url, map);
 					}
 				}
 			}

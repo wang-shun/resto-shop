@@ -252,6 +252,13 @@ public class OrderMessageListener implements MessageListener {
                     map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                     doPostAnsc(LogUtils.url, map);
                     map.put("content","用户:"+customer.getNickname()+"优惠券过期发短信提醒"+"请求地址:"+MQSetting.getLocalIP());
+                }else{
+                    Map map = new HashMap(4);
+                    map.put("brandName", setting.getBrandName());
+                    map.put("fileName", customer.getId());
+                    map.put("type", "UserAction");
+                    map.put("content", "系统数据库表tb_template_flow不存在模板消息的template_id,请求服务器地址为:" + MQSetting.getLocalIP());
+                    doPostAnsc(LogUtils.url, map);
                 }
             }
             if(setting.getIsSendCouponMsg() == Common.YES){
@@ -432,11 +439,21 @@ public class OrderMessageListener implements MessageListener {
                     map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                     doPostAnsc(LogUtils.url, map);
                     //发送短信
-                    com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                    smsParam.put("key1",shop.getName());
-                    smsParam.put("key2", order.getVerCode());
-                    smsParam.put("key3",order.getSerialNumber());
-                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105785023");
+                    if(setting.getMessageSwitch()==1){
+                        com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                        smsParam.put("key1",shop.getName());
+                        smsParam.put("key2", order.getVerCode());
+                        smsParam.put("key3",order.getSerialNumber());
+                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105785023");
+                    }
+                }else{
+                    Brand brand = brandService.selectById(order.getBrandId());
+                    Map map = new HashMap(4);
+                    map.put("brandName", brand.getBrandName());
+                    map.put("fileName", customer.getId());
+                    map.put("type", "UserAction");
+                    map.put("content", "系统数据库表tb_template_flow不存在模板消息的template_id,请求服务器地址为:" + MQSetting.getLocalIP());
+                    doPostAnsc(LogUtils.url, map);
                 }
             }
         }catch (Exception e){
@@ -548,11 +565,22 @@ public class OrderMessageListener implements MessageListener {
                 map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);
                 //发送短信
-                com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                smsParam.put("money1", money);
-                smsParam.put("money2",shareSetting.getMinMoney());
-                smsParam.put("money3",shareSetting.getMaxMoney());
-                com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105890057");
+                if(setting.getMessageSwitch()==1){
+                    com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                    smsParam.put("money1", money);
+                    smsParam.put("money2",shareSetting.getMinMoney());
+                    smsParam.put("money3",shareSetting.getMaxMoney());
+                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105890057");
+                }
+            }else{
+                Order order=orderService.selectById(appraise.getOrderId());
+                Brand brand = brandService.selectById(order.getBrandId());
+                Map map = new HashMap(4);
+                map.put("brandName", brand.getBrandName());
+                map.put("fileName", customer.getId());
+                map.put("type", "UserAction");
+                map.put("content", "系统数据库表tb_template_flow不存在模板消息的template_id,请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(LogUtils.url, map);
             }
         }
     }

@@ -7885,12 +7885,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     orderMap.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                     doPostAnsc(url, orderMap);
                     //发送短信
-                    com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                    smsParam.put("number",order.getSerialNumber());
-                    smsParam.put("name",shopDetail.getName());
-                    smsParam.put("tablenumber",o.getTableNumber());
-                    smsParam.put("count","共"+order.getOrderItems().size()+"份");
-                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105745031");
+                    if(setting.getMessageSwitch()==1){
+                        com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                        smsParam.put("number",order.getSerialNumber());
+                        smsParam.put("name",shopDetail.getName());
+                        smsParam.put("tablenumber",o.getTableNumber());
+                        smsParam.put("count","共"+order.getOrderItems().size()+"份");
+                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105745031");
+                    }
+                }else{
+                    Map map = new HashMap(4);
+                    map.put("brandName", brand.getBrandName());
+                    map.put("fileName", customer.getId());
+                    map.put("type", "UserAction");
+                    map.put("content", "系统数据库表tb_template_flow不存在模板消息的template_id,请求服务器地址为:" + MQSetting.getLocalIP());
+                    doPostAnsc(LogUtils.url, map);
                 }
             }
         }
