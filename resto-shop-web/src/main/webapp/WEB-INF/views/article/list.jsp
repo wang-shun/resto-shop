@@ -189,7 +189,7 @@
                                 <label class="col-md-5 control-label">开启提醒</label>
                                 <div class="col-md-7 radio-list">
                                     <label class="radio-inline">
-                                        <input type="checkbox" v-bind:true-value="true" v-bind:false-value="false"
+                                        <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
                                                v-model="m.needRemind">提示
                                     </label>
                                 </div>
