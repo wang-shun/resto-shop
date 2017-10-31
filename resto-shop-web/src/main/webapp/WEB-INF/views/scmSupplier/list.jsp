@@ -93,8 +93,14 @@
                             </div>
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">备注</label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-4">
                                     <textarea class="form-control" v-model="parameter.note" value="{{parameter.note?parameter.note:'内容'}}" name="note"></textarea>
+                                </div>
+
+                                <label class="col-md-2 control-label">是否启用<span style="color:#FF0000;">*</span></label>
+                                <div class="col-md-2">
+                                    是<input name="state" type="radio"  v-model="parameter.state"  :value="1">
+                                    否<input name="state" type="radio"  v-model="parameter.state"  :value="0">
                                 </div>
                             </div>
                         </div>
@@ -188,6 +194,17 @@
                     orderable:false,
                 },
                 {
+                    title : "是否启用",
+                    data : "state",
+                    createdCell:function (td,tdData) {//td中的数据
+                        switch (tdData){
+                            case 0:tdData='未启用';break;
+                            case 1:tdData='启用';break;
+                        }
+                        $(td).html(tdData);
+                    },
+                },
+                {
                     title : "备注",
                     data : "note",
                     orderable:false,
@@ -238,8 +255,9 @@
                     topMobile: "",
                     topEmail: "",
                     position:"",
+                    state:"",
                     supplierContacts:[],//详情
-                    supContactIds:[],
+                    supContactIds:[]
                 }
             },
             methods:{
@@ -291,6 +309,7 @@
                         topContact: "",
                         topMobile: "",
                         topEmail: "",
+                        state: "",
                         supplierContacts:[],//详情
                         supContactIds:[],
                     };
@@ -326,6 +345,7 @@
                     saveObj.supContactIds =this.parameter.supContactIds;
                     saveObj.version =this.parameter.version;
                     saveObj.taxNumber =this.parameter.taxNumber;
+                    saveObj.state =this.parameter.state;
                     var parSup=this.parameter.supplierContacts;
                     for(var i=0;i<parSup.length;i++){
                         saveObj.supplierContacts[i]={
@@ -358,6 +378,11 @@
                             submit=false;
                             message='联系人电话';
                         }
+                    }
+                    if(this.parameter.state ='' ||!this.parameter.state){
+                        this.parameter.state =1;
+                    }else{
+                        this.parameter.state =0;
                     }
                     if(submit){
                         $.ajax({

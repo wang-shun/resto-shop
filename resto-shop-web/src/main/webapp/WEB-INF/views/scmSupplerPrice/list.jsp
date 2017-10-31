@@ -522,7 +522,7 @@
             },
             ready:function(){//钩子函数加载后
                 var _this=this;
-                $.get('scmSupplier/list_all',function (jsonData) { //供应商查询
+                $.get('scmSupplier/list_all?state=1',function (jsonData) { //供应商查询
                     var data=jsonData.data;
                     _this.supNames=data;//供应商
                     for(var i=0;i<data.length;i++){
