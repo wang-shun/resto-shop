@@ -10,4 +10,22 @@
             and customer_id = #{customerId}
         </if>
     </select>
+
+    <insert id="insertSelective" parameterMap="com.resto.shop.web.model.OrderBefore">
+        insert into tb_order_before
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tableNumber != null">table_number,</if>
+            <if test="customerId != null">customer_id,</if>
+            <if test="shopDetailId != null">shop_detail_id,</if>
+            <if test="orderId != null">order_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tableNumber != null">#{tableNumber},</if>
+            <if test="customerId != null">#{customerId},</if>
+            <if test="shopDetailId != null">#{shopDetailId},</if>
+            <if test="orderId != null">#{orderId},</if>
+        </trim>
+    </insert>
+
+
 </mapper>
