@@ -771,6 +771,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public List<Article> getArticleBefore(String shopId) {
-        return articleMapper.getArticleBefore(shopId);
+        List<Article> articleList = articleMapper.getArticleBefore(shopId);
+        return articleList;
     }
 }
