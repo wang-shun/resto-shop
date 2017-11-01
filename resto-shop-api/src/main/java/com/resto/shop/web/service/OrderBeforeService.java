@@ -11,5 +11,5 @@ import java.util.List;
  */
 public interface OrderBeforeService extends GenericService<OrderBefore, Long> {
 
-    OrderBefore getOrderNoPay(String tableNumber, String shopId);
+    OrderBefore getOrderNoPay(String tableNumber, String shopId,String customerId);
 }

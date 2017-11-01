@@ -9,5 +9,6 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface OrderBeforeMapper  extends GenericDao<OrderBefore,Long> {
 
-    OrderBefore getOrderNoPay(@Param("tableNumber") String tableNumber,@Param("shopId") String shopId);
+    OrderBefore getOrderNoPay(@Param("tableNumber") String tableNumber,@Param("shopId") String shopId,
+                              @Param("customerId") String customerId);
 }
