@@ -180,5 +180,5 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * @param shopId
 	 * @return
 	 */
-	List<Article> getArticleBefore(String shopId);
+	List<Article> getArticleBefore(String shopId,String tableNumber,String customerId);
 }

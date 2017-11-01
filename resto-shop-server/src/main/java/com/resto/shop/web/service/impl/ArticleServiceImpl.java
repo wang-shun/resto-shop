@@ -10,6 +10,7 @@ import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.MQSetting;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.BrandSettingService;
@@ -89,6 +90,15 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Resource
     private RecommendCategoryService recommendCategoryService;
 
+    @Autowired
+    private OrderService orderService;
+
+
+    @Autowired
+    private TableGroupService tableGroupService;
+
+    @Autowired
+    private OrderBeforeService orderBeforeService;
 
     @Override
     public GenericDao<Article, String> getDao() {
@@ -770,8 +780,56 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     }
 
     @Override
-    public List<Article> getArticleBefore(String shopId) {
+    public List<Article> getArticleBefore(String shopId,String tableNumber,String customerId) {
         List<Article> articleList = articleMapper.getArticleBefore(shopId);
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
+        //判断是否开启预点餐功能
+        if(shopDetail.getOrderBefore() == Common.NO  || brandSetting.getOrderBefore() == Common.NO){
+            return null;
+        }
+        if(tableNumber == null){
+            return articleList;
+        }else {
+            //先去判断,这个桌子上存不存在未支付的预点餐商品
+            OrderBefore orderBefore = orderBeforeService.getOrderNoPay(tableNumber,shopId);
+            if(orderBefore != null){
+                //存在未支付的预点餐餐品
+                return null;
+            }
+
+
+            //然后判断能不能加菜
+            if(shopDetail.getOpenManyCustomerOrder() == Common.NO || brandSetting.getOpenManyCustomerOrder() == Common.NO){
+                Order order = orderService.getLastOrderByCustomer(customerId,shopId,null);
+                if(order == null){
+                    return articleList;
+                }else if (!order.getAllowContinueOrder()){
+                    return articleList;
+                }else{
+                    return null;
+                }
+            }else{
+                //如果开启了多人点餐，先去找这个人是不是在组里
+                //先判断用户是否在一个已支付的组里了
+                TableGroup groupList = tableGroupService.getTableGroupByState(shopId,customerId, tableNumber, 1);
+                if(groupList != null){
+                    //只有用户在已支付的组内才有可能可以加菜
+                    Order order = orderService.getLastOrderByCustomer(customerId,shopId,groupList.getGroupId());
+                    if(order == null){
+                        return articleList;
+                    }else if (!order.getAllowContinueOrder()){
+                        return articleList;
+                    }else{
+                        return null;
+                    }
+
+                }
+
+            }
+
+        }
+
         return articleList;
     }
 }
