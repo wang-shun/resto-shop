@@ -454,4 +454,15 @@ order by t.print_sort asc
             #{articleId}
         </foreach>
     </select>
+
+
+    <select id="getOrderBefore" resultType="OrderItem">
+        select * from tb_order_item where order_id = (
+        select order_id from tb_order_before where state = 0 and table_number = #{tableNumber}
+        and shop_detail_id = #{shopId}
+        <if test="customerId != null">
+            and customer_id = #{customerId}
+        </if>
+        )
+    </select>
 </mapper>

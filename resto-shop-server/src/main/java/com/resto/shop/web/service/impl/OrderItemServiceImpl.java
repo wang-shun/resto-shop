@@ -179,4 +179,9 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
     public List<OrderItem> selectByArticleIds(String[] articleIds) {
         return orderitemMapper.selectByArticleIds(articleIds);
     }
+
+    @Override
+    public List<OrderItem> getOrderBefore(String tableNumber, String shopId, String customerId) {
+        return orderitemMapper.getOrderBefore(tableNumber, shopId, customerId);
+    }
 }
