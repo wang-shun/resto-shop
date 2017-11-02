@@ -253,6 +253,16 @@ public class Order implements Serializable{
 
     private Integer isConsumptionRebate;    //是否参与消费返利
 
+    private Integer orderBefore;
+
+    public Integer getOrderBefore() {
+        return orderBefore;
+    }
+
+    public void setOrderBefore(Integer orderBefore) {
+        this.orderBefore = orderBefore;
+    }
+
     public Integer getIsConsumptionRebate() {
         return isConsumptionRebate;
     }
