@@ -103,6 +103,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private CouponService couponService;
 
+    @Autowired
+    private OrderBeforeService orderBeforeService;
+
     @Resource
     OrderPaymentItemService orderPaymentItemService;
 
@@ -1354,6 +1357,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOrderState(OrderState.CANCEL);
             update(order);
             refundOrder(order);
+
             log.info("取消订单成功:" + order.getId());
 
             //拒绝订单后还原库存
@@ -4444,6 +4448,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //            orderMap.put("content", "订单:" + order.getId() + "在pos端被拒绝,请求服务器地址为:" + MQSetting.getLocalIP());
 //            doPostAnsc(url, map);
         }
+        orderBeforeService.updateState(order.getId(),2);
         return order;
     }
 

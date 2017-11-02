@@ -17,6 +17,6 @@ public interface OrderBeforeService extends GenericService<OrderBefore, Long> {
 
     List<OrderItem> getOrderBefore(String tableNumber,String shopId,String customerId);
 
-    void updateState(String orderId);
+    void updateState(String orderId,Integer state);
 
 }

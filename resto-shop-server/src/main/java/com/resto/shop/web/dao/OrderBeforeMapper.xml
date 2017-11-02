@@ -30,7 +30,7 @@
 
     <update id="updateState">
         update tb_order_before
-        set state = 1
+        set state = #{state}
         where order_id = #{orderId}
     </update>
 

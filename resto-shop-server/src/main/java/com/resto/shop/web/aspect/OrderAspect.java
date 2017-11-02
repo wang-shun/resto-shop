@@ -4,12 +4,10 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.*;
-import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
-import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
@@ -17,13 +15,11 @@ import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.text.StrSubstitutor;
-import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +28,8 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 
@@ -147,7 +143,7 @@ public class OrderAspect {
                 return;
             }
             if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
-                orderBeforeService.updateState(order.getBeforeId());
+                orderBeforeService.updateState(order.getBeforeId(),1);
             }
             if(order.getPayMode() != PayMode.WEIXIN_PAY && !StringUtils.isEmpty(order.getGroupId())){
                 //如果多人买的 一起清空购物车
@@ -616,7 +612,7 @@ public class OrderAspect {
 //        }
 
         if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
-            orderBeforeService.updateState(order.getBeforeId());
+            orderBeforeService.updateState(order.getBeforeId(),1);
         }
 
         //R+外卖走消息队列  (订单不为空 支付模式不为空  支付为微信或者支付宝支付  已支付  已下单 外卖模式)

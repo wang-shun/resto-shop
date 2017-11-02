@@ -101,7 +101,7 @@ public class OrderBeforeServiceImpl extends GenericServiceImpl<OrderBefore, Long
     }
 
     @Override
-    public void updateState(String orderId) {
-        orderBeforeMapper.updateState(orderId);
+    public void updateState(String orderId,Integer state) {
+        orderBeforeMapper.updateState(orderId,state);
     }
 }
