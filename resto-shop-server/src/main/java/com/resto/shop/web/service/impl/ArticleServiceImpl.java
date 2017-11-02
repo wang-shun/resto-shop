@@ -782,6 +782,12 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Override
     public List<Article> getArticleBefore(String shopId,String tableNumber,String customerId) {
         List<Article> articleList = articleMapper.getArticleBefore(shopId);
+        Map<String, Article> discountMap = selectAllSupportArticle(shopId);
+        for (Article article : articleList) {
+            if (discountMap.containsKey(article.getId())) {
+                article.setDiscount(discountMap.get(article.getId()).getDiscount());
+            }
+        }
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
         //判断是否开启预点餐功能
