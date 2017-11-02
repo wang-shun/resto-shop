@@ -422,8 +422,8 @@ public abstract class Assertion extends Assert {
 	 * @param mobiles
 	 * @param message
 	 */
-	public static void isMobileNO(String mobiles,String message){  
-		Pattern p = Pattern.compile("^((13[0-9])|(15[^4,\\D])|(177)|(18[0,5-9]))\\d{8}$");  
+	public static void isMobileNO(String mobiles,String message){
+		Pattern p = Pattern.compile("^((13[\\d])|(15[0-35-9])|(18[\\d])|(145)|(147)|(17[0135678]))\\d{8}$");
 		if(!p.matcher(mobiles).matches()){
 			throw new IllegalArgumentException(message);
 		}
