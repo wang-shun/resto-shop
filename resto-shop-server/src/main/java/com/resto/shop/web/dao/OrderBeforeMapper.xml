@@ -11,7 +11,7 @@
         </if>
     </select>
 
-    <insert id="insertSelective" parameterMap="com.resto.shop.web.model.OrderBefore">
+    <insert id="insertSelective" parameterType="com.resto.shop.web.model.OrderBefore">
         insert into tb_order_before
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="tableNumber != null">table_number,</if>
