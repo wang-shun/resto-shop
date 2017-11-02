@@ -255,6 +255,16 @@ public class Order implements Serializable{
 
     private Integer orderBefore;
 
+    private String beforeId;
+
+    public String getBeforeId() {
+        return beforeId;
+    }
+
+    public void setBeforeId(String beforeId) {
+        this.beforeId = beforeId;
+    }
+
     public Integer getOrderBefore() {
         return orderBefore;
     }

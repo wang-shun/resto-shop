@@ -633,6 +633,9 @@
             <if test="orderBefore != null">
                 order_before,
             </if>
+            <if test="beforeId != null">
+                before_id,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -805,6 +808,9 @@
             </if>
             <if test="orderBefore != null">
                 #{orderBefore},
+            </if>
+            <if test="beforeId != null">
+                #{beforeId},
             </if>
         </trim>
     </insert>

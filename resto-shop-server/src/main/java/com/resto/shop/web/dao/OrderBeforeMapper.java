@@ -11,4 +11,6 @@ public interface OrderBeforeMapper  extends GenericDao<OrderBefore,Long> {
 
     OrderBefore getOrderNoPay(@Param("tableNumber") String tableNumber,@Param("shopId") String shopId,
                               @Param("customerId") String customerId);
+
+    void updateState(String orderId);
 }

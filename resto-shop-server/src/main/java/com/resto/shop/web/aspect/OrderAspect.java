@@ -146,7 +146,9 @@ public class OrderAspect {
                 MQMessageProducer.sendPrintSuccess(shopId);
                 return;
             }
-
+            if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
+                orderBeforeService.updateState(order.getBeforeId());
+            }
             if(order.getPayMode() != PayMode.WEIXIN_PAY && !StringUtils.isEmpty(order.getGroupId())){
                 //如果多人买的 一起清空购物车
                 shopCartService.deleteByGroup(order.getGroupId());
@@ -612,6 +614,10 @@ public class OrderAspect {
 //                (ShopMode.TABLE_MODE != order.getOrderMode() || ShopMode.BOSS_ORDER != order.getOrderMode())) {//坐下点餐模式不发送该消息
 //            sendPaySuccessMsg(order);
 //        }
+
+        if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
+            orderBeforeService.updateState(order.getBeforeId());
+        }
 
         //R+外卖走消息队列  (订单不为空 支付模式不为空  支付为微信或者支付宝支付  已支付  已下单 外卖模式)
         if (order != null && order.getPayMode() != null && (order.getPayMode() == OrderPayMode.WX_PAY || order.getPayMode() == OrderPayMode.ALI_PAY) &&

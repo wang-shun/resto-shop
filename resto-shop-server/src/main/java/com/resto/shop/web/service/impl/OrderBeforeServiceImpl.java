@@ -99,4 +99,9 @@ public class OrderBeforeServiceImpl extends GenericServiceImpl<OrderBefore, Long
         }
         return null;
     }
+
+    @Override
+    public void updateState(String orderId) {
+        orderBeforeMapper.updateState(orderId);
+    }
 }

@@ -28,6 +28,11 @@
     </insert>
 
 
+    <update id="updateState">
+        update tb_order_before
+        set state = 1
+        where order_id = #{orderId}
+    </update>
 
 
 </mapper>
