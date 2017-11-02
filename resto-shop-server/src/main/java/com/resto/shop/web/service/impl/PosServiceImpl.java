@@ -267,8 +267,11 @@ public class PosServiceImpl implements PosService {
     @Override
     public void syncPosOrder(String data) {
         JSONObject json = new JSONObject(data);
-
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
+        Order serverDataBaseOrder = orderMapper.selectByPrimaryKey(orderDto.getId());
+        if(serverDataBaseOrder != null){  //  判断服务器数据库是否已经存在此订单
+            return;
+        }
         if(!StringUtils.isEmpty(orderDto.getParentOrderId())){
             Order order = orderService.selectById(orderDto.getParentOrderId());
             orderDto.setCustomerId(order.getCustomerId());
