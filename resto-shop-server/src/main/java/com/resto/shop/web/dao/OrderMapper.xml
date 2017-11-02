@@ -630,6 +630,9 @@
             <if test="groupId != null">
                 group_id,
             </if>
+            <if test="orderBefore != null">
+                order_before,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -799,6 +802,9 @@
             </if>
             <if test="groupId != null">
                 #{groupId},
+            </if>
+            <if test="orderBefore != null">
+                #{orderBefore},
             </if>
         </trim>
     </insert>

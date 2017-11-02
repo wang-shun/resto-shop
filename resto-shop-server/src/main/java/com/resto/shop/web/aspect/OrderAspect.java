@@ -26,6 +26,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -81,6 +82,9 @@ public class OrderAspect {
     @Resource
     ParticipantService participantService;
 
+    @Autowired
+    OrderBeforeService orderBeforeService;
+
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.createOrder(..))")
     public void createOrder() {
     }
@@ -108,7 +112,16 @@ public class OrderAspect {
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
         String time = DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
         if (jsonResult.isSuccess() == true) {
+
             Order order = (Order) jsonResult.getData();
+            if(order.getOrderBefore() != null){
+                OrderBefore orderBefore = new OrderBefore();
+                orderBefore.setTableNumber(order.getTableNumber());
+                orderBefore.setCustomerId(order.getCustomerId());
+                orderBefore.setShopDetailId(order.getShopDetailId());
+                orderBefore.setOrderId(order.getId());
+                orderBeforeService.insert(orderBefore);
+            }
             if(!org.apache.commons.lang3.StringUtils.isEmpty(order.getGroupId()) && order.getOrderState() == OrderState.PAYMENT){
                 //如果是多人点餐已支付
                 MemcachedUtils.delete(order.getShopDetailId()+order.getGroupId());
