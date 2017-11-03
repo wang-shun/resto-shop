@@ -132,15 +132,15 @@ public class ShopInfoController extends GenericController{
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
         }
         //服务费类型  0：经典版  1：升级版
-       if (shopDetail.getServiceType().equals(Common.YES)){ //如果是新版服务费
+       if (Common.YES.equals(shopDetail.getServiceType())){ //如果是新版服务费
            BigDecimal servicePrice = BigDecimal.ZERO;
-           if (shopDetail.getIsOpenTablewareFee().equals(Common.YES)){ //如果开通了餐具费
+           if (Common.YES.equals(shopDetail.getIsOpenTablewareFee())){ //如果开通了餐具费
                 servicePrice = servicePrice.add(shopDetail.getTablewareFeePrice()); //服务费累加餐盒费
            }
-           if (shopDetail.getIsOpenSauceFee().equals(Common.YES)){ //如果开通了酱料费
+           if (Common.YES.equals(shopDetail.getIsOpenSauceFee())){ //如果开通了酱料费
                servicePrice = servicePrice.add(shopDetail.getSauceFeePrice()); //服务费累加酱料费
            }
-           if (shopDetail.getIsOpenTowelFee().equals(Common.YES)){ //如果开通了纸巾费
+           if (Common.YES.equals(shopDetail.getIsOpenTowelFee())){ //如果开通了纸巾费
                 servicePrice = servicePrice.add(shopDetail.getTowelFeePrice());
            }
            //将新版服务费总值赋值到服务费价格字段(微信端还是走之前的那个逻辑：根据店铺开关和服务费价格前端计算)
