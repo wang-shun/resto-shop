@@ -517,6 +517,8 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Order getGroupOrderByGroupId(String groupId);
 
+
+
 	Order getLastOrderByTableNumber(@Param("tableNumber") String tableNumber,@Param("shopId") String shopId);
 
 	BigDecimal getServicePrice(String shopId);

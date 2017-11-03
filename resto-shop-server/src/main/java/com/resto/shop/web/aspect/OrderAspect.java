@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -144,6 +145,17 @@ public class OrderAspect {
             }
             if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
                 orderBeforeService.updateState(order.getBeforeId(),1);
+                Order before = orderService.selectById(order.getBeforeId());
+                before.setOrderState(OrderState.CANCEL);
+                orderService.update(before);
+                List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
+                if(!CollectionUtils.isEmpty(orderItems)){
+                    for(OrderItem orderItem : orderItems){
+                        orderItem.setOrderId(order.getId());
+                        orderItem.setStatus(2);
+                        orderItemService.update(orderItem);
+                    }
+                }
             }
             if(order.getPayMode() != PayMode.WEIXIN_PAY && !StringUtils.isEmpty(order.getGroupId())){
                 //如果多人买的 一起清空购物车
@@ -613,6 +625,17 @@ public class OrderAspect {
 
         if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
             orderBeforeService.updateState(order.getBeforeId(),1);
+            Order before = orderService.selectById(order.getBeforeId());
+            before.setOrderState(OrderState.CANCEL);
+            orderService.update(before);
+            List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
+            if(!CollectionUtils.isEmpty(orderItems)){
+                for(OrderItem orderItem : orderItems){
+                    orderItem.setOrderId(order.getId());
+                    orderItem.setStatus(2);
+                    orderItemService.update(orderItem);
+                }
+            }
         }
 
         //R+外卖走消息队列  (订单不为空 支付模式不为空  支付为微信或者支付宝支付  已支付  已下单 外卖模式)
