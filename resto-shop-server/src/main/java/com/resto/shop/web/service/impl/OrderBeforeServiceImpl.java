@@ -71,7 +71,8 @@ public class OrderBeforeServiceImpl extends GenericServiceImpl<OrderBefore, Long
                     && shopDetail.getOpenManyCustomerOrder() == Common.YES){
                 //多人
                 //判断下这个人所在的组内的所有成员有没有生成过预点餐餐品
-                TableGroup tableGroup = tableGroupService.getTableGroupByCustomer(tableNumber, customerId,shopId);
+
+                TableGroup tableGroup = tableGroupService.getTableGroupByState(tableNumber, customerId,shopId,0);
                 if(tableGroup == null){
                     //这个人不在组内
                     return orderItemService.getOrderBefore(tableNumber, shopId, customerId);
