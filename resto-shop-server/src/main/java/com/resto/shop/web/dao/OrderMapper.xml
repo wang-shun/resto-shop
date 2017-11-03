@@ -191,6 +191,13 @@
         <result column="erase_money" property="eraseMoney"/>
         <result column="no_discount_money" property="noDiscountMoney"/>
         <result column="group_id" property="groupId"/>
+        <result column="sauce_fee_count" property="sauceFeeCount"/>
+        <result column="sauce_fee_price" property="sauceFeePrice"/>
+        <result column="towel_fee_count" property="towelFeeCount"/>
+        <result column="towel_fee_price" property="towelFeePrice"/>
+        <result column="tableware_fee_count" property="tablewareFeeCount"/>
+        <result column="tableware_fee_price" property="tablewareFeePrice"/>
+        <result column="" property=""/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -390,6 +397,7 @@
         last_order_time,customer_count,service_price,pay_mode,base_money,base_order_money,base_customer_count,meal_fee_price,meal_all_number
         ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
         print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, group_id
+        ,sauce_fee_count,sauce_fee_price,towel_fee_count,towel_fee_price,tableware_fee_count,tableware_fee_price,is_use_new_service
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -625,6 +633,27 @@
             <if test="groupId != null">
                 group_id,
             </if>
+            <if test="sauceFeeCount != null">
+                sauce_fee_count,
+            </if>
+            <if test="sauceFeePrice != null">
+                sauce_fee_price,
+            </if>
+            <if test="towelFeeCount != null">
+                towel_fee_count,
+            </if>
+            <if test="towelFeePrice != null">
+                towel_fee_price,
+            </if>
+            <if test="tablewareFeeCount != null">
+                tableware_fee_count,
+            </if>
+            <if test="tablewareFeePrice != null">
+                tableware_fee_price,
+            </if>
+            <if test="isUseNewService != null">
+                is_use_new_service,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -791,6 +820,27 @@
             </if>
             <if test="groupId != null">
                 #{groupId},
+            </if>
+            <if test="sauceFeeCount != null">
+                #{sauceFeeCount},
+            </if>
+            <if test="sauceFeePrice != null">
+                #{sauceFeePrice},
+            </if>
+            <if test="towelFeeCount != null">
+                #{towelFeeCount},
+            </if>
+            <if test="towelFeePrice != null">
+                #{towelFeePrice},
+            </if>
+            <if test="tablewareFeeCount != null">
+                #{tablewareFeeCount},
+            </if>
+            <if test="tablewareFeePrice != null">
+                #{tablewareFeePrice},
+            </if>
+            <if test="isUseNewService != null">
+                #{isUseNewService},
             </if>
         </trim>
     </insert>
@@ -965,6 +1015,27 @@
             </if>
             <if test="baseOrderMoney != null">
                 base_order_money = #{baseOrderMoney},
+            </if>
+            <if test="sauceFeeCount != null">
+                sauce_fee_count = #{sauceFeeCount},
+            </if>
+            <if test="sauceFeePrice != null">
+                sauce_fee_price = #{sauceFeePrice},
+            </if>
+            <if test="towelFeeCount != null">
+                towel_fee_count = #{towelFeeCount},
+            </if>
+            <if test="towelFeePrice != null">
+                towel_fee_price = #{towelFeePrice},
+            </if>
+            <if test="tablewareFeeCount != null">
+                tableware_fee_count = #{tablewareFeeCount},
+            </if>
+            <if test="tablewareFeePrice != null">
+                tableware_fee_price = #{tablewareFeePrice},
+            </if>
+            <if test="isUseNewService != null">
+                is_use_new_service = #{isUseNewService},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}

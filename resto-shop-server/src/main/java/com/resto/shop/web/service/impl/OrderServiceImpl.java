@@ -944,7 +944,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setOrderMoney(totalMoney.add(order.getServicePrice()).add(order.getMealFeePrice())); // 订单实际金额
             order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
             order.setPrintTimes(0);
+            //判断当前订单所在店铺的服务费类型  0：经典版  1：升级版
+            if (Common.YES.equals(shopDetail.getServiceType())){ //如果是启用的升级版服务费则将其拆分(拆分为shop端店铺设置开启的餐具费、纸巾费、酱料费)
 
+            }
             order.setOrderMode(detail.getShopMode());
             if (order.getOrderMode() == ShopMode.CALL_NUMBER) {
                 order.setTableNumber(order.getVerCode());
