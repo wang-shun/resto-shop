@@ -245,6 +245,9 @@ public class WeOrderDetailServiceImpl extends GenericServiceImpl<WeOrderDetail, 
                                     articleReturnNum++;
                                     articleReturnTotal = articleReturnTotal.add(oi.getPayValue());
                                     break;
+
+                                default:
+                                    break;
                             }
                         }
 

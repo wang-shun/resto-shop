@@ -111,6 +111,7 @@
 			url:"printer/list_all",
 			dataType:"json",
 			success:function(data){
+			    console.log(JSON.stringify(data));
 				if(data.length > 0){
 					vueObj.$set("printerList",data);
 					vueObj.$set("selected",data[0].id);

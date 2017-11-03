@@ -81,4 +81,7 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
     List<OrderItem> selectRefundArticleItem(@Param("orderId") String orderId);
 
     List<OrderItem> selectByArticleIds(String[] articleIds);
+
+    List<OrderItem> getOrderBefore(@Param("tableNumber") String tableNumber,
+                                   @Param("shopId") String shopId,@Param("customerId") String customerId);
 }

@@ -29,12 +29,18 @@
 				<artifactId>resto-brand-core</artifactId>
 				<version>1.0.1</version>
 			</dependency>
+			<dependency>
+				<groupId>cn.restoplus</groupId>
+				<artifactId>resto-scm-api</artifactId>
+				<version>1.0.1</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
 	<modules>
-<!-- 		<module>resto-shop-web</module> -->
+       <!--<module>resto-shop-web  </module> -->
 		<module>resto-shop-server</module>
 		<module>resto-shop-api</module>
+		
 	</modules>
 </project>

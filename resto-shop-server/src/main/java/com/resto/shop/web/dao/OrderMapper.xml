@@ -190,6 +190,7 @@
         <result column="pos_discount" property="posDiscount"/>
         <result column="erase_money" property="eraseMoney"/>
         <result column="no_discount_money" property="noDiscountMoney"/>
+        <result column="is_consumption_rebate" property="isConsumptionRebate"/>
         <result column="group_id" property="groupId"/>
         <result column="sauce_fee_count" property="sauceFeeCount"/>
         <result column="sauce_fee_price" property="sauceFeePrice"/>
@@ -274,6 +275,7 @@
         <result column="order_mode" property="orderMode"/>
         <result column="pay_type" property="payType"/>
         <result column="amount_with_children" property="amountWithChildren"/>
+        <result column="create_time" property="createTime"/>
         <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
             <id column="orderPaymentItemId" property="id"/>
             <result column="payment_mode_id" property="paymentModeId"/>
@@ -396,7 +398,7 @@
         count_with_child,
         last_order_time,customer_count,service_price,pay_mode,base_money,base_order_money,base_customer_count,meal_fee_price,meal_all_number
         ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
-        print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, group_id
+        print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, is_consumption_rebate, group_id
         ,sauce_fee_count,sauce_fee_price,towel_fee_count,towel_fee_price,tableware_fee_count,tableware_fee_price,is_use_new_service
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
@@ -630,8 +632,17 @@
             <if test="posDiscount != null">
                 pos_discount,
             </if>
+            <if test="isConsumptionRebate != null">
+                is_consumption_rebate,
+            </if>
             <if test="groupId != null">
                 group_id,
+            </if>
+            <if test="orderBefore != null">
+                order_before,
+            </if>
+            <if test="beforeId != null">
+                before_id,
             </if>
             <if test="sauceFeeCount != null">
                 sauce_fee_count,
@@ -818,8 +829,17 @@
             <if test="posDiscount != null">
                 #{posDiscount},
             </if>
+            <if test="isConsumptionRebate != null">
+                #{isConsumptionRebate},
+            </if>
             <if test="groupId != null">
                 #{groupId},
+            </if>
+            <if test="orderBefore != null">
+                #{orderBefore},
+            </if>
+            <if test="beforeId != null">
+                #{beforeId},
             </if>
             <if test="sauceFeeCount != null">
                 #{sauceFeeCount},
@@ -1036,6 +1056,9 @@
             </if>
             <if test="isUseNewService != null">
                 is_use_new_service = #{isUseNewService},
+            </if>
+            <if test="isConsumptionRebate != null">
+                is_consumption_rebate = #{isConsumptionRebate},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -2404,9 +2427,11 @@ GROUP BY r.table_number
 
     </select>
 
+
+
     <select id="selectListByShopId" resultMap="consumedOrderByshopId">
         SELECT
-        o.id,o.order_money,oi.payment_mode_id ,oi.pay_value
+        o.id,o.order_money,oi.payment_mode_id ,oi.pay_value,o.create_time
         FROM
         tb_order o
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
@@ -2415,6 +2440,9 @@ GROUP BY r.table_number
         and o.production_status in (2,3) AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
     </select>
+
+
+
 
     <!-- 根据订单状态和生产状态查询指定店铺的订单   不包含包含外卖订单-->
     <select id="selectByOrderSatesAndProductionStates" resultType="Order">
@@ -2491,6 +2519,13 @@ GROUP BY r.table_number
         order by create_time desc limit 1
     </select>
 
+    <select id="getGroupOrderByGroupId" resultType="Order">
+        select * from tb_order where group_id = #{groupId}
+        and table_number is not null and  allow_continue_order = 1
+        and parent_order_id is null
+        order by create_time desc limit 1
+    </select>
+
 
     <select id="selectExceptionOrderListBybrandId" resultType="Order">
         SELECT  o.id FROM tb_order o
@@ -2528,7 +2563,7 @@ on o.id = oi.order_id
         from tb_order o
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
-        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND oi.payment_mode_id not in (13,14,15,20)
+        WHERE  o.brand_id = #{brandId} and o.order_state in(2,10,11,12) AND oi.payment_mode_id not in (13,14,15,20,21)
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}
         ]]>
     </select>
@@ -2823,7 +2858,7 @@ AND o.brand_id = #{brandId}
 
     <select id="selectPayBefore" resultType="java.math.BigDecimal">
     select sum(pay_value) from tb_order_payment_item
-    where order_id = #{orderId} and payment_mode_id not in (13,14,15,20)
+    where order_id = #{orderId} and payment_mode_id not in (13,14,15,20,21)
 </select>
 
     <select id="getPayHoufu" resultType="java.math.BigDecimal">
@@ -3013,7 +3048,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
-opi.payment_mode_id not in (13,14,15,20) AND
+opi.payment_mode_id not in (13,14,15,20,21) AND
 o.production_status in(2,3,6)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
@@ -3047,7 +3082,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_order_payment_item opi on opi.order_id=o.id
 WHERE  o.order_state in(2,10,11,12) AND
-opi.payment_mode_id not in (13,14,15,20) AND
+opi.payment_mode_id not in (13,14,15,20,21) AND
 o.production_status in(2,3,6)
 AND  <![CDATA[
 o.create_time>#{beginDate} AND  o.create_time<#{endDate}
@@ -3388,7 +3423,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
             td.customer_id customerId,
             COUNT(1) orderCount,
             SUM(td.order_money) orderTotal,
-            AVG(td.order_money) avgOrderMoney,
+            ROUND(AVG(td.order_money),2) avgOrderMoney,
             DATE_FORMAT(td.create_time,'%Y-%m-%d %H:%i:%s') lastOrderTime
         FROM
             tb_order td
@@ -3410,4 +3445,24 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <select id="selectAfterValidOrderByCustomerId" resultType="Order">
         select * from tb_order where customer_id = #{customerId} and order_state in (2,10,11,12) and production_status != 6 order by create_time desc limit 1
     </select>
+
+    <select id="selectOrderNumByTimeAndBrandId" resultType="com.resto.shop.web.dto.OrderNumDto">
+
+        SELECT
+        COUNT(DISTINCT o.id) num,
+        o.shop_detail_id shopId
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item opi ON o.id = opi.order_id
+        WHERE
+        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        AND o.order_state IN (2, 10, 11, 12)
+        AND o.production_status IN (2, 3)
+        AND o.brand_id = #{brandId}
+        GROUP BY
+        o.shop_detail_id;
+    </select>
+
+
+
 </mapper>

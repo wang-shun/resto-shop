@@ -15,7 +15,9 @@
         max-height: 80vh;
         overflow-y: auto;
     }
-
+    .form-group.isHidden {
+        visibility: hidden;
+    }
     .print-sort {
 
     }
@@ -184,6 +186,26 @@
                             </div>
 
                             <div class="form-group col-md-4">
+                                <label class="col-md-5 control-label">开启提醒</label>
+                                <div class="col-md-7 radio-list">
+                                    <label class="radio-inline">
+                                        <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
+                                               v-model="m.needRemind">提示
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label class="col-md-5 control-label">gif动图</label>
+                                <div class="col-md-7">
+                                    <input type="hidden" name="gifUrl" v-model="m.gifUrl">
+                                    <img-file-upload cut="false" class="form-control" @success="uploadSuccessGif"
+                                                     @error="uploadError"></img-file-upload>
+                                    <img v-if="m.gifUrl" :src="m.gifUrl" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-5">
                                 <label class="col-md-5 control-label">菜品图片显示类型</label>
                                 <div  class="col-md-7">
                                     <label class="radio-inline">
@@ -198,8 +220,8 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-5">
-                                <label class="col-md-3 control-label">描述</label>
+                            <div class="form-group col-md-4">
+                                <label class="col-md-3 control-label" style="text-align: left;">描述</label>
                                 <div class="col-md-7">
                                     <textarea rows="3" class="form-control" name="description"
                                               v-model="m.description"></textarea>
@@ -1041,7 +1063,6 @@
 //                                virtualId:this.virtualList[0].id,
                                 supportTimes: [],
                                 kitchenList: [],
-                                virtualList:[],
                                 mealAttrs: [],
                                 isRemind: false,
                                 activated: true,
@@ -1081,6 +1102,13 @@
                             $("[name='photoLittle']").val(url).trigger("change");
                             C.simpleMsg("上传成功");
                             $("#photoLittle").attr("src", "/" + url);
+                        }
+                        ,
+                        uploadSuccessGif: function (url) {
+                            console.log(url);
+                            $("[name='gifUrl']").val(url).trigger("change");
+                            C.simpleMsg("上传成功");
+                            $("#gifUrl").attr("src", "/" + url);
                         }
                         ,
                         uploadError: function (msg) {

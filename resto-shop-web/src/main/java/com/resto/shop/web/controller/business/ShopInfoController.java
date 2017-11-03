@@ -93,6 +93,8 @@ public class ShopInfoController extends GenericController{
                 case 3 :
                     shopDetail.setConsumeConfineTime(Integer.MAX_VALUE);
                     break;
+                default:
+                    break;
             }
         }
         if(shopDetail.getIsTurntable()==1){
@@ -130,6 +132,12 @@ public class ShopInfoController extends GenericController{
             shopDetail.setnoticeTelephone("");
         }else  if(shopDetail.getIsOpenSms()==1){
             shopDetail.setnoticeTelephone(shopDetail.getnoticeTelephone().replace("，",","));
+        }
+        if (shopDetail.getWarningWechat() == null){
+            shopDetail.setWarningWechat(Common.NO);
+        }
+        if (shopDetail.getWarningSms() == null){
+            shopDetail.setWarningSms(Common.NO);
         }
         //服务费类型  0：经典版  1：升级版
        if (Common.YES.equals(shopDetail.getServiceType())){ //如果是新版服务费

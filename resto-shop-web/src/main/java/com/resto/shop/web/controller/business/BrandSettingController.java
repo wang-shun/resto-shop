@@ -51,11 +51,18 @@ public class BrandSettingController extends GenericController{
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid BrandSetting brandSetting){
+		if(brandSetting.getSmsPushGiftCoupons() == null){
+			brandSetting.setSmsPushGiftCoupons(0);
+		}
+		if(brandSetting.getWechatPushGiftCoupons() == null){
+			brandSetting.setWechatPushGiftCoupons(0);
+		}
 		brandSettingService.update(brandSetting);
 		/*if(RedisUtil.get(getCurrentBrandId()+"setting") != null){
 			RedisUtil.remove(getCurrentBrandId()+"setting");
 		}*/
 		Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
+		RedisUtil.clean(brand.getId(), brand.getBrandSign());
 		ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
 		LogTemplateUtils.brandSettingEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
 

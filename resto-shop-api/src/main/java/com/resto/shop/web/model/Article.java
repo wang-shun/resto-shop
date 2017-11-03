@@ -156,6 +156,46 @@ public class Article implements Serializable{
 
     private String photoLittle;            //菜品类型2  小图存放地址
 
+    private Integer openCatty;             //是否开启称斤买卖菜品
+
+    private BigDecimal cattyMoney;         //称斤买卖 价格 单位（g）
+
+    private Integer needRemind;            //是否需要优先提醒添加此菜品
+
+    private String gifUrl;                 //gif图片路径
+
+    public Integer getNeedRemind() {
+        return needRemind;
+    }
+
+    public void setNeedRemind(Integer needRemind) {
+        this.needRemind = needRemind;
+    }
+
+    public String getGifUrl() {
+        return gifUrl;
+    }
+
+    public void setGifUrl(String gifUrl) {
+        this.gifUrl = gifUrl;
+    }
+
+    public Integer getOpenCatty() {
+        return openCatty;
+    }
+
+    public void setOpenCatty(Integer openCatty) {
+        this.openCatty = openCatty;
+    }
+
+    public BigDecimal getCattyMoney() {
+        return cattyMoney;
+    }
+
+    public void setCattyMoney(BigDecimal cattyMoney) {
+        this.cattyMoney = cattyMoney;
+    }
+
     public Integer getMonthlySales() {
         return monthlySales;
     }

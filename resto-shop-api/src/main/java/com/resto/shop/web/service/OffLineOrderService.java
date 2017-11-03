@@ -1,6 +1,7 @@
 package com.resto.shop.web.service;
 
 import com.resto.brand.core.generic.GenericService;
+import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.model.OffLineOrder;
 
 import java.util.Date;
@@ -13,6 +14,9 @@ public interface OffLineOrderService extends GenericService<OffLineOrder, String
 
     List<OffLineOrder> selectlistByTimeSourceAndShopId(String id, Date begin, Date end, int offlinePos);
 
+    List<OffLineOrder> selectlistByTimeSourceAndShopId(String id, String beginTime, String endTime, int offlinePos);
+
+
     /**
      * 查询一段时间内的订单的各项之和
      * @param offlinePos
@@ -24,4 +28,15 @@ public interface OffLineOrderService extends GenericService<OffLineOrder, String
     OffLineOrder selectSumByTimeSourceAndShopId(int offlinePos, String id, Date todayBegin, Date todayEnd);
 
 	OffLineOrder selectByTimeSourceAndShopId(int offlinePos, String id, Date dateBegin, Date dateEnd);
+
+    /**
+     * 查询线下店铺交易笔数
+     * @param currentBrandId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<OrderNumDto> selectOrderNumByTimeAndBrandId(String currentBrandId, String beginDate, String endDate);
+
+
 }

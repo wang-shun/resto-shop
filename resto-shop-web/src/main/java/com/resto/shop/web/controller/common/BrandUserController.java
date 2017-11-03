@@ -69,7 +69,7 @@ public class BrandUserController extends GenericController{
 
     /**
      * 用户登录
-     * 
+     *
      * @param brandUser
      * @param result
      * @return

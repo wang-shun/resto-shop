@@ -52,4 +52,6 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	List<OrderItem> selectRefundArticleItem(String orderId);
 
 	List<OrderItem> selectByArticleIds(String[] articleIds);
+
+	List<OrderItem> getOrderBefore(String tableNumber, String shopId, String customerId);
 }

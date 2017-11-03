@@ -16,6 +16,7 @@ import cn.restoplus.rpc.client.RpcProxy;
 
 @Configurable
 @ImportResource({"classpath:applicationContext.xml"})
+@Resource
 public class ServerConfig {
 	@Bean
 	public WechatConfigService wechatConfigService(){
@@ -173,6 +174,10 @@ public class ServerConfig {
 		return proxy.create(CloseShopService.class);
 	}
 
+    @Bean
+    public TemplateService templateService(){
+        return proxy.create(TemplateService.class);
+    }
 
 
 }

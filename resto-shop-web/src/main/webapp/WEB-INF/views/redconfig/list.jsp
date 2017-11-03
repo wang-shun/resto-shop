@@ -249,9 +249,9 @@
 //                        that.cancel();
 //                        tb.ajax.reload();
 //                    });
-					if(parseInt(that.m.maxRatio) <= parseInt(that.m.minRatio)){
+					if(parseInt(that.m.maxRatio) < parseInt(that.m.minRatio)){
 						toastr.clear();
-						toastr.error("最大比例不得小于等于最小比例！");
+						toastr.error("最大比例不得小于最小比例！");
 						return;
 					}
 					$.ajax({

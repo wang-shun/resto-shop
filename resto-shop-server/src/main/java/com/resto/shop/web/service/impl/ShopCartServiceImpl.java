@@ -51,6 +51,18 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     public Integer updateShopCart(ShopCart shopCart) {
         //先查询当前客户是否有该商品的 购物车的条目
         Integer number = shopCart.getNumber();
+        if(shopCart.getId() != null){
+            //更新购物车
+            //先找到这条记录
+            ShopCart shopCartItem = shopcartMapper.selectByPrimaryKey(shopCart.getId());
+            if(shopCartItem.getShopType().equals(ShopCarType.CAOBAO)){
+                shopCartItem.setNumber(shopCart.getNumber());
+                shopcartMapper.updateShopCartItem(shopCartItem);
+                shopcartMapper.delMealItem(shopCartItem.getId().toString());
+                return shopCartItem.getId();
+            }
+
+        }
         Integer oldNumber = new Integer(0);
         ShopCart shopCartItem = shopcartMapper.selectShopCartItem(shopCart);
         if(shopCartItem != null){
@@ -187,5 +199,10 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     @Override
     public void deleteByGroup(String groupId) {
         shopcartMapper.deleteByGroup(groupId);
+    }
+
+    @Override
+    public void updateShopCartByGroupId(String groupId) {
+        shopcartMapper.updateShopCartByGroupId(groupId);
     }
 }
