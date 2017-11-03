@@ -2355,6 +2355,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         //遍历 订单集合
         for (OrderItem item : articleList) {
+            if(item.getStatus() != 1){
+                continue;
+            }
             //得到当前菜品 所关联的厨房信息
             String articleId = item.getArticleId();
 
