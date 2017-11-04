@@ -321,10 +321,14 @@
 				},
 				downloadQRcode: function () {
 					var that = this;
-					$.post("shopDetailManage/openQRCode", {id: that.m.id}, function (data) {
-						window.open(data);
+					$.ajax({
+						url: "shopDetailManage/openQRCode",
+						type: "post",
+						data: {"shopId": this.m.id},
+						success: function (data) {
+							window.open(data);
+						}
 					})
-
 				},
 			}
 		});

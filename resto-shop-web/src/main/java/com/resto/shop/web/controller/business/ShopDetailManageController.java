@@ -9,8 +9,10 @@
  import com.resto.brand.web.model.Brand;
  import com.resto.brand.web.model.ShopDetail;
  import com.resto.brand.web.model.TableQrcode;
+ import com.resto.brand.web.model.WechatConfig;
  import com.resto.brand.web.service.BrandService;
  import com.resto.brand.web.service.ShopDetailService;
+ import com.resto.brand.web.service.WechatConfigService;
  import com.resto.shop.web.controller.GenericController;
  import com.resto.shop.web.util.LogTemplateUtils;
  import com.resto.shop.web.util.RedisUtil;
@@ -40,6 +42,9 @@
 
      @Resource
      BrandService brandService;
+
+     @Resource
+     WechatConfigService wechatConfigService;
 
      @RequestMapping("/list")
          public void list(){
@@ -190,4 +195,18 @@
          }
      }
 
+     @RequestMapping("openQRCode")
+     @ResponseBody
+     public String openQRCode(String shopId, HttpServletRequest request, HttpServletResponse response) throws IOException, WriterException {
+         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+         WechatConfig wechatConfig = wechatConfigService.selectByBrandId(shopDetail.getBrandId());
+         String token = WeChatUtils.getAccessToken(wechatConfig.getAppid(), wechatConfig.getAppsecret());
+         org.json.JSONObject qrParam = new org.json.JSONObject();
+         qrParam.put("QrCodeId", shopId);
+         String result = WeChatUtils.getParamQrCode(token, qrParam.toString());//二维码的附带参数字符串类型，长度不能超过64
+         org.json.JSONObject obj = new org.json.JSONObject(result);
+         String img = obj.has("ticket")?obj.getString("ticket"):"";
+         String conteng = WeChatUtils.showQrcode(img);
+         return conteng;
+     }
  }
