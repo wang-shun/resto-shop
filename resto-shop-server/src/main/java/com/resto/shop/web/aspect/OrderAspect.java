@@ -145,6 +145,8 @@ public class OrderAspect {
             }
             if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
                 orderBeforeService.updateState(order.getBeforeId(),1);
+                order.setParentOrderId(null);
+                orderService.update(order);
                 Order before = orderService.selectById(order.getBeforeId());
                 before.setOrderState(OrderState.CANCEL);
                 orderService.update(before);
@@ -625,6 +627,8 @@ public class OrderAspect {
 
         if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
             orderBeforeService.updateState(order.getBeforeId(),1);
+            order.setParentOrderId(null);
+            orderService.update(order);
             Order before = orderService.selectById(order.getBeforeId());
             before.setOrderState(OrderState.CANCEL);
             orderService.update(before);
