@@ -321,11 +321,10 @@
 				},
 				downloadQRcode: function () {
 					var that = this;
-					$.post("shopDetailManage/download", {id: that.m.id}, function (data) {
-						if (data.success) {
-							window.location.href = "shopDetailManage/downloadFile?fileName=" + data.message;
-						}
+					$.post("shopDetailManage/openQRCode", {id: that.m.id}, function (data) {
+						window.open(data);
 					})
+
 				},
 			}
 		});
