@@ -7903,7 +7903,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Brand brand = brandService.selectById(o.getBrandId());
             WechatConfig config = wechatConfigService.selectByBrandId(o.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
-            BrandSetting setting = brandSettingService.selectById(brand.getBrandSettingId())
+            BrandSetting setting = brandSettingService.selectById(brand.getBrandSettingId());
 
             // ------------------拼msg 推送消息start
 
