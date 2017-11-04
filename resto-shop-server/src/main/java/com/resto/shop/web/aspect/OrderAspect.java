@@ -146,7 +146,7 @@ public class OrderAspect {
             if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
                 orderBeforeService.updateState(order.getBeforeId(),1);
                 Order before = orderService.selectById(order.getBeforeId());
-                before.setOrderState(OrderState.PAYMENT);
+                before.setOrderState(OrderState.CANCEL);
                 orderService.update(before);
                 List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
                 if(!CollectionUtils.isEmpty(orderItems)){
@@ -626,7 +626,7 @@ public class OrderAspect {
         if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
             orderBeforeService.updateState(order.getBeforeId(),1);
             Order before = orderService.selectById(order.getBeforeId());
-            before.setOrderState(OrderState.PAYMENT);
+            before.setOrderState(OrderState.CANCEL);
             orderService.update(before);
             List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
             if(!CollectionUtils.isEmpty(orderItems)){
@@ -1170,6 +1170,10 @@ public class OrderAspect {
                         map.put("type", "UserAction");
                         map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                         doPostAnsc(LogUtils.url, map);
+                        //发送短信
+                        com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                        smsParam.put("name", brand.getBrandName());
+                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105945069");
                     }
                 }
             }
