@@ -146,7 +146,7 @@ public class OrderAspect {
             if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
                 orderBeforeService.updateState(order.getBeforeId(),1);
                 Order before = orderService.selectById(order.getBeforeId());
-                before.setOrderState(OrderState.CANCEL);
+                before.setOrderState(OrderState.PAYMENT);
                 orderService.update(before);
                 List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
                 if(!CollectionUtils.isEmpty(orderItems)){
@@ -626,7 +626,7 @@ public class OrderAspect {
         if(!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT){
             orderBeforeService.updateState(order.getBeforeId(),1);
             Order before = orderService.selectById(order.getBeforeId());
-            before.setOrderState(OrderState.CANCEL);
+            before.setOrderState(OrderState.PAYMENT);
             orderService.update(before);
             List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
             if(!CollectionUtils.isEmpty(orderItems)){
