@@ -425,7 +425,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             //如果这个订单已经被组里的人买单了，那么其他人不能在
-            if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30)){
+            if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1)){
                 String customerId =  String.valueOf(RedisUtil.get(order.getGroupId()+"pay"));
                 if(!customer.getId().equals(customerId)){
                     jsonResult.setSuccess(false);
