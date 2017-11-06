@@ -433,11 +433,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Boolean checkDuoren = MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30);
             log.info("分布式锁:"+checkDuoren);
             if(!checkDuoren){
-                jsonResult.setSuccess(false);
-                jsonResult.setMessage("该订单正在被"+RedisUtil.get(order.getGroupId()+"pay")+"支付中，请勿重复买单！");
+                String customerId =  String.valueOf(MemcachedUtils.get(order.getGroupId()+"pay"));
+                if(!customerId.equals(customer.getId())){
+                    jsonResult.setSuccess(false);
+                    Customer payer = customerService.selectById(customerId);
+                    jsonResult.setMessage("该订单正在被"+payer.getNickname()+"支付中，请勿重复买单！");
+                }
+
                 return jsonResult;
             }else{
-                RedisUtil.set(order.getGroupId()+"pay",customer.getNickname());
+                MemcachedUtils.put(order.getGroupId()+"pay",customer.getId(),30);
             }
         }
 
