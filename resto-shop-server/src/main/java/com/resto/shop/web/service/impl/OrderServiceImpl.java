@@ -1015,7 +1015,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     order.setTableNumber(parentOrder.getTableNumber());
                     order.setVerCode(parentOrder.getVerCode());
                     order.setCustomerCount(parentOrder.getCustomerCount());
-                } else if(StringUtils.isEmpty(order.getBeforeId())) {
+                } else if(StringUtils.isEmpty(order.getBeforeId()) &&  order.getOrderBefore() == null) {
                     Order lastOrder = orderMapper.getLastOrderByCustomer(customer.getId(), order.getShopDetailId(), brandSetting.getCloseContinueTime());
                     if (lastOrder != null && lastOrder.getParentOrderId() != null) {
                         Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
