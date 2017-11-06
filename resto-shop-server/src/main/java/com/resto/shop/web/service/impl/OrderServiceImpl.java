@@ -903,7 +903,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                CustomerCartPayMap.put("type", "UserAction");
 //                CustomerCartPayMap.put("content", "用户:"+customer.getNickname()+"使用银联支付了：" + item.getPayValue() +"订单Id为:"+order.getId()+",请求服务器地址为:" + MQSetting.getLocalIP());
 //                doPostAnsc(url, CustomerCartPayMap);
-                LogTemplateUtils.getBankByUserType(brand.getBrandName(), customer.getId(), customer.getNickname(), item.getPayValue());
+                LogTemplateUtils.getBankByUserType(brand.getBrandName(), order.getId(), customer.getNickname(), item.getPayValue());
                 order.setAllowContinueOrder(false);
             } else if (payMoney.compareTo(BigDecimal.ZERO) > 0 && order.getPayMode() == OrderPayMode.XJ_PAY) {
                 OrderPaymentItem item = new OrderPaymentItem();
@@ -923,7 +923,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                crashPayMap.put("content", "订单:"+order.getId()+"订单使用现金支付了：" + item.getPayValue() +",请求服务器地址为:" + MQSetting.getLocalIP());
 //                doPostAnsc(url, crashPayMap);
                 LogTemplateUtils.getMoneyByOrderType(brand.getBrandName(), order.getId(), item.getPayValue());
-                LogTemplateUtils.getMoneyByUserType(brand.getBrandName(), customer.getId(), customer.getNickname(), item.getPayValue());
+                LogTemplateUtils.getMoneyByUserType(brand.getBrandName(), order.getId(), customer.getNickname(), item.getPayValue());
 
 //                Map CustomerCrashPayMap = new HashMap(4);
 //                CustomerCrashPayMap.put("brandName", brand.getBrandName());
