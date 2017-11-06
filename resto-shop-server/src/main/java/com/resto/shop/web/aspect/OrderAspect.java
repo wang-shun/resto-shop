@@ -249,19 +249,16 @@ public class OrderAspect {
                 }
                 msg.append("<a href='" + url + "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
             }
-            try {
+            if(order.getGroupId() == null || "".equals(order.getGroupId())) {
                 String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-                //            log.info("订单支付完成后，发送客服消息:" + order.getId() + " -- " + result);
-                //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                //                    "订单发送推送：" + msg.toString());
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
                 map.put("fileName", customer.getId());
                 map.put("type", "UserAction");
                 map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                 doPostAnsc(LogUtils.url, map);
-            } catch (Exception e) {
-                log.error("发送客服消息失败:" + e.getMessage());
+            }else{
+                sendToGroupCustomerListMsg(order, msg.toString(), config, brand.getBrandName());
             }
         }else{
             if (order.getOrderMode() != null) {
@@ -477,20 +474,38 @@ public class OrderAspect {
                     content.put("keyword4", keyword4);
                     content.put("keyword5", keyword5);
                     content.put("remark", remark);
-                    String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
                     Brand brand = brandService.selectById(order.getBrandId());
-                    Map map = new HashMap(4);
-                    map.put("brandName", brand.getBrandName());
-                    map.put("fileName", customer.getId());
-                    map.put("type", "UserAction");
-                    map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(LogUtils.url, map);
-                    //发送短信
-                    com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                    smsParam.put("key1",order.getSerialNumber());
-                    smsParam.put("key2",shop.getName());
-                    smsParam.put("key3",order.getTableNumber());
-                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105880019");
+                    if(order.getGroupId() == null || "".equals(order.getGroupId())) {
+                        String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                        Map map = new HashMap(4);
+                        map.put("brandName", brand.getBrandName());
+                        map.put("fileName", customer.getId());
+                        map.put("type", "UserAction");
+                        map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPostAnsc(LogUtils.url, map);
+                        //发送短信
+                        com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                        smsParam.put("key1",order.getSerialNumber());
+                        smsParam.put("key2",shop.getName());
+                        smsParam.put("key3",order.getTableNumber());
+                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105880019");
+                    }else{
+                        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+                        for(Participant p : participants){
+                            Customer c = customerService.selectById(p.getCustomerId());
+                            String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                            Map map = new HashMap(4);
+                            map.put("brandName", brand.getBrandName());
+                            map.put("fileName", c.getId());
+                            map.put("type", "UserAction");
+                            map.put("content", "系统向用户:" + c.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                            doPostAnsc(LogUtils.url, map);
+                            //发送短信
+                            com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                            smsParam.put("name", brand.getBrandName());
+                            com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(c.getTelephone(),smsParam,"餐加","SMS_105880019");
+                        }
+                    }
                 }
             }
         }
@@ -1000,15 +1015,17 @@ public class OrderAspect {
                     }
                     msg.append("<a href='" + url + "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
                 }
-                String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-                //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                //                    "订单发送推送：" + msg.toString());
-                Map map = new HashMap(4);
-                map.put("brandName", brand.getBrandName());
-                map.put("fileName", customer.getId());
-                map.put("type", "UserAction");
-                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPostAnsc(LogUtils.url, map);
+                if(order.getGroupId() == null || "".equals(order.getGroupId())) {
+                    String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+                    Map map = new HashMap(4);
+                    map.put("brandName", brand.getBrandName());
+                    map.put("fileName", customer.getId());
+                    map.put("type", "UserAction");
+                    map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                    doPostAnsc(LogUtils.url, map);
+                }else{
+                    sendToGroupCustomerListMsg(order, msg.toString(), config, brand.getBrandName());
+                }
             }else{
                 List<TemplateFlow> templateFlowList = templateService.selectTemplateId(config.getAppid(), "OPENTM408705883");
                 String templateId = templateFlowList.get(0).getTemplateId();
@@ -1077,19 +1094,37 @@ public class OrderAspect {
                 content.put("keyword4", keyword4);
                 content.put("keyword5", keyword5);
                 content.put("remark", remark);
-                String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
-                Map map = new HashMap(4);
-                map.put("brandName", brand.getBrandName());
-                map.put("fileName", customer.getId());
-                map.put("type", "UserAction");
-                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                doPostAnsc(LogUtils.url, map);
-                //发送短信
-                com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                smsParam.put("key1",order.getSerialNumber());
-                smsParam.put("key2",shopDetail.getName());
-                smsParam.put("key3",order.getTableNumber());
-                com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105880019");
+                if(order.getGroupId() == null || "".equals(order.getGroupId())) {
+                    String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                    Map map = new HashMap(4);
+                    map.put("brandName", brand.getBrandName());
+                    map.put("fileName", customer.getId());
+                    map.put("type", "UserAction");
+                    map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                    doPostAnsc(LogUtils.url, map);
+                    //发送短信
+                    com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                    smsParam.put("key1",order.getSerialNumber());
+                    smsParam.put("key2",shopDetail.getName());
+                    smsParam.put("key3",order.getTableNumber());
+                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105880019");
+                }else{
+                    List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+                    for(Participant p : participants){
+                        Customer c = customerService.selectById(p.getCustomerId());
+                        String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                        Map map = new HashMap(4);
+                        map.put("brandName", brand.getBrandName());
+                        map.put("fileName", c.getId());
+                        map.put("type", "UserAction");
+                        map.put("content", "系统向用户:" + c.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPostAnsc(LogUtils.url, map);
+                        //发送短信
+                        com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                        smsParam.put("name", brand.getBrandName());
+                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(c.getTelephone(),smsParam,"餐加","SMS_105880019");
+                    }
+                }
             }
         }
     }
@@ -1166,14 +1201,14 @@ public class OrderAspect {
                         String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpurl, content, config.getAppid(), config.getAppsecret());
                         Map map = new HashMap(4);
                         map.put("brandName", brand.getBrandName());
-                        map.put("fileName", customer.getId());
+                        map.put("fileName", c.getId());
                         map.put("type", "UserAction");
-                        map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                        map.put("content", "系统向用户:" + c.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                         doPostAnsc(LogUtils.url, map);
                         //发送短信
                         com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
                         smsParam.put("name", brand.getBrandName());
-                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105945069");
+                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(c.getTelephone(),smsParam,"餐加","SMS_105945069");
                     }
                 }
             }
