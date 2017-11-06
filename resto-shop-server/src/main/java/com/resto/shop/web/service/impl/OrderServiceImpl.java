@@ -997,19 +997,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPrintTimes(0);
             //判断当前订单所在店铺的服务费类型  0：经典版  1：升级版
             if (Common.YES.equals(shopDetail.getServiceType())){ //如果是启用的升级版服务费则将其拆分(拆分为shop端店铺设置开启的餐具费、纸巾费、酱料费)
-                if (Common.YES.equals(shopDetail.getIsOpenSauceFee())){ //如果店铺开启了餐具费
-                    order.setSauceFeeCount(order.getCustomerCount());//将对应的就餐人数设置为餐具费的数量
-                    order.setSauceFeePrice(new BigDecimal(order.getSauceFeeCount()).multiply(shopDetail.getSauceFeePrice()));//餐具费价格等于数量乘以设置的单价
+                if (order.getCustomerCount() != null) {
+                    if (Common.YES.equals(shopDetail.getIsOpenSauceFee())) { //如果店铺开启了餐具费
+                        order.setSauceFeeCount(order.getCustomerCount());//将对应的就餐人数设置为餐具费的数量
+                        order.setSauceFeePrice(new BigDecimal(order.getSauceFeeCount()).multiply(shopDetail.getSauceFeePrice()));//餐具费价格等于数量乘以设置的单价
+                    }
+                    if (Common.YES.equals(shopDetail.getIsOpenTowelFee())) {//如果店铺开启了纸巾费
+                        order.setTowelFeeCount(order.getCustomerCount());
+                        order.setTowelFeePrice(new BigDecimal(order.getTowelFeeCount()).multiply(shopDetail.getTowelFeePrice()));
+                    }
+                    if (Common.YES.equals(shopDetail.getIsOpenTablewareFee())) {//如果店铺开启了酱料费
+                        order.setTablewareFeeCount(order.getCustomerCount());
+                        order.setTablewareFeePrice(new BigDecimal(order.getTablewareFeeCount()).multiply(shopDetail.getTablewareFeePrice()));
+                    }
+                    order.setIsUseNewService(Common.YES);
                 }
-                if (Common.YES.equals(shopDetail.getIsOpenTowelFee())){//如果店铺开启了纸巾费
-                    order.setTowelFeeCount(order.getCustomerCount());
-                    order.setTowelFeePrice(new BigDecimal(order.getTowelFeeCount()).multiply(shopDetail.getTowelFeePrice()));
-                }
-                if (Common.YES.equals(shopDetail.getIsOpenTablewareFee())){//如果店铺开启了酱料费
-                    order.setTablewareFeeCount(order.getCustomerCount());
-                    order.setTablewareFeePrice(new BigDecimal(order.getTablewareFeeCount()).multiply(shopDetail.getTablewareFeePrice()));
-                }
-                order.setIsUseNewService(Common.YES);
             }
             order.setOrderMode(detail.getShopMode());
             if (order.getOrderMode() == ShopMode.CALL_NUMBER) {
