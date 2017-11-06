@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.web.model.RefundRemark;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -256,6 +257,17 @@ public class Order implements Serializable{
     private Integer orderBefore;
 
     private String beforeId;
+
+    //新版服务费的集合 包括：餐具费、纸巾费、酱料费
+    private List<JSONObject> serviceList;
+
+    public List<JSONObject> getServiceList() {
+        return serviceList;
+    }
+
+    public void setServiceList(List<JSONObject> serviceList) {
+        this.serviceList = serviceList;
+    }
 
     public String getBeforeId() {
         return beforeId;
