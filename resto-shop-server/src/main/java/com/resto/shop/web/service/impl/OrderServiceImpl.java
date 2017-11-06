@@ -425,26 +425,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             //如果这个订单已经被组里的人买单了，那么其他人不能在
-            log.info("key:+++"+order.getShopDetailId()+order.getGroupId());
-            log.info(String.valueOf(MemcachedUtils.get(order.getShopDetailId()+order.getGroupId())));
-            Boolean checkDuoren;
-            if(MemcachedUtils.get(order.getShopDetailId()+order.getGroupId()) == null){
-               checkDuoren = true;
-            }else{
-                checkDuoren = false;
-            }
-            MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30);
-            MemcachedUtils.put(order.getShopDetailId()+order.getGroupId(),1,30);
-            log.info("分布式锁:"+checkDuoren);
-            if(!checkDuoren){
-                String customerId =  String.valueOf(MemcachedUtils.get(order.getGroupId()+"pay"));
+            if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30)){
+                String customerId =  String.valueOf(RedisUtil.get(order.getGroupId()+"pay"));
                 if(!customer.getId().equals(customerId)){
                     jsonResult.setSuccess(false);
-                    jsonResult.setMessage("该订单正在被支付中，请勿重复买单！");
+                    Customer payer = customerService.selectById(customerId);
+                    jsonResult.setMessage("该订单正在被"+payer.getNickname()+"支付中，请勿重复买单！");
                 }
                 return jsonResult;
             }else{
-                MemcachedUtils.put(order.getGroupId()+"pay",customer.getId());
+                RedisUtil.set(order.getGroupId()+"pay",customer.getId());
             }
         }
 
