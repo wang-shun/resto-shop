@@ -2445,6 +2445,7 @@ GROUP BY r.table_number
           or(order_mode = 6 ))
         and table_number is not null
         and allow_continue_order = 1
+        and order_state != 6
         order by create_time desc limit 1
     </select>
 
