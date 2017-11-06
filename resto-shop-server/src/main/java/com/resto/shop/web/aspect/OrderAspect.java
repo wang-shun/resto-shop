@@ -942,6 +942,7 @@ public class OrderAspect {
                 }
                 if (order.getPrintTimes() == 0) {
                     sendPaySuccessMsg(order);
+                    log.info("1\n2\n3\n4\n5\n6" + order.getId());
                 }
 
                 if (order.getOrderMode() != null) {
