@@ -436,10 +436,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 String customerId =  String.valueOf(MemcachedUtils.get(order.getGroupId()+"pay"));
                 if(!customerId.equals(customer.getId())){
                     jsonResult.setSuccess(false);
-                    Customer payer = customerService.selectById(customerId);
-                    jsonResult.setMessage("该订单正在被"+payer.getNickname()+"支付中，请勿重复买单！");
+                    jsonResult.setMessage("该订单正在被支付中，请勿重复买单！");
                 }
-
                 return jsonResult;
             }else{
                 MemcachedUtils.put(order.getGroupId()+"pay",customer.getId());
