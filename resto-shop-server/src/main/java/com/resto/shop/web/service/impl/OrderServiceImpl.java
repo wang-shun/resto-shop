@@ -775,6 +775,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal payMoney = totalMoney.add(order.getServicePrice());
         payMoney = payMoney.add(order.getMealFeePrice());
         if(!StringUtils.isEmpty(order.getBeforeId())){
+            order.setParentOrderId(null);
             //如果这个订单之前存在预点餐的餐品
             Order before = selectById(order.getBeforeId());
             payMoney = payMoney.add(before.getOrderMoney());
