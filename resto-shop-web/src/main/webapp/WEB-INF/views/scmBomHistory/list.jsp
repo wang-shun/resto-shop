@@ -6,14 +6,24 @@
     th,td{text-align: center;}
     #tableBodyLists th,#tableBodyLists td{line-height:2.5;}
 </style>
+
+
+
 <div id="control">
+
+        <a class="btn btn-info ajaxify" href="scmBom/list">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+
+
     <div class="row form-div" v-show="showform">
         <div class="col-md-offset-3 col-md-6" >
             <div class="portlet light bordered">
                 <div class="portlet-title">
-                    <div class="caption">
-                        <span class="caption-subject bold font-blue-hoki">新增BOM</span>
-                    </div>
+                    <%--<div class="caption">--%>
+                        <%--<span class="caption-subject bold font-blue-hoki">新增BOM</span>--%>
+                    <%--</div>--%>
                 </div>
 
                 <div class="portlet-body">
@@ -114,11 +124,10 @@
                                 </tr></thead>
                                 <tbody>
                                 <tr v-for="(index,item) in parameter.bomDetailDoList">
-
                                     <td>{{index+1}}</td>
                                     <td>{{item.materialCode}}</td>
-                                    <td>{{item.materialTypeShow?item.materialTypeShow:item.materialType}}</td>
-                                    <td>{{item.materialName}}</td>
+                                    <td>{{item.materialTypeShow}}</td>
+                                    <td>{{item.materialName}}{{item.name}}</td>
                                     <td>{{item.minMeasureUnit}}{{item.unitName}}/{{item.specName}}</td>
                                     <td>{{item.minMeasureUnit}}/{{item.minUnitName}}</td>
                                     <td><input style="width: 50px" type="text" v-model="item.materialCount" value="{{(item.materialCount?item.materialCount:1)}}" ></td>
@@ -155,22 +164,12 @@
                             <thead><tr>
                                 <th>行号</th>
                                 <th>原料编码</th>
-                                <th>原料类型</th>
-                                <th>原料名称</th>
-                                <th>规格</th>
-                                <th>最小单位</th>
-                                <th>最小单位数量</th>
-                                <th>操作</th>
+                                <th>原料类型</th><th>原料名称</th>
+                                <th>规格</th><th>最小单位</th><th>最小单位数量</th><th>操作</th>
                             </tr></thead>
                             <tbody>
                         <tr v-for="(index,item) in bomRawMaterial">
-                            <td>{{index+1}}</td>
-                            <td>{{item.materialCode}}</td>
-                            <td>{{item.materialType}}</td>
-                            <%--<td>{{item.materialName}}{{item.name}}</td>--%>
-                            <td>{{item.materialName}}</td>
-                            <td>{{item.unitName}}</td>
-                            <td>{{item.minMeasureUnit}}</td>
+                            <td>{{index+1}}</td><td>{{item.materialCode}}</td><td>{{item.materialType}}</td><td>{{item.materialName}}</td><td>{{item.unitName}}</td><td>{{item.minMeasureUnit}}</td>
                             <td><input style="width:50px;" type="text" v-model="materialCount" value="item.materialCount"></td><td><button class="btn btn-xs red">移除</button></td>
                         </tr>
                         </tbody>
@@ -187,9 +186,9 @@
     </div>
     <div class="table-div">
         <div class="table-operator">
-            <s:hasPermission name="scmBom/add">
-                <button class="btn green pull-right" @click="create">新建BOM</button>
-            </s:hasPermission>
+            <%--<s:hasPermission name="scmBom/add">--%>
+                <%--<button class="btn green pull-right" @click="create">新建BOM</button>--%>
+            <%--</s:hasPermission>--%>
         </div>
         <div class="clearfix"></div>
         <div class="table-filter"></div>
@@ -202,18 +201,18 @@
         </table>
     </div>
 </div>
+
 <!--树状图--><!--处理过的-->
 <link href="assets/treeview/themes/default/style.min.css" rel="stylesheet">
 <script src="assets/treeview/js/jstrestwo.js"></script>
 
 <script>
     (function(){
-
         var that = this;
         var tableBodyList = $("#tableBodyList>table");
         var tb = tableBodyList.DataTable({
             ajax : {
-                url : "scmBom/list_all",
+                url : "scmBomHistory/list_all",
                 dataSrc : "data",
                 type : "post",
                 data : function(data) {
@@ -222,43 +221,23 @@
             },
             //ordering: false,//取消上下排序
             columns : [
-//                {
-//                    title : "序号",
-//                    data : "priority",
-//                    orderable:true,
-//                },
-//                {
-//                    title: "菜品编码",
-//                    data : "articleId",
-//                    orderable:false,
-//                },
+
                 {
                     title : "菜品类别",
                     data : "familyName",
                     orderable:false,
                 },
-
                 {
                     title : "菜品名称",
                     data : "articleName",
                     orderable:false,
                 },
-                {
-                    title : "计量单位 ",
-                    data : "measurementUnit",
-                    orderable:false,
-                },
+
                 {
                     title: "版本号",
                     data: "version",
                     orderable:false,
                 },
-                {
-                    title: "最大版本号",
-                    data: "maxVersion",
-                    orderable:false,
-                },
-
                 {
                     title: "开始时间",
                     data: "startEffect",
@@ -289,6 +268,11 @@
                 ,
 
                 {
+                    title : "计量单位 ",
+                    data : "measurementUnit",
+                    orderable:false,
+                },
+                {
                     title : "原料种类",
                     data : "size",
                     orderable:false,
@@ -296,35 +280,32 @@
                         $(td).html(tdData+'种');
                     }
                 },
-                {
-                    title : "操作",
-                    data : "id",
-                    orderable:false,
-                    createdCell:function(td,tdData,rowData){
-                        var button = $("<a href='scmBomHistory/list?articleId="+rowData.articleId+"' class='btn btn-xs btn-primary ajaxify'>历史BOM</a>");
-                        var operator=[
-                            <s:hasPermission name="scmBom/edit">
-                            C.createScmBomEditBtn(rowData),
-                            </s:hasPermission>
-                            button,
-                        ];
-                        $(td).html(operator);
+                <%--{--%>
+                    <%--title : "操作",--%>
+                    <%--data : "id",--%>
+                    <%--orderable:false,--%>
+                    <%--createdCell:function(td,tdData,rowData){--%>
+                        <%--var operator=[--%>
+                            <%--<s:hasPermission name="scmBom/edit">--%>
+                            <%--C.createEditBtn(rowData),--%>
+                            <%--</s:hasPermission>--%>
+                        <%--];--%>
+                        <%--$(td).html(operator);--%>
 
-                    }
-                },
+                    <%--}--%>
+                <%--},--%>
                 {
                     data : "bomDetailDoList",
                     createdCell : function(td,tdData){
-                        var html='<tr>' +
-                                    '<th>行号</th>' +
-                                    '<th>原料编码</th>' +
-                                    '<th>原料类型</th>' +
-                                    '<th>原料名称</th>' +
-                                    '<th>规格</th>' +
-                                    '<th>最小单位</th>' +
-                                    '<th>最小单位数量</th>' +
-                                    '<th>主计量单位换算量</th>' +
-                               '</tr>';
+                        var html='<tr><th>行号</th>' +
+                            '<th>原料编码</th>' +
+                            '<th>原料类型</th>' +
+                            '<th>原料名称</th>' +
+                            '<th>规格</th>' +
+                            '<th>最小单位</th>' +
+                            '<th>最小单位数量</th>' +
+                            '<th>主计量单位换算量</th>' +
+                            '</tr>';
                         for(var i=0;i<tdData.length;i++){
                             switch(tdData[i].materialType){
                                 case 'INGREDIENTS':tdData[i].materialType='主料';break;
@@ -336,7 +317,7 @@
                                 '<td>'+tdData[i].materialCode+'</td>' +
                                 '<td>'+tdData[i].materialType+'</td>' +
                                 '<td>'+tdData[i].materialName+'</td>' +
-                                '<td>'+tdData[i].measureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td>' +
+                                '<td>'+tdData[i].minMeasureUnit+tdData[i].unitName+'/'+tdData[i].specName+'</td>' +
                                 '<td>'+tdData[i].minMeasureUnit+'/'+tdData[i].minUnitName+'</td>' +
                                 '<td>'+tdData[i].materialCount+'</td>' +
                                 '<td>'+(tdData[i].materialCount/tdData[i].coefficient).toFixed(4)+'</td>' +
@@ -424,7 +405,7 @@
                 edit:function(model){ //编辑打开弹窗
                     var that=this;
                     var articleIdZhi=model.articleId;
-
+                    debugger
                     this.parameter= model;
                     this.parameter.state=model.state;//状态 0-未启用 1-启用
                     this.parameter.bomDetailDeleteIds=[];
@@ -438,30 +419,25 @@
                 save:function(e){ //新增and编辑保存
                     var _this=this;
                     var savearr=[];
-                    debugger
                     for(var i=0;i<_this.parameter.bomDetailDoList.length;i++){
-                        debugger
                         savearr[i]={
                             id:_this.parameter.bomDetailDoList[i].id,
                             materialId:_this.parameter.bomDetailDoList[i].idTwo,
                             minMeasureUnit:_this.parameter.bomDetailDoList[i].minMeasureUnit,
                             unitName:_this.parameter.bomDetailDoList[i].unitName,
                             materialType:_this.parameter.bomDetailDoList[i].materialType,
-                            materialTypeShow:_this.parameter.bomDetailDoList[i].materialTypeShow,//修复提交失败原料类型为空
-                            materialName:_this.parameter.bomDetailDoList[i].materialName ,
+                            materialName:_this.parameter.bomDetailDoList[i].name,
                             specName:_this.parameter.bomDetailDoList[i].specName,
                             materialCode:_this.parameter.bomDetailDoList[i].materialCode,
                             lossFactor:_this.parameter.bomDetailDoList[i].lossFactor,
                             actLossFactor:_this.parameter.bomDetailDoList[i].actLossFactor,
                             materialCount:_this.parameter.bomDetailDoList[i].materialCount,
                             measurementUnit:_this.parameter.bomDetailDoList[i].measurementUnit,
-                            minUnitName:_this.parameter.bomDetailDoList[i].minUnitName,//修复提交失败最小单位为空
                             version:_this.parameter.bomDetailDoList[i].version,
                         }
                     }
-
                     _this.parameter.bomDetailDoList=savearr;
-                    var url='scmBom/modify';
+                    var url='scmBomHistory/modify';
                     if(!this.parameter.id) {
                         url='scmBom/create';
                         _this.parameter;
@@ -474,6 +450,7 @@
                     else if(_this.parameter.bomDetailDoList.length<=0) message='产品原料';
                     else if(!this.parameter.startEffect) message='开始时间';
                     else if(!this.parameter.endEffect) message='结束时间';
+                    else if(!this.parameter.producer) message='制作人';
                     else  submit=true;
                      debugger
                     if(this.parameter.state ='' ||!this.parameter.state){
@@ -489,84 +466,38 @@
                             message='请填写原料数量';
                         }
                     }
-
-                    if(url =="scmBom/modify"){
-                        $.get("scmBom/effectiveBomHead"+'?articleId='+_this.parameter.articleId,function (result) {
-                            C.confirmDialog((result.message != null && _this.parameter.state=='1') ? result.message:+ "你确定要启用改bom吗?" + ",你确定要启用改bom吗?", "提醒", function () {
-                                if(submit){
-                                    $.ajax({
-                                        type:"POST",
-                                        url:url,
-                                        contentType:"application/json",
-                                        datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
-                                        data:JSON.stringify(_this.parameter),
-                                        beforeSend:function(){ //请求之前执行
-                                            console.log("请求之前执行");
-                                            _this.showform=false;
-                                        },
-                                        success:function(data){ //成功后返回
-                                            console.log(data);
-                                            C.systemButtonNo('success','成功');
-                                        },
-                                        error: function(){ //失败后执行
-                                            C.systemButtonNo('error','失败');
-                                        }
-                                    });
-                                    this.parameter= {
-                                        bomDetailDoList:[],//bom原材料显示
-                                        bomDetailDeleteIds:[],//删除的list节点
-                                        bomCode:'',
-                                        productCode:'',
-                                        measurementUnit:'',
-                                        state:'',
-                                    };
-                                }else {
-                                    C.systemButtonNo('error','请填写'+message);
-                                }
-
-                            });
-
+                    if(submit){
+                        $.ajax({
+                            type:"POST",
+                            url:url,
+                            contentType:"application/json",
+                            datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
+                            data:JSON.stringify(_this.parameter),
+                            beforeSend:function(){ //请求之前执行
+                                console.log("请求之前执行");
+                                _this.showform=false;
+                            },
+                            success:function(data){ //成功后返回
+                                console.log(data);
+                                C.systemButtonNo('success','成功');
+                            },
+                            error: function(){ //失败后执行
+                                C.systemButtonNo('error','失败');
+                            }
                         });
-
-
-                    }else{
-                        if(submit){
-                            $.ajax({
-                                type:"POST",
-                                url:url,
-                                contentType:"application/json",
-                                datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
-                                data:JSON.stringify(_this.parameter),
-                                beforeSend:function(){ //请求之前执行
-                                    console.log("请求之前执行");
-                                    _this.showform=false;
-                                },
-                                success:function(data){ //成功后返回
-                                    console.log(data);
-                                    C.systemButtonNo('success','成功');
-                                },
-                                error: function(){ //失败后执行
-                                    C.systemButtonNo('error','失败');
-                                }
-                            });
-                            this.parameter= {
-                                bomDetailDoList:[],//bom原材料显示
-                                bomDetailDeleteIds:[],//删除的list节点
-                                bomCode:'',
-                                productCode:'',
-                                measurementUnit:'',
-                                state:'',
-                            };
-                        }else {
-                            _this.bomRawMaterial =_this.parameter.bomDetailDoList;
-                            C.systemButtonNo('error','请填写'+message);
-                        }
-
+                        this.parameter= {
+                            bomDetailDoList:[],//bom原材料显示
+                            bomDetailDeleteIds:[],//删除的list节点
+                            bomCode:'',
+                            productCode:'',
+                            measurementUnit:'',
+                            state:'',
+                        };
+                    }else {
+                        C.systemButtonNo('error','请填写'+message);
                     }
-
-
                 },
-                bomRawMaterialSub:function () { //添加原料保存  待优化
+                bomRawMaterialSub:function () { //添加原料保存
                     var originaldata=$('#assignTree').jstrestwo().get_bottom_checked(true);//拿到树状图中的数组
                     for(var i=0;i<originaldata.length;i++){
                         if(originaldata[i].original.materialType){
@@ -575,14 +506,12 @@
                     }
                     for(var i=0;i<this.bomRawMaterial.length;i++){
                         this.bomRawMaterial[i].materialId=this.bomRawMaterial[i].id;
-                        this.bomRawMaterial[i].materialName=this.bomRawMaterial[i].name;
                         delete this.bomRawMaterial[i].id;
                     }
                     for(var i=0;i<this.bomRawMaterial.length;i++){
                         var sta=true;
                         for(var j=0;j<this.parameter.bomDetailDoList.length;j++){
-                            if(this.bomRawMaterial[i].idTwo==this.parameter.bomDetailDoList[j].idTwo||this.bomRawMaterial[i].idTwo==this.parameter.bomDetailDoList[j].materialId)
-                                sta=false;
+                            if(this.bomRawMaterial[i].idTwo==this.parameter.bomDetailDoList[j].idTwo||this.bomRawMaterial[i].idTwo==this.parameter.bomDetailDoList[j].materialId) sta=false;
                         }
                         if(sta)this.parameter.bomDetailDoList.push(this.bomRawMaterial[i]);
                     }
@@ -641,28 +570,27 @@
 
             //vue实例化之后执行的方法
             created : function(){
-                $("#beginDate").datetimepicker({
-                    format: 'yyyy-mm-dd',
-                    minView:'month',
-                    language: 'zh-CN',
-                    autoclose:true
-                }).on("click",function(){
-                    $("#beginDate").datetimepicker("setEndDate",$("#endDate").val())
+                //初始化多选框按钮 和 时间插件
+                //时间默认值
+                $('.form_datetime').val(new Date().format("yyyy-mm-dd"));
+                //this.initTime();
+                $('.form_datetime').datetimepicker({
+                    //endDate : new Date(),
+                    //minView : "month",
+                    //maxView : "month",
+                    autoclose : true,//选择后自动关闭时间选择器
+                    todayBtn : true,//在底部显示 当天日期
+                    todayHighlight : true,//高亮当前日期
+                    format : "yyyy-mm-dd",
+                    //startView : "month",
+                    language : "zh-CN"
                 });
-                $("#endDate").datetimepicker({
-                    format: 'yyyy-mm-dd',
-                    minView:'month',
-                    language: 'zh-CN',
-                    autoclose:true
-                }).on("click",function(){
-                    $("#endDate").datetimepicker("setStartDate",$("#beginDate").val())
-                });
+
             },
         });
         C.vue=vueObj;
         $.get('scmCategory/query',function (jsonData) { //得到数据
             var defaultData=jsonData.data;//处理数据
-
             for(var i=0;i<defaultData.length;i++){
                 defaultData[i].idTwo = defaultData[i].id;
                 delete defaultData[i].id;

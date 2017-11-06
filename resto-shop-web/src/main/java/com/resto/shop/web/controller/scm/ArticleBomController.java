@@ -1,5 +1,7 @@
  package com.resto.shop.web.controller.scm;
 
+ import cn.restoplus.common.utils.ListUtil;
+ import com.alibaba.fastjson.JSONObject;
  import com.resto.brand.core.entity.Result;
  import com.resto.brand.web.model.BrandSetting;
  import com.resto.brand.web.service.BrandSettingService;
@@ -15,8 +17,9 @@
 
  import javax.annotation.Resource;
  import javax.validation.Valid;
+ import java.util.List;
 
-@Controller
+ @Controller
 @RequestMapping("scmBom")
 public class ArticleBomController extends GenericController{
 
@@ -29,14 +32,12 @@ public class ArticleBomController extends GenericController{
 
 	@RequestMapping("/list")
     public String list(){
-
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
 		if (brandSetting.getIsOpenScm().equals(Common.YES)){
 			return "scmBom/list";
 		}else {
 			return "notopen";
 		}
-
     }
 
 	@RequestMapping("/list_all")
@@ -51,6 +52,18 @@ public class ArticleBomController extends GenericController{
 		MdRulArticleBomHead articlebom = articlebomService.queryById(id);
 		return getSuccessResult(articlebom);
 	}
+	@RequestMapping("effectiveBomHead")
+	@ResponseBody
+	public Result effectiveBomHead(String articleId){
+		List<MdRulArticleBomHead> articleboms = articlebomService.findEffectiveBomHeadByState(getCurrentShopId(),articleId);
+
+		if(ListUtil.isNotEmpty(articleboms)){
+			return new Result("该供菜品存在有效的BOM清单："+articleboms.get(0).getBomCode(), 0, true);
+		}
+
+		return getSuccessResult(articleboms);
+	}
+
 
 	@RequestMapping("create")
 	@ResponseBody
@@ -67,13 +80,17 @@ public class ArticleBomController extends GenericController{
 
 	}
 
+
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid @RequestBody MdRulArticleBomHeadDo articlebom){
 		articlebom.setShopDetailId(this.getCurrentShopId());
+		articlebom.setCreaterId(this.getCurrentUserId());
+		articlebom.setCreaterName(getCurrentBrandUser().getName());
   		articlebomService.updateRulArticleBomHead(articlebom);
 		return Result.getSuccess();
 	}
+
 
 	@RequestMapping("delete")
 	@ResponseBody

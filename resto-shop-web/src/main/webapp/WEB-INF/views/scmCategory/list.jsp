@@ -115,7 +115,7 @@
     <div class="table-div">
         <div class="table-operator">
             <s:hasPermission name="scmSupplier/create">
-                <button class="btn green pull-right" @click="create">新增分类</button>
+                <button class="btn green pull-right" @click="create">新增品牌</button>
             </s:hasPermission>
         </div>
         <div class="clearfix"></div>

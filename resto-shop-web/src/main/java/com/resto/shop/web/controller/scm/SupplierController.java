@@ -44,8 +44,8 @@ public class SupplierController extends GenericController{
 
 	@RequestMapping("/list_all")
 	@ResponseBody
-	public Result listData(HttpServletRequest request){
-		return  getSuccessResult(supplierService.queryJoin4Page(getCurrentShopId()));
+	public Result listData(HttpServletRequest request,Integer state){
+		return  getSuccessResult(supplierService.queryJoin4Page(getCurrentShopId(),state));
 	}
 	
 	@RequestMapping("list_one")
