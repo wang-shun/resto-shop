@@ -106,7 +106,20 @@ public interface PosService {
 
     void syncChangeTable(String orderId,String tableNumber);
 
+    /**
+     * 开台，将桌位设置为占用状态
+     * @param shopId
+     * @param tableNumber
+     */
     void syncOpenTable(String shopId,String tableNumber);
+
+    /**
+     * 更新桌位状态（空闲或者锁定）
+     * @param shopId
+     * @param tableNumber
+     * @param state  false：锁定   true：释放
+     */
+    void syncTableState(String shopId,String tableNumber,boolean state);
 
 
 

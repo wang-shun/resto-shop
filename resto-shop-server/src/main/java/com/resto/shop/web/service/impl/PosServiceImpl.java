@@ -156,6 +156,7 @@ public class PosServiceImpl implements PosService {
         jsonObject.put("dataType", "orderPay");
         jsonObject.put("orderId",order.getId());
         jsonObject.put("payMode", order.getPayMode());
+        jsonObject.put("isPosPay", order.getIsPosPay());
         List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
         List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
         for(OrderPaymentItem  paymentItem: payItemsList){
@@ -483,4 +484,10 @@ public class PosServiceImpl implements PosService {
     public void syncOpenTable(String shopId,String tableNumber) {
         RedisUtil.set(shopId+tableNumber+"status",false);
     }
+
+    @Override
+    public void syncTableState(String shopId, String tableNumber, boolean state) {
+        RedisUtil.set(shopId+tableNumber+"status", state);
+    }
+
 }

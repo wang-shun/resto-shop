@@ -49,6 +49,7 @@ public class OrderDto implements Serializable {
         this.servicePrice = order.getServicePrice();
         this.mealAllNumber = order.getMealAllNumber();
         this.mealFeePrice = order.getMealFeePrice();
+        this.isPosPay = order.getIsPosPay();
     }
 
     //订单id
@@ -103,6 +104,8 @@ public class OrderDto implements Serializable {
     private BigDecimal paymentAmount;
     //用户id
     private String customerId;
+    //是否是Pos支付
+    private Integer isPosPay;
 
     private String customerAddressId;
 
@@ -382,5 +385,13 @@ public class OrderDto implements Serializable {
 
     public void setPrintOrderTime(Long printOrderTime) {
         this.printOrderTime = printOrderTime;
+    }
+
+    public Integer getIsPosPay() {
+        return isPosPay;
+    }
+
+    public void setIsPosPay(Integer isPosPay) {
+        this.isPosPay = isPosPay;
     }
 }
