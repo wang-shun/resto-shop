@@ -442,7 +442,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                 return jsonResult;
             }else{
-                MemcachedUtils.put(order.getGroupId()+"pay",customer.getId(),30);
+                MemcachedUtils.put(order.getGroupId()+"pay",customer.getId());
             }
         }
 
