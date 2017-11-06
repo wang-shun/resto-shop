@@ -987,19 +987,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPrintTimes(0);
             //判断当前订单所在店铺的服务费类型  0：经典版  1：升级版
             if (Common.YES.equals(shopDetail.getServiceType())){ //如果是启用的升级版服务费则将其拆分(拆分为shop端店铺设置开启的餐具费、纸巾费、酱料费)
-                if (Common.YES.equals(shopDetail.getIsOpenSauceFee())){ //如果店铺开启了餐具费
-                    order.setSauceFeeCount(order.getCustomerCount());//将对应的就餐人数设置为餐具费的数量
-                    order.setSauceFeePrice(new BigDecimal(order.getSauceFeeCount()).multiply(shopDetail.getSauceFeePrice()));//餐具费价格等于数量乘以设置的单价
+                if (order.getCustomerCount() != null) {
+                    if (Common.YES.equals(shopDetail.getIsOpenSauceFee())) { //如果店铺开启了餐具费
+                        order.setSauceFeeCount(order.getCustomerCount());//将对应的就餐人数设置为餐具费的数量
+                        order.setSauceFeePrice(new BigDecimal(order.getSauceFeeCount()).multiply(shopDetail.getSauceFeePrice()));//餐具费价格等于数量乘以设置的单价
+                    }
+                    if (Common.YES.equals(shopDetail.getIsOpenTowelFee())) {//如果店铺开启了纸巾费
+                        order.setTowelFeeCount(order.getCustomerCount());
+                        order.setTowelFeePrice(new BigDecimal(order.getTowelFeeCount()).multiply(shopDetail.getTowelFeePrice()));
+                    }
+                    if (Common.YES.equals(shopDetail.getIsOpenTablewareFee())) {//如果店铺开启了酱料费
+                        order.setTablewareFeeCount(order.getCustomerCount());
+                        order.setTablewareFeePrice(new BigDecimal(order.getTablewareFeeCount()).multiply(shopDetail.getTablewareFeePrice()));
+                    }
+                    order.setIsUseNewService(Common.YES);
                 }
-                if (Common.YES.equals(shopDetail.getIsOpenTowelFee())){//如果店铺开启了纸巾费
-                    order.setTowelFeeCount(order.getCustomerCount());
-                    order.setTowelFeePrice(new BigDecimal(order.getTowelFeeCount()).multiply(shopDetail.getTowelFeePrice()));
-                }
-                if (Common.YES.equals(shopDetail.getIsOpenTablewareFee())){//如果店铺开启了酱料费
-                    order.setTablewareFeeCount(order.getCustomerCount());
-                    order.setTablewareFeePrice(new BigDecimal(order.getTablewareFeeCount()).multiply(shopDetail.getTablewareFeePrice()));
-                }
-                order.setIsUseNewService(Common.YES);
             }
             order.setOrderMode(detail.getShopMode());
             if (order.getOrderMode() == ShopMode.CALL_NUMBER) {
@@ -4405,13 +4407,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order == null) {
             return null;
         }
-        if (BigDecimal.ZERO.compareTo(order.getServicePrice()) > 0){//订单产生了服务费
+        if (BigDecimal.ZERO.compareTo(order.getServicePrice()) < 0){//订单产生了服务费
             List<com.alibaba.fastjson.JSONObject> objectList = new ArrayList<>();
             com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());//查询出该笔订单所在店铺
             if (Common.YES.equals(order.getIsUseNewService())){ //如果该笔订单产生的是新版服务费
                 if (order.getSauceFeeCount() != null && order.getSauceFeeCount() > 0){ //产生餐具费
-                    jsonObject.put("id", shopDetail.getId());
+                    jsonObject.put("id", shopDetail.getId() + "10");
                     jsonObject.put("type", 10);
                     jsonObject.put("name", shopDetail.getSauceFeeName());
                     jsonObject.put("count", order.getSauceFeeCount());//产生数量
@@ -4420,7 +4422,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 if (order.getTowelFeeCount() != null && order.getTowelFeeCount() > 0){ //产生纸巾费
                     jsonObject = new com.alibaba.fastjson.JSONObject();
-                    jsonObject.put("id", shopDetail.getId());
+                    jsonObject.put("id", shopDetail.getId() + "11");
                     jsonObject.put("type", 11);
                     jsonObject.put("name", shopDetail.getTowelFeeName());
                     jsonObject.put("count", order.getTowelFeeCount());//产生数量
@@ -4429,7 +4431,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 if (order.getTablewareFeeCount() != null && order.getTablewareFeeCount() > 0){ //产生酱料费
                     jsonObject = new com.alibaba.fastjson.JSONObject();
-                    jsonObject.put("id", shopDetail.getId());
+                    jsonObject.put("id", shopDetail.getId() + "12");
                     jsonObject.put("type", 12);
                     jsonObject.put("name", shopDetail.getTablewareFeeName());
                     jsonObject.put("count", order.getTablewareFeeCount());//产生数量
@@ -7969,7 +7971,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         o.setMealAllNumber(mealCount);
         o.setArticleCount(o.getArticleCount() - Integer.parseInt(RedisUtil.get(o.getId() + "ItemCount").toString()));
 //        o.setPaymentAmount(total.add(o.getServicePrice()));
-        o.setOriginalAmount(origin.add(shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount() != null ? o.getCustomerCount() : 0))));
+        //这里不知道为什么会怎么写， 正常情况下 o.getServicePrice() = shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount()))
+//        o.setOriginalAmount(origin.add(shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount() != null ? o.getCustomerCount() : 0))));
+        o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {
             o.setAmountWithChildren(o.getAmountWithChildren().subtract(order.getRefundMoney()));
