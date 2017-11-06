@@ -8033,176 +8033,165 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Brand brand = brandService.selectById(o.getBrandId());
             WechatConfig config = wechatConfigService.selectByBrandId(o.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
-            BrandSetting setting = brandSettingService.selectById(brand.getBrandSettingId());
+            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+            for(Customer customer : customerList) {
+                if (setting.getTemplateEdition() == 0) {
+                    StringBuilder msg = new StringBuilder("亲，您");
+                    msg.append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("的订单已完成退菜，相关款项")
+                            .append("会在24小时内退还至您的微信账户，请注意查收！\n");
+                    msg.append("订单编号:\n");
+                    msg.append(o.getSerialNumber()).append("\n");
+                    msg.append("桌号:").append(o.getTableNumber()).append("\n");
+                    msg.append("店铺名:").append(shopDetail.getName()).append("\n");
+                    msg.append("订单时间:").append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("\n");
+                    //        msg.append("订单明细:").append("\n");
+                    BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
+                    //        if (o.getCustomerCount() != null && o.getCustomerCount() != 0) {
+                    //            msg.append("\t").append(brandSetting.getServiceName()).append("X").append(o.getBaseCustomerCount()).append("\n");
+                    //        }
+                    //
+                    //        List<OrderItem> totalItem = new ArrayList<>();
+                    //        List<String> childs = orderMapper.selectChildIdsByParentId(o.getId());
+                    //        if (!CollectionUtils.isEmpty(childs)) {
+                    //            List<OrderItem> item = orderitemMapper.listByOrderIds(childs);
+                    //            totalItem.addAll(item);
+                    //        }
+                    //        totalItem.addAll(o.getOrderItems());
+                    //
 
-            // ------------------拼msg 推送消息start
 
-            StringBuilder msg = new StringBuilder("亲，您");
-            msg.append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("的订单已完成退菜，相关款项")
-                    .append("会在24小时内退还至您的微信账户，请注意查收！\n");
-            msg.append("订单编号:\n");
-            msg.append(o.getSerialNumber()).append("\n");
-            msg.append("桌号:").append(o.getTableNumber()).append("\n");
-            msg.append("店铺名:").append(shopDetail.getName()).append("\n");
-            msg.append("订单时间:").append(DateFormatUtils.format(o.getCreateTime(), "yyyy-MM-dd HH:mm")).append("\n");
-//        msg.append("订单明细:").append("\n");
-//            BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
-//        if (o.getCustomerCount() != null && o.getCustomerCount() != 0) {
-//            msg.append("\t").append(brandSetting.getServiceName()).append("X").append(o.getBaseCustomerCount()).append("\n");
-//        }
-//        List<OrderItem> totalItem = new ArrayList<>();
-//        List<String> childs = orderMapper.selectChildIdsByParentId(o.getId());
-//        if (!CollectionUtils.isEmpty(childs)) {
-//            List<OrderItem> item = orderitemMapper.listByOrderIds(childs);
-//            totalItem.addAll(item);
-//        }
-//        totalItem.addAll(o.getOrderItems());
-//        for (OrderItem orderItem : totalItem) {
-//            if (orderItem.getCount() != 0)
-//                msg.append("\t").append(orderItem.getArticleName()).append("X").append(orderItem.getCount()).append("\n");
-//        }
-//        msg.append("订单金额:").append(o.getAmountWithChildren().doubleValue() != 0.0 ? o.getAmountWithChildren() : o.getOrderMoney()).append("\n");
-            msg.append("退菜明细:").append("\n");
-//        if (o.getBaseCustomerCount() != null && o.getBaseCustomerCount() != o.getCustomerCount()) {
-//            msg.append("\t").append(brandSetting.getServiceName()).append("X").append(o.getBaseCustomerCount() - o.getCustomerCount()).append("\n");
-//        }
-//        for (OrderItem orderItem : o.getOrderItems()) {
-//            if (orderItem.getRefundCount() > 0) {
-//                msg.append("\t").append(orderItem.getArticleName()).append("X").append(orderItem.getRefundCount()).append("\n");
-//            }
-//        }
-            for (OrderItem orderItem : order.getOrderItems()) {
-                if (orderItem.getType().equals(ArticleType.ARTICLE)) {//退的是菜
-                    OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
-                    msg.append("\t").append(item.getArticleName()).append("X").append(orderItem.getCount()).append("\n");
-                    if (item.getType() == OrderItemType.SETMEALS) {
-                        List<OrderItem> child = orderitemMapper.getListByParentId(item.getId());
-                        for (OrderItem c : child) {
-                            //                childItem.setArticleName("|__" + childItem.getArticleName());
-                            msg.append("\t").append("|__").append(c.getArticleName()).append("X").append(c.getRefundCount()).append("\n");
-                        }
-                    }
-                } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) { //老版服务费
-                    msg.append("\t").append(shopDetail.getServiceName()).append("X").append(orderItem.getCount()).append("\n");
-                } else if (orderItem.getType().equals(ArticleType.SAUCE_FEE_PRICE)){ //餐具费
-                    msg.append("\t").append(shopDetail.getSauceFeeName()).append("X").append(orderItem.getCount()).append("\n");
-                } else if (orderItem.getType().equals(ArticleType.TOWEL_FEE_PRICE)){ //纸巾费
-                    msg.append("\t").append(shopDetail.getTowelFeeName()).append("X").append(orderItem.getCount()).append("\n");
-                } else if (orderItem.getType().equals(ArticleType.TABLEWARE_FEE_PRICE)){ //酱料费
-                    msg.append("\t").append(shopDetail.getTablewareFeeName()).append("X").append(orderItem.getCount()).append("\n");
-                }
-            }
-            msg.append("退菜金额:").append(order.getRefundMoney()).append("\n");
-            // ------------------拼msg 推送消息end
-            for(Customer customer : customerList){
-                if(setting.getTemplateEdition()==0){
-                    WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-                    Map customerMap = new HashMap(4);
-                    customerMap.put("brandName", brand.getBrandName());
-                    customerMap.put("fileName", customer.getId());
-                    customerMap.put("type", "UserAction");
-                    customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(LogUtils.url, customerMap);
-                    Map map = new HashMap(4);
-                    map.put("brandName", brand.getBrandName());
-                    map.put("fileName", shopDetail.getName());
-                    map.put("type", "posAction");
-                    map.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(url, map);
-                    Map orderMap = new HashMap(4);
-                    orderMap.put("brandName", brand.getBrandName());
-                    orderMap.put("fileName", order.getId());
-                    orderMap.put("type", "orderAction");
-                    orderMap.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(url, orderMap);
-                }else{
-                    List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM203022210");
-                    String templateId = templateFlowList.get(0).getTemplateId();
-                    String jumpUrl ="";
-                    Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
-                    Map<String, Object> first = new HashMap<String, Object>();
-                    first.put("value", "您好，您的订单已完成退菜！");
-                    first.put("color", "#00DB00");
-                    Map<String, Object> keyword1 = new HashMap<String, Object>();
-                    keyword1.put("value", shopDetail.getName());
-                    keyword1.put("color", "#000000");
-                    Map<String, Object> keyword2 = new HashMap<String, Object>();
-                    keyword2.put("value", o.getTableNumber());
-                    keyword2.put("color", "#000000");
-                    Map<String, Object> keyword3 = new HashMap<String, Object>();
-                    for (int i=0; i<(order.getOrderItems().size() > 5 ? 6 : order.getOrderItems().size()); i++) {
-                        OrderItem orderItem1 = order.getOrderItems().get(i);
-                        if (orderItem1.getType().equals(ArticleType.ARTICLE)) {
-                            OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem1.getId());
-                            msg.append("\t").append(item.getArticleName()).append("×").append(orderItem1.getCount()).append("\n");
+                    //        for (OrderItem orderItem : totalItem) {
+                    //
+                    //
+                    //            if (orderItem.getCount() != 0)
+                    //                msg.append("\t").append(orderItem.getArticleName()).append("X").append(orderItem.getCount()).append("\n");
+                    //        }
+                    //        msg.append("订单金额:").append(o.getAmountWithChildren().doubleValue() != 0.0 ? o.getAmountWithChildren() : o.getOrderMoney()).append("\n");
+                    msg.append("退菜明细:").append("\n");
+
+                    //        if (o.getBaseCustomerCount() != null && o.getBaseCustomerCount() != o.getCustomerCount()) {
+                    //            msg.append("\t").append(brandSetting.getServiceName()).append("X").append(o.getBaseCustomerCount() - o.getCustomerCount()).append("\n");
+                    //        }
+                    //        for (OrderItem orderItem : o.getOrderItems()) {
+                    //            if (orderItem.getRefundCount() > 0) {
+                    //                msg.append("\t").append(orderItem.getArticleName()).append("X").append(orderItem.getRefundCount()).append("\n");
+                    //            }
+                    //        }
+                    for (OrderItem orderItem : order.getOrderItems()) {
+                        if (orderItem.getType().equals(ArticleType.ARTICLE)) {
+                            OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem.getId());
+                            msg.append("\t").append(item.getArticleName()).append("X").append(orderItem.getCount()).append("\n");
                             if (item.getType() == OrderItemType.SETMEALS) {
                                 List<OrderItem> child = orderitemMapper.getListByParentId(item.getId());
                                 for (OrderItem c : child) {
                                     //                childItem.setArticleName("|__" + childItem.getArticleName());
-                                    msg.append("\t").append("|__").append(c.getArticleName()).append("×").append(c.getRefundCount()).append("\n");
+                                    msg.append("\t").append("|__").append(c.getArticleName()).append("X").append(c.getRefundCount()).append("\n");
                                 }
                             }
 
-                        } else if (orderItem1.getType().equals(ArticleType.SERVICE_PRICE)) {
-                            msg.append("\t").append(shopDetail.getServiceName()).append("×").append(orderItem1.getCount()).append("\n");
-                        } else if (orderItem1.getType().equals(ArticleType.SAUCE_FEE_PRICE)){ //餐具费
-                            msg.append("\t").append(shopDetail.getSauceFeeName()).append("X").append(orderItem1.getCount()).append("\n");
-                        } else if (orderItem1.getType().equals(ArticleType.TOWEL_FEE_PRICE)){ //纸巾费
-                            msg.append("\t").append(shopDetail.getTowelFeeName()).append("X").append(orderItem1.getCount()).append("\n");
-                        } else if (orderItem1.getType().equals(ArticleType.TABLEWARE_FEE_PRICE)){ //酱料费
-                            msg.append("\t").append(shopDetail.getTablewareFeeName()).append("X").append(orderItem1.getCount()).append("\n");
+                        } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
+                            msg.append("\t").append(shopDetail.getServiceName()).append("X").append(orderItem.getCount()).append("\n");
                         }
-                        if(order.getOrderItems().size()>5){
-                            msg.append("...");
-                        }
-
                     }
-                    keyword3.put("value", msg.toString());
-                    keyword3.put("color", "#000000");
-                    Map<String, Object> keyword4 = new HashMap<String, Object>();
-                    keyword4.put("value", "共"+order.getOrderItems().size()+"份");
-                    keyword4.put("color", "#000000");
-                    Map<String, Object> keyword5 = new HashMap<String, Object>();
-                    keyword5.put("value",DateUtil.formatDate(new Date(),"yyyy-MM-dd HH:mm:ss"));
-                    keyword5.put("color", "#000000");
-                    Map<String, Object> remark = new HashMap<String, Object>();
-                    remark.put("value", "相关款项会在24小时内退还至您的账户，请注意查收！");
-                    remark.put("color", "#173177");
-                    content.put("first", first);
-                    content.put("keyword1", keyword1);
-                    content.put("keyword2", keyword2);
-                    content.put("keyword3", keyword3);
-                    content.put("keyword4", keyword4);
-                    content.put("keyword5", keyword5);
-                    content.put("remark", remark);
-                    String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
-                    Map customerMap = new HashMap(4);
-                    customerMap.put("brandName", brand.getBrandName());
-                    customerMap.put("fileName", customer.getId());
-                    customerMap.put("type", "UserAction");
-                    customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(LogUtils.url, customerMap);
-                    Map map = new HashMap(4);
-                    map.put("brandName", brand.getBrandName());
-                    map.put("fileName", shopDetail.getName());
-                    map.put("type", "posAction");
-                    map.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(url, map);
-                    Map orderMap = new HashMap(4);
-                    orderMap.put("brandName", brand.getBrandName());
-                    orderMap.put("fileName", order.getId());
-                    orderMap.put("type", "orderAction");
-                    orderMap.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                    doPostAnsc(url, orderMap);
-                    //发送短信
-                    com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                    smsParam.put("number",order.getSerialNumber());
-                    smsParam.put("name",shopDetail.getName());
-                    smsParam.put("tablenumber",o.getTableNumber());
-                    smsParam.put("count","共"+order.getOrderItems().size()+"份");
-                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105745031");
-                }
+                    msg.append("退菜金额:").append(order.getRefundMoney()).append("\n");
 
+                    WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+
+                    //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
+                    //                "订单发送推送：" + msg.toString());
+                } else {
+                    List<TemplateFlow> templateFlowList = templateService.selectTemplateId(config.getAppid(), "OPENTM203022210");
+                    if (templateFlowList != null && templateFlowList.size() != 0) {
+                        String templateId = templateFlowList.get(0).getTemplateId();
+                        String jumpUrl = "";
+                        Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+                        Map<String, Object> first = new HashMap<String, Object>();
+                        first.put("value", "您好，您的订单已完成退菜！");
+                        first.put("color", "#00DB00");
+                        Map<String, Object> keyword1 = new HashMap<String, Object>();
+                        keyword1.put("value", shopDetail.getName());
+                        keyword1.put("color", "#000000");
+                        Map<String, Object> keyword2 = new HashMap<String, Object>();
+                        keyword2.put("value", o.getTableNumber());
+                        keyword2.put("color", "#000000");
+                        Map<String, Object> keyword3 = new HashMap<String, Object>();
+                        StringBuffer msg = new StringBuffer();
+                        for (int i = 0; i < (order.getOrderItems().size() > 5 ? 6 : order.getOrderItems().size()); i++) {
+                            OrderItem orderItem1 = order.getOrderItems().get(i);
+                            if (orderItem1.getType().equals(ArticleType.ARTICLE)) {
+                                OrderItem item = orderitemMapper.selectByPrimaryKey(orderItem1.getId());
+                                msg.append("\t").append(item.getArticleName()).append("×").append(orderItem1.getCount()).append("\n");
+                                if (item.getType() == OrderItemType.SETMEALS) {
+                                    List<OrderItem> child = orderitemMapper.getListByParentId(item.getId());
+                                    for (OrderItem c : child) {
+                                        //                childItem.setArticleName("|__" + childItem.getArticleName());
+                                        msg.append("\t").append("|__").append(c.getArticleName()).append("×").append(c.getRefundCount()).append("\n");
+                                    }
+                                }
+
+                            } else if (orderItem1.getType().equals(ArticleType.SERVICE_PRICE)) {
+                                msg.append("\t").append(shopDetail.getServiceName()).append("×").append(orderItem1.getCount()).append("\n");
+                            }
+                            if (order.getOrderItems().size() > 5) {
+                                msg.append("...");
+                            }
+
+                        }
+                        keyword3.put("value", msg.toString());
+                        keyword3.put("color", "#000000");
+                        Map<String, Object> keyword4 = new HashMap<String, Object>();
+                        keyword4.put("value", "共" + order.getOrderItems().size() + "份");
+                        keyword4.put("color", "#000000");
+                        Map<String, Object> keyword5 = new HashMap<String, Object>();
+                        keyword5.put("value", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+                        keyword5.put("color", "#000000");
+                        Map<String, Object> remark = new HashMap<String, Object>();
+                        remark.put("value", "相关款项会在24小时内退还至您的账户，请注意查收！");
+                        remark.put("color", "#173177");
+                        content.put("first", first);
+                        content.put("keyword1", keyword1);
+                        content.put("keyword2", keyword2);
+                        content.put("keyword3", keyword3);
+                        content.put("keyword4", keyword4);
+                        content.put("keyword5", keyword5);
+                        content.put("remark", remark);
+                        String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                        Map customerMap = new HashMap(4);
+                        customerMap.put("brandName", brand.getBrandName());
+                        customerMap.put("fileName", customer.getId());
+                        customerMap.put("type", "UserAction");
+                        customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPostAnsc(LogUtils.url, customerMap);
+                        Map map = new HashMap(4);
+                        map.put("brandName", brand.getBrandName());
+                        map.put("fileName", shopDetail.getName());
+                        map.put("type", "posAction");
+                        map.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPostAnsc(url, map);
+                        Map orderMap = new HashMap(4);
+                        orderMap.put("brandName", brand.getBrandName());
+                        orderMap.put("fileName", order.getId());
+                        orderMap.put("type", "orderAction");
+                        orderMap.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPostAnsc(url, orderMap);
+                        //发送短信
+                        if (setting.getMessageSwitch() == 1) {
+                            com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                            smsParam.put("number", order.getSerialNumber());
+                            smsParam.put("name", shopDetail.getName());
+                            smsParam.put("tablenumber", o.getTableNumber());
+                            smsParam.put("count", "共" + order.getOrderItems().size() + "份");
+                            com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105745031");
+                        }
+                    } else {
+                        Map map = new HashMap(4);
+                        map.put("brandName", brand.getBrandName());
+                        map.put("fileName", customer.getId());
+                        map.put("type", "UserAction");
+                        map.put("content", "系统数据库表tb_template_flow不存在模板消息的template_id,请求服务器地址为:" + MQSetting.getLocalIP());
+                        doPostAnsc(LogUtils.url, map);
+                    }
+                }
             }
         }
     }
