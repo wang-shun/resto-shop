@@ -4407,13 +4407,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order == null) {
             return null;
         }
-        if (BigDecimal.ZERO.compareTo(order.getServicePrice()) > 0){//订单产生了服务费
+        if (BigDecimal.ZERO.compareTo(order.getServicePrice()) < 0){//订单产生了服务费
             List<com.alibaba.fastjson.JSONObject> objectList = new ArrayList<>();
             com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());//查询出该笔订单所在店铺
             if (Common.YES.equals(order.getIsUseNewService())){ //如果该笔订单产生的是新版服务费
                 if (order.getSauceFeeCount() != null && order.getSauceFeeCount() > 0){ //产生餐具费
-                    jsonObject.put("id", shopDetail.getId());
+                    jsonObject.put("id", shopDetail.getId() + "10");
                     jsonObject.put("type", 10);
                     jsonObject.put("name", shopDetail.getSauceFeeName());
                     jsonObject.put("count", order.getSauceFeeCount());//产生数量
@@ -4422,7 +4422,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 if (order.getTowelFeeCount() != null && order.getTowelFeeCount() > 0){ //产生纸巾费
                     jsonObject = new com.alibaba.fastjson.JSONObject();
-                    jsonObject.put("id", shopDetail.getId());
+                    jsonObject.put("id", shopDetail.getId() + "11");
                     jsonObject.put("type", 11);
                     jsonObject.put("name", shopDetail.getTowelFeeName());
                     jsonObject.put("count", order.getTowelFeeCount());//产生数量
@@ -4431,7 +4431,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 if (order.getTablewareFeeCount() != null && order.getTablewareFeeCount() > 0){ //产生酱料费
                     jsonObject = new com.alibaba.fastjson.JSONObject();
-                    jsonObject.put("id", shopDetail.getId());
+                    jsonObject.put("id", shopDetail.getId() + "12");
                     jsonObject.put("type", 12);
                     jsonObject.put("name", shopDetail.getTablewareFeeName());
                     jsonObject.put("count", order.getTablewareFeeCount());//产生数量

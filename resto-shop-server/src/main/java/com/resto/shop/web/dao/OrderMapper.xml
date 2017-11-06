@@ -198,7 +198,7 @@
         <result column="towel_fee_price" property="towelFeePrice"/>
         <result column="tableware_fee_count" property="tablewareFeeCount"/>
         <result column="tableware_fee_price" property="tablewareFeePrice"/>
-        <result column="" property=""/>
+        <result column="is_use_new_service" property="isUseNewService"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
