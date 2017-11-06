@@ -15,8 +15,8 @@ import com.resto.scm.web.model.DocPmsPoHeader;
 import com.resto.scm.web.service.DocPmsPoHeaderService;
 
 @Controller
-@RequestMapping("docPmsPoHeader")
-public class DocPmsPoHeaderController extends GenericController{
+@RequestMapping("scmDocPmsPoHeader")
+public class ScmDocPmsPoHeaderController extends GenericController{
 
 	@Resource
 	DocPmsPoHeaderService docPmsPoHeaderService;
@@ -33,7 +33,7 @@ public class DocPmsPoHeaderController extends GenericController{
 	
 	@RequestMapping("list_one")
 	@ResponseBody
-	public Result list_one(Integer id){
+	public Result list_one(Long id){
 		DocPmsPoHeader docPmsPoHeader = docPmsPoHeaderService.selectById(id);
 		return getSuccessResult(docPmsPoHeader);
 	}
@@ -54,8 +54,8 @@ public class DocPmsPoHeaderController extends GenericController{
 	
 	@RequestMapping("delete")
 	@ResponseBody
-	public Result delete(Integer id){
-		docPmsPoHeaderService.delete(id);
+	public Result delete(Long id){
+		docPmsPoHeaderService.deleteById(id);
 		return Result.getSuccess();
 	}
 }
