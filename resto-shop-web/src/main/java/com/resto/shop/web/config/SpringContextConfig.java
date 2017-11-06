@@ -595,6 +595,13 @@ public class SpringContextConfig {
         return proxy.create(ArticleBomHeadHistoryService.class);
     }
 
+    @Bean
+    public DocPmsPoHeaderService docPmsPoHeaderService(){
+        return proxy.create(DocPmsPoHeaderService.class);
+    }
+
+
+
 
     //------------scm server config end-----------
 

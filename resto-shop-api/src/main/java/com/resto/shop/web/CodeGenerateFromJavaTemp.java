@@ -46,12 +46,12 @@ public class CodeGenerateFromJavaTemp {
 		 * 实体类型 主键  和  表名
 		 */
 		String [][]  classPrimay = new String[][]{
-		new String[]{"MaterialStock","Long","doc_material_stock"},
-		new String[]{"ArticleBom","Long","md_rul_article_bom_head"},
-		new String[]{"upplier","Long","md_supplier"},
-		new String[]{"SupplierPrice","Long","md_supplier_price_head"},
-		new String[]{"MaterialStock","Long","doc_material_stock"},
-		new String[]{"StockInPlan","Long","doc_stk_in_plan_header"},
+			//		new String[]{"MaterialStock","Long","doc_material_stock"},
+			//		new String[]{"ArticleBom","Long","md_rul_article_bom_head"},
+			//		new String[]{"upplier","Long","md_supplier"},
+			//		new String[]{"SupplierPrice","Long","md_supplier_price_head"},
+			//		new String[]{"MaterialStock","Long","doc_material_stock"},
+			//		new String[]{"StockInPlan","Long","doc_stk_in_plan_header"},
 		};
 
 
