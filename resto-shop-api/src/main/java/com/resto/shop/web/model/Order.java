@@ -309,7 +309,7 @@ public class Order implements Serializable{
 
     private Integer towelFeeCount;
 
-    private BigDecimal towelFeeFeePrice;
+    private BigDecimal towelFeePrice;
 
     private Integer tablewareFeeCount;
 
@@ -341,12 +341,13 @@ public class Order implements Serializable{
         this.towelFeeCount = towelFeeCount;
     }
 
-    public BigDecimal getTowelFeeFeePrice() {
-        return towelFeeFeePrice;
+
+    public BigDecimal getTowelFeePrice() {
+        return towelFeePrice;
     }
 
-    public void setTowelFeeFeePrice(BigDecimal towelFeeFeePrice) {
-        this.towelFeeFeePrice = towelFeeFeePrice;
+    public void setTowelFeePrice(BigDecimal towelFeePrice) {
+        this.towelFeePrice = towelFeePrice;
     }
 
     public Integer getTablewareFeeCount() {

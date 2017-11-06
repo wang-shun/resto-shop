@@ -993,7 +993,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 if (Common.YES.equals(shopDetail.getIsOpenTowelFee())){//如果店铺开启了纸巾费
                     order.setTowelFeeCount(order.getCustomerCount());
-                    order.setTowelFeeFeePrice(new BigDecimal(order.getTowelFeeCount()).multiply(shopDetail.getTowelFeePrice()));
+                    order.setTowelFeePrice(new BigDecimal(order.getTowelFeeCount()).multiply(shopDetail.getTowelFeePrice()));
                 }
                 if (Common.YES.equals(shopDetail.getIsOpenTablewareFee())){//如果店铺开启了酱料费
                     order.setTablewareFeeCount(order.getCustomerCount());
@@ -4424,7 +4424,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     jsonObject.put("type", 11);
                     jsonObject.put("name", shopDetail.getTowelFeeName());
                     jsonObject.put("count", order.getTowelFeeCount());//产生数量
-                    jsonObject.put("unitPrice", order.getTowelFeeFeePrice().divide(new BigDecimal(order.getTowelFeeCount())));//单价
+                    jsonObject.put("unitPrice", order.getTowelFeePrice().divide(new BigDecimal(order.getTowelFeeCount())));//单价
                     objectList.add(jsonObject);
                 }
                 if (order.getTablewareFeeCount() != null && order.getTablewareFeeCount() > 0){ //产生酱料费
@@ -7658,7 +7658,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 BigDecimal refundPrice = new BigDecimal(refundCount).multiply(orderItem.getUnitPrice()); //退掉的金额
                 serviceOrder.setId(order.getId());
                 serviceOrder.setTowelFeeCount(order.getTowelFeeCount() - refundCount);//减去订单中的纸巾数量
-                serviceOrder.setTowelFeeFeePrice(order.getTowelFeeFeePrice().subtract(refundPrice));//减去订单中的纸巾费
+                serviceOrder.setTowelFeePrice(order.getTowelFeePrice().subtract(refundPrice));//减去订单中的纸巾费
                 serviceOrder.setServicePrice(order.getServicePrice().subtract(refundPrice));
                 update(serviceOrder);
                 Map map = new HashMap(4);
