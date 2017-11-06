@@ -426,7 +426,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             //如果这个订单已经被组里的人买单了，那么其他人不能在
             log.info("key:+++"+order.getShopDetailId()+order.getGroupId());
-            if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30)){
+            Boolean checkDuoren = MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30);
+            log.info("分布式锁:"+checkDuoren);
+            if(!checkDuoren){
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("该订单正在被"+RedisUtil.get(order.getGroupId()+"pay")+"支付中，请勿重复买单！");
                 return jsonResult;
