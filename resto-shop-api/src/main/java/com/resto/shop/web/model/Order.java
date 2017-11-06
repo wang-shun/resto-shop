@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.web.model.RefundRemark;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -257,6 +258,17 @@ public class Order implements Serializable{
 
     private String beforeId;
 
+    //新版服务费的集合 包括：餐具费、纸巾费、酱料费
+    private List<JSONObject> serviceList;
+
+    public List<JSONObject> getServiceList() {
+        return serviceList;
+    }
+
+    public void setServiceList(List<JSONObject> serviceList) {
+        this.serviceList = serviceList;
+    }
+
     public String getBeforeId() {
         return beforeId;
     }
@@ -290,6 +302,76 @@ public class Order implements Serializable{
     }
 
     private String groupId;
+
+    private Integer sauceFeeCount;
+
+    private BigDecimal sauceFeePrice;
+
+    private Integer towelFeeCount;
+
+    private BigDecimal towelFeeFeePrice;
+
+    private Integer tablewareFeeCount;
+
+    private BigDecimal tablewareFeePrice;
+
+    private Integer isUseNewService;
+
+    public Integer getSauceFeeCount() {
+        return sauceFeeCount;
+    }
+
+    public void setSauceFeeCount(Integer sauceFeeCount) {
+        this.sauceFeeCount = sauceFeeCount;
+    }
+
+    public BigDecimal getSauceFeePrice() {
+        return sauceFeePrice;
+    }
+
+    public void setSauceFeePrice(BigDecimal sauceFeePrice) {
+        this.sauceFeePrice = sauceFeePrice;
+    }
+
+    public Integer getTowelFeeCount() {
+        return towelFeeCount;
+    }
+
+    public void setTowelFeeCount(Integer towelFeeCount) {
+        this.towelFeeCount = towelFeeCount;
+    }
+
+    public BigDecimal getTowelFeeFeePrice() {
+        return towelFeeFeePrice;
+    }
+
+    public void setTowelFeeFeePrice(BigDecimal towelFeeFeePrice) {
+        this.towelFeeFeePrice = towelFeeFeePrice;
+    }
+
+    public Integer getTablewareFeeCount() {
+        return tablewareFeeCount;
+    }
+
+    public void setTablewareFeeCount(Integer tablewareFeeCount) {
+        this.tablewareFeeCount = tablewareFeeCount;
+    }
+
+    public BigDecimal getTablewareFeePrice() {
+        return tablewareFeePrice;
+    }
+
+    public void setTablewareFeePrice(BigDecimal tablewareFeePrice) {
+        this.tablewareFeePrice = tablewareFeePrice;
+    }
+
+    public Integer getIsUseNewService() {
+        return isUseNewService;
+    }
+
+    public void setIsUseNewService(Integer isUseNewService) {
+        this.isUseNewService = isUseNewService;
+    }
 
     public Integer getTag() {
         return tag;
