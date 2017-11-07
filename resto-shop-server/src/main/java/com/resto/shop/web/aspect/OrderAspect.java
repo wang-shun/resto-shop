@@ -227,8 +227,20 @@ public class OrderAspect {
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
 
             //BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-            if (setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getServicePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 1) {
-                msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
+            if (order.getServicePrice().compareTo(BigDecimal.ZERO) > 0) { //如果产生了服务费
+                if (order.getIsUseNewService().equals(Common.YES)){ //如果开通了新版服务费
+                    if (order.getSauceFeeCount() != null && order.getSauceFeeCount() > 0){ //产生了餐具费
+                        msg.append(shopDetail.getSauceFeeName() + "：" + order.getSauceFeePrice() + "\n");
+                    }
+                    if (order.getTowelFeeCount() != null && order.getTowelFeeCount() > 0){ //产生了纸巾费
+                        msg.append(shopDetail.getTowelFeeName() + "：" + order.getTowelFeePrice() + "\n");
+                    }
+                    if (order.getTablewareFeeCount() != null && order.getTablewareFeeCount() > 0){ //产生了酱料费
+                        msg.append(shopDetail.getTablewareFeeName() + "：" + order.getTablewareFeePrice());
+                    }
+                }else { //旧版服务费
+                    msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
+                }
             }
             if (setting.getIsMealFee() == 1 && order.getMealFeePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1) {
                 msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
