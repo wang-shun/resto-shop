@@ -566,6 +566,7 @@ public class SpringContextConfig {
     public ArticleBomHeadService articleBomHeadService(){
         return proxy.create(ArticleBomHeadService.class);
     }
+
     @Bean
     public StockCountCheckService stockCountCheckService(){
         return proxy.create(StockCountCheckService.class);
@@ -588,6 +589,17 @@ public class SpringContextConfig {
     public MaterialStockService materialStockService(){
         return proxy.create(MaterialStockService.class);
     }
+
+    @Bean
+    public ArticleBomHeadHistoryService articleBomHeadHistoryService(){
+        return proxy.create(ArticleBomHeadHistoryService.class);
+    }
+
+    @Bean
+    public DocPmsPoHeaderService docPmsPoHeaderService(){
+        return proxy.create(DocPmsPoHeaderService.class);
+    }
+
 
 
 

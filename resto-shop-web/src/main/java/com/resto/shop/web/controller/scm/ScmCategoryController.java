@@ -31,14 +31,12 @@ public class ScmCategoryController extends GenericController {
 
     @RequestMapping("/list")
     public String list(){
-
         BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
         if (brandSetting.getIsOpenScm().equals(Common.YES)){
             return "scmCategory/list";
         }else {
             return "notopen";
         }
-
     }
 
     @RequestMapping("/query")

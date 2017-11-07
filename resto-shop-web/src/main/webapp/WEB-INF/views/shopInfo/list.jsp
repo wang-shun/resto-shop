@@ -584,7 +584,7 @@
 					</div>
 					<!-- 服务费升级版end -->
 
-                    <! -- 第三方接口appid-->
+                    <!-- 第三方接口appid-->
                     <div  class="form-group" v-if="b.openThirdInterface==1">
                         <label class="col-md-4 control-label">第三方接口appid：</label>
                         <div class="col-sm-6">
