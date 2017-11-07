@@ -504,6 +504,14 @@ public class PosServiceImpl implements PosService {
         orderRefundRemarkService.posSyncDeleteByOrderId(orderId);
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(orderDto.getShopDetailId());
+        syncPosLocalOrder(orderDto, shopDetail);
+        for(OrderDto childrenOrderDto : orderDto.getChildrenOrders()){
+            syncPosLocalOrder(childrenOrderDto, shopDetail);
+        }
+        return true;
+    }
+
+    public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
         Order order = new Order(orderDto);
         order.setOrderMode(shopDetail.getShopMode());
         order.setReductionAmount(BigDecimal.valueOf(0));
@@ -528,7 +536,5 @@ public class PosServiceImpl implements PosService {
         for(OrderRefundRemark orderRefundRemark: orderRefundRemarks){
             orderRefundRemarkService.insert(orderRefundRemark);
         }
-        return true;
     }
-
 }

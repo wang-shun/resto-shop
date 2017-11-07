@@ -122,6 +122,8 @@ public class OrderDto implements Serializable {
 
     private BigDecimal mealFeePrice;
 
+    private List<OrderDto> childrenOrders;
+
     private List<OrderRefundRemark> orderRefundRemarks;
 
     public Integer getMealAllNumber() {
@@ -404,5 +406,13 @@ public class OrderDto implements Serializable {
 
     public void setOrderRefundRemarks(List<OrderRefundRemark> orderRefundRemarks) {
         this.orderRefundRemarks = orderRefundRemarks;
+    }
+
+    public List<OrderDto> getChildrenOrders() {
+        return childrenOrders;
+    }
+
+    public void setChildrenOrders(List<OrderDto> childrenOrders) {
+        this.childrenOrders = childrenOrders;
     }
 }
