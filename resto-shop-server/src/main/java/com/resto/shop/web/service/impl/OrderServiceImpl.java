@@ -7026,21 +7026,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal ARTICLE_COUNT = flg ? updateCount.abs() : updateCount.multiply(new BigDecimal(-1));
             BigDecimal SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getSauceFeePrice());
             if (!flg) {
-                order.setServicePrice(order.getServicePrice().subtract(shopDetail.getSauceFeePrice().multiply(ARTICLE_COUNT.abs())));
-                order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
-                order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
-                order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
+                BigDecimal refundMoney = shopDetail.getSauceFeePrice().multiply(ARTICLE_COUNT.abs()); //减掉的金额
+                order.setServicePrice(order.getServicePrice().subtract(refundMoney)); //减去此次剪掉的餐具费
+                order.setPaymentAmount(order.getPaymentAmount().subtract(refundMoney));
+                order.setOrderMoney(order.getOrderMoney().subtract(refundMoney));
+                order.setOriginalAmount(order.getOriginalAmount().subtract(refundMoney));
                 if (order.getAmountWithChildren().doubleValue() > 0) {
-                    order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
+                    order.setAmountWithChildren(order.getAmountWithChildren().subtract(refundMoney));
                 }
             }else {
-                order.setServicePrice(order.getServicePrice().add(shopDetail.getSauceFeePrice().multiply(ARTICLE_COUNT)));
-                order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
-                order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
+                BigDecimal addMoney = shopDetail.getSauceFeePrice().multiply(ARTICLE_COUNT); //增加的金额
+                order.setServicePrice(order.getServicePrice().add(addMoney));
+                order.setPaymentAmount(order.getPaymentAmount().add(addMoney));
+                order.setOrderMoney(order.getOrderMoney().add(addMoney));
+                order.setOriginalAmount(order.getOriginalAmount().add(addMoney));
                 if (order.getAmountWithChildren().doubleValue() > 0) {
-                    order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
+                    order.setAmountWithChildren(order.getAmountWithChildren().add(addMoney));
                 }
-                order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
             }
             update(order);
             if (flg){
@@ -7079,21 +7081,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal ARTICLE_COUNT = flg ? updateCount.abs() : updateCount.multiply(new BigDecimal(-1));
             BigDecimal SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getTowelFeePrice());
             if (!flg) {
-                order.setServicePrice(order.getServicePrice().subtract(shopDetail.getTowelFeePrice().multiply(ARTICLE_COUNT.abs())));
-                order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
+                BigDecimal refundMoney = shopDetail.getTowelFeePrice().multiply(ARTICLE_COUNT.abs());
+                order.setServicePrice(order.getServicePrice().subtract(refundMoney));
+                order.setPaymentAmount(order.getPaymentAmount().subtract(refundMoney));
+                order.setOrderMoney(order.getOrderMoney().subtract(refundMoney));
+                order.setOriginalAmount(order.getOriginalAmount().subtract(refundMoney));
                 if (order.getAmountWithChildren().doubleValue() > 0) {
-                    order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
+                    order.setAmountWithChildren(order.getAmountWithChildren().subtract(refundMoney));
                 }
-                order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
-                order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
             }else {
-                order.setServicePrice(order.getServicePrice().add(shopDetail.getTowelFeePrice().multiply(ARTICLE_COUNT)));
-                order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
-                order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
+                BigDecimal addMoney = shopDetail.getTowelFeePrice().multiply(ARTICLE_COUNT);
+                order.setServicePrice(order.getServicePrice().add(addMoney));
+                order.setPaymentAmount(order.getPaymentAmount().add(addMoney));
+                order.setOrderMoney(order.getOrderMoney().add(addMoney));
+                order.setOriginalAmount(order.getOriginalAmount().add(addMoney));
                 if (order.getAmountWithChildren().doubleValue() > 0) {
-                    order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
+                    order.setAmountWithChildren(order.getAmountWithChildren().add(addMoney));
                 }
-                order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
             }
             update(order);
             if (flg){
@@ -7132,21 +7136,23 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal ARTICLE_COUNT = flg ? updateCount.abs() : updateCount.multiply(new BigDecimal(-1));
             BigDecimal SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getTablewareFeePrice());
             if (!flg) {
-                order.setServicePrice(order.getServicePrice().subtract(shopDetail.getTablewareFeePrice().multiply(ARTICLE_COUNT.abs())));
-                order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
+                BigDecimal refundMoney = shopDetail.getTablewareFeePrice().multiply(ARTICLE_COUNT.abs());
+                order.setServicePrice(order.getServicePrice().subtract(refundMoney));
+                order.setPaymentAmount(order.getPaymentAmount().subtract(refundMoney));
                 if (order.getAmountWithChildren().doubleValue() > 0) {
-                    order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
+                    order.setAmountWithChildren(order.getAmountWithChildren().subtract(refundMoney));
                 }
-                order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
-                order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
+                order.setOrderMoney(order.getOrderMoney().subtract(refundMoney));
+                order.setOriginalAmount(order.getOriginalAmount().subtract(refundMoney));
             }else {
-                order.setServicePrice(order.getServicePrice().add(shopDetail.getTablewareFeePrice().multiply(ARTICLE_COUNT)));
-                order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
-                order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
+                BigDecimal addMoney = shopDetail.getTablewareFeePrice().multiply(ARTICLE_COUNT);
+                order.setServicePrice(order.getServicePrice().add(addMoney));
+                order.setPaymentAmount(order.getPaymentAmount().add(addMoney));
+                order.setOrderMoney(order.getOrderMoney().add(addMoney));
                 if (order.getAmountWithChildren().doubleValue() > 0) {
-                    order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
+                    order.setAmountWithChildren(order.getAmountWithChildren().add(addMoney));
                 }
-                order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
+                order.setOriginalAmount(order.getOriginalAmount().add(addMoney));
             }
             update(order);
             if (flg){
