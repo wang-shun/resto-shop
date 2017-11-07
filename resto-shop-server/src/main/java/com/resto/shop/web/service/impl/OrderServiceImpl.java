@@ -8242,8 +8242,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 }
                             }
 
-                        } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
-                            msg.append("\t").append(shopDetail.getServiceName()).append("X").append(orderItem.getCount()).append("\n");
                         } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) { //老版服务费
                             msg.append("\t").append(shopDetail.getServiceName()).append("X").append(orderItem.getCount()).append("\n");
                         } else if (orderItem.getType().equals(ArticleType.SAUCE_FEE_PRICE)){ //餐具费
