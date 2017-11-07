@@ -7027,21 +7027,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getSauceFeePrice());
             if (!flg) {
                 order.setServicePrice(order.getServicePrice().subtract(shopDetail.getSauceFeePrice().multiply(ARTICLE_COUNT.abs())));
+                order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
+                order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
+                order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
+                if (order.getAmountWithChildren().doubleValue() > 0) {
+                    order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
+                }
             }else {
                 order.setServicePrice(order.getServicePrice().add(shopDetail.getSauceFeePrice().multiply(ARTICLE_COUNT)));
+                order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
+                order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
+                if (order.getAmountWithChildren().doubleValue() > 0) {
+                    order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
+                }
+                order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
             }
-            order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
-            if (order.getAmountWithChildren().doubleValue() > 0) {
-                order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
-            }
-            order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
-            order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
-            order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
-            order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
-            if (order.getAmountWithChildren().doubleValue() > 0) {
-                order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
-            }
-            order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
             update(order);
             if (flg){
                 order.setDistributionModeId(DistributionType.MODIFY_ORDER); //加菜
@@ -7080,21 +7080,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getTowelFeePrice());
             if (!flg) {
                 order.setServicePrice(order.getServicePrice().subtract(shopDetail.getTowelFeePrice().multiply(ARTICLE_COUNT.abs())));
+                order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
+                if (order.getAmountWithChildren().doubleValue() > 0) {
+                    order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
+                }
+                order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
+                order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
             }else {
                 order.setServicePrice(order.getServicePrice().add(shopDetail.getTowelFeePrice().multiply(ARTICLE_COUNT)));
+                order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
+                order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
+                if (order.getAmountWithChildren().doubleValue() > 0) {
+                    order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
+                }
+                order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
             }
-            order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
-            if (order.getAmountWithChildren().doubleValue() > 0) {
-                order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
-            }
-            order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
-            order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
-            order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
-            order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
-            if (order.getAmountWithChildren().doubleValue() > 0) {
-                order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
-            }
-            order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
             update(order);
             if (flg){
                 order.setDistributionModeId(DistributionType.MODIFY_ORDER); //加菜
@@ -7133,21 +7133,21 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             BigDecimal SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getTablewareFeePrice());
             if (!flg) {
                 order.setServicePrice(order.getServicePrice().subtract(shopDetail.getTablewareFeePrice().multiply(ARTICLE_COUNT.abs())));
+                order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
+                if (order.getAmountWithChildren().doubleValue() > 0) {
+                    order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
+                }
+                order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
+                order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
             }else {
                 order.setServicePrice(order.getServicePrice().add(shopDetail.getTablewareFeePrice().multiply(ARTICLE_COUNT)));
+                order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
+                order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
+                if (order.getAmountWithChildren().doubleValue() > 0) {
+                    order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
+                }
+                order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
             }
-            order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
-            if (order.getAmountWithChildren().doubleValue() > 0) {
-                order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
-            }
-            order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
-            order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
-            order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
-            order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
-            if (order.getAmountWithChildren().doubleValue() > 0) {
-                order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
-            }
-            order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
             update(order);
             if (flg){
                 order.setDistributionModeId(DistributionType.MODIFY_ORDER); //加菜
