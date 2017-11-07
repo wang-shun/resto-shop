@@ -8244,6 +8244,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                         } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) {
                             msg.append("\t").append(shopDetail.getServiceName()).append("X").append(orderItem.getCount()).append("\n");
+                        } else if (orderItem.getType().equals(ArticleType.SERVICE_PRICE)) { //老版服务费
+                            msg.append("\t").append(shopDetail.getServiceName()).append("X").append(orderItem.getCount()).append("\n");
+                        } else if (orderItem.getType().equals(ArticleType.SAUCE_FEE_PRICE)){ //餐具费
+                            msg.append("\t").append(shopDetail.getSauceFeeName()).append("X").append(orderItem.getCount()).append("\n");
+                        } else if (orderItem.getType().equals(ArticleType.TOWEL_FEE_PRICE)){ //纸巾费
+                            msg.append("\t").append(shopDetail.getTowelFeeName()).append("X").append(orderItem.getCount()).append("\n");
+                        } else if (orderItem.getType().equals(ArticleType.TABLEWARE_FEE_PRICE)){ //酱料费
+                            msg.append("\t").append(shopDetail.getTablewareFeeName()).append("X").append(orderItem.getCount()).append("\n");
                         }
                     }
                     msg.append("退菜金额:").append(order.getRefundMoney()).append("\n");
@@ -8284,6 +8292,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
                             } else if (orderItem1.getType().equals(ArticleType.SERVICE_PRICE)) {
                                 msg.append("\t").append(shopDetail.getServiceName()).append("×").append(orderItem1.getCount()).append("\n");
+                            } else if (orderItem1.getType().equals(ArticleType.SAUCE_FEE_PRICE)){ //餐具费
+                                msg.append("\t").append(shopDetail.getSauceFeeName()).append("X").append(orderItem1.getCount()).append("\n");
+                            } else if (orderItem1.getType().equals(ArticleType.TOWEL_FEE_PRICE)){ //纸巾费
+                                msg.append("\t").append(shopDetail.getTowelFeeName()).append("X").append(orderItem1.getCount()).append("\n");
+                            } else if (orderItem1.getType().equals(ArticleType.TABLEWARE_FEE_PRICE)){ //酱料费
+                                msg.append("\t").append(shopDetail.getTablewareFeeName()).append("X").append(orderItem1.getCount()).append("\n");
                             }
                             if (order.getOrderItems().size() > 5) {
                                 msg.append("...");
