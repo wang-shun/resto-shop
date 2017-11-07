@@ -7060,7 +7060,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
             }
-            pushMessage.append(shopDetail.getServiceName() + "  " + message);
+            pushMessage.append(shopDetail.getSauceFeeName() + "  " + message);
             map.put("content", shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId()
                     + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(url, map);
@@ -7113,7 +7113,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
             }
-            pushMessage.append(shopDetail.getServiceName() + "  " + message);
+            pushMessage.append(shopDetail.getTowelFeeName() + "  " + message);
             map.put("content", shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId()
                     + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(url, map);
@@ -7166,7 +7166,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
             }
-            pushMessage.append(shopDetail.getServiceName() + "  " + message);
+            pushMessage.append(shopDetail.getTablewareFeeName() + "  " + message);
             map.put("content", shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId()
                     + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(url, map);
