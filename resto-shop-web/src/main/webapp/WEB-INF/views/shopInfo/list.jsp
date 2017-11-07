@@ -514,7 +514,7 @@
 								</div>
 								<div class="col-md-4">
 									<input v-show="m.isOpenTablewareFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="text" class="form-control" name="tablewareFeePrice" v-model="m.tablewareFeePrice" required>
+									<input v-else type="number" class="form-control" name="tablewareFeePrice" v-model="m.tablewareFeePrice" required>
 								</div>
 								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
 									<input type="checkbox" class="form-control" value="1" name="isOpenTablewareFee" v-model="m.isOpenTablewareFee">
@@ -544,7 +544,7 @@
 								</div>
 								<div class="col-md-4">
 									<input v-show="m.isOpenTowelFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="text" class="form-control" name="towelFeePrice" v-model="m.towelFeePrice" required>
+									<input v-else type="number" class="form-control" name="towelFeePrice" v-model="m.towelFeePrice" required>
 								</div>
 								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
 									<input type="checkbox" class="form-control" value="1" name="isOpenTowelFee" v-model="m.isOpenTowelFee">
@@ -574,7 +574,7 @@
 								</div>
 								<div class="col-md-4">
 									<input v-show="m.isOpenSauceFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="text" class="form-control" name="sauceFeePrice" v-model="m.sauceFeePrice" required>
+									<input v-else type="number" class="form-control" name="sauceFeePrice" v-model="m.sauceFeePrice" required>
 								</div>
 								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
 									<input type="checkbox" class="form-control" value="1" name="isOpenSauceFee" v-model="m.isOpenSauceFee">

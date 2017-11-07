@@ -6955,10 +6955,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("content", "接收到修改菜品的请求,订单号为 " + order.getId() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
         BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-        if (type == 0) { //如果要修改的是服务费
+        if (type.equals(ArticleType.SERVICE_PRICE)) { //如果要修改的是服务费
             BigDecimal baseCustomerCount = new BigDecimal(order.getCustomerCount());
             order.setCustomerCount(count);
-            order.setBaseCustomerCount(count);
+//            order.setBaseCustomerCount(count); //这是bug， 注掉它
             order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
@@ -6986,13 +6986,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 ARTICLE_NAME = ARTICLE_NAME.concat("(退)");
                 ARTICLE_COUNT = updateCount.multiply(new BigDecimal(-1));
                 SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getServicePrice());
-            } else if (updateCount.compareTo(BigDecimal.ZERO) == 0) {
-                message = "减" + count + "份";
-                order.setDistributionModeId(DistributionType.REFUND_ORDER);
-                ARTICLE_NAME = ARTICLE_NAME.concat("(退)");
-                ARTICLE_COUNT = new BigDecimal(count).multiply(new BigDecimal(-1));
-                SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getServicePrice());
-            } else {
+            }else {
                 message = "加" + updateCount.abs() + "份";
                 order.setDistributionModeId(DistributionType.MODIFY_ORDER);
                 ARTICLE_NAME = ARTICLE_NAME.concat("(加)");
@@ -7017,9 +7011,166 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("content", shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId()
                     + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(url, map);
+        } else if (type.equals(ArticleType.SAUCE_FEE_PRICE)){ //修改的是新版餐具费
+            BigDecimal baseSauceFeeCount = new BigDecimal(order.getSauceFeeCount()); //修改前的餐具数量
+            order.setSauceFeeCount(count);
+            order.setSauceFeePrice(new BigDecimal(count).multiply(shopDetail.getSauceFeePrice()));
+            Boolean flg = true; //用来标识此次编辑是加还是减  true：加  false：减
+            updateCount = baseSauceFeeCount.subtract(new BigDecimal(count)); //此次修改的数量
+            if (updateCount.compareTo(BigDecimal.ZERO) > 0){ //如果大于0说明现在的比原来的小为减
+                flg = false;
+            }
+            String message = flg ? "加" + updateCount.abs() + "份" : "减" + updateCount + "份"; //推送信息
+            Map<String, Object> orderItemMap = new HashMap<>();
+            String ARTICLE_NAME = flg ? shopDetail.getSauceFeeName().concat("(加)") : shopDetail.getSauceFeeName().concat("(减)"); //菜品
+            BigDecimal ARTICLE_COUNT = flg ? updateCount.abs() : updateCount.multiply(new BigDecimal(-1));
+            BigDecimal SUBTOTAL = updateCount.multiply(shopDetail.getSauceFeePrice());
+            if (!flg) {
+                order.setServicePrice(order.getServicePrice().subtract(shopDetail.getSauceFeePrice().multiply(ARTICLE_COUNT.abs())));
+            }else {
+                order.setServicePrice(order.getServicePrice().add(shopDetail.getSauceFeePrice().multiply(ARTICLE_COUNT)));
+            }
+            order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
+            if (order.getAmountWithChildren().doubleValue() > 0) {
+                order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
+            }
+            order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
+            order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
+            order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
+            order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
+            if (order.getAmountWithChildren().doubleValue() > 0) {
+                order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
+            }
+            order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
+            update(order);
+            if (flg){
+                order.setDistributionModeId(DistributionType.MODIFY_ORDER); //加菜
+            }else {
+                order.setDistributionModeId(DistributionType.REFUND_ORDER); //退菜
+            }
+            orderItemMap.put("SUBTOTAL", SUBTOTAL);
+            orderItemMap.put("ARTICLE_NAME", ARTICLE_NAME);
+            orderItemMap.put("ARTICLE_COUNT", ARTICLE_COUNT);
+            if (shopDetail.getModifyOrderPrintReceipt().equals(Common.YES)) {
+                List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+                for (Printer p : printer) {
+                    Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
+                    if (ticket != null) {
+                        printTask.add(ticket);
+                    }
+                }
+            }
+            pushMessage.append(shopDetail.getServiceName() + "  " + message);
+            map.put("content", shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId()
+                    + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(url, map);
+        }else if (type.equals(ArticleType.TOWEL_FEE_PRICE)){ //修改的是新版纸巾费
+            BigDecimal baseTowelFeeCount = new BigDecimal(order.getTowelFeeCount()); //修改前的纸巾数量
+            order.setTowelFeeCount(count);
+            order.setTowelFeePrice(new BigDecimal(count).multiply(shopDetail.getTowelFeePrice()));
+            Boolean flg = true; //用来标识此次编辑是加还是减  true：加  false：减
+            updateCount = baseTowelFeeCount.subtract(new BigDecimal(count)); //此次修改的数量
+            if (updateCount.compareTo(BigDecimal.ZERO) > 0){ //如果大于0说明现在的比原来的小为减
+                flg = false;
+            }
+            String message = flg ? "加" + updateCount.abs() + "份" : "减" + updateCount + "份"; //推送信息
+            Map<String, Object> orderItemMap = new HashMap<>();
+            String ARTICLE_NAME = flg ? shopDetail.getTowelFeeName().concat("(加)") : shopDetail.getTowelFeeName().concat("(减)"); //菜品
+            BigDecimal ARTICLE_COUNT = flg ? updateCount.abs() : updateCount.multiply(new BigDecimal(-1));
+            BigDecimal SUBTOTAL = updateCount.multiply(shopDetail.getTowelFeePrice());
+            if (!flg) {
+                order.setServicePrice(order.getServicePrice().subtract(shopDetail.getTowelFeePrice().multiply(ARTICLE_COUNT.abs())));
+            }else {
+                order.setServicePrice(order.getServicePrice().add(shopDetail.getTowelFeePrice().multiply(ARTICLE_COUNT)));
+            }
+            order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
+            if (order.getAmountWithChildren().doubleValue() > 0) {
+                order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
+            }
+            order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
+            order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
+            order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
+            order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
+            if (order.getAmountWithChildren().doubleValue() > 0) {
+                order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
+            }
+            order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
+            update(order);
+            if (flg){
+                order.setDistributionModeId(DistributionType.MODIFY_ORDER); //加菜
+            }else {
+                order.setDistributionModeId(DistributionType.REFUND_ORDER); //退菜
+            }
+            orderItemMap.put("SUBTOTAL", SUBTOTAL);
+            orderItemMap.put("ARTICLE_NAME", ARTICLE_NAME);
+            orderItemMap.put("ARTICLE_COUNT", ARTICLE_COUNT);
+            if (shopDetail.getModifyOrderPrintReceipt().equals(Common.YES)) {
+                List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+                for (Printer p : printer) {
+                    Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
+                    if (ticket != null) {
+                        printTask.add(ticket);
+                    }
+                }
+            }
+            pushMessage.append(shopDetail.getServiceName() + "  " + message);
+            map.put("content", shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId()
+                    + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(url, map);
+        }else if (type.equals(ArticleType.TABLEWARE_FEE_PRICE)){ //修改的是新版酱料费
+            BigDecimal baseTableWareFeeCount = new BigDecimal(order.getTablewareFeeCount()); //修改前的酱料数量
+            order.setTablewareFeeCount(count);
+            order.setTablewareFeePrice(new BigDecimal(count).multiply(shopDetail.getTablewareFeePrice()));
+            Boolean flg = true; //用来标识此次编辑是加还是减  true：加  false：减
+            updateCount = baseTableWareFeeCount.subtract(new BigDecimal(count)); //此次修改的数量
+            if (updateCount.compareTo(BigDecimal.ZERO) > 0){ //如果大于0说明现在的比原来的小为减
+                flg = false;
+            }
+            String message = flg ? "加" + updateCount.abs() + "份" : "减" + updateCount + "份"; //推送信息
+            Map<String, Object> orderItemMap = new HashMap<>();
+            String ARTICLE_NAME = flg ? shopDetail.getTablewareFeeName().concat("(加)") : shopDetail.getTablewareFeeName().concat("(减)"); //菜品
+            BigDecimal ARTICLE_COUNT = flg ? updateCount.abs() : updateCount.multiply(new BigDecimal(-1));
+            BigDecimal SUBTOTAL = updateCount.multiply(shopDetail.getTablewareFeePrice());
+            if (!flg) {
+                order.setServicePrice(order.getServicePrice().subtract(shopDetail.getTablewareFeePrice().multiply(ARTICLE_COUNT.abs())));
+            }else {
+                order.setServicePrice(order.getServicePrice().add(shopDetail.getTablewareFeePrice().multiply(ARTICLE_COUNT)));
+            }
+            order.setPaymentAmount(order.getPaymentAmount().subtract(order.getServicePrice()));
+            if (order.getAmountWithChildren().doubleValue() > 0) {
+                order.setAmountWithChildren(order.getAmountWithChildren().subtract(order.getServicePrice()));
+            }
+            order.setOrderMoney(order.getOrderMoney().subtract(order.getServicePrice()));
+            order.setOriginalAmount(order.getOriginalAmount().subtract(order.getServicePrice()));
+            order.setPaymentAmount(order.getPaymentAmount().add(order.getServicePrice()));
+            order.setOrderMoney(order.getOrderMoney().add(order.getServicePrice()));
+            if (order.getAmountWithChildren().doubleValue() > 0) {
+                order.setAmountWithChildren(order.getAmountWithChildren().add(order.getServicePrice()));
+            }
+            order.setOriginalAmount(order.getOriginalAmount().add(order.getServicePrice()));
+            update(order);
+            if (flg){
+                order.setDistributionModeId(DistributionType.MODIFY_ORDER); //加菜
+            }else {
+                order.setDistributionModeId(DistributionType.REFUND_ORDER); //退菜
+            }
+            orderItemMap.put("SUBTOTAL", SUBTOTAL);
+            orderItemMap.put("ARTICLE_NAME", ARTICLE_NAME);
+            orderItemMap.put("ARTICLE_COUNT", ARTICLE_COUNT);
+            if (shopDetail.getModifyOrderPrintReceipt().equals(Common.YES)) {
+                List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
+                for (Printer p : printer) {
+                    Map<String, Object> ticket = modifyOrderPrintReceipt(order, orderItemMap, p, shopDetail);
+                    if (ticket != null) {
+                        printTask.add(ticket);
+                    }
+                }
+            }
+            pushMessage.append(shopDetail.getServiceName() + "  " + message);
+            map.put("content", shopDetail.getName() + "修改了" + shopDetail.getServiceName() + "，数量修改为" + count + ",订单号为:" + order.getId()
+                    + ",请求服务器地址为:" + MQSetting.getLocalIP());
+            doPostAnsc(url, map);
         } else { //修改的是菜品
-
-
             OrderItem orderItem = orderItemService.selectById(orderItemId); //找到要修改的菜品
             if (count > orderItem.getCount()) {
                 result.setSuccess(false);
@@ -7087,13 +7238,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 ARTICLE_NAME = ARTICLE_NAME.concat("(退)");
                 ARTICLE_COUNT = updateCount.multiply(new BigDecimal(-1));
                 SUBTOTAL = ARTICLE_COUNT.multiply(orderItem.getUnitPrice());
-            } else if (updateCount.compareTo(BigDecimal.ZERO) == 0) {
-                message = "减" + count + "份";
-                order.setDistributionModeId(DistributionType.REFUND_ORDER);
-                ARTICLE_NAME = ARTICLE_NAME.concat("(退)");
-                ARTICLE_COUNT = new BigDecimal(count).multiply(new BigDecimal(-1));
-                SUBTOTAL = ARTICLE_COUNT.multiply(orderItem.getUnitPrice());
-            } else {
+            }else {
                 message = "加" + updateCount.abs() + "份";
                 order.setDistributionModeId(DistributionType.MODIFY_ORDER);
                 ARTICLE_NAME = ARTICLE_NAME.concat("(加)");
