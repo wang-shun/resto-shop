@@ -7024,7 +7024,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Map<String, Object> orderItemMap = new HashMap<>();
             String ARTICLE_NAME = flg ? shopDetail.getSauceFeeName().concat("(加)") : shopDetail.getSauceFeeName().concat("(减)"); //菜品
             BigDecimal ARTICLE_COUNT = flg ? updateCount.abs() : updateCount.multiply(new BigDecimal(-1));
-            BigDecimal SUBTOTAL = flg ? updateCount.abs().multiply(shopDetail.getSauceFeePrice()) : updateCount.multiply(shopDetail.getSauceFeePrice());
+            BigDecimal SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getSauceFeePrice());
             if (!flg) {
                 order.setServicePrice(order.getServicePrice().subtract(shopDetail.getSauceFeePrice().multiply(ARTICLE_COUNT.abs())));
             }else {
@@ -7077,7 +7077,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Map<String, Object> orderItemMap = new HashMap<>();
             String ARTICLE_NAME = flg ? shopDetail.getTowelFeeName().concat("(加)") : shopDetail.getTowelFeeName().concat("(减)"); //菜品
             BigDecimal ARTICLE_COUNT = flg ? updateCount.abs() : updateCount.multiply(new BigDecimal(-1));
-            BigDecimal SUBTOTAL = flg ? updateCount.abs().multiply(shopDetail.getTowelFeePrice()) : updateCount.multiply(shopDetail.getTowelFeePrice());
+            BigDecimal SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getTowelFeePrice());
             if (!flg) {
                 order.setServicePrice(order.getServicePrice().subtract(shopDetail.getTowelFeePrice().multiply(ARTICLE_COUNT.abs())));
             }else {
@@ -7130,7 +7130,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Map<String, Object> orderItemMap = new HashMap<>();
             String ARTICLE_NAME = flg ? shopDetail.getTablewareFeeName().concat("(加)") : shopDetail.getTablewareFeeName().concat("(减)"); //菜品
             BigDecimal ARTICLE_COUNT = flg ? updateCount.abs() : updateCount.multiply(new BigDecimal(-1));
-            BigDecimal SUBTOTAL = flg ? updateCount.abs().multiply(shopDetail.getTablewareFeePrice()) : updateCount.multiply(shopDetail.getTablewareFeePrice());
+            BigDecimal SUBTOTAL = ARTICLE_COUNT.multiply(shopDetail.getTablewareFeePrice());
             if (!flg) {
                 order.setServicePrice(order.getServicePrice().subtract(shopDetail.getTablewareFeePrice().multiply(ARTICLE_COUNT.abs())));
             }else {
