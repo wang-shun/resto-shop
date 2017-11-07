@@ -3576,8 +3576,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 
-        List<Map<String, Object>> items = new ArrayList<>();
-        List<Map<String, Object>> refundItems = new ArrayList<>();
+        List<Map<String, Object>> items = new ArrayList<>(); //存储菜品项
+        List<Map<String, Object>> refundItems = new ArrayList<>(); //存储退掉的菜品
         List<String> articleIds = new ArrayList<>();
         for (OrderItem article : orderItems) {
             if (!article.getType().equals(OrderItemType.MEALS_CHILDREN)) {
@@ -3590,14 +3590,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         Map<String, Object> selectMap = new HashMap<>();
         selectMap.put("articleIds", articleIds);
+        //查询订单项中菜品的排序  排序规则是：分类排序->菜品排序
         List<String> articleSort = articleService.selectArticleSort(selectMap);
+        //根据查询出来的菜品顺序封装数据
         for (String articleId : articleSort) {
             for (OrderItem article : orderItems) {
-                if (article.getType().equals(OrderItemType.SETMEALS) && articleId.equalsIgnoreCase(article.getArticleId())) {
+                if (article.getType().equals(OrderItemType.SETMEALS) && articleId.equalsIgnoreCase(article.getArticleId())) { //如果是套餐
                     getOrderItems(article, items, refundItems);
                     getOrderItemMeal(orderItems, items, refundItems, article.getId());
-                } else if (!article.getType().equals(OrderItemType.MEALS_CHILDREN)) {
-                    if (article.getArticleId().contains("@")) {
+                } else if (!article.getType().equals(OrderItemType.MEALS_CHILDREN)) { //如果不是套餐子品
+                    if (article.getArticleId().contains("@")) { //发现是老规格
                         if (articleId.equalsIgnoreCase(article.getArticleId().substring(0, article.getArticleId().indexOf("@")))) {
                             getOrderItems(article, items, refundItems);
                         }
@@ -3612,7 +3614,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
 
-        if (order.getDistributionModeId() == 1) {
+        if (order.getDistributionModeId() == 1) { //如果是堂吃
             if (order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0
                     && StringUtils.isBlank(order.getParentOrderId())) {
                 Map<String, Object> item = new HashMap<>();
@@ -3634,7 +3636,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     refundItems.add(refundItem);
                 }
             }
-        } else if (order.getDistributionModeId() == 3 || order.getDistributionModeId() == 2) {
+        } else if (order.getDistributionModeId() == 3 || order.getDistributionModeId() == 2) { //如果是外带或外卖
             if (order.getBaseMealAllCount() != null && order.getBaseMealAllCount() != 0) {
                 Map<String, Object> item = new HashMap<>();
                 List<String> childs = orderMapper.selectChildIdsByParentId(order.getId());
@@ -8558,22 +8560,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         new BigDecimal(article.getRefundCount()).multiply(new BigDecimal(a.getMealFeeNumber()))));
             }
         }
-//        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
-//        Brand brand = brandService.selectBrandBySetting(brandSetting.getId());
-
-//        if (order.getBaseCustomerCount() != null && order.getBaseCustomerCount() != 0
-//                && StringUtils.isBlank(order.getParentOrderId())) {
-//            Map<String, Object> refundItem = new HashMap<>();
-//            refundItem.put("SUBTOTAL", -shopDetail.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))).multiply(order.getPosDiscount()).doubleValue());
-//            refundItem.put("ARTICLE_NAME", shopDetail.getServiceName() + "(退)");
-//            if ("27f56b31669f4d43805226709874b530".equals(brand.getId())) {
-//                refundItem.put("ARTICLE_NAME", "就餐人数" + "(退)");
-//            }
-//            refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getCustomerCount()));
-//            refundItems.add(refundItem);
-//            articleCount = articleCount.add(new BigDecimal(order.getBaseCustomerCount() - order.getCustomerCount()));
-//            orderMoney = orderMoney.add(shopDetail.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))));
-//        }
         Map<String, Object> print = new HashMap<>();
         String tableNumber = order.getTableNumber() != null ? order.getTableNumber() : "";
         print.put("TABLE_NO", tableNumber);
