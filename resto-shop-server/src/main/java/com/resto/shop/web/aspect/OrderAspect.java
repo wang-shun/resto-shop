@@ -236,7 +236,7 @@ public class OrderAspect {
                         msg.append(shopDetail.getTowelFeeName() + "：" + order.getTowelFeePrice() + "\n");
                     }
                     if (order.getTablewareFeeCount() != null && order.getTablewareFeeCount() > 0){ //产生了酱料费
-                        msg.append(shopDetail.getTablewareFeeName() + "：" + order.getTablewareFeePrice());
+                        msg.append(shopDetail.getTablewareFeeName() + "：" + order.getTablewareFeePrice() + "\n");
                     }
                 }else { //旧版服务费
                     msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
@@ -1050,7 +1050,7 @@ public class OrderAspect {
                             msg.append(shopDetail.getTowelFeeName() + "：" + order.getTowelFeePrice() + "\n");
                         }
                         if (order.getTablewareFeeCount() != null && order.getTablewareFeeCount() > 0){ //产生了酱料费
-                            msg.append(shopDetail.getTablewareFeeName() + "：" + order.getTablewareFeePrice());
+                            msg.append(shopDetail.getTablewareFeeName() + "：" + order.getTablewareFeePrice()  + "\n");
                         }
                     }else { //旧版服务费
                         msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
