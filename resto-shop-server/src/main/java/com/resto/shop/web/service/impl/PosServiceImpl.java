@@ -84,6 +84,9 @@ public class PosServiceImpl implements PosService {
     @Autowired
     private PosMapper posMapper;
 
+    @Autowired
+    private OrderRefundRemarkService orderRefundRemarkService;
+
     @Override
     public String syncArticleStock(String shopId) {
         Map<String, Object> result = new HashMap<>();
@@ -266,7 +269,7 @@ public class PosServiceImpl implements PosService {
     }
 
     @Override
-    public void syncPosOrder(String data) {
+    public void syncPosCreateOrder(String data) {
         JSONObject json = new JSONObject(data);
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
         Order serverDataBaseOrder = orderMapper.selectByPrimaryKey(orderDto.getId());
@@ -488,6 +491,44 @@ public class PosServiceImpl implements PosService {
     @Override
     public void syncTableState(String shopId, String tableNumber, boolean state) {
         RedisUtil.set(shopId+tableNumber+"status", state);
+    }
+
+    @Override
+    public boolean syncPosLocalOrder(String data) {
+        JSONObject json = new JSONObject(data);
+        OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
+        String orderId = orderDto.getId();
+        orderService.delete(orderId);
+        orderItemService.posSyncDeleteByOrderId(orderId);
+        orderPaymentItemService.posSyncDeleteByOrderId(orderId);
+        orderRefundRemarkService.posSyncDeleteByOrderId(orderId);
+
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(orderDto.getShopDetailId());
+        Order order = new Order(orderDto);
+        order.setOrderMode(shopDetail.getShopMode());
+        order.setReductionAmount(BigDecimal.valueOf(0));
+        order.setBrandId(shopDetail.getBrandId());
+        //  订单
+        orderService.insert(order);
+        //  订单项
+        List<OrderItemDto> orderItemDtos =  orderDto.getOrderItem();
+        List<OrderItem> orderItems = new ArrayList<>();
+        for(OrderItemDto orderItemDto : orderItemDtos){
+            OrderItem orderItem = new OrderItem(orderItemDto);
+            orderItems.add(orderItem);
+        }
+        orderItemService.insertItems(orderItems);
+        //  订单支付项
+        List<OrderPaymentDto> orderPaymentDtos = orderDto.getOrderPayment();
+        for(OrderPaymentDto orderPaymentDto : orderPaymentDtos){
+            orderPaymentItemService.insert(new OrderPaymentItem(orderPaymentDto));
+        }
+        //  订单退菜备注
+        List<OrderRefundRemark> orderRefundRemarks = orderDto.getOrderRefundRemarks();
+        for(OrderRefundRemark orderRefundRemark: orderRefundRemarks){
+            orderRefundRemarkService.insert(orderRefundRemark);
+        }
+        return true;
     }
 
 }

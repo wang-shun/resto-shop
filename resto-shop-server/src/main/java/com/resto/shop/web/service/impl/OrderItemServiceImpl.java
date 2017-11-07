@@ -179,4 +179,9 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
     public List<OrderItem> selectByArticleIds(String[] articleIds) {
         return orderitemMapper.selectByArticleIds(articleIds);
     }
+
+    @Override
+    public void posSyncDeleteByOrderId(String orderId) {
+        orderitemMapper.posSyncDeleteByOrderId(orderId);
+    }
 }

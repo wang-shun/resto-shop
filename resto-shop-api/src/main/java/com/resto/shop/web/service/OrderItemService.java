@@ -52,4 +52,11 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	List<OrderItem> selectRefundArticleItem(String orderId);
 
 	List<OrderItem> selectByArticleIds(String[] articleIds);
+
+	/**
+	 * 根据 订单ID 删除
+	 * Pos 2.0 同步数据使用
+	 * @param orderId
+	 */
+	void posSyncDeleteByOrderId(String orderId);
 }

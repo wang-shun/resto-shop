@@ -15,4 +15,6 @@ public interface OrderRefundRemarkMapper  extends GenericDao<OrderRefundRemark,L
     int updateByPrimaryKeySelective(OrderRefundRemark record);
 
     int updateByPrimaryKey(OrderRefundRemark record);
+
+    void posSyncDeleteByOrderId(String orderId);
 }

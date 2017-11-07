@@ -1,6 +1,7 @@
 package com.resto.shop.web.posDto;
 
 import com.resto.shop.web.model.Order;
+import com.resto.shop.web.model.OrderRefundRemark;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -120,6 +121,8 @@ public class OrderDto implements Serializable {
     private Integer mealAllNumber;
 
     private BigDecimal mealFeePrice;
+
+    private List<OrderRefundRemark> orderRefundRemarks;
 
     public Integer getMealAllNumber() {
         return mealAllNumber;
@@ -393,5 +396,13 @@ public class OrderDto implements Serializable {
 
     public void setIsPosPay(Integer isPosPay) {
         this.isPosPay = isPosPay;
+    }
+
+    public List<OrderRefundRemark> getOrderRefundRemarks() {
+        return orderRefundRemarks;
+    }
+
+    public void setOrderRefundRemarks(List<OrderRefundRemark> orderRefundRemarks) {
+        this.orderRefundRemarks = orderRefundRemarks;
     }
 }

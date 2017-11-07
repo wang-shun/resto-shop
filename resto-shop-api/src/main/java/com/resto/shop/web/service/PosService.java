@@ -76,7 +76,7 @@ public interface PosService {
      * 同步pos端创建的订单
      * @param data json数据
      */
-    void syncPosOrder(String data);
+    void syncPosCreateOrder(String data);
 
 
     /**
@@ -121,7 +121,11 @@ public interface PosService {
      */
     void syncTableState(String shopId,String tableNumber,boolean state);
 
-
+    /**
+     * 同步 Pos 端 本地订单
+     * @param data
+     */
+    boolean syncPosLocalOrder(String data);
 
     void test();
 }

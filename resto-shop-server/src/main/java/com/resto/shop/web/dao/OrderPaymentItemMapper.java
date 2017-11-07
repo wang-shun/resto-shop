@@ -121,4 +121,6 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
     List<OrderPaymentItem> selectRefundPayMent(@Param("orderId") String orderId);
 
     int deleteByOrderId(String orderId);
+
+    void posSyncDeleteByOrderId(String orderId);
 }

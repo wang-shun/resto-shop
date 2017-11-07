@@ -20,6 +20,10 @@ public class OrderRefundRemarkServiceImpl extends GenericServiceImpl<OrderRefund
     @Override
     public GenericDao<OrderRefundRemark, Long> getDao() {
         return orderrefundremarkMapper;
-    } 
+    }
 
+    @Override
+    public void posSyncDeleteByOrderId(String orderId) {
+        orderrefundremarkMapper.posSyncDeleteByOrderId(orderId);
+    }
 }
