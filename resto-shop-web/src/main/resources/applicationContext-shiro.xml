@@ -28,6 +28,7 @@
 				/account_paynotify/wxpay_notify=anon<!-- 账户充值微信通知 -->
 
                 /api/* =anon <!-- 对接第三方-->
+                /bossApp/* =anon <!-- 对接第三方-->
                 <!-- 其他资源需要认证 -->
                 /** = authc
             </value>
