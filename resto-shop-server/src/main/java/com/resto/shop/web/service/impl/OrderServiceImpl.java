@@ -2255,7 +2255,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 		o.setProductionStatus(ProductionStatus.GET_IT);
 		int count = orderMapper.updateByPrimaryKeySelective(o);
 		//yz 2017/08/03 计费系统 添加账户设置(简单版) ---resto+外卖订单
-			BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
+            Brand brand = brandService.selectByPrimaryKey(o.getBrandId());
+            BrandSetting brandSetting = brandSettingService.selectById(brand.getBrandSettingId());
+//			BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
 
 			if (brandSetting != null && JifeiType.TOTAL_ORDER_DRAWAL.equals(brandSetting.getOpenBrandAccount())) {//说明开启了品牌账户
 				//查询品牌账户设置
@@ -2320,7 +2322,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     brandAccountLogService.insert(blog);
                     brandAccountService.update(brandAccount);
                     //yz TODO//判断品牌账户是否需要发送通知(账户不足通知)---
-                    Brand brand = brandService.selectByPrimaryKey(o.getBrandId());
                     List<AccountNotice> noticeList = accountNoticeService.selectByAccountId(brandAccount.getId());
                     //拉取最新的brandAccount
                     BrandAccount brandAccount2 = brandAccountService.selectById(brandAccount.getId());
