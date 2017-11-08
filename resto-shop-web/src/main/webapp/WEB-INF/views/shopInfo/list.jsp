@@ -473,7 +473,7 @@
 					</div>
 
 					<!-- 服务费经典版begin -->
-                    <div v-show="m.isUseServicePrice==1 && m.serviceType == 0">
+                    <div v-if="m.isUseServicePrice==1 && m.serviceType == 0">
                         <div v-show="showp" >
                             <div class="form-group">
                                 <label  class="col-sm-4 control-label formBox">名称：</label>
@@ -493,7 +493,7 @@
 					<!-- 服务费经典版end -->
 
 					<!-- 服务费升级版begin -->
-					<div class="form-group" v-show="m.isUseServicePrice == 1 && m.serviceType == 1">
+					<div class="form-group" v-if="m.isUseServicePrice == 1 && m.serviceType == 1">
 						<label  class="col-sm-4 control-label" :class="{ formBox : m.isOpenTablewareFee == 1, gray : m.isOpenTablewareFee == 0}" style="margin-top: 20px;">餐具费：</label>
 						<div  class="col-md-6">
 							<div class="row">
@@ -523,7 +523,7 @@
 						</div>
 					</div>
 
-					<div class="form-group" v-show="m.isUseServicePrice == 1 && m.serviceType == 1">
+					<div class="form-group" v-if="m.isUseServicePrice == 1 && m.serviceType == 1">
 						<label  class="col-sm-4 control-label" :class="{ formBox : m.isOpenTowelFee == 1, gray : m.isOpenTowelFee == 0}" style="margin-top: 20px;">纸巾费：</label>
 						<div  class="col-md-6">
 							<div class="row">
@@ -553,7 +553,7 @@
 						</div>
 					</div>
 
-					<div class="form-group" v-show="m.isUseServicePrice == 1 && m.serviceType == 1">
+					<div class="form-group" v-if="m.isUseServicePrice == 1 && m.serviceType == 1">
 						<label  class="col-sm-4 control-label" :class="{ formBox : m.isOpenSauceFee == 1, gray : m.isOpenSauceFee == 0}" style="margin-top: 20px;">酱料费：</label>
 						<div  class="col-md-6">
 							<div class="row">
