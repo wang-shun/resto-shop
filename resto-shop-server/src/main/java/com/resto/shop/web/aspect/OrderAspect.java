@@ -804,11 +804,7 @@ public class OrderAspect {
         if (customer != null) {
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             if (setting.getTemplateEdition() == 0) {
-                if(shopDetail.getShopMode() == ShopMode.MEISHI){
-                    WeChatUtils.sendCustomerMsgASync(shopDetail.getName() + "温馨提醒您，您的餐品已经准备好了，请尽快前来吧台取餐~", customer.getWechatId(), config.getAppid(), config.getAppsecret());
-                }else{
-                    WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
-                }
+                WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
                 map.put("fileName", customer.getId());
@@ -834,11 +830,7 @@ public class OrderAspect {
                     keyword3.put("value", order.getSerialNumber());
                     keyword3.put("color", "#000000");
                     Map<String, Object> remark = new HashMap<String, Object>();
-                    if(shopDetail.getShopMode() == ShopMode.MEISHI){
-                        remark.put("value", shopDetail.getName() + "温馨提醒您，您的餐品已经准备好了，请尽快前来吧台取餐~");
-                    }else{
-                        remark.put("value", "为了保证出品新鲜美味，请您请尽快到吧台取餐！");
-                    }
+                    remark.put("value", "为了保证出品新鲜美味，请您请尽快到吧台取餐！");
                     remark.put("color", "#173177");
                     content.put("first", first);
                     content.put("keyword1", keyword1);
@@ -858,11 +850,7 @@ public class OrderAspect {
                         smsParam.put("key1", shopDetail.getName());
                         smsParam.put("key2", order.getVerCode());
                         smsParam.put("key3", order.getSerialNumber());
-                        if(shopDetail.getShopMode() == ShopMode.MEISHI){
-                            com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "");
-                        }else{
-                            com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105785023");
-                        }
+                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105785023");
                     }
                 } else {
                     Map map = new HashMap(4);
