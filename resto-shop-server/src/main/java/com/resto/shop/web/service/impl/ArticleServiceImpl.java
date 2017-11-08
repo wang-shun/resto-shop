@@ -340,49 +340,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         return array;
     }
 
-    /*@Override
-    public int[] getStockNum(String shopId){
-        int array[]=null;
-        int j = 0;
-        FreeDay day = freedayMapper.selectByDate(DateFormatUtils.format(new Date(), "yyyy-MM-dd"), shopId);
-        int freeDay = 0;
-        if (day == null) {
-            freeDay = 1;
-        }
-        List<ArticleStock> result = articleMapper.getStock(shopId, "", 0, freeDay, null);
-        List<ArticleFamily> families = articleFamilyService.selectList(shopId);
-        for (int i = 0 ; i < result.size() ; i++) {
-            ArticleStock articleStock = result.get(i);
-            Integer ck = (Integer) RedisUtil.get(articleStock.getId() + Common.KUCUN);
-            if (ck != null) {
-                Integer num=0;
-                if(ck<=articleStock.getInventoryWarning()){
-                    num++;
-                }
-                if(num!=0){
-                    array[j]=num;
-                }
-            }
-            for(int r = 0 ; r < families.size() ; r++){
-                ArticleFamily articleFamily=families.get(r);
-                if(articleFamily.getId()==articleStock.getArticleFamilyId()){
-                    Integer cku = (Integer) RedisUtil.get(articleStock.getId() + Common.KUCUN);
-                    Integer num=0;
-                    if (cku != null) {
-                        if(ck<=articleStock.getInventoryWarning()){
-                            num++;
-                        }
-                    }
-                    if(num!=0){
-                        j++;
-                        array[j]=num;
-                    }
-                }
-            }
-        }
-        return array;
-    }*/
-
     @Override
     public Boolean clearStock(String articleId, String shopId) {
         Article article = null;
