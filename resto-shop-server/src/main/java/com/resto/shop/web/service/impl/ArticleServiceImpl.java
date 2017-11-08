@@ -327,6 +327,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             if (ck != null) {
                 articleStock.setCurrentStock(ck);
             }
+            articleStock.setInventoryWarningNum(0);
             if (empty != null && empty == Common.YES) {
                 //售罄
                 if (articleStock.getCurrentStock() == 0) {
