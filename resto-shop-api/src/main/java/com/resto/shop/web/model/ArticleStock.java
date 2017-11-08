@@ -27,6 +27,12 @@ public class ArticleStock implements Serializable {
     
     private Integer activated;
 
+    private Integer inventoryWarning;
+
+    private Integer inventoryWarningNum;
+
+    private String articleFamilyId;
+
     final public Integer getStockWorkingDay() {
         return stockWorkingDay;
     }
@@ -106,6 +112,28 @@ public class ArticleStock implements Serializable {
 	public void setActivated(Integer activated) {
 		this.activated = activated;
 	}
-	
-	
+
+    public Integer getInventoryWarning() {
+        return inventoryWarning;
+    }
+
+    public void setInventoryWarning(Integer inventoryWarning) {
+        this.inventoryWarning = inventoryWarning;
+    }
+
+    public Integer getInventoryWarningNum() {
+        return inventoryWarningNum;
+    }
+
+    public void setInventoryWarningNum(Integer inventoryWarningNum) {
+        this.inventoryWarningNum = inventoryWarningNum;
+    }
+
+    public String getArticleFamilyId() {
+        return articleFamilyId;
+    }
+
+    public void setArticleFamilyId(String articleFamilyId) {
+        this.articleFamilyId = articleFamilyId;
+    }
 }
