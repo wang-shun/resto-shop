@@ -114,6 +114,10 @@ public class Article implements Serializable{
     //周末库存
     private Integer stockWeekend;
 
+    //菜品预警库存数量设置
+    private Integer inventoryWarning;
+
+
     private Integer currentWorkingStock;
 
     //推荐餐品包id
@@ -683,5 +687,13 @@ public class Article implements Serializable{
 
     public void setPhotoLittle(String photoLittle) {
         this.photoLittle = photoLittle;
+    }
+
+    public Integer getInventoryWarning() {
+        return inventoryWarning;
+    }
+
+    public void setInventoryWarning(Integer inventoryWarning) {
+        this.inventoryWarning = inventoryWarning;
     }
 }

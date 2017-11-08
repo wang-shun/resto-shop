@@ -181,4 +181,10 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * @return
 	 */
 	List<Article> getArticleBefore(String shopId,String tableNumber,String customerId);
+
+	/**
+	 * 获取页面端菜品预警库存数量统计
+	 * @return
+	 */
+	/*int[] getStockNum(String shopId);*/
 }

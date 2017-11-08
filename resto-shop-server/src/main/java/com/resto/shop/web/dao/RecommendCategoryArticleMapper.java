@@ -18,4 +18,6 @@ public interface RecommendCategoryArticleMapper extends GenericDao<RecommendCate
     int updateByPrimaryKey(RecommendCategoryArticle record);
 
     int deleteRecommendCategoryId(String id);
+
+    RecommendCategoryArticle selectByArticleId(String articleId);
 }
