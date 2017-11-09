@@ -527,19 +527,25 @@ public class PosServiceImpl implements PosService {
         List<OrderItemDto> orderItemDtos =  orderDto.getOrderItem();
         List<OrderItem> orderItems = new ArrayList<>();
         for(OrderItemDto orderItemDto : orderItemDtos){
-            OrderItem orderItem = new OrderItem(orderItemDto);
-            orderItems.add(orderItem);
+            if(StringUtils.isNotEmpty(orderItemDto.getId())){
+                OrderItem orderItem = new OrderItem(orderItemDto);
+                orderItems.add(orderItem);
+            }
         }
         orderItemService.insertItems(orderItems);
         //  订单支付项
         List<OrderPaymentDto> orderPaymentDtos = orderDto.getOrderPayment();
         for(OrderPaymentDto orderPaymentDto : orderPaymentDtos){
-            orderPaymentItemService.insert(new OrderPaymentItem(orderPaymentDto));
+            if(StringUtils.isNotEmpty(orderPaymentDto.getId())){
+                orderPaymentItemService.insert(new OrderPaymentItem(orderPaymentDto));
+            }
         }
         //  订单退菜备注
         List<OrderRefundRemark> orderRefundRemarks = orderDto.getOrderRefundRemarks();
         for(OrderRefundRemark orderRefundRemark: orderRefundRemarks){
-            orderRefundRemarkService.insert(orderRefundRemark);
+            if(orderRefundRemark.getId() != null){
+                orderRefundRemarkService.insert(orderRefundRemark);
+            }
         }
     }
 }
