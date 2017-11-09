@@ -22,6 +22,8 @@ import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
@@ -35,6 +37,8 @@ import static com.resto.shop.web.service.impl.OrderServiceImpl.generateString;
  */
 @RpcService
 public class PosServiceImpl implements PosService {
+
+    Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private ArticleService articleService;
@@ -499,13 +503,13 @@ public class PosServiceImpl implements PosService {
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
         String orderId = orderDto.getId();
         orderService.delete(orderId);
-        System.out.println("Order 删除");
+        log.info("Order 删除：" + orderId);
         orderItemService.posSyncDeleteByOrderId(orderId);
-        System.out.println("OrderItem 删除");
+        log.info("OrderItem 删除：" + orderId);
         orderPaymentItemService.posSyncDeleteByOrderId(orderId);
-        System.out.println("OrderPaymentItem 删除");
+        log.info("OrderPaymentItem 删除：" + orderId);
         orderRefundRemarkService.posSyncDeleteByOrderId(orderId);
-        System.out.println("OrderRefundRemark 删除");
+        log.info("OrderRefundRemark 删除：" + orderId);
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(orderDto.getShopDetailId());
         syncPosLocalOrder(orderDto, shopDetail);
