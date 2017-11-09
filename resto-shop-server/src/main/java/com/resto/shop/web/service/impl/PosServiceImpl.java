@@ -527,11 +527,17 @@ public class PosServiceImpl implements PosService {
         List<OrderItemDto> orderItemDtos =  orderDto.getOrderItem();
         List<OrderItem> orderItems = new ArrayList<>();
         for(OrderItemDto orderItemDto : orderItemDtos){
+            log.info("\n\nid：" + orderItemDto.getId());
+            log.info("\n\norderItemDto：");
+            log.info(orderItemDto.toString());
             if(StringUtils.isNotEmpty(orderItemDto.getId())){
                 OrderItem orderItem = new OrderItem(orderItemDto);
+                log.info("\n\norderItem：");
+                log.info(orderItem.toString());
                 orderItems.add(orderItem);
             }
         }
+        log.info("\n\norderItems：" + orderItems.size());
         orderItemService.insertItems(orderItems);
         //  订单支付项
         List<OrderPaymentDto> orderPaymentDtos = orderDto.getOrderPayment();

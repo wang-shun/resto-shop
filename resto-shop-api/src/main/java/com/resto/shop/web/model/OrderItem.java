@@ -2,6 +2,7 @@ package com.resto.shop.web.model;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -433,5 +434,49 @@ public class OrderItem implements Serializable {
 
     public void setPosDiscount(String posDiscount) {
         this.posDiscount = posDiscount;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderItem{" +
+                "id='" + id + '\'' +
+                ", articleName='" + articleName + '\'' +
+                ", articleDesignation='" + articleDesignation + '\'' +
+                ", count=" + count +
+                ", originalPrice=" + originalPrice +
+                ", unitPrice=" + unitPrice +
+                ", baseUnitPrice=" + baseUnitPrice +
+                ", finalPrice=" + finalPrice +
+                ", remark='" + remark + '\'' +
+                ", posDiscount='" + posDiscount + '\'' +
+                ", sort=" + sort +
+                ", status=" + status +
+                ", orderId='" + orderId + '\'' +
+                ", articleId='" + articleId + '\'' +
+                ", type=" + type +
+                ", mealItems=" + Arrays.toString(mealItems) +
+                ", recommendList=" + Arrays.toString(recommendList) +
+                ", parentId='" + parentId + '\'' +
+                ", createTime=" + createTime +
+                ", children=" + children +
+                ", articleSum=" + articleSum +
+                ", articleFamily=" + articleFamily +
+                ", shopId='" + shopId + '\'' +
+                ", telephone='" + telephone + '\'' +
+                ", name='" + name + '\'' +
+                ", price=" + price +
+                ", mealItemId=" + mealItemId +
+                ", recommendId='" + recommendId + '\'' +
+                ", refundCount=" + refundCount +
+                ", orginCount=" + orginCount +
+                ", mealFeeNumber=" + mealFeeNumber +
+                ", extraPrice=" + extraPrice +
+                ", changeCount=" + changeCount +
+                ", discount=" + discount +
+                ", printFailFlag=" + printFailFlag +
+                ", peference=" + peference +
+                ", packageNumber=" + packageNumber +
+                ", orderRefundRemark=" + orderRefundRemark +
+                '}';
     }
 }

@@ -262,4 +262,32 @@ public class OrderItemDto implements Serializable {
     public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
     }
+
+    @Override
+    public String toString() {
+        return "OrderItemDto{" +
+                "status=" + status +
+                ", id='" + id + '\'' +
+                ", createTime=" + createTime +
+                ", orginCount=" + orginCount +
+                ", mealFeeNumber=" + mealFeeNumber +
+                ", type=" + type +
+                ", sort=" + sort +
+                ", remark='" + remark + '\'' +
+                ", changeCount=" + changeCount +
+                ", finalPrice=" + finalPrice +
+                ", articleId='" + articleId + '\'' +
+                ", count=" + count +
+                ", orderId='" + orderId + '\'' +
+                ", originalPrice=" + originalPrice +
+                ", articleName='" + articleName + '\'' +
+                ", refundCount=" + refundCount +
+                ", unitPrice=" + unitPrice +
+                ", printFailFlag=" + printFailFlag +
+                ", recommendId='" + recommendId + '\'' +
+                ", kitchenId='" + kitchenId + '\'' +
+                ", parentId='" + parentId + '\'' +
+                ", mealItemId=" + mealItemId +
+                '}';
+    }
 }
