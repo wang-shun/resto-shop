@@ -953,7 +953,6 @@ public class OrderAspect {
                 }
                 if (order.getPrintTimes() == 0) {
                     sendPaySuccessMsg(order);
-                    log.info("1\n2\n3\n4\n5\n6" + order.getId());
                 }
 
                 if (order.getOrderMode() != null) {
@@ -1892,9 +1891,14 @@ public class OrderAspect {
     }
 
     public void sendToGroupCustomerListMsg(Order order, String msg, WechatConfig config, String brandName) {
-        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+        String orderId = order.getId();
+        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+            orderId = order.getParentOrderId();
+        }
+        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
         for (Participant p : participants) {
             Customer c = customerService.selectById(p.getCustomerId());
+            log.info("1\n2\n3\n4\n5\n6\n" + c.getNickname());
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());
             Map map = new HashMap(4);
             map.put("brandName", brandName);
