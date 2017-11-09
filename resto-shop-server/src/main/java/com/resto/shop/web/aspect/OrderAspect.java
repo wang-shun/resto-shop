@@ -227,8 +227,20 @@ public class OrderAspect {
             msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
 
             //BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-            if (setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getServicePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 1) {
-                msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
+            if (order.getServicePrice().compareTo(BigDecimal.ZERO) > 0) { //如果产生了服务费
+                if (order.getIsUseNewService().equals(Common.YES)){ //如果开通了新版服务费
+                    if (order.getSauceFeeCount() != null && order.getSauceFeeCount() > 0){ //产生了餐具费
+                        msg.append(shopDetail.getSauceFeeName() + "：" + order.getSauceFeePrice() + "\n");
+                    }
+                    if (order.getTowelFeeCount() != null && order.getTowelFeeCount() > 0){ //产生了纸巾费
+                        msg.append(shopDetail.getTowelFeeName() + "：" + order.getTowelFeePrice() + "\n");
+                    }
+                    if (order.getTablewareFeeCount() != null && order.getTablewareFeeCount() > 0){ //产生了酱料费
+                        msg.append(shopDetail.getTablewareFeeName() + "：" + order.getTablewareFeePrice() + "\n");
+                    }
+                }else { //旧版服务费
+                    msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
+                }
             }
             if (setting.getIsMealFee() == 1 && order.getMealFeePrice().compareTo(BigDecimal.ZERO) != 0 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1) {
                 msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
@@ -793,8 +805,6 @@ public class OrderAspect {
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             if (setting.getTemplateEdition() == 0) {
                 WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
-                //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                //                "订单发送推送：您的餐品已经准备好了，请尽快到吧台取餐！");
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
                 map.put("fileName", customer.getId());
@@ -943,7 +953,6 @@ public class OrderAspect {
                 }
                 if (order.getPrintTimes() == 0) {
                     sendPaySuccessMsg(order);
-                    log.info("1\n2\n3\n4\n5\n6" + order.getId());
                 }
 
                 if (order.getOrderMode() != null) {
@@ -1029,8 +1038,20 @@ public class OrderAspect {
                 msg.append("店铺名：" + shopDetail.getName() + "\n");
                 msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
                 //BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-                if (setting.getIsUseServicePrice() == 1 && shopDetail.getIsUseServicePrice() == 1 && order.getDistributionModeId() == 1) {
-                    msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
+                if (order.getServicePrice().compareTo(BigDecimal.ZERO) > 0) { //如果产生了服务费
+                    if (order.getIsUseNewService().equals(Common.YES)){ //如果开通了新版服务费
+                        if (order.getSauceFeeCount() != null && order.getSauceFeeCount() > 0){ //产生了餐具费
+                            msg.append(shopDetail.getSauceFeeName() + "：" + order.getSauceFeePrice() + "\n");
+                        }
+                        if (order.getTowelFeeCount() != null && order.getTowelFeeCount() > 0){ //产生了纸巾费
+                            msg.append(shopDetail.getTowelFeeName() + "：" + order.getTowelFeePrice() + "\n");
+                        }
+                        if (order.getTablewareFeeCount() != null && order.getTablewareFeeCount() > 0){ //产生了酱料费
+                            msg.append(shopDetail.getTablewareFeeName() + "：" + order.getTablewareFeePrice()  + "\n");
+                        }
+                    }else { //旧版服务费
+                        msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
+                    }
                 }
                 if (setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1) {
                     msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
@@ -1870,7 +1891,11 @@ public class OrderAspect {
     }
 
     public void sendToGroupCustomerListMsg(Order order, String msg, WechatConfig config, String brandName) {
-        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+        String orderId = order.getId();
+        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+            orderId = order.getParentOrderId();
+        }
+        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
         for (Participant p : participants) {
             Customer c = customerService.selectById(p.getCustomerId());
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());

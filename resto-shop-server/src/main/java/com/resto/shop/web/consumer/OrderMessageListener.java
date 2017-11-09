@@ -464,7 +464,7 @@ public class OrderMessageListener implements MessageListener {
                         smsParam.put("key1",shop.getName());
                         smsParam.put("key2", order.getVerCode());
                         smsParam.put("key3",order.getSerialNumber());
-                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_105785023");
+                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105785023");
                     }
                 }else{
                     Brand brand = brandService.selectById(order.getBrandId());
