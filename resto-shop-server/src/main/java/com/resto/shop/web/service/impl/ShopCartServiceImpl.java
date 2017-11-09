@@ -64,7 +64,13 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
 
         }
         Integer oldNumber = new Integer(0);
-        log.info(shopCart.toString());
+        log.info(shopCart.getDistributionModeId()+"----dfdfdf");
+        log.info(shopCart.getArticleId()+"----dfdfdf");
+        log.info(shopCart.getCustomerId()+"----dfdfdf");
+        log.info(shopCart.getShopType()+"----dfdfdf");
+        log.info(shopCart.getShopDetailId()+"----dfdfdf");
+
+
         ShopCart shopCartItem = shopcartMapper.selectShopCartItem(shopCart);
         log.info(shopCartItem.getShopType());
         if(shopCartItem != null){
