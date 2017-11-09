@@ -64,7 +64,9 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
 
         }
         Integer oldNumber = new Integer(0);
+        log.info(shopCart.toString());
         ShopCart shopCartItem = shopcartMapper.selectShopCartItem(shopCart);
+
         if(shopCartItem != null){
             oldNumber = shopCartItem.getNumber();
         }
