@@ -252,6 +252,17 @@ public class OrderMessageListener implements MessageListener {
                     map.put("content", "系统向用户:"+customer.getNickname()+"推送微信消息:"+msg.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
                     doPostAnsc(LogUtils.url, map);
                     map.put("content","用户:"+customer.getNickname()+"优惠券过期发短信提醒"+"请求地址:"+MQSetting.getLocalIP());
+
+                    //发送短信
+                    if(setting.getMessageSwitch()==1){
+                        com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                        smsParam.put("shop",shopName);
+                        smsParam.put("price", pr);
+                        smsParam.put("name",name);
+                        smsParam.put("day",pushDay);
+                        com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_43790004");
+                    }
+
                 }else{
                     Map map = new HashMap(4);
                     map.put("brandName", setting.getBrandName());
