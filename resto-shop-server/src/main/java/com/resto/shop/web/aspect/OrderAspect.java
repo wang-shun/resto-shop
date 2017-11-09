@@ -1898,6 +1898,7 @@ public class OrderAspect {
         List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
         for (Participant p : participants) {
             Customer c = customerService.selectById(p.getCustomerId());
+            log.info("1\n2\n3\n4\n5\n6\n" + c.getNickname());
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());
             Map map = new HashMap(4);
             map.put("brandName", brandName);
