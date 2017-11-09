@@ -425,7 +425,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             //如果这个订单已经被组里的人买单了，那么其他人不能在
-            if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1)){
+            if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30)){
                 String customerId =  String.valueOf(RedisUtil.get(order.getGroupId()+"pay"));
                 if(!customer.getId().equals(customerId)){
                     jsonResult.setSuccess(false);
@@ -475,7 +475,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
             int orderCount = orderMapper.checkTableNumber(order.getShopDetailId(), order.getTableNumber(), order.getCustomerId(), brandSetting.getCloseContinueTime());
-            if (orderCount > 0) {
+            if (orderCount > 0 && StringUtils.isEmpty(order.getGroupId())) {
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("不好意思，这桌有人了");
                 return jsonResult;
