@@ -475,7 +475,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
             int orderCount = orderMapper.checkTableNumber(order.getShopDetailId(), order.getTableNumber(), order.getCustomerId(), brandSetting.getCloseContinueTime());
-            if (orderCount > 0) {
+            if (orderCount > 0 && StringUtils.isEmpty(order.getGroupId())) {
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("不好意思，这桌有人了");
                 return jsonResult;
