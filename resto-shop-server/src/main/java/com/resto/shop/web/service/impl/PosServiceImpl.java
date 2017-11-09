@@ -499,9 +499,13 @@ public class PosServiceImpl implements PosService {
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
         String orderId = orderDto.getId();
         orderService.delete(orderId);
+        System.out.println("Order 删除");
         orderItemService.posSyncDeleteByOrderId(orderId);
+        System.out.println("OrderItem 删除");
         orderPaymentItemService.posSyncDeleteByOrderId(orderId);
+        System.out.println("OrderPaymentItem 删除");
         orderRefundRemarkService.posSyncDeleteByOrderId(orderId);
+        System.out.println("OrderRefundRemark 删除");
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(orderDto.getShopDetailId());
         syncPosLocalOrder(orderDto, shopDetail);
