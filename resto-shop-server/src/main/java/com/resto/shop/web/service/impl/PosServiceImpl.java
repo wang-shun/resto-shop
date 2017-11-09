@@ -501,16 +501,6 @@ public class PosServiceImpl implements PosService {
     public boolean syncPosLocalOrder(String data) {
         JSONObject json = new JSONObject(data);
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
-        String orderId = orderDto.getId();
-        orderService.delete(orderId);
-        log.info("Order 删除：" + orderId);
-        orderItemService.posSyncDeleteByOrderId(orderId);
-        log.info("OrderItem 删除：" + orderId);
-        orderPaymentItemService.posSyncDeleteByOrderId(orderId);
-        log.info("OrderPaymentItem 删除：" + orderId);
-        orderRefundRemarkService.posSyncDeleteByOrderId(orderId);
-        log.info("OrderRefundRemark 删除：" + orderId);
-
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(orderDto.getShopDetailId());
         syncPosLocalOrder(orderDto, shopDetail);
         for(OrderDto childrenOrderDto : orderDto.getChildrenOrders()){
@@ -520,6 +510,13 @@ public class PosServiceImpl implements PosService {
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
+        // 清除老数据
+        String orderId = orderDto.getId();
+        orderService.delete(orderId);
+        orderItemService.posSyncDeleteByOrderId(orderId);
+        orderPaymentItemService.posSyncDeleteByOrderId(orderId);
+        orderRefundRemarkService.posSyncDeleteByOrderId(orderId);
+        //  插入新数据
         Order order = new Order(orderDto);
         order.setOrderMode(shopDetail.getShopMode());
         order.setReductionAmount(BigDecimal.valueOf(0));
