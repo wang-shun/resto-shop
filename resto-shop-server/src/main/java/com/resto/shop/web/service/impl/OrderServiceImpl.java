@@ -8373,24 +8373,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         content.put("keyword5", keyword5);
                         content.put("remark", remark);
                         String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
-                        Map customerMap = new HashMap(4);
-                        customerMap.put("brandName", brand.getBrandName());
-                        customerMap.put("fileName", customer.getId());
-                        customerMap.put("type", "UserAction");
-                        customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                        doPostAnsc(LogUtils.url, customerMap);
-                        Map map = new HashMap(4);
-                        map.put("brandName", brand.getBrandName());
-                        map.put("fileName", shopDetail.getName());
-                        map.put("type", "posAction");
-                        map.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                        doPostAnsc(url, map);
-                        Map orderMap = new HashMap(4);
-                        orderMap.put("brandName", brand.getBrandName());
-                        orderMap.put("fileName", order.getId());
-                        orderMap.put("type", "orderAction");
-                        orderMap.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                        doPostAnsc(url, orderMap);
                         //发送短信
                         if (setting.getMessageSwitch() == 1) {
                             com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
