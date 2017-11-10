@@ -13,6 +13,7 @@ import com.resto.shop.web.model.ShopCart;
 import com.resto.shop.web.service.ShopCartService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -43,7 +44,11 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
             //开启多人点餐
             List<String> customerIdList = getListByGroupIdDistinctCustomerId(shopcart.getGroupId());
 
-            return shopcartMapper.getListByGroupId(shopcart.getGroupId(),customerIdList);
+            if(CollectionUtils.isEmpty(customerIdList)){
+                return shopcartMapper.getListByGroupId(shopcart.getGroupId(),null);
+            }else{
+                return shopcartMapper.getListByGroupId(shopcart.getGroupId(),customerIdList);
+            }
         }else{
             return shopcartMapper.listUserAndShop(shopcart);
         }
@@ -186,8 +191,12 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     @Override
     public List<ShopCart> getListByGroupId(String groupId) {
         List<String> customerIdList = getListByGroupIdDistinctCustomerId(groupId);
+        if(CollectionUtils.isEmpty(customerIdList)){
+            return shopcartMapper.getListByGroupId(groupId,null);
+        }else{
+            return shopcartMapper.getListByGroupId(groupId,customerIdList);
+        }
 
-        return shopcartMapper.getListByGroupId(groupId,customerIdList);
     }
 
     @Override
