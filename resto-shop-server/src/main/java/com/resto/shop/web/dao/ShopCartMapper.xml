@@ -178,7 +178,7 @@
     <select id="getListByGroupId" resultType="ShopCart">
         select * from tb_shop_cart where group_id = #{groupId}
         and customer_id in
-        <foreach collection="list" index="index" item="item"  open="(" separator="," close=")">
+        <foreach collection="ids" index="index" item="item"  open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>
