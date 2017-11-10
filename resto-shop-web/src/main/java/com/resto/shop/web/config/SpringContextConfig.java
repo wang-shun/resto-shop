@@ -591,6 +591,11 @@ public class SpringContextConfig {
     }
 
     @Bean
+    public MdBillService mdBillService(){
+        return proxy.create(MdBillService.class);
+    }
+
+    @Bean
     public ArticleBomHeadHistoryService articleBomHeadHistoryService(){
         return proxy.create(ArticleBomHeadHistoryService.class);
     }
