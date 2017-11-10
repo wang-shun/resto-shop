@@ -550,7 +550,7 @@ public class OrderAspect {
                                     smsParam.put("key1", order.getSerialNumber());
                                     smsParam.put("key2", shop.getName());
                                     smsParam.put("key3", order.getTableNumber());
-                                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105880019");
+                                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(c.getTelephone(), smsParam, "餐加", "SMS_105880019");
                                 }
                             }
                         }
