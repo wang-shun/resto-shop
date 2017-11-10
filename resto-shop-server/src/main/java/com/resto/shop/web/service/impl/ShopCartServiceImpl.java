@@ -10,6 +10,7 @@ import com.resto.shop.web.constant.ShopCarType;
 import com.resto.shop.web.dao.ShopCartMapper;
 import com.resto.shop.web.model.CustomerGroup;
 import com.resto.shop.web.model.ShopCart;
+import com.resto.shop.web.model.TableGroup;
 import com.resto.shop.web.service.ShopCartService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -216,7 +217,8 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     }
 
     @Override
-    public void updateShopCartByGroupId(String groupId) {
-        shopcartMapper.updateShopCartByGroupId(groupId);
+    public void updateShopCartByGroupId(String groupId,String shopId) {
+
+        shopcartMapper.updateShopCartByGroupId(groupId,shopId);
     }
 }

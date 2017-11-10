@@ -204,5 +204,6 @@
         update tb_shop_cart
         set group_id = #{groupId}
         where group_id = "" or group_id is null
+        and shop_detail_id = #{shopId}
     </update>
 </mapper>
