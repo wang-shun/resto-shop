@@ -45,7 +45,7 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
             List<String> customerIdList = getListByGroupIdDistinctCustomerId(shopcart.getGroupId());
 
             if(CollectionUtils.isEmpty(customerIdList)){
-                return shopcartMapper.getListByGroupId(shopcart.getGroupId(),null);
+                return null;
             }else{
                 return shopcartMapper.getListByGroupId(shopcart.getGroupId(),customerIdList);
             }
@@ -192,7 +192,7 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     public List<ShopCart> getListByGroupId(String groupId) {
         List<String> customerIdList = getListByGroupIdDistinctCustomerId(groupId);
         if(CollectionUtils.isEmpty(customerIdList)){
-            return shopcartMapper.getListByGroupId(groupId,null);
+            return null;
         }else{
             return shopcartMapper.getListByGroupId(groupId,customerIdList);
         }
