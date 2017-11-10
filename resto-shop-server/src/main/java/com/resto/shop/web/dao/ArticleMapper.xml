@@ -36,6 +36,7 @@
         <result column="article_type" property="articleType" jdbcType="INTEGER"/>
         <result column="stock_working_day" property="stockWorkingDay" jdbcType="INTEGER"/>
         <result column="stock_weekend" property="stockWeekend" jdbcType="INTEGER"/>
+        <result column="inventory_warning" property="inventoryWarning" jdbcType="INTEGER"/>
         <result column="current_working_stock" property="currentWorkingStock" jdbcType="INTEGER"/>
         <result column="recommend_id" property="recommendId"/>
         <result column="newUnit" property="newUnit"/>
@@ -59,7 +60,7 @@
         is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time,
         create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price,
         fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc,
-        is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,
+        is_remind,article_type,stock_working_day,stock_weekend,inventory_warning,current_working_stock,
         recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id,initials,
         photo_type,photo_little,open_catty,catty_money,need_remind,gif_url
     </sql>
@@ -84,7 +85,7 @@
         price, fans_price, has_mult_price,
         has_unit, peference, unit,
         show_big, control_color, show_desc,
-        is_remind,article_type,stock_working_day,stock_weekend,
+        is_remind,article_type,stock_working_day,stock_weekend,inventory_warning,
         recommend_id,is_hidden,pId,eleme_name,photo_square,meal_fee_number,
         is_main_food,virtual_id,initials,photo_type,photo_little)
         values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR},
@@ -97,7 +98,7 @@
         #{price,jdbcType=DECIMAL}, #{fansPrice,jdbcType=DECIMAL}, #{hasMultPrice,jdbcType=BIT},
         #{hasUnit,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR},
         #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT},
-        #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
+        #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},#{inventoryWarning,jdbcType=INTEGER},
         #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT},#{pId},#{elemeName,jdbcType=VARCHAR},
         #{photoSquare},#{mealFeeNumber},#{isMainFood},#{virtualId,jdbcType=INTEGER},#{initials},
         #{photoType},#{photoLittle})
@@ -206,6 +207,9 @@
             </if>
             <if test="stockWeekend != null">
                 stock_weekend,
+            </if>
+            <if test="inventoryWarning != null">
+                inventory_warning,
             </if>
             <if test="recommendId != null">
                 recommend_id,
@@ -353,6 +357,9 @@
             <if test="stockWeekend != null">
                 #{stockWeekend},
             </if>
+            <if test="inventoryWarning != null">
+                #{inventoryWarning},
+            </if>
             <if test="recommendId != null">
                 #{recommendId},
             </if>
@@ -495,6 +502,9 @@
             <if test="stockWeekend != null">
                 stock_weekend = #{stockWeekend},
             </if>
+            <if test="inventoryWarning != null">
+                inventory_warning = #{inventoryWarning},
+            </if>
             <if test="currentWorkingStock != null">
                 current_working_stock = #{currentWorkingStock},
             </if>
@@ -579,6 +589,7 @@
         article_type = #{articleType},
         stock_working_day = #{stockWorkingDay,jdbcType=INTEGER},
         stock_weekend = #{stockWeekend,jdbcType=INTEGER},
+        inventory_warning = #{inventoryWarning,jdbcType=INTEGER},
         current_working_stock = #{currentWorkingStock,jdbcType=INTEGER},
         recommend_id = #{recommendId,jdbcType=VARCHAR},
         is_hidden = #{isHidden,isRemind,jdbcType=BIT},
@@ -759,7 +770,9 @@ where t.id = t2.article_id
         t.article_type articleType,
         ifnull(t2.empty_remark,t.empty_remark) as empty_remark,
         t.activated,
-        t.is_empty
+        t.is_empty,
+        t.inventory_warning,
+        t.article_family_id
         from tb_article t
         left join tb_article_price t2 on t.id = t2.article_id
         left join tb_article_family t3 on t.article_family_id = t3.id

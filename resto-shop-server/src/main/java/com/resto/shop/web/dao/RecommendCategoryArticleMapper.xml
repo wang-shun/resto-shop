@@ -11,13 +11,19 @@
     <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
   </resultMap>
   <sql id="Base_Column_List" >
-    id, article_name, recommend_sort, "recommend_category_id", "article_id", create_time, update_time
+    id, article_name, recommend_sort, recommend_category_id, article_id, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
     select 
     <include refid="Base_Column_List" />
     from tb_recommend_category_article
     where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByArticleId" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from tb_recommend_category_article
+    where article_id = #{articleId,jdbcType=VARCHAR}
   </select>
   <select id="selectList" resultType="RedConfig">
     select
