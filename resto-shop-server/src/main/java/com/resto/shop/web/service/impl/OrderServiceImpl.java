@@ -4503,6 +4503,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getBaseCustomerCount() != null && order.getBaseCustomerCount() > 0){//订单有原始就餐人数
             List<com.alibaba.fastjson.JSONObject> objectList = new ArrayList<>();
             com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
+            jsonObject.put("baseCount", order.getBaseCustomerCount());//原始人数
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());//查询出该笔订单所在店铺
             if (order.getIsUseNewService().equals(Common.YES)){ //如果该笔订单产生的是新版服务费
                 if (shopDetail.getIsOpenSauceFee().equals(Common.YES)){ //开通了餐具费
