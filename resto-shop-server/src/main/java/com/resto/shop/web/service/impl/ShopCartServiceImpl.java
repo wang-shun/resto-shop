@@ -8,6 +8,7 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.constant.ShopCarType;
 import com.resto.shop.web.dao.ShopCartMapper;
+import com.resto.shop.web.model.CustomerGroup;
 import com.resto.shop.web.model.ShopCart;
 import com.resto.shop.web.service.ShopCartService;
 import org.apache.commons.lang3.StringUtils;
@@ -40,7 +41,9 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopcart.getShopDetailId());
         if(shopDetail.getOpenManyCustomerOrder() == Common.YES && !StringUtils.isEmpty(shopcart.getGroupId())){
             //开启多人点餐
-            return shopcartMapper.getListByGroupId(shopcart.getGroupId());
+            List<String> customerIdList = getListByGroupIdDistinctCustomerId(shopcart.getGroupId());
+
+            return shopcartMapper.getListByGroupId(shopcart.getGroupId(),customerIdList);
         }else{
             return shopcartMapper.listUserAndShop(shopcart);
         }
@@ -182,7 +185,9 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
 
     @Override
     public List<ShopCart> getListByGroupId(String groupId) {
-        return shopcartMapper.getListByGroupId(groupId);
+        List<String> customerIdList = getListByGroupIdDistinctCustomerId(groupId);
+
+        return shopcartMapper.getListByGroupId(groupId,customerIdList);
     }
 
     @Override

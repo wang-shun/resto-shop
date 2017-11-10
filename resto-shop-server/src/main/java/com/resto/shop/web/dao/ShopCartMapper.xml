@@ -177,6 +177,11 @@
 
     <select id="getListByGroupId" resultType="ShopCart">
         select * from tb_shop_cart where group_id = #{groupId}
+        and customer_id in
+        <foreach collection="list" item="id" open="("
+                 separator="," close=")">
+            #{id}
+        </foreach>
     </select>
 
     <update id="resetGroupId">
