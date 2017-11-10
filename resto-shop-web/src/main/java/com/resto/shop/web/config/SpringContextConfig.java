@@ -606,10 +606,7 @@ public class SpringContextConfig {
     }
 
 
-
-
     //------------scm server config end-----------
-
 
     //-----------------------
 
