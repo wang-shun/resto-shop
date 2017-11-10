@@ -127,7 +127,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			appraise.setCreateTime(new Date());
 			appraise.setStatus((byte)1);
 			appraise.setShopDetailId(order.getShopDetailId());
-			order.setCustomerId(appraise.getCustomerId());
+//			order.setCustomerId(appraise.getCustomerId());
 			BigDecimal redMoney= rewardRed(order);
 			appraise.setRedMoney(redMoney);
 			appraise.setBrandId(order.getBrandId());
