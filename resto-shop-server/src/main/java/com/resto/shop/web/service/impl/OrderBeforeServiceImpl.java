@@ -63,6 +63,9 @@ public class OrderBeforeServiceImpl extends GenericServiceImpl<OrderBefore, Long
     @Override
     public List<OrderItem> getOrderBefore(String tableNumber, String shopId, String customerId) {
         ShopDetail shopDetail =  shopDetailService.selectById(shopId);
+        if(shopDetail == null){
+            return null;
+        }
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
         if(StringUtils.isEmpty(tableNumber)){
             return null;
