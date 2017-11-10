@@ -56,5 +56,6 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
 
     void deleteByGroup(String groupId);
 
-    void updateShopCartByGroupId(@Param("groupId") String groupId,@Param("shopId") String shopId);
+    void updateShopCartByGroupId(@Param("groupId") String groupId,@Param("shopId") String shopId
+    ,@Param("customerId") String customerId);
 }

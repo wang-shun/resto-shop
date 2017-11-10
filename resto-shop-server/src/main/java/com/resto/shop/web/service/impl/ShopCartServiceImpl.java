@@ -217,8 +217,8 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     }
 
     @Override
-    public void updateShopCartByGroupId(String groupId,String shopId) {
+    public void updateShopCartByGroupId(String groupId,String shopId,String customerId) {
 
-        shopcartMapper.updateShopCartByGroupId(groupId,shopId);
+        shopcartMapper.updateShopCartByGroupId(groupId,shopId,customerId);
     }
 }
