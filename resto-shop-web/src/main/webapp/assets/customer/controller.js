@@ -506,6 +506,8 @@ var Controller = function(controlId,datatable){
 	}
 
     this.createApproveBtn = function(model,url,urlData){
+		debugger
+		console.info("----model:"+model)
         var button = $("<button class='btn btn-xs red'>审核</button>");
         button.click(function(){
             if(_C.vue){
