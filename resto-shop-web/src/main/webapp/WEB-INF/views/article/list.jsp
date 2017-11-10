@@ -275,6 +275,14 @@
                                                            id="stockWeekend"/>
                                                 </div>
                                             </div>
+                                            <div class="form-group col-sm-4 ">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">菜品预警库存</div>
+                                                    <input name="inventoryWarning"
+                                                           class="form-control" v-model="m.inventoryWarning"
+                                                           id="inventoryWarning"/>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

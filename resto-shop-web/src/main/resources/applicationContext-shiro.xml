@@ -29,6 +29,7 @@
                 /scmUnitController/list_all=anon<!-- test使用 -->
 
                 /api/* =anon <!-- 对接第三方-->
+                /bossApp/* =anon <!-- 对接第三方-->
                 <!-- 其他资源需要认证 -->
                 /** = authc
             </value>

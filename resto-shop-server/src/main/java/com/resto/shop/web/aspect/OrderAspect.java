@@ -528,7 +528,11 @@ public class OrderAspect {
                             smsParam.put("key3", order.getTableNumber());
                             com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105880019");
                         } else {
-                            List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+                            String orderId = order.getId();
+                            if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+                                orderId = order.getParentOrderId();
+                            }
+                            List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
                             for (Participant p : participants) {
                                 Customer c = customerService.selectById(p.getCustomerId());
                                 WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
@@ -805,8 +809,6 @@ public class OrderAspect {
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             if (setting.getTemplateEdition() == 0) {
                 WeChatUtils.sendCustomerMsgASync("您的餐品已经准备好了，请尽快到吧台取餐！", customer.getWechatId(), config.getAppid(), config.getAppsecret());
-                //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-                //                "订单发送推送：您的餐品已经准备好了，请尽快到吧台取餐！");
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
                 map.put("fileName", customer.getId());
@@ -955,7 +957,6 @@ public class OrderAspect {
                 }
                 if (order.getPrintTimes() == 0) {
                     sendPaySuccessMsg(order);
-                    log.info("1\n2\n3\n4\n5\n6" + order.getId());
                 }
 
                 if (order.getOrderMode() != null) {
@@ -1175,7 +1176,11 @@ public class OrderAspect {
                         smsParam.put("key3", order.getTableNumber());
                         com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105880019");
                     } else {
-                        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+                        String orderId = order.getId();
+                        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+                            orderId = order.getParentOrderId();
+                        }
+                        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
                         for (Participant p : participants) {
                             Customer c = customerService.selectById(p.getCustomerId());
                             String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
@@ -1266,7 +1271,11 @@ public class OrderAspect {
                         map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                         doPostAnsc(LogUtils.url, map);
                     } else {
-                        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+                        String orderId = order.getId();
+                        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+                            orderId = order.getParentOrderId();
+                        }
+                        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
                         for (Participant p : participants) {
                             Customer c = customerService.selectById(p.getCustomerId());
                             String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpurl, content, config.getAppid(), config.getAppsecret());
@@ -1396,7 +1405,11 @@ public class OrderAspect {
                                 com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105945069");
                             }
                         } else {
-                            List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+                            String orderId = order.getId();
+                            if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+                                orderId = order.getParentOrderId();
+                            }
+                            List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
                             for (Participant p : participants) {
                                 Customer c = customerService.selectById(p.getCustomerId());
                                 String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
@@ -1894,7 +1907,11 @@ public class OrderAspect {
     }
 
     public void sendToGroupCustomerListMsg(Order order, String msg, WechatConfig config, String brandName) {
-        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), order.getId());
+        String orderId = order.getId();
+        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+            orderId = order.getParentOrderId();
+        }
+        List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
         for (Participant p : participants) {
             Customer c = customerService.selectById(p.getCustomerId());
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());

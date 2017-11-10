@@ -425,7 +425,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             //如果这个订单已经被组里的人买单了，那么其他人不能在
-            if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1)){
+            if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30)){
                 String customerId =  String.valueOf(RedisUtil.get(order.getGroupId()+"pay"));
                 if(!customer.getId().equals(customerId)){
                     jsonResult.setSuccess(false);
@@ -475,7 +475,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         if (!StringUtils.isEmpty(order.getTableNumber())) { //如果存在桌号
             int orderCount = orderMapper.checkTableNumber(order.getShopDetailId(), order.getTableNumber(), order.getCustomerId(), brandSetting.getCloseContinueTime());
-            if (orderCount > 0) {
+            if (orderCount > 0 && StringUtils.isEmpty(order.getGroupId())) {
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("不好意思，这桌有人了");
                 return jsonResult;
@@ -5280,47 +5280,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if(brandOrderReportDto.getWaimaiPrice()==null){
             brandOrderReportDto.setWaimaiPrice(initial);
         }
-        //封装店铺的数据
-        List<ShopOrderReportDto> shopOrderReportDtoLists = new ArrayList<ShopOrderReportDto>();
-        for(int i = 0; i < shopDetailList.size(); i++){
-            ShopDetail shopDetail=shopDetailList.get(i);
-            ShopOrderReportDto shopOrderReportDto= new ShopOrderReportDto();
-            Date begin = DateUtil.getformatBeginDate(beginDate);
-            Date end = DateUtil.getformatEndDate(endDate);
-            shopOrderReportDto=orderMapper.procDayAllOrderItemShop(begin,end,shopDetail.getId());
-            BigDecimal initial_=new BigDecimal("0.00");
-            if(shopOrderReportDto.getShop_orderCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
-                BigDecimal ssinglePrice= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_orderCount());
-                shopOrderReportDto.setShop_singlePrice(new BigDecimal(ssinglePrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
-            }else{
-                shopOrderReportDto.setShop_singlePrice(initial_);
-            }
+        List<ShopOrderReportDto> shopOrderReportDtoLists = getBossAppOrderReport(brandId,shopDetailList,beginDate,endDate);
 
-            if(shopOrderReportDto.getShop_peopleCount()!=null&&shopOrderReportDto.getShop_peopleCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
-                BigDecimal speopleCount= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_peopleCount());
-                shopOrderReportDto.setShop_perPersonPrice(new BigDecimal(speopleCount.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
-            }else{
-                shopOrderReportDto.setShop_perPersonPrice(initial_);
-            }
-            if(shopOrderReportDto.getShop_peopleCount()==null){
-                shopOrderReportDto.setShop_peopleCount(0);
-            }
-            if(shopOrderReportDto.getShop_orderPrice()==null){
-                shopOrderReportDto.setShop_orderPrice(initial_);
-            }
-            if(shopOrderReportDto.getShop_tangshiPrice()==null){
-                shopOrderReportDto.setShop_tangshiPrice(initial_);
-            }
-            if(shopOrderReportDto.getShop_waidaiPrice()==null){
-                shopOrderReportDto.setShop_waidaiPrice(initial_);
-            }
-            if(shopOrderReportDto.getShop_waimaiPrice()==null){
-                shopOrderReportDto.setShop_waimaiPrice(initial_);
-            }
-            shopOrderReportDto.setShopDetailId(shopDetail.getId());
-            shopOrderReportDto.setShopName(shopDetail.getName());
-            shopOrderReportDtoLists.add(shopOrderReportDto);
-        }
         //封装返回Map集
         Map<String, Object> map = new HashMap<>();
         map.put("shopId", shopOrderReportDtoLists);
@@ -9759,6 +9720,104 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
         return order;
+    }
+
+    @Override
+    public List<Map<String,Object>> callBossAppOrdrReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate) {
+
+            List<Map<String,Object>> list = new ArrayList<>();
+            List<ShopOrderReportDto> shopOrderReportDtoList =  getBossAppOrderReport(brandId,shopDetailList,beginDate,endDate);
+            if(shopOrderReportDtoList != null && !shopOrderReportDtoList.isEmpty()){
+                for(ShopOrderReportDto so:shopOrderReportDtoList){
+                    //查询线下订单数据
+                    OffLineOrder offLineOrder = offLineOrderMapper.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS,so.getShopDetailId(),DateUtil.getformatBeginDate(beginDate),DateUtil.getformatEndDate(endDate));
+                    //线下订单数
+                    int offlineOrderNum = 0;
+                    //线下订单金额
+                    BigDecimal offlienOrderPrice = BigDecimal.ZERO;
+                    if(offLineOrder != null ){
+                        offlineOrderNum = offLineOrder.getEnterCount();
+                        offlienOrderPrice = offLineOrder.getEnterTotal();
+                    }
+
+                    Map<String,Object> map = new HashMap<>();
+                    map.put("brandId",brandId);
+                    map.put("shopId",so.getShopDetailId());
+                    map.put("dateTime",beginDate);
+                    //订单总数
+                    map.put("orderNum",so.getShop_orderCount());
+                    //订单总额
+                    map.put("orderMoney",so.getShop_orderPrice());
+                    //就餐人数
+                    map.put("customerCount",so.getShop_peopleCount());
+                    //糖吃订单数
+                    map.put("tangshiOrderNum",so.getShop_tangshiCount());
+                    //堂吃订单金额
+                    map.put("tanshiOrderPrice",so.getShop_tangshiPrice());
+                    //外卖订单总数
+                    map.put("outFoodOrderNum",so.getShop_waimaiCount());
+                    //外卖订单总额
+                    map.put("outFoodOrderPrice",so.getShop_waimaiPrice());
+                    //外带订单总数
+                    map.put("outAwayOrderNum",so.getShop_waidaiCount());
+                    //外带订单总额
+                    map.put("outAwaryOrdrPrice",so.getShop_waidaiPrice());
+
+                    //线下订单总数
+                    map.put("offLineOrderNum",offlineOrderNum);
+                    //线下订单朕
+                    map.put("offLineOrderPrice",offlienOrderPrice);
+                    list.add(map);
+                }
+            }
+
+            return  list;
+
+    }
+
+    private List<ShopOrderReportDto> getBossAppOrderReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate) {
+        List<ShopOrderReportDto> shopOrderReportDtoLists = new ArrayList<>();
+        for(int i = 0; i < shopDetailList.size(); i++){
+            ShopDetail shopDetail=shopDetailList.get(i);
+            ShopOrderReportDto shopOrderReportDto= new ShopOrderReportDto();
+            Date begin = DateUtil.getformatBeginDate(beginDate);
+            Date end = DateUtil.getformatEndDate(endDate);
+            shopOrderReportDto=orderMapper.procDayAllOrderItemShop(begin,end,shopDetail.getId());
+            BigDecimal initial_=new BigDecimal("0.00");
+            if(shopOrderReportDto.getShop_orderCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
+                BigDecimal ssinglePrice= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_orderCount());
+                shopOrderReportDto.setShop_singlePrice(new BigDecimal(ssinglePrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+            }else{
+                shopOrderReportDto.setShop_singlePrice(initial_);
+            }
+
+            if(shopOrderReportDto.getShop_peopleCount()!=null&&shopOrderReportDto.getShop_peopleCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
+                BigDecimal speopleCount= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_peopleCount());
+                shopOrderReportDto.setShop_perPersonPrice(new BigDecimal(speopleCount.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+            }else{
+                shopOrderReportDto.setShop_perPersonPrice(initial_);
+            }
+            if(shopOrderReportDto.getShop_peopleCount()==null){
+                shopOrderReportDto.setShop_peopleCount(0);
+            }
+            if(shopOrderReportDto.getShop_orderPrice()==null){
+                shopOrderReportDto.setShop_orderPrice(initial_);
+            }
+            if(shopOrderReportDto.getShop_tangshiPrice()==null){
+                shopOrderReportDto.setShop_tangshiPrice(initial_);
+            }
+            if(shopOrderReportDto.getShop_waidaiPrice()==null){
+                shopOrderReportDto.setShop_waidaiPrice(initial_);
+            }
+            if(shopOrderReportDto.getShop_waimaiPrice()==null){
+                shopOrderReportDto.setShop_waimaiPrice(initial_);
+            }
+            shopOrderReportDto.setShopDetailId(shopDetail.getId());
+            shopOrderReportDto.setShopName(shopDetail.getName());
+            shopOrderReportDtoLists.add(shopOrderReportDto);
+        }
+        return shopOrderReportDtoLists;
+
     }
 
     @Override

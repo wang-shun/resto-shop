@@ -97,8 +97,7 @@ public class CloseShopServieImpl implements CloseShopService{
 	public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand) {
 
 		//定位数据库
-
-
+		
 		/**
 		 * 1.结店退款
 		 * 2查询天气
