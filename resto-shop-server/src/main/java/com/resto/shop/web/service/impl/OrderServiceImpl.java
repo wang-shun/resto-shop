@@ -1075,6 +1075,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 tableGroupService.update(tableGroup);
                 //获取去重后的点餐人员列表  记录参与者
                 List<String> customerIdList = shopCartService.getListByGroupIdDistinctCustomerId(order.getGroupId());
+                List<ShopCart> shopCarts = shopCartService.getListByGroupId(order.getGroupId());
+                Map orderMap = new HashMap(4);
+                orderMap.put("brandName", brand.getBrandName());
+                orderMap.put("fileName", order.getId());
+                orderMap.put("type", "orderAction");
+                orderMap.put("content", "点餐参与者:"+shopCarts.toString());
+                doPostAnsc(url, orderMap);
                 for(String cId : customerIdList){
                     Participant participant = new Participant();
                     participant.setGroupId(order.getGroupId());
