@@ -207,11 +207,7 @@ public class PlatformOrder {
         originalPrice = new BigDecimal(order.getOriginalPrice());
         totalPrice = new BigDecimal(order.getTotalPrice());
         address = order.getAddress();
-        String phoneList = "";
-        for(int i = 0; i < order.getPhoneList().size(); i++){
-            phoneList = order.getPhoneList().get(i) + ",";
-        }
-        phone = phoneList;
+        phone = order.getPhoneList().toString();
         name = order.getConsignee();
         orderCreateTime = order.getCreatedAt();
         createTime = new Date();
