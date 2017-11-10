@@ -9359,7 +9359,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //得到桌号
         TableQrcode tableQrcode =  tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(), Integer.valueOf(order.getTableNumber()));
         //得到该笔订单的评论信息
-        Appraise appraise = appraiseService.selectDeatilByOrderId(order.getId());
+        Appraise appraise = appraiseService.selectDeatilByOrderId(order.getId(), null);
         //得到该笔订单给差评的菜品Id
         String[] articleIds = appraise.getArticleId().split(",");
         //得到差评菜品的订单信息

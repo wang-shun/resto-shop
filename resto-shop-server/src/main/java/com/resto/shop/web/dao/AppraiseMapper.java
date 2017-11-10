@@ -31,7 +31,7 @@ public interface AppraiseMapper  extends GenericDao<Appraise,String> {
 
 	Appraise selectDetailedById(String appraiseId);
 
-    List<Appraise> selectDeatilByOrderId(String orderId);
+    List<Appraise> selectDeatilByOrderId(@Param("orderId")String orderId, @Param("customerId")String customerId);
 
     Appraise selectAppraiseByCustomerId(@Param("customerId")String customerId,@Param("shopId") String shopId);
 
