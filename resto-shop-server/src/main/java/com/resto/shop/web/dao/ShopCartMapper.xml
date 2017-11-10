@@ -177,6 +177,13 @@
 
     <select id="getListByGroupId" resultType="ShopCart">
         select * from tb_shop_cart where group_id = #{groupId}
+        <if test="ids != null">
+            and customer_id in
+            <foreach collection="ids" index="index" item="item"  open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
     </select>
 
     <update id="resetGroupId">
@@ -197,5 +204,7 @@
         update tb_shop_cart
         set group_id = #{groupId}
         where group_id = "" or group_id is null
+        and shop_detail_id = #{shopId}
+        and customer_id = #{customerId}
     </update>
 </mapper>

@@ -425,7 +425,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             //如果这个订单已经被组里的人买单了，那么其他人不能在
-            if(!MemcachedUtils.add(order.getShopDetailId()+order.getGroupId(),1,30)){
+            if(RedisUtil.get(order.getShopDetailId()+order.getGroupId()) != null){
                 String customerId =  String.valueOf(RedisUtil.get(order.getGroupId()+"pay"));
                 if(!customer.getId().equals(customerId)){
                     jsonResult.setSuccess(false);
@@ -435,6 +435,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 return jsonResult;
             }else{
                 RedisUtil.set(order.getGroupId()+"pay",customer.getId());
+                RedisUtil.set(order.getShopDetailId()+order.getGroupId(),1,30l);
             }
         }
 
@@ -1075,6 +1076,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 tableGroupService.update(tableGroup);
                 //获取去重后的点餐人员列表  记录参与者
                 List<String> customerIdList = shopCartService.getListByGroupIdDistinctCustomerId(order.getGroupId());
+                List<ShopCart> shopCarts = shopCartService.getListByGroupId(order.getGroupId());
+                Map orderMap = new HashMap(4);
+                orderMap.put("brandName", brand.getBrandName());
+                orderMap.put("fileName", order.getId());
+                orderMap.put("type", "orderAction");
+                orderMap.put("content", "点餐参与者:"+shopCarts.toString());
+                doPostAnsc(url, orderMap);
                 for(String cId : customerIdList){
                     Participant participant = new Participant();
                     participant.setGroupId(order.getGroupId());
@@ -2681,7 +2689,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("PRINT_TASK_ID", print_id);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
-        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", oldtableNumber);
         //添加当天打印订单的序号
@@ -2741,7 +2750,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("LINE_WIDTH", shopDetail.getPageSize() == 0 ? 48 : 42);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
-        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", oldtableNumber);
         //添加当天打印订单的序号
@@ -2818,7 +2828,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("PRINT_TASK_ID", print_id);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", tableNumber);
         //添加当天打印订单的序号
@@ -2949,7 +2960,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("LINE_WIDTH", shopDetail.getPageSize() == 0 ? 48 : 42);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", tableNumber);
         //添加当天打印订单的序号
@@ -3096,7 +3108,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         data.put("RESTAURANT_NAME", shopDetail.getName());
 
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         data.put("ARTICLE_COUNT", order.getArticleCount());
         print.put("DATA", data);
         print.put("STATUS", 0);
@@ -3174,7 +3187,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("PAYMENT_AMOUNT", order.getOrderMoney());
         data.put("RESTAURANT_NAME", shopDetail.getName());
 
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         data.put("ARTICLE_COUNT", order.getArticleCount());
         print.put("DATA", data);
         print.put("STATUS", 0);
@@ -3252,7 +3266,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("ORDER_ID", serialNumber);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", order.getTableNumber());
         if (StringUtils.isNotBlank(order.getRemark())) {
@@ -3408,7 +3423,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("ORDER_ID", serialNumber);
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", order.getTableNumber());
         if (StringUtils.isNotBlank(order.getRemark())) {
@@ -3850,7 +3866,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         BigDecimal articleCount = new BigDecimal(order.getArticleCount());
         if (order.getParentOrderId() == null) {
             articleCount = articleCount.add(new BigDecimal(order.getCustomerCount() == null ? 0
@@ -4214,7 +4231,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         BigDecimal articleCount = new BigDecimal(order.getArticleCount());
         if (order.getParentOrderId() == null) {
             articleCount = articleCount.add(new BigDecimal(order.getCustomerCount() == null ? 0
@@ -7460,7 +7478,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", new BigDecimal(orderItem.get("SUBTOTAL").toString()).compareTo(BigDecimal.ZERO) > 0 ? orderItem.get("SUBTOTAL") : 0);
         data.put("RESTAURANT_NAME", shopDetail.getName());
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         data.put("ARTICLE_COUNT", orderItem.get("ARTICLE_COUNT"));
         data.put("CUSTOMER_SATISFACTION", star.toString());
         data.put("CUSTOMER_SATISFACTION_DEGREE", level);
@@ -8373,24 +8392,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         content.put("keyword5", keyword5);
                         content.put("remark", remark);
                         String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
-                        Map customerMap = new HashMap(4);
-                        customerMap.put("brandName", brand.getBrandName());
-                        customerMap.put("fileName", customer.getId());
-                        customerMap.put("type", "UserAction");
-                        customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                        doPostAnsc(LogUtils.url, customerMap);
-                        Map map = new HashMap(4);
-                        map.put("brandName", brand.getBrandName());
-                        map.put("fileName", shopDetail.getName());
-                        map.put("type", "posAction");
-                        map.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                        doPostAnsc(url, map);
-                        Map orderMap = new HashMap(4);
-                        orderMap.put("brandName", brand.getBrandName());
-                        orderMap.put("fileName", order.getId());
-                        orderMap.put("type", "orderAction");
-                        orderMap.put("content", "订单:" + order.getId() + "pos端执行退菜推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                        doPostAnsc(url, orderMap);
                         //发送短信
                         if (setting.getMessageSwitch() == 1) {
                             com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
@@ -8693,7 +8694,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("CUSTOMER_COUNT", order.getCustomerCount() == null ? "-" : order.getCustomerCount());
         data.put("PAYMENT_AMOUNT", orderMoney.subtract(order.getRefundMoney()));
         data.put("RESTAURANT_NAME", shopDetail.getName());
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         data.put("ARTICLE_COUNT", -articleCount.intValue());
         data.put("CUSTOMER_SATISFACTION", star.toString());
         data.put("CUSTOMER_SATISFACTION_DEGREE", level);
@@ -9560,7 +9562,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //订单Id
         data.put("ORDER_ID", serialNumber);
         //订单时间
-        data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
+        data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
+        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
         //订单模式
         data.put("DISTRIBUTION_MODE", modeText);
         //桌号
