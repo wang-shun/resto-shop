@@ -123,11 +123,16 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			order.setAllowContinueOrder(false);
 			orderService.update(order);
 		}else if(order.getAllowAppraise() && order.getGroupId() != null && !"".equals(order.getGroupId())){
+			//判断用户是否已经评论
+			Appraise a = appraiseMapper.selectByOrderIdCustomerId(appraise.getOrderId(), appraise.getCustomerId());
+			if(a != null){
+				log.error("订单不允许评论:	"+order.getId());
+				throw new AppException(AppException.ORDER_NOT_ALL_APPRAISE);
+			}
 			appraise.setId(ApplicationUtils.randomUUID());
 			appraise.setCreateTime(new Date());
 			appraise.setStatus((byte)1);
 			appraise.setShopDetailId(order.getShopDetailId());
-			order.setCustomerId(appraise.getCustomerId());
 			BigDecimal redMoney= rewardRed(order);
 			appraise.setRedMoney(redMoney);
 			appraise.setBrandId(order.getBrandId());
