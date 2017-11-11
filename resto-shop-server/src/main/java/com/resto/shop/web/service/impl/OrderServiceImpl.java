@@ -1117,7 +1117,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         Participant participant = new Participant();
                         participant.setGroupId(order.getGroupId());
                         participant.setCustomerId(cId);
-                        participant.setOrderId(order.getParentOrderId());
+                        participant.setOrderId(order.getId());
                         participant.setIsPay(0);
                         participant.setAppraise(0);
                         participant.setBrandId(order.getBrandId());
@@ -1129,7 +1129,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     Participant participant = new Participant();
                     participant.setGroupId(order.getGroupId());
                     participant.setCustomerId(order.getCustomerId());
-                    participant.setOrderId(order.getParentOrderId());
+                    participant.setOrderId(order.getId());
                     participant.setIsPay(0);
                     participant.setAppraise(0);
                     participant.setBrandId(order.getBrandId());
