@@ -45,6 +45,7 @@ public class ShopDetailController extends GenericController{
 	@ResponseBody
 	public Result modify(ShopDetail shopDetail){
 	    shopDetail.setId(getCurrentShopId());
+	    log.info(shopDetail.getIsOpenTablewareFee() + "");
 	    if(shopDetail.getIsOpenSauceFee() == null){
 	    	shopDetail.setIsOpenSauceFee(0);
 		}
