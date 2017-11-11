@@ -8361,7 +8361,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         }
                     }
                     msg.append("退菜金额:").append(order.getRefundMoney()).append("\n");
-
+                    log.info("tttt"+msg.toString());
+                    log.info("tt"+customer.getWechatId());
+                    log.info("t"+config.getAppid());
                     WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 
                     //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), o.getId(),
