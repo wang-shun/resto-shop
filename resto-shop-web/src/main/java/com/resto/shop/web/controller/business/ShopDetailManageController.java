@@ -63,6 +63,16 @@
      @ResponseBody
      public Result modify(ShopDetail shopDetail){
          shopDetail.setId(getCurrentShopId());
+         log.info(shopDetail.getIsOpenTablewareFee() + "22222");
+         if(shopDetail.getIsOpenSauceFee() == null){
+             shopDetail.setIsOpenSauceFee(0);
+         }
+         if(shopDetail.getIsOpenTablewareFee() == null){
+             shopDetail.setIsOpenTablewareFee(0);
+         }
+         if(shopDetail.getIsOpenTowelFee() == null){
+             shopDetail.setIsOpenTowelFee(0);
+         }
 //         switch (shopDetail.getWaitUnit()){
 //             case 1 :
 //                 shopDetail.setTimeOut(shopDetail.getWaitTime());
