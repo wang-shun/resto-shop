@@ -473,19 +473,19 @@
 					</div>
 
 					<!-- 服务费经典版begin -->
-                    <div v-if="m.isUseServicePrice==1 && m.serviceType == 0">
+                    <div v-show="m.isUseServicePrice==1 && m.serviceType == 0">
                         <div v-show="showp" >
                             <div class="form-group">
                                 <label  class="col-sm-4 control-label formBox">名称：</label>
                                 <div  class="col-md-6 radio-list">
-                                    <input type="test" class="form-control" name="serviceName" v-if="!m.serviceName" value="服务费" required="required">
-                                    <input type="test" class="form-control" name="serviceName" v-if="m.serviceName" v-model="m.serviceName" required="required">
+                                    <input type="test" class="form-control" name="serviceName" v-if="!m.serviceName" value="服务费">
+                                    <input type="test" class="form-control" name="serviceName" v-if="m.serviceName" v-model="m.serviceName">
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label  class="col-sm-4 control-label formBox">服务费/每人：</label>
                                 <div  class="col-md-6 radio-list">
-                                    <input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" required="required" min="0">
+                                    <input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" min="0">
                                 </div>
                             </div>
                         </div>
@@ -493,7 +493,7 @@
 					<!-- 服务费经典版end -->
 
 					<!-- 服务费升级版begin -->
-					<div class="form-group" v-if="m.isUseServicePrice == 1 && m.serviceType == 1">
+					<div class="form-group" v-show="m.isUseServicePrice == 1 && m.serviceType == 1">
 						<label  class="col-sm-4 control-label" :class="{ formBox : m.isOpenTablewareFee == 1, gray : m.isOpenTablewareFee == 0}" style="margin-top: 20px;">餐具费：</label>
 						<div  class="col-md-6">
 							<div class="row">
@@ -510,20 +510,20 @@
 							<div class="row">
 								<div class="col-md-4">
 									<input v-show="m.isOpenTablewareFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="text" class="form-control" name="tablewareFeeName" v-model="m.tablewareFeeName" required>
+									<input v-else type="text" class="form-control" name="tablewareFeeName" v-model="m.tablewareFeeName">
 								</div>
 								<div class="col-md-4">
 									<input v-show="m.isOpenTablewareFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="number" class="form-control" name="tablewareFeePrice" v-model="m.tablewareFeePrice" required>
+									<input v-else type="number" class="form-control" name="tablewareFeePrice" v-model="m.tablewareFeePrice">
 								</div>
 								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
-									<input type="checkbox" value="1" name="isOpenTablewareFee" v-model="m.isOpenTablewareFee">
+									<input type="checkbox" class="form-control" value="1" name="isOpenTablewareFee" v-model="m.isOpenTablewareFee">
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="form-group" v-if="m.isUseServicePrice == 1 && m.serviceType == 1">
+					<div class="form-group" v-show="m.isUseServicePrice == 1 && m.serviceType == 1">
 						<label  class="col-sm-4 control-label" :class="{ formBox : m.isOpenTowelFee == 1, gray : m.isOpenTowelFee == 0}" style="margin-top: 20px;">纸巾费：</label>
 						<div  class="col-md-6">
 							<div class="row">
@@ -540,20 +540,20 @@
 							<div class="row">
 								<div class="col-md-4">
 									<input v-show="m.isOpenTowelFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="text" class="form-control" name="towelFeeName" v-model="m.towelFeeName" required>
+									<input v-else type="text" class="form-control" name="towelFeeName" v-model="m.towelFeeName">
 								</div>
 								<div class="col-md-4">
 									<input v-show="m.isOpenTowelFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="number" class="form-control" name="towelFeePrice" v-model="m.towelFeePrice" required>
+									<input v-else type="number" class="form-control" name="towelFeePrice" v-model="m.towelFeePrice">
 								</div>
 								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
-									<input type="checkbox" value="1" name="isOpenTowelFee" v-model="m.isOpenTowelFee">
+									<input type="checkbox" class="form-control" value="1" name="isOpenTowelFee" v-model="m.isOpenTowelFee">
 								</div>
 							</div>
 						</div>
 					</div>
 
-					<div class="form-group" v-if="m.isUseServicePrice == 1 && m.serviceType == 1">
+					<div class="form-group" v-show="m.isUseServicePrice == 1 && m.serviceType == 1">
 						<label  class="col-sm-4 control-label" :class="{ formBox : m.isOpenSauceFee == 1, gray : m.isOpenSauceFee == 0}" style="margin-top: 20px;">酱料费：</label>
 						<div  class="col-md-6">
 							<div class="row">
@@ -570,14 +570,14 @@
 							<div class="row">
 								<div class="col-md-4">
 									<input v-show="m.isOpenSauceFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="text" class="form-control" name="sauceFeeName" v-model="m.sauceFeeName" required>
+									<input v-else type="text" class="form-control" name="sauceFeeName" v-model="m.sauceFeeName">
 								</div>
 								<div class="col-md-4">
 									<input v-show="m.isOpenSauceFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="number" class="form-control" name="sauceFeePrice" v-model="m.sauceFeePrice" required>
+									<input v-else type="number" class="form-control" name="sauceFeePrice" v-model="m.sauceFeePrice">
 								</div>
 								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
-									<input type="checkbox"  value="1" name="isOpenSauceFee" v-model="m.isOpenSauceFee">
+									<input type="checkbox" class="form-control" value="1" name="isOpenSauceFee" v-model="m.isOpenSauceFee">
 								</div>
 							</div>
 						</div>
