@@ -88,7 +88,7 @@
 
 
   <select id="getGroupByGroupId" resultType="CustomerGroup">
-      select * from tb_customer_group where group_id = #{groupId} order by create_time asc
+      select * from tb_customer_group where group_id = #{groupId} GROUP  by customer_id order by create_time asc
   </select>
 
   <select id="getGroupByCustomerId" resultType="CustomerGroup">

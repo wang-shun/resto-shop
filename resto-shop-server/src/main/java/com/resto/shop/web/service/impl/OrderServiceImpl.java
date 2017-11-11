@@ -8282,7 +8282,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<CustomerGroup> customerGroups = customerGroupService.getGroupByGroupId(o.getGroupId());
             for(CustomerGroup customerGroup : customerGroups){
                 Customer customer = customerService.selectById(customerGroup.getCustomerId());
-                customerList.add(customer);
+                if(customer != null){
+                    customerList.add(customer);
+                }
+
             }
         }else{
             Customer customer = customerService.selectById(o.getCustomerId());
