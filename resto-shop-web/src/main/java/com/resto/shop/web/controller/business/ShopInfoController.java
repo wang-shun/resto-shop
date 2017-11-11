@@ -155,6 +155,16 @@ public class ShopInfoController extends GenericController{
            shopDetail.setServicePrice(servicePrice);
        }
 
+        if(shopDetail.getIsOpenSauceFee() == null){
+            shopDetail.setIsOpenSauceFee(0);
+        }
+        if(shopDetail.getIsOpenTablewareFee() == null){
+            shopDetail.setIsOpenTablewareFee(0);
+        }
+        if(shopDetail.getIsOpenTowelFee() == null){
+            shopDetail.setIsOpenTowelFee(0);
+        }
+
 //        shopDetailService.updateWithDatong(shopDetail,getCurrentBrandId(),getBrandName());
         shopDetailService.update(shopDetail);
         ShopDetail shopDetail1 =(ShopDetail) RedisUtil.get(getCurrentShopId()+"info");
