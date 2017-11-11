@@ -2639,7 +2639,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map.put("type", "posAction");
         map.put("content", "订单:" + order.getId() + "返回打印厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map);
-
+        if (printTask.size() != 0){
+            //从缓存里取当前订单的厨打打印次数， 如果为空则是第一次打印则当前打印次数为1
+            Integer printTimes = RedisUtil.get(order.getId() + "KITCHEN") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "KITCHEN").toString()) + 1;
+            //订单返回厨打单打印模板视为已打印成功
+            RedisUtil.set(order.getId() + "KITCHEN", printTimes);
+        }
         return printTask;
     }
 
@@ -2690,7 +2695,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的转台单打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "TURNTABLE") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "TURNTABLE").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", oldtableNumber);
         //添加当天打印订单的序号
@@ -2730,6 +2737,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //添加到 打印集合
         printTask.add(print);
         RedisUtil.set(print_id, print);
+        //订单返回转台单打印模板视为已打印成功
+        RedisUtil.set(order.getId() + "TURNTABLE", printTimes);
     }
 
     private void getTurnTableModelNew(Order order, Printer printer,ShopDetail shopDetail, List<Map<String, Object>> printTask,String oldtableNumber) {
@@ -2751,7 +2760,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的转台单打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "TURNTABLE") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "TURNTABLE").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", oldtableNumber);
         //添加当天打印订单的序号
@@ -2791,6 +2802,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //添加到 打印集合
         printTask.add(print);
         RedisUtil.set(print_id, print);
+        //订单返回转台单打印模板视为已打印成功
+        RedisUtil.set(order.getId() + "TURNTABLE", printTimes);
     }
 
 
@@ -2829,7 +2842,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的转台单打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "KITCHEN") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "KITCHEN").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", tableNumber);
         //添加当天打印订单的序号
@@ -2961,7 +2976,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的转台单打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "KITCHEN") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "KITCHEN").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", tableNumber);
         //添加当天打印订单的序号
@@ -3109,7 +3126,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_NAME", shopDetail.getName());
 
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的厨打打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "KITCHEN") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "KITCHEN").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         data.put("ARTICLE_COUNT", order.getArticleCount());
         print.put("DATA", data);
         print.put("STATUS", 0);
@@ -3188,7 +3207,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("RESTAURANT_NAME", shopDetail.getName());
 
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的厨打打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "KITCHEN") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "KITCHEN").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         data.put("ARTICLE_COUNT", order.getArticleCount());
         print.put("DATA", data);
         print.put("STATUS", 0);
@@ -3267,7 +3288,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的厨打打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "KITCHEN") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "KITCHEN").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", order.getTableNumber());
         if (StringUtils.isNotBlank(order.getRemark())) {
@@ -3424,7 +3447,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Object> data = new HashMap<String, Object>();
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的厨打打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "KITCHEN") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "KITCHEN").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         data.put("DISTRIBUTION_MODE", modeText);
         data.put("TABLE_NUMBER", order.getTableNumber());
         if (StringUtils.isNotBlank(order.getRemark())) {
@@ -3867,7 +3892,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的总单打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "TICKET") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "TICKET").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         BigDecimal articleCount = new BigDecimal(order.getArticleCount());
         if (order.getParentOrderId() == null) {
             articleCount = articleCount.add(new BigDecimal(order.getCustomerCount() == null ? 0
@@ -3958,6 +3985,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         printList.add(print_id);
         RedisUtil.set(shopDetail.getId() + "printList", printList);
+        //订单返回总单打印模板视为已打印成功
+        RedisUtil.set(order.getId() + "TICKET", printTimes);
         return print;
     }
 
@@ -4232,7 +4261,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的总单打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "TICKET") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "TICKET").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         BigDecimal articleCount = new BigDecimal(order.getArticleCount());
         if (order.getParentOrderId() == null) {
             articleCount = articleCount.add(new BigDecimal(order.getCustomerCount() == null ? 0
@@ -4323,6 +4354,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         printList.add(print_id);
         RedisUtil.set(shopDetail.getId() + "printList", printList);
+        //订单返回总单打印模板视为已打印成功
+        RedisUtil.set(order.getId() + "TICKET", printTimes);
         return print;
     }
 
@@ -7479,7 +7512,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("PAYMENT_AMOUNT", new BigDecimal(orderItem.get("SUBTOTAL").toString()).compareTo(BigDecimal.ZERO) > 0 ? orderItem.get("SUBTOTAL") : 0);
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的编辑订单的总单打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "MODIFYTICKET") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "MODIFYTICKET").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         data.put("ARTICLE_COUNT", orderItem.get("ARTICLE_COUNT"));
         data.put("CUSTOMER_SATISFACTION", star.toString());
         data.put("CUSTOMER_SATISFACTION_DEGREE", level);
@@ -7505,6 +7540,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("DATA", data);
         print.put("STATUS", 0);
         print.put("TICKET_TYPE", TicketType.RECEIPT);
+        //订单返回编辑订单打印模板视为已打印成功
+        RedisUtil.set(order.getId() + "MODIFYTICKET", printTimes);
         return print;
     }
 
@@ -8695,7 +8732,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("PAYMENT_AMOUNT", orderMoney.subtract(order.getRefundMoney()));
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //从缓存里取当前订单的退菜总单打印次数， 如果为空则是第一次打印则当前打印次数为1
+        Integer printTimes = RedisUtil.get(order.getId() + "REFUNDTICKET") == null ? 1 : Integer.valueOf(RedisUtil.get(order.getId() + "REFUNDTICKET").toString()) + 1;
+        data.put("PRINT_TIMES", printTimes); //打印次数
         data.put("ARTICLE_COUNT", -articleCount.intValue());
         data.put("CUSTOMER_SATISFACTION", star.toString());
         data.put("CUSTOMER_SATISFACTION_DEGREE", level);
@@ -8723,6 +8762,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("DATA", data);
         print.put("STATUS", 0);
         print.put("TICKET_TYPE", TicketType.RECEIPT);
+        //订单返回退菜总单打印模板视为已打印成功
+        RedisUtil.set(order.getId() + "REFUNDTICKET", printTimes);
         return print;
     }
 
@@ -9563,7 +9604,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         data.put("ORDER_ID", serialNumber);
         //订单时间
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
-        data.put("PRINT_TIMES", order.getPrintTimes()); //打印次数
+        //一个订单只会被评论一次， 所以该笔订单的差评打印次数衡为1
+        data.put("PRINT_TIMES", 1); //打印次数
         //订单模式
         data.put("DISTRIBUTION_MODE", modeText);
         //桌号
