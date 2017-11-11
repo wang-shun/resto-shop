@@ -23,6 +23,6 @@ public class GroupAspect  {
     @AfterReturning(value = "insertGroup()", returning = "tableGroup")
     public void insertGroup(TableGroup tableGroup) {
         //创建组后 如果 15分钟内 没有 买单 ，则组自动消失
-        MQMessageProducer.removeTableGroup(tableGroup,1500 * 60 * 1000);
+        MQMessageProducer.removeTableGroup(tableGroup,15 * 60 * 1000);
     }
 }
