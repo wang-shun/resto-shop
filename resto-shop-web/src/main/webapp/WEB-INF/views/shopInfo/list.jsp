@@ -965,6 +965,7 @@
                                     if (!reg.test(tablewareFeePrice) || !reg.test(towelFeePrice) || !reg.test(sauceFeePrice)){ //如果有新版服务费不是数字的
                                         toastr.clear();
                                         toastr.error("升级版服务费的价格只能是整数");
+                                        return;
                                     }
                                 }
                             }
