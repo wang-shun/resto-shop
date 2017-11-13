@@ -87,7 +87,7 @@
     </select>
   <select id="selectMealAttrByShopId" resultType="MealAttr">
       SELECT ma.id,ma.`name`,ma.sort,ma.article_id,ma.print_sort,ma.choice_type,ma.choice_count
-       from tb_meal_attr ma LEFT JOIN tb_article a on ma.article_id = a.id where a.shop_detail_id = #{shopId}
+       from tb_meal_attr ma LEFT JOIN tb_article a on ma.article_id = a.id where a.shop_detail_id = #{shopId} and a.state = 1;
   </select>
 
 </mapper>
