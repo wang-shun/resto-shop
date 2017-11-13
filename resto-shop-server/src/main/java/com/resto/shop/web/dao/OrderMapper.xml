@@ -192,6 +192,8 @@
         <result column="no_discount_money" property="noDiscountMoney"/>
         <result column="is_consumption_rebate" property="isConsumptionRebate"/>
         <result column="group_id" property="groupId"/>
+        <result column="before_id" property="beforeId"/>
+        <result column="order_before" property="orderBefore"/>
         <result column="sauce_fee_count" property="sauceFeeCount"/>
         <result column="sauce_fee_price" property="sauceFeePrice"/>
         <result column="towel_fee_count" property="towelFeeCount"/>
