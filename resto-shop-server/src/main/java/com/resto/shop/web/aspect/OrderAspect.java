@@ -504,8 +504,13 @@ public class OrderAspect {
                         keyword5.put("value", msg.toString());
                         keyword5.put("color", "#000000");
                         Map<String, Object> remark = new HashMap<String, Object>();
-                        remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
-                        remark.put("color", "#173177");
+                        if (order.getOrderMode() == ShopMode.BOSS_ORDER && !order.getBeforeId().isEmpty()) {
+                            remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
+                            remark.put("color", "#173177");
+                        }else{
+                            remark.put("value", "");
+                            remark.put("color", "#173177");
+                        }
                         content.put("first", first);
                         content.put("keyword1", keyword1);
                         content.put("keyword2", keyword2);
@@ -1166,8 +1171,13 @@ public class OrderAspect {
                     keyword5.put("value", msg.toString());
                     keyword5.put("color", "#000000");
                     Map<String, Object> remark = new HashMap<String, Object>();
-                    remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
-                    remark.put("color", "#173177");
+                    if (order.getOrderMode() == ShopMode.BOSS_ORDER && !order.getBeforeId().isEmpty()) {
+                        remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
+                        remark.put("color", "#173177");
+                    }else{
+                        remark.put("value", "");
+                        remark.put("color", "#173177");
+                    }
                     content.put("first", first);
                     content.put("keyword1", keyword1);
                     content.put("keyword2", keyword2);

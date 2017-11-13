@@ -426,13 +426,12 @@
 
 					<div class="form-group">
 						<label class="col-md-4 control-label">日结小票模板类型：</label>
-						<div  class="col-md-6 radio-list">
-							<label class="radio-inline">
-								<input type="radio" name="templateType"v-model="m.templateType" value="0">经典版
-							</label>
-							<label class="radio-inline">
-								<input type="radio" name="templateType" v-model="m.templateType" value="1">升级版
-							</label>
+						<div  class="col-md-2 radio-list">
+							<select class="form-control" name="templateType" v-model="m.templateType">
+								<option value="0">经典版</option>
+								<option value="1">升级版</option>
+								<option value="2">简约版</option>
+							</select>
 						</div>
 					</div>
 
@@ -1041,6 +1040,10 @@
                                     this.m.openPosIntegralPay = value;
                                     break;
                             }
+                        },
+                        setTemplateType : function (value) {
+						    alert(value);
+							this.m.templateType = value;
                         }
 					}
 				});
