@@ -253,8 +253,7 @@ public class OrderAspect {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
             msg.append("订单金额：" + order.getOrderMoney() + "\n");
-            log.info("订单状态\n：" + order.getOrderBefore() + "\n");
-            if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getOrderBefore() != 1) {
+            if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getOrderBefore() == null) {
                 String url = "";
                 if (order.getParentOrderId() == null) {
                     url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
@@ -1091,7 +1090,7 @@ public class OrderAspect {
                     msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
                 }
                 msg.append("订单金额：" + sum + "\n");
-                if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4 && order.getOrderBefore() != 1) {
+                if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4 && order.getOrderBefore() == null) {
                     String url = "";
                     if (order.getParentOrderId() == null) {
                         url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
