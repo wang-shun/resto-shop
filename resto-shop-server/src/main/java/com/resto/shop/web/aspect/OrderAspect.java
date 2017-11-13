@@ -253,6 +253,7 @@ public class OrderAspect {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
             msg.append("订单金额：" + order.getOrderMoney() + "\n");
+            log.info("订单状态\n：" + order.getOrderBefore() + "\n");
             if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getOrderBefore() != 1) {
                 String url = "";
                 if (order.getParentOrderId() == null) {
