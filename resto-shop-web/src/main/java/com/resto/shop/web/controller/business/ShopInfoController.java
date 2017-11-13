@@ -140,6 +140,15 @@ public class ShopInfoController extends GenericController{
             shopDetail.setWarningSms(Common.NO);
         }
         //服务费类型  0：经典版  1：升级版
+        if(shopDetail.getIsOpenSauceFee() == null){ //如果关闭了餐具费
+            shopDetail.setIsOpenSauceFee(0);
+        }
+        if(shopDetail.getIsOpenTablewareFee() == null){ //如果关闭了纸巾费
+            shopDetail.setIsOpenTablewareFee(0);
+        }
+        if(shopDetail.getIsOpenTowelFee() == null){ //如果关闭了酱料费
+            shopDetail.setIsOpenTowelFee(0);
+        }
        if (Common.YES.equals(shopDetail.getServiceType())){ //如果是新版服务费
            BigDecimal servicePrice = BigDecimal.ZERO;
            if (Common.YES.equals(shopDetail.getIsOpenTablewareFee())){ //如果开通了餐具费
@@ -154,16 +163,6 @@ public class ShopInfoController extends GenericController{
            //将新版服务费总值赋值到服务费价格字段(微信端还是走之前的那个逻辑：根据店铺开关和服务费价格前端计算)
            shopDetail.setServicePrice(servicePrice);
        }
-
-        if(shopDetail.getIsOpenSauceFee() == null){
-            shopDetail.setIsOpenSauceFee(0);
-        }
-        if(shopDetail.getIsOpenTablewareFee() == null){
-            shopDetail.setIsOpenTablewareFee(0);
-        }
-        if(shopDetail.getIsOpenTowelFee() == null){
-            shopDetail.setIsOpenTowelFee(0);
-        }
 
 //        shopDetailService.updateWithDatong(shopDetail,getCurrentBrandId(),getBrandName());
         shopDetailService.update(shopDetail);
