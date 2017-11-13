@@ -70,6 +70,10 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
                 shopcartMapper.delMealItem(shopCartItem.getId().toString());
                 return shopCartItem.getId();
             }
+            if(number == 0){
+                shopcartMapper.deleteByPrimaryKey(shopCart.getId());
+                shopcartMapper.delMealItem(shopCartItem.getId().toString());
+            }
 
         }
         Integer oldNumber = new Integer(0);
