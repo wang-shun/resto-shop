@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.*;
+import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
@@ -14,6 +15,7 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
+import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.JoinPoint;
@@ -143,7 +145,7 @@ public class OrderAspect {
                 MQMessageProducer.sendPrintSuccess(shopId);
                 return;
             }
-            if (!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT) {
+            if (order.getBeforeId() != null && order.getOrderState() == OrderState.PAYMENT) {
                 orderBeforeService.updateState(order.getBeforeId(), 1);
                 Order before = orderService.selectById(order.getBeforeId());
                 before.setOrderState(OrderState.CANCEL);
@@ -251,7 +253,7 @@ public class OrderAspect {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
             msg.append("订单金额：" + order.getOrderMoney() + "\n");
-            if (order.getOrderMode() == ShopMode.BOSS_ORDER && !order.getBeforeId().isEmpty()) {
+            if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getBeforeId() != null) {
                 String url = "";
                 if (order.getParentOrderId() == null) {
                     url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
@@ -502,8 +504,13 @@ public class OrderAspect {
                         keyword5.put("value", msg.toString());
                         keyword5.put("color", "#000000");
                         Map<String, Object> remark = new HashMap<String, Object>();
-                        remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
-                        remark.put("color", "#173177");
+                        if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getBeforeId() != null) {
+                            remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
+                            remark.put("color", "#173177");
+                        }else{
+                            remark.put("value", "");
+                            remark.put("color", "#173177");
+                        }
                         content.put("first", first);
                         content.put("keyword1", keyword1);
                         content.put("keyword2", keyword2);
@@ -696,7 +703,7 @@ public class OrderAspect {
 //            sendPaySuccessMsg(order);
 //        }
 
-        if (!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT) {
+        if (order.getBeforeId() != null && order.getOrderState() == OrderState.PAYMENT) {
             orderBeforeService.updateState(order.getBeforeId(), 1);
             Order before = orderService.selectById(order.getBeforeId());
             before.setOrderState(OrderState.CANCEL);
@@ -1083,7 +1090,7 @@ public class OrderAspect {
                     msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
                 }
                 msg.append("订单金额：" + sum + "\n");
-                if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4 && !order.getBeforeId().isEmpty()) {
+                if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4 && order.getBeforeId() != null) {
                     String url = "";
                     if (order.getParentOrderId() == null) {
                         url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
@@ -1164,8 +1171,13 @@ public class OrderAspect {
                     keyword5.put("value", msg.toString());
                     keyword5.put("color", "#000000");
                     Map<String, Object> remark = new HashMap<String, Object>();
-                    remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
-                    remark.put("color", "#173177");
+                    if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getBeforeId() != null) {
+                        remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
+                        remark.put("color", "#173177");
+                    }else{
+                        remark.put("value", "");
+                        remark.put("color", "#173177");
+                    }
                     content.put("first", first);
                     content.put("keyword1", keyword1);
                     content.put("keyword2", keyword2);
