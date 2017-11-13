@@ -484,7 +484,7 @@
                             <div class="form-group">
                                 <label  class="col-sm-4 control-label formBox">服务费/每人：</label>
                                 <div  class="col-md-6 radio-list">
-                                    <input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" min="0">
+                                    <input type="text" class="form-control" name="servicePrice" v-model="m.servicePrice" min="0">
                                 </div>
                             </div>
                         </div>
@@ -513,7 +513,7 @@
 								</div>
 								<div class="col-md-4">
 									<input v-show="m.isOpenTablewareFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="number" class="form-control" name="tablewareFeePrice" v-model="m.tablewareFeePrice">
+									<input v-else type="text" class="form-control" name="tablewareFeePrice" v-model="m.tablewareFeePrice">
 								</div>
 								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
 									<input type="checkbox" class="form-control" value="1" name="isOpenTablewareFee" v-model="m.isOpenTablewareFee">
@@ -543,7 +543,7 @@
 								</div>
 								<div class="col-md-4">
 									<input v-show="m.isOpenTowelFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="number" class="form-control" name="towelFeePrice" v-model="m.towelFeePrice">
+									<input v-else type="text" class="form-control" name="towelFeePrice" v-model="m.towelFeePrice">
 								</div>
 								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
 									<input type="checkbox" class="form-control" value="1" name="isOpenTowelFee" v-model="m.isOpenTowelFee">
@@ -573,7 +573,7 @@
 								</div>
 								<div class="col-md-4">
 									<input v-show="m.isOpenSauceFee == 0" type="text" class="form-control" disabled>
-									<input v-else type="number" class="form-control" name="sauceFeePrice" v-model="m.sauceFeePrice">
+									<input v-else type="text" class="form-control" name="sauceFeePrice" v-model="m.sauceFeePrice">
 								</div>
 								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
 									<input type="checkbox" class="form-control" value="1" name="isOpenSauceFee" v-model="m.isOpenSauceFee">
@@ -944,6 +944,31 @@
 								toastr.error("混合支付模式下不可以同时关闭2种支付方式！");
 								return;
 							}
+
+                            var reg = new RegExp("^[0-9]*$"); //用来验证服务费数据是数字
+                            var serviceType = this.m.serviceType;
+                            if (serviceType == 0){ //经典版服务费
+                                var servicePrice = this.m.servicePrice;
+                                if (!reg.test(servicePrice)){
+                                    toastr.clear();
+                                    toastr.error("经典版服务费只能是整数");
+                                    return;
+                                }
+                            }else { //升级版服务费
+                                var isOpenSauceFee = this.m.isOpenSauceFee;
+                                var isOpenTowelFee = this.m.isOpenTowelFee;
+                                var isOpenTablewareFee = this.m.isOpenTablewareFee;
+                                if (isOpenSauceFee == 1 || isOpenTowelFee == 1 || isOpenTablewareFee == 1){ //如果开通了餐具费、纸巾费、酱料费
+                                    var tablewareFeePrice = this.m.tablewareFeePrice;
+                                    var towelFeePrice = this.m.towelFeePrice;
+                                    var sauceFeePrice = this.m.sauceFeePrice;
+                                    if (!reg.test(tablewareFeePrice) || !reg.test(towelFeePrice) || !reg.test(sauceFeePrice)){ //如果有新版服务费不是数字的
+                                        toastr.clear();
+                                        toastr.error("升级版服务费的价格只能是整数");
+                                        return;
+                                    }
+                                }
+                            }
 							$.ajax({
 								url : "shopInfo/modify",
 								data : $(formDom).serialize(),
