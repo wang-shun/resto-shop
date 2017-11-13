@@ -504,7 +504,7 @@ public class OrderAspect {
                         keyword5.put("value", msg.toString());
                         keyword5.put("color", "#000000");
                         Map<String, Object> remark = new HashMap<String, Object>();
-                        if (order.getOrderMode() == ShopMode.BOSS_ORDER && !order.getBeforeId().isEmpty()) {
+                        if (order.getOrderMode() == ShopMode.BOSS_ORDER && !StringUtils.isEmpty(order.getBeforeId())) {
                             remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
                             remark.put("color", "#173177");
                         }else{
@@ -1171,7 +1171,7 @@ public class OrderAspect {
                     keyword5.put("value", msg.toString());
                     keyword5.put("color", "#000000");
                     Map<String, Object> remark = new HashMap<String, Object>();
-                    if (order.getOrderMode() == ShopMode.BOSS_ORDER && !order.getBeforeId().isEmpty()) {
+                    if (order.getOrderMode() == ShopMode.BOSS_ORDER && !StringUtils.isEmpty(order.getBeforeId())) {
                         remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
                         remark.put("color", "#173177");
                     }else{
