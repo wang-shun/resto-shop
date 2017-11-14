@@ -253,7 +253,7 @@ public class OrderAspect {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
             msg.append("订单金额：" + order.getOrderMoney() + "\n");
-            if (order.getOrderMode() == ShopMode.BOSS_ORDER && !StringUtils.isEmpty(order.getBeforeId())) {
+            if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getOrderBefore() == null) {
                 String url = "";
                 if (order.getParentOrderId() == null) {
                     url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
@@ -504,7 +504,7 @@ public class OrderAspect {
                         keyword5.put("value", msg.toString());
                         keyword5.put("color", "#000000");
                         Map<String, Object> remark = new HashMap<String, Object>();
-                        if (order.getOrderMode() == ShopMode.BOSS_ORDER && !StringUtils.isEmpty(order.getBeforeId())) {
+                        if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getOrderBefore() == null) {
                             remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
                             remark.put("color", "#173177");
                         }else{
@@ -1090,7 +1090,7 @@ public class OrderAspect {
                     msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
                 }
                 msg.append("订单金额：" + sum + "\n");
-                if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4 && !StringUtils.isEmpty(order.getBeforeId())) {
+                if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4 && order.getOrderBefore() == null) {
                     String url = "";
                     if (order.getParentOrderId() == null) {
                         url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
@@ -1171,7 +1171,7 @@ public class OrderAspect {
                     keyword5.put("value", msg.toString());
                     keyword5.put("color", "#000000");
                     Map<String, Object> remark = new HashMap<String, Object>();
-                    if (order.getOrderMode() == ShopMode.BOSS_ORDER && !StringUtils.isEmpty(order.getBeforeId())) {
+                    if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getOrderBefore() == null) {
                         remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
                         remark.put("color", "#173177");
                     }else{
