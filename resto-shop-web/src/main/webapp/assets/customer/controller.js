@@ -234,6 +234,7 @@ var Controller = function(controlId,datatable){
 		};
 		options  = $.extend(defaults,options);
 		form.submit(function(e){
+			debugger
 			e.preventDefault();
 			form.attr('action',options.formaction||form.attr('action'));
 			_C.ajaxFormEx(form,options);
