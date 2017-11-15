@@ -978,7 +978,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             order.setAllowCancel(true); // 订单是否允许取消
             order.setAllowAppraise(false);
-            order.setArticleCount(articleCount); // 订单餐品总数
+            if(!StringUtils.isEmpty(order.getBeforeId())){
+                Order beforeOrder = orderMapper.selectByPrimaryKey(order.getBeforeId());
+                order.setArticleCount(articleCount + beforeOrder.getArticleCount());
+            }else{
+                order.setArticleCount(articleCount); // 订单餐品总数
+            }
             order.setClosed(false); // 订单是否关闭 否
             order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
             order.setOriginalAmount(originMoney.add(order.getServicePrice()).add(order.getMealFeePrice()).add(extraMoney));// 原价
