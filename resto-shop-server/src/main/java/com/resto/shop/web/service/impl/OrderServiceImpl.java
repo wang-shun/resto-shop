@@ -5954,6 +5954,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Map<String, Object> serviceMap = new HashMap<>();
             if ("27f56b31669f4d43805226709874b530".equals(brand.getId())) {
                 serviceMap.put("serviceName", "就餐人数");
+            } else if (StringUtils.isBlank(shopDetail.getServiceName())){
+                serviceMap.put("serviceName", "服务费");
             } else {
                 serviceMap.put("serviceName", shopDetail.getServiceName());
             }
@@ -6010,7 +6012,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             selectOrderMap.put("orderIds", orderIds);
             selectOrderMap.put("count", "count != 0");
             List<OrderItem> saledOrderItems = orderItemService.selectOrderItemByOrderIds(selectOrderMap);
-            if (shopDetail.getTemplateType().equals(Common.YES)) {
+            if (shopDetail.getTemplateType().equals(Common.YES) || shopDetail.getTemplateType().equals(2)) { //升级版或简约版
                 List<String> articleIds = new ArrayList<>();
                 for (OrderItem item : saledOrderItems) {
                     if (item.getArticleId().indexOf("@") != -1) {
@@ -6023,28 +6025,31 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 List<ArticleFamily> articleFamilies = articleFamilyMapper.selectArticleSort(articleIds);
                 for (ArticleFamily articleFamily : articleFamilies) {
                     List<Map<String, Object>> familyArticleMaps = new ArrayList<>();
-//                BigDecimal familyCount = BigDecimal.ZERO;
+                    BigDecimal familyCount = BigDecimal.ZERO;
                     for (Article article : articleFamily.getArticleList()) {
                         BigDecimal unitNewCount = BigDecimal.ZERO;
                         Map<String, Map<String, Integer>> unitMaps = new HashMap<>();
                         for (OrderItem orderItem : saledOrderItems) {
                             Map<String, Object> itemMap = new HashMap<>();
                             if (orderItem.getType().equals(OrderItemType.SETMEALS) && orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
+                                familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
                                 saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount()));
-                                itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-                                itemMap.put("SUBTOTAL", orderItem.getCount());
-                                familyArticleMaps.add(itemMap);
-                                selectMap.clear();
-                                selectMap.put("articleId", orderItem.getArticleId());
-                                selectMap.put("beginDate", beginDate);
-                                selectMap.put("endDate", endDate);
-                                List<ArticleSellDto> articleSellDtos = mealAttrMapper.queryArticleMealAttr(selectMap);
-                                for (ArticleSellDto articleSellDto : articleSellDtos) {
-                                    if (orderItem.getArticleId().equalsIgnoreCase(articleSellDto.getArticleId()) && articleSellDto.getBrandSellNum() != 0) {
-                                        itemMap = new HashMap<>();
-                                        itemMap.put("PRODUCT_NAME", "|_" + articleSellDto.getArticleName());
-                                        itemMap.put("SUBTOTAL", articleSellDto.getBrandSellNum());
-                                        familyArticleMaps.add(itemMap);
+                                if (shopDetail.getTemplateType().equals(Common.YES)) {
+                                    itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+                                    itemMap.put("SUBTOTAL", orderItem.getCount());
+                                    familyArticleMaps.add(itemMap);
+                                    selectMap.clear();
+                                    selectMap.put("articleId", orderItem.getArticleId());
+                                    selectMap.put("beginDate", beginDate);
+                                    selectMap.put("endDate", endDate);
+                                    List<ArticleSellDto> articleSellDtos = mealAttrMapper.queryArticleMealAttr(selectMap);
+                                    for (ArticleSellDto articleSellDto : articleSellDtos) {
+                                        if (orderItem.getArticleId().equalsIgnoreCase(articleSellDto.getArticleId()) && articleSellDto.getBrandSellNum() != 0) {
+                                            itemMap = new HashMap<>();
+                                            itemMap.put("PRODUCT_NAME", "|_" + articleSellDto.getArticleName());
+                                            itemMap.put("SUBTOTAL", articleSellDto.getBrandSellNum());
+                                            familyArticleMaps.add(itemMap);
+                                        }
                                     }
                                 }
                             } else if (orderItem.getType().equals(OrderItemType.UNITPRICE) && orderItem.getArticleId().substring(0, orderItem.getArticleId().indexOf("@")).equalsIgnoreCase(article.getId())) {
@@ -6078,48 +6083,60 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 }
                                 unitMaps.put(orderItem.getArticleId(), map);
                             } else if (orderItem.getArticleId().equalsIgnoreCase(article.getId())) {
-//                            familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
+                                familyCount = familyCount.add(new BigDecimal(orderItem.getCount()));
                                 saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getCount() - orderItem.getPackageNumber()));
-                                itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
-                                itemMap.put("SUBTOTAL", orderItem.getCount() + "(" + (orderItem.getCount() - orderItem.getPackageNumber()) + "+" + orderItem.getPackageNumber() + ")");
-                                familyArticleMaps.add(itemMap);
+                                if (shopDetail.getTemplateType().equals(Common.YES)) {
+                                    itemMap.put("PRODUCT_NAME", orderItem.getArticleName());
+                                    itemMap.put("SUBTOTAL", orderItem.getCount() + "(" + (orderItem.getCount() - orderItem.getPackageNumber()) + "+" + orderItem.getPackageNumber() + ")");
+                                    familyArticleMaps.add(itemMap);
+                                }
                             }
                         }
                         if (unitMaps.containsKey(article.getId())) {
-                            Map<String, Object> itemMap = new HashMap<>();
                             Map<String, Integer> unitPriceMap = unitMaps.get(article.getId());
                             BigDecimal articleCount = unitNewCount.compareTo(BigDecimal.ZERO) > 0 ? unitNewCount : BigDecimal.ZERO;
                             List<Map<String, Object>> maps = new ArrayList<>();
                             for (Map.Entry<String, Integer> unitMap : unitPriceMap.entrySet()) {
-                                Map<String, Object> map = new HashMap<>();
-                                map.put("PRODUCT_NAME", "|_" + unitMap.getKey());
-                                map.put("SUBTOTAL", unitMap.getValue());
+                                if (shopDetail.getTemplateType().equals(Common.YES)) {
+                                    Map<String, Object> map = new HashMap<>();
+                                    map.put("PRODUCT_NAME", "|_" + unitMap.getKey());
+                                    map.put("SUBTOTAL", unitMap.getValue());
+                                    maps.add(map);
+                                }
                                 if (unitNewCount.compareTo(BigDecimal.ZERO) == 0) {
                                     articleCount = articleCount.add(new BigDecimal(unitMap.getValue()));
                                 }
-                                maps.add(map);
                             }
-//                        familyCount = familyCount.add(articleCount);
+                            familyCount = familyCount.add(articleCount);
                             saledProductAmount = saledProductAmount.add(articleCount);
-                            itemMap.put("PRODUCT_NAME", article.getName());
-                            itemMap.put("SUBTOTAL", articleCount);
-                            familyArticleMaps.add(itemMap);
-                            familyArticleMaps.addAll(maps);
+                            if (shopDetail.getTemplateType().equals(Common.YES)) {
+                                Map<String, Object> itemMap = new HashMap<>();
+                                itemMap.put("PRODUCT_NAME", article.getName());
+                                itemMap.put("SUBTOTAL", articleCount);
+                                familyArticleMaps.add(itemMap);
+                                familyArticleMaps.addAll(maps);
+                            }
                         }
                     }
                     Map<String, Object> itemMap = new HashMap<>();
-                    BigDecimal strLength = new BigDecimal(articleFamily.getName().length()).multiply(new BigDecimal(2));
-                    Integer length = new BigDecimal(40).subtract(strLength).divide(new BigDecimal(2)).intValue();
-                    String string = "-";
-                    for (int i = 1; i < length; i++) {
-                        string = string.concat("-");
+                    if (shopDetail.getTemplateType().equals(Common.YES)) {
+                        BigDecimal strLength = new BigDecimal(articleFamily.getName().length()).multiply(new BigDecimal(2));
+                        Integer length = new BigDecimal(40).subtract(strLength).divide(new BigDecimal(2)).intValue();
+                        String string = "-";
+                        for (int i = 1; i < length; i++) {
+                            string = string.concat("-");
+                        }
+                        itemMap.put("PRODUCT_NAME", string.concat(articleFamily.getName()).concat(string));
+                    }else {
+                        itemMap.put("PRODUCT_NAME", articleFamily.getName());
+                        itemMap.put("SUBTOTAL", familyCount);
                     }
-                    itemMap.put("PRODUCT_NAME", string.concat(articleFamily.getName()).concat(string));
-//                itemMap.put("SUBTOTAL", familyCount);
                     saledProducts.add(itemMap);
-                    saledProducts.addAll(familyArticleMaps);
+                    if (shopDetail.getTemplateType().equals(Common.YES)) {
+                        saledProducts.addAll(familyArticleMaps);
+                    }
                 }
-            } else {
+            } else if (shopDetail.getTemplateType().equals(Common.NO)){ //经典版
                 for (OrderItem orderItem : saledOrderItems) {
                     saledProductAmount = saledProductAmount.add(new BigDecimal(orderItem.getType().equals(OrderItemType.SETMEALS) ? 0 : orderItem.getCount()));
                     Map<String, Object> itemMap = new HashMap<>();
