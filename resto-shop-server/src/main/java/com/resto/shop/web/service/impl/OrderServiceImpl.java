@@ -431,8 +431,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     jsonResult.setSuccess(false);
                     Customer payer = customerService.selectById(customerId);
                     jsonResult.setMessage("该订单正在被"+payer.getNickname()+"支付中，请勿重复买单！");
+                    return jsonResult;
                 }
-                return jsonResult;
             }else{
                 RedisUtil.set(order.getGroupId()+"pay",customer.getId());
                 RedisUtil.set(order.getShopDetailId()+order.getGroupId(),1,30l);
