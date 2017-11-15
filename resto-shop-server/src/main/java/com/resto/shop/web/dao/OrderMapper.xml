@@ -1278,6 +1278,7 @@
         amount_with_children,
         print_fail_flag,
         print_kitchen_flag,
+        order_before,
         closed,
         ifnull(count_with_child,article_count) as totalCount,
         (select count(1) from tb_order t2 where t2.parent_order_id = tb_order.id ) as childCount
