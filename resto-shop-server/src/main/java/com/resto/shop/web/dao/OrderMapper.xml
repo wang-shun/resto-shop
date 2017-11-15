@@ -1136,7 +1136,7 @@
     <!-- 根据订单查询 订单状态 和 生产状态 -->
     <select id="selectOrderStatesById" resultType="Order">
         SELECT
-        id,order_state,production_status,allow_continue_order,allow_cancel,allow_appraise
+        id,order_state,production_status,allow_continue_order,allow_cancel,allow_appraise,order_before
         from tb_order where id = #{orderId}
     </select>
 
