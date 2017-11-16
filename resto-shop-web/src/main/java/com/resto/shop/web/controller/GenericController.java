@@ -1,39 +1,31 @@
 package com.resto.shop.web.controller;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.model.SysError;
-import com.resto.brand.web.service.SysErrorService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.validation.BindException;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.InitBinder;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
 import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.resto.brand.core.entity.DataVailedException;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.feature.orm.mybatis.Page;
 import com.resto.brand.web.model.BrandUser;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.SysErrorService;
 import com.resto.shop.web.config.SessionKey;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Component
 public abstract class GenericController{
@@ -84,8 +76,6 @@ public abstract class GenericController{
 	 * @return
 	 */
 	public HttpServletResponse getResponse(){
-
-
 		return ((ServletWebRequest)RequestContextHolder.getRequestAttributes()).getResponse();
 	}
 	
@@ -171,6 +161,9 @@ public abstract class GenericController{
 		return (BrandUser) getRequest().getSession().getAttribute(SessionKey.USER_INFO);
 	}
 
+	public String getCurrentShopName(){
+		return (String) getRequest().getSession().getAttribute(SessionKey.CURRENT_SHOP_NAME);
+	}
 	public String getCurrentUserId(){
 		return getCurrentBrandUser().getId();
 	}

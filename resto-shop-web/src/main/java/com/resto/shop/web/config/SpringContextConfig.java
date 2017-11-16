@@ -591,6 +591,11 @@ public class SpringContextConfig {
     }
 
     @Bean
+    public MdBillService mdBillService(){
+        return proxy.create(MdBillService.class);
+    }
+
+    @Bean
     public ArticleBomHeadHistoryService articleBomHeadHistoryService(){
         return proxy.create(ArticleBomHeadHistoryService.class);
     }
@@ -601,10 +606,7 @@ public class SpringContextConfig {
     }
 
 
-
-
     //------------scm server config end-----------
-
 
     //-----------------------
 
