@@ -13,20 +13,20 @@ import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
 
 /**
-日志模板
+ 日志模板
  */
 public class LogTemplateUtils {
 
     //日志类型
-  public static final String POSTYPE = "posAction";
-  public static final String USERTYPE="UserAction";
-  public static final String ORDERTYPE="orderAction";
+    public static final String POSTYPE = "posAction";
+    public static final String USERTYPE="UserAction";
+    public static final String ORDERTYPE="orderAction";
 
-  public static final String DAYSMSTYPE="daySmsAction";
+    public static final String DAYSMSTYPE="daySmsAction";
 
-  public  static  final String THIRDTYPE = "thirdAction";
+    public  static  final String THIRDTYPE = "thirdAction";
 
-  public static final String SHOPTYPE="shopAction";      //记录shop端操作记录
+    public static final String SHOPTYPE="shopAction";      //记录shop端操作记录
 
     //模板map
     public static  Map getOrderBaseMap(String brandName,String id,String logType){
@@ -39,38 +39,38 @@ public class LogTemplateUtils {
         return  map;
     }
 
-//--------------------第一种 记录orderAction begin
-   //createOrder创建订单时记录 记录订单项的数据 在orderserviceImpl中调用
-   public static void getOrderItemLogByOrderType(String brandName, String orderId, List<OrderItem> orderItems){
-       //yz 2017-03-27 orderAction 增加订单菜品项
-       Map map = getOrderBaseMap(brandName,orderId,ORDERTYPE);
-       StringBuilder sb = new StringBuilder();
-       if(!orderItems.isEmpty()){
-           for(OrderItem item:orderItems){
-               sb.append("菜品id:"+item.getArticleId());
-               sb.append("菜品名称:"+item.getArticleName());
-               sb.append("原价:"+item.getOriginalPrice());
-               sb.append("单价:"+item.getPrice());
-               sb.append("最终计算的价格:"+item.getFinalPrice());
-               sb.append("餐品数量"+item.getCount());
-               sb.append("折扣"+item.getDiscount());
-               sb.append("餐盒数量:"+item.getMealFeeNumber());
-               sb.append("餐品类型:"+OrderItemType.getPayModeName(item.getType()));
-           }
-       }
-       map.put("content", "订单:" + orderId + "订单菜品项为:"+sb.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
-       doPostAnsc(url, map);
-   }
+    //--------------------第一种 记录orderAction begin
+    //createOrder创建订单时记录 记录订单项的数据 在orderserviceImpl中调用
+    public static void getOrderItemLogByOrderType(String brandName, String orderId, List<OrderItem> orderItems){
+        //yz 2017-03-27 orderAction 增加订单菜品项
+        Map map = getOrderBaseMap(brandName,orderId,ORDERTYPE);
+        StringBuilder sb = new StringBuilder();
+        if(!orderItems.isEmpty()){
+            for(OrderItem item:orderItems){
+                sb.append("菜品id:"+item.getArticleId());
+                sb.append("菜品名称:"+item.getArticleName());
+                sb.append("原价:"+item.getOriginalPrice());
+                sb.append("单价:"+item.getPrice());
+                sb.append("最终计算的价格:"+item.getFinalPrice());
+                sb.append("餐品数量"+item.getCount());
+                sb.append("折扣"+item.getDiscount());
+                sb.append("餐盒数量:"+item.getMealFeeNumber());
+                sb.append("餐品类型:"+OrderItemType.getPayModeName(item.getType()));
+            }
+        }
+        map.put("content", "订单:" + orderId + "订单菜品项为:"+sb.toString()+",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, map);
+    }
 
     //记录订单支付项 2017-03-27
     //支付项---等位红包支付
-      public  static  void getWaitMoneyLogByOrderType(String brandName, String orderId, BigDecimal payValue){
-          Map waitPayMap=getOrderBaseMap(brandName,orderId,ORDERTYPE);
-          waitPayMap.put("content", "订单:"+orderId+"使用等位红包支付了：" + payValue +",请求服务器地址为:" + MQSetting.getLocalIP());
-          doPostAnsc(url, waitPayMap);
-      }
+    public  static  void getWaitMoneyLogByOrderType(String brandName, String orderId, BigDecimal payValue){
+        Map waitPayMap=getOrderBaseMap(brandName,orderId,ORDERTYPE);
+        waitPayMap.put("content", "订单:"+orderId+"使用等位红包支付了：" + payValue +",请求服务器地址为:" + MQSetting.getLocalIP());
+        doPostAnsc(url, waitPayMap);
+    }
 
-      //支付项---优惠券
+    //支付项---优惠券
     public static void getCouponByOrderType(String brandName, String id, BigDecimal payValue) {
         Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
         map.put("content", "订单:"+id+"订单使用优惠券支付了：" + payValue +",请求服务器地址为:" + MQSetting.getLocalIP());
@@ -149,11 +149,11 @@ public class LogTemplateUtils {
      */
     public static void getAutoCancleOrderByOrderType(String brandName, String id, Boolean auto) {
         Map map=getOrderBaseMap(brandName,id,ORDERTYPE);
-          if(null!=auto&&auto){
-              map.put("content", "订单:" + id + "取消订单成功--是2小时自动取消订单"+",请求服务器地址为:" + MQSetting.getLocalIP());
-          }else {
-              map.put("content", "订单:" + id + "取消订单成功--是用户自己取消未支付"+",请求服务器地址为:" + MQSetting.getLocalIP());
-          }
+        if(null!=auto&&auto){
+            map.put("content", "订单:" + id + "取消订单成功--是2小时自动取消订单"+",请求服务器地址为:" + MQSetting.getLocalIP());
+        }else {
+            map.put("content", "订单:" + id + "取消订单成功--是用户自己取消未支付"+",请求服务器地址为:" + MQSetting.getLocalIP());
+        }
         doPostAnsc(url, map);
     }
 
@@ -282,7 +282,7 @@ public class LogTemplateUtils {
     /**
      * 添加购物车
      */
-    public  static  void getUpdateShopcart(String brandName,Customer customer,String shopName,Article article){
+    public  static  void getUpdateShopcart(String brandName,Customer customer,String shopName,Article article,ShopCart shopCart){
         Map map=getOrderBaseMap(brandName,customer.getId(),USERTYPE);
         StringBuilder sb = new StringBuilder();
         String articleTypeName=OrderItemType.getPayModeName(article.getArticleType());
@@ -290,7 +290,7 @@ public class LogTemplateUtils {
                 .append("将菜品id:"+article.getId())
                 .append("菜品类型为:")
                 .append(articleTypeName).append("菜品名字为:")
-                .append(article.getName()).append("的菜品加入到购物车").append("加入的店铺为:"+shopName);
+                .append(article.getName()).append("x"+shopCart.getNumber()).append("的菜品加入到购物车").append("加入的店铺为:"+shopName);
         map.put("content",sb.toString()+"请求服务器地址为:"+MQSetting.getLocalIP());
         doPostAnsc(url,map);
     }
