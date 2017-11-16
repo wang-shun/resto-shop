@@ -171,7 +171,6 @@ public class OrderAspect {
                 MQMessageProducer.sendCreateOrderMessage(order);
             }
 
-            if (order.getPayMode() != PayMode.WEIXIN_PAY) {
             if (order.getPayMode() != PayMode.WEIXIN_PAY && StringUtils.isEmpty(order.getGroupId())) {
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
