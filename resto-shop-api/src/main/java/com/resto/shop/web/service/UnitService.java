@@ -51,4 +51,7 @@ public interface UnitService extends GenericService<Unit, String> {
     * @return
     */
    List<UnitDetail> selectUnitDetailByShopId(String shopId);
+
+
+
 }

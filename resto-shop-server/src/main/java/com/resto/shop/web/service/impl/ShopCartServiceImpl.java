@@ -3,10 +3,18 @@ package com.resto.shop.web.service.impl;
 import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.ShopDetailService;
+import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.constant.ShopCarType;
 import com.resto.shop.web.dao.ShopCartMapper;
+import com.resto.shop.web.model.CustomerGroup;
 import com.resto.shop.web.model.ShopCart;
+import com.resto.shop.web.model.TableGroup;
 import com.resto.shop.web.service.ShopCartService;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -20,6 +28,11 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     @Resource
     private ShopCartMapper shopcartMapper;
 
+
+    @Autowired
+    private ShopDetailService shopDetailService;
+
+
     @Override
     public GenericDao<ShopCart, Integer> getDao() {
         return shopcartMapper;
@@ -27,13 +40,43 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
 
     @Override
     public List<ShopCart> listUserAndShop(ShopCart shopcart) {
-        return shopcartMapper.listUserAndShop(shopcart);
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopcart.getShopDetailId());
+        if(shopDetail.getOpenManyCustomerOrder() == Common.YES && !StringUtils.isEmpty(shopcart.getGroupId())){
+            //开启多人点餐
+            List<String> customerIdList = getListByGroupIdDistinctCustomerId(shopcart.getGroupId());
+
+            if(CollectionUtils.isEmpty(customerIdList)){
+                return null;
+            }else{
+                return shopcartMapper.getListByGroupId(shopcart.getGroupId(),customerIdList);
+            }
+        }else{
+            return shopcartMapper.listUserAndShop(shopcart);
+        }
+
     }
 
     @Override
     public Integer updateShopCart(ShopCart shopCart) {
         //先查询当前客户是否有该商品的 购物车的条目
         Integer number = shopCart.getNumber();
+        if(shopCart.getId() != null){
+            //更新购物车
+            //先找到这条记录
+            ShopCart shopCartItem = shopcartMapper.selectByPrimaryKey(shopCart.getId());
+            if(shopCartItem.getShopType().equals(ShopCarType.CAOBAO)){
+                shopCartItem.setNumber(shopCart.getNumber());
+                shopcartMapper.updateShopCartItem(shopCartItem);
+                shopcartMapper.delMealItem(shopCartItem.getId().toString());
+                return shopCartItem.getId();
+            }
+            if(number == 0){
+                shopcartMapper.deleteByPrimaryKey(shopCart.getId());
+                shopcartMapper.delMealItem(shopCartItem.getId().toString());
+                return null;
+            }
+
+        }
         Integer oldNumber = new Integer(0);
         ShopCart shopCartItem = shopcartMapper.selectShopCartItem(shopCart);
         if(shopCartItem != null){
@@ -131,7 +174,56 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     }
 
     @Override
+    public void clearGroupId(Integer id) {
+        shopcartMapper.clearGroupId(id);
+    }
+
+    @Override
     public void deleteCustomerArticle(String customerId, String articleId) {
         shopcartMapper.deleteCustomerArticle(customerId, articleId);
+    }
+
+    @Override
+    public void groupNew(String customerId, String shopId, String groupId) {
+        shopcartMapper.groupNew(customerId, shopId, groupId);
+    }
+
+
+    @Override
+    public Integer checkRepeat(String articleId, String groupId,String customerId) {
+        return shopcartMapper.checkRepeat(articleId, groupId,customerId) ;
+    }
+
+    @Override
+    public List<ShopCart> getListByGroupId(String groupId) {
+        List<String> customerIdList = getListByGroupIdDistinctCustomerId(groupId);
+        if(CollectionUtils.isEmpty(customerIdList)){
+            return null;
+        }else{
+            return shopcartMapper.getListByGroupId(groupId,customerIdList);
+        }
+
+    }
+
+    @Override
+    public List<String> getListByGroupIdDistinctCustomerId(String groupId) {
+        return shopcartMapper.getListByGroupIdDistinctCustomerId(groupId);
+    }
+
+    @Override
+    public void resetGroupId(String groupId) {
+        shopcartMapper.resetGroupId(groupId);
+    }
+
+
+    @Override
+    public void deleteByGroup(String groupId) {
+        shopcartMapper.deleteByGroup(groupId);
+    }
+
+    @Override
+    public void updateShopCartByGroupId(String groupId,String shopId,String customerId) {
+
+        shopcartMapper.updateShopCartByGroupId(groupId,shopId,customerId);
     }
 }

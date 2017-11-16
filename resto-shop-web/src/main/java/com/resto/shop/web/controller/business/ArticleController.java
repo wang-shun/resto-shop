@@ -11,10 +11,7 @@ import com.resto.brand.web.service.PlatformService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.model.Article;
-import com.resto.shop.web.model.ArticlePrice;
-import com.resto.shop.web.model.ArticleRecommendPrice;
-import com.resto.shop.web.model.MealItem;
+import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,6 +64,12 @@ public class ArticleController extends GenericController {
 
     @Autowired
     private PlatformService platformService;
+
+    @Resource
+    RecommendCategoryArticleService recommendCategoryArticleService;
+
+    @Resource
+    RecommendCategoryService recommendCategoryService;
 
     @RequestMapping("/list")
     public void list() {
@@ -183,6 +186,15 @@ public class ArticleController extends GenericController {
                 result.setStatusCode(100);
                 return result;
             }
+        }
+        RecommendCategoryArticle recommendCategoryArticle=recommendCategoryArticleService.selectByArticleId(id);
+        if(recommendCategoryArticle!=null){
+            RecommendCategory recommendCategory=recommendCategoryService.selectById(recommendCategoryArticle.getRecommendCategoryId());
+            Result result = new Result();
+            result.setSuccess(false);
+            result.setMessage("删除失败，该菜品在推荐类别“" +recommendCategory.getName()+ "”中存在，请在推荐类别中删除后重试");
+            result.setStatusCode(100);
+            return result;
         }
         articleService.delete(id);
         //联动删除在推荐餐品包中的id

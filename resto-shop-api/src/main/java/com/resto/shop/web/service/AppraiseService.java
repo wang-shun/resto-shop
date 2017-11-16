@@ -41,7 +41,7 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 
 	Appraise selectDetailedById(String appraiseId);
 
-	Appraise selectDeatilByOrderId(String orderId);
+	Appraise selectDeatilByOrderId(String orderId, String customerId);
 
 	Appraise selectAppraiseByCustomerId(String customerId,String shopId);
 	
@@ -80,4 +80,12 @@ public interface AppraiseService extends GenericService<Appraise, String> {
 	 * @return
 	 */
 	List<Appraise> selectByTimeAndBrandId( Date begin, Date end);
+
+	/**
+	 * 该订单下某人的评论记录
+	 * @param orderId
+	 * @param customerId
+     * @return
+     */
+	Appraise selectByOrderIdCustomerId(String orderId, String customerId);
 }

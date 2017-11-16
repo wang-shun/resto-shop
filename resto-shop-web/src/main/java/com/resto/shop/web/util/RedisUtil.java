@@ -119,6 +119,11 @@ public class RedisUtil {
         RedisUtil.redisTemplate = redisTemplate;
     }
 
+    public  static  void clean(String brandId, String brandSign){
+        remove(brandSign);
+        remove(brandId + "shopList");
+        remove(brandId + "setting");
+    }
 
     public static void main(String[] args) {
         set("test","1",100L);

@@ -21,6 +21,7 @@ public class OpenBrandAccountInterceptor  implements HandlerInterceptor {
 			//httpServletResponse.sendRedirect("/accountchargeorder/list");
 			modelAndView.setViewName("accountchargeorder/list");
 		}
+
 	}
 
 	@Override

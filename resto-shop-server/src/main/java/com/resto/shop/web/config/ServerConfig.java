@@ -16,6 +16,7 @@ import cn.restoplus.rpc.client.RpcProxy;
 
 @Configurable
 @ImportResource({"classpath:applicationContext.xml"})
+@Resource
 public class ServerConfig {
 	@Bean
 	public WechatConfigService wechatConfigService(){

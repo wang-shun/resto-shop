@@ -5,6 +5,9 @@
 	.formBox{
         color: #5bc0de;
 	}
+	.gray{
+		color: #5e6672;
+	}
 </style>
 <div id="control" class="row">
 	<div class="col-md-12" >
@@ -423,13 +426,12 @@
 
 					<div class="form-group">
 						<label class="col-md-4 control-label">日结小票模板类型：</label>
-						<div  class="col-md-6 radio-list">
-							<label class="radio-inline">
-								<input type="radio" name="templateType"v-model="m.templateType" value="0">经典版
-							</label>
-							<label class="radio-inline">
-								<input type="radio" name="templateType" v-model="m.templateType" value="1">升级版
-							</label>
+						<div  class="col-md-2 radio-list">
+							<select class="form-control" name="templateType" v-model="m.templateType">
+								<option value="0">经典版</option>
+								<option value="1">升级版</option>
+								<option value="2">简约版</option>
+							</select>
 						</div>
 					</div>
 
@@ -456,25 +458,132 @@
                             </label>
                         </div>
                     </div>
-                    <div v-if="m.isUseServicePrice==1">
-                        <div v-if="showp" >
+
+					<div class="form-group" v-show="m.isUseServicePrice == 1">
+						<label class="col-md-4 control-label" :class="{ formBox : m.isUseServicePrice == 1}">服务费版本：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="serviceType"  v-model="m.serviceType" value="0">	经典版
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="serviceType"  v-model="m.serviceType" value="1">	升级版
+							</label>
+						</div>
+					</div>
+
+					<!-- 服务费经典版begin -->
+                    <div v-show="m.isUseServicePrice==1 && m.serviceType == 0">
+                        <div v-show="showp" >
                             <div class="form-group">
-                                <label  class="col-sm-4 control-label" :class="{ formBox : m.isUseServicePrice == 1}">名称：</label>
+                                <label  class="col-sm-4 control-label formBox">名称：</label>
                                 <div  class="col-md-6 radio-list">
-                                    <input type="test" class="form-control" name="serviceName" v-if="!m.serviceName" value="服务费" required="required">
-                                    <input type="test" class="form-control" name="serviceName" v-if="m.serviceName" v-model="m.serviceName" required="required">
+                                    <input type="test" class="form-control" name="serviceName" v-if="!m.serviceName" value="服务费">
+                                    <input type="test" class="form-control" name="serviceName" v-if="m.serviceName" v-model="m.serviceName">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label  class="col-sm-4 control-label" :class="{ formBox : m.isUseServicePrice == 1}">服务费/每人：</label>
+                                <label  class="col-sm-4 control-label formBox">服务费/每人：</label>
                                 <div  class="col-md-6 radio-list">
-                                    <input type="number" class="form-control" name="servicePrice" v-model="m.servicePrice" required="required" min="0">
+                                    <input type="text" class="form-control" name="servicePrice" v-model="m.servicePrice" min="0">
                                 </div>
                             </div>
                         </div>
                     </div>
+					<!-- 服务费经典版end -->
 
-                    <! -- 第三方接口appid-->
+					<!-- 服务费升级版begin -->
+					<div class="form-group" v-show="m.isUseServicePrice == 1 && m.serviceType == 1">
+						<label  class="col-sm-4 control-label" :class="{ formBox : m.isOpenTablewareFee == 1, gray : m.isOpenTablewareFee == 0}" style="margin-top: 20px;">餐具费：</label>
+						<div  class="col-md-6">
+							<div class="row">
+								<div class="col-md-4">
+									<p style="text-align: center;margin: 5px 0;font-weight: bold">名称</p>
+								</div>
+								<div class="col-md-4">
+									<p style="text-align: center;margin: 5px 0;font-weight: bold">价格</p>
+								</div>
+								<div class="col-md-4">
+									<p style="text-align: center;margin: 5px 0;font-weight: bold">是否启用(勾选启用)</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-4">
+									<input v-show="m.isOpenTablewareFee == 0" type="text" class="form-control" disabled>
+									<input v-else type="text" class="form-control" name="tablewareFeeName" v-model="m.tablewareFeeName">
+								</div>
+								<div class="col-md-4">
+									<input v-show="m.isOpenTablewareFee == 0" type="text" class="form-control" disabled>
+									<input v-else type="text" class="form-control" name="tablewareFeePrice" v-model="m.tablewareFeePrice">
+								</div>
+								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
+									<input type="checkbox" class="form-control" value="1" name="isOpenTablewareFee" v-model="m.isOpenTablewareFee">
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group" v-show="m.isUseServicePrice == 1 && m.serviceType == 1">
+						<label  class="col-sm-4 control-label" :class="{ formBox : m.isOpenTowelFee == 1, gray : m.isOpenTowelFee == 0}" style="margin-top: 20px;">纸巾费：</label>
+						<div  class="col-md-6">
+							<div class="row">
+								<div class="col-md-4">
+									<p style="text-align: center;margin: 5px 0;font-weight: bold">名称</p>
+								</div>
+								<div class="col-md-4">
+									<p style="text-align: center;margin: 5px 0;font-weight: bold">价格</p>
+								</div>
+								<div class="col-md-4">
+									<p style="text-align: center;margin: 5px 0;font-weight: bold">是否启用(勾选启用)</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-4">
+									<input v-show="m.isOpenTowelFee == 0" type="text" class="form-control" disabled>
+									<input v-else type="text" class="form-control" name="towelFeeName" v-model="m.towelFeeName">
+								</div>
+								<div class="col-md-4">
+									<input v-show="m.isOpenTowelFee == 0" type="text" class="form-control" disabled>
+									<input v-else type="text" class="form-control" name="towelFeePrice" v-model="m.towelFeePrice">
+								</div>
+								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
+									<input type="checkbox" class="form-control" value="1" name="isOpenTowelFee" v-model="m.isOpenTowelFee">
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="form-group" v-show="m.isUseServicePrice == 1 && m.serviceType == 1">
+						<label  class="col-sm-4 control-label" :class="{ formBox : m.isOpenSauceFee == 1, gray : m.isOpenSauceFee == 0}" style="margin-top: 20px;">酱料费：</label>
+						<div  class="col-md-6">
+							<div class="row">
+								<div class="col-md-4">
+									<p style="text-align: center;margin: 5px 0;font-weight: bold">名称</p>
+								</div>
+								<div class="col-md-4">
+									<p style="text-align: center;margin: 5px 0;font-weight: bold">价格</p>
+								</div>
+								<div class="col-md-4">
+									<p style="text-align: center;margin: 5px 0;font-weight: bold">是否启用(勾选启用)</p>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-4">
+									<input v-show="m.isOpenSauceFee == 0" type="text" class="form-control" disabled>
+									<input v-else type="text" class="form-control" name="sauceFeeName" v-model="m.sauceFeeName">
+								</div>
+								<div class="col-md-4">
+									<input v-show="m.isOpenSauceFee == 0" type="text" class="form-control" disabled>
+									<input v-else type="text" class="form-control" name="sauceFeePrice" v-model="m.sauceFeePrice">
+								</div>
+								<div class="col-md-4" style="text-align: center;margin-top: 8px;">
+									<input type="checkbox" class="form-control" value="1" name="isOpenSauceFee" v-model="m.isOpenSauceFee">
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- 服务费升级版end -->
+
+                    <!-- 第三方接口appid-->
                     <div  class="form-group" v-if="b.openThirdInterface==1">
                         <label class="col-md-4 control-label">第三方接口appid：</label>
                         <div class="col-sm-6">
@@ -622,6 +731,18 @@
 							<%--</label>--%>
 						<%--</div>--%>
 					<%--</div>--%>
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label" >菜品图片展现：</label>
+                        <div  class="col-md-6 radio-list">
+                            <label class="radio-inline">
+                                <input type="radio" name="articlePhoto"v-model="m.articlePhoto" value="0">大图
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="articlePhoto" v-model="m.articlePhoto" value="1">小图
+                            </label>
+                        </div>
+                    </div>
 					<div class="form-group">
 						<label class="col-md-4 control-label">R+外卖最大配送范围(单位km)：</label>
 						<div  class="col-md-6">
@@ -651,6 +772,17 @@
 											</button>
 										</span>
 							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-md-4 control-label" :class="{ formBox : m.orderBefore == 1}">餐品预点餐：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="orderBefore"v-model="m.orderBefore" value="1">开启
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="orderBefore" v-model="m.orderBefore" value="0"> 未开启
+							</label>
 						</div>
 					</div>
 
@@ -685,6 +817,19 @@
 							</textarea><font color="red">*多个关键词中间以英文状态下的逗号(,)隔开</font>
 						</div>
 					</div>
+
+					<div class="form-group">
+						<label class="col-md-4 control-label">是否开启多人点餐：</label>
+						<div  class="col-md-6 radio-list">
+							<label class="radio-inline">
+								<input type="radio" name="openManyCustomerOrder"v-model="m.openManyCustomerOrder" value="1">是
+							</label>
+							<label class="radio-inline">
+								<input type="radio" name="openManyCustomerOrder" v-model="m.openManyCustomerOrder" value="0">否
+							</label>
+						</div>
+					</div>
+
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>
@@ -799,6 +944,31 @@
 								toastr.error("混合支付模式下不可以同时关闭2种支付方式！");
 								return;
 							}
+
+                            var reg = new RegExp("^[0-9]*$"); //用来验证服务费数据是数字
+                            var serviceType = this.m.serviceType;
+                            if (serviceType == 0){ //经典版服务费
+                                var servicePrice = this.m.servicePrice;
+                                if (!reg.test(servicePrice)){
+                                    toastr.clear();
+                                    toastr.error("经典版服务费只能是整数");
+                                    return;
+                                }
+                            }else { //升级版服务费
+                                var isOpenSauceFee = this.m.isOpenSauceFee;
+                                var isOpenTowelFee = this.m.isOpenTowelFee;
+                                var isOpenTablewareFee = this.m.isOpenTablewareFee;
+                                if (isOpenSauceFee == 1 || isOpenTowelFee == 1 || isOpenTablewareFee == 1){ //如果开通了餐具费、纸巾费、酱料费
+                                    var tablewareFeePrice = this.m.tablewareFeePrice;
+                                    var towelFeePrice = this.m.towelFeePrice;
+                                    var sauceFeePrice = this.m.sauceFeePrice;
+                                    if (!reg.test(tablewareFeePrice) || !reg.test(towelFeePrice) || !reg.test(sauceFeePrice)){ //如果有新版服务费不是数字的
+                                        toastr.clear();
+                                        toastr.error("升级版服务费的价格只能是整数");
+                                        return;
+                                    }
+                                }
+                            }
 							$.ajax({
 								url : "shopInfo/modify",
 								data : $(formDom).serialize(),
@@ -895,6 +1065,10 @@
                                     this.m.openPosIntegralPay = value;
                                     break;
                             }
+                        },
+                        setTemplateType : function (value) {
+						    alert(value);
+							this.m.templateType = value;
                         }
 					}
 				});

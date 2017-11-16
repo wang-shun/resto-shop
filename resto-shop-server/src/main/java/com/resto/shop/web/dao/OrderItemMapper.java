@@ -88,4 +88,7 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
      * @param orderId
      */
     void posSyncDeleteByOrderId(String orderId);
+
+    List<OrderItem> getOrderBefore(@Param("tableNumber") String tableNumber,
+                                   @Param("shopId") String shopId,@Param("customerId") String customerId);
 }

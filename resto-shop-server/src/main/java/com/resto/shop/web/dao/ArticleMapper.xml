@@ -36,6 +36,7 @@
         <result column="article_type" property="articleType" jdbcType="INTEGER"/>
         <result column="stock_working_day" property="stockWorkingDay" jdbcType="INTEGER"/>
         <result column="stock_weekend" property="stockWeekend" jdbcType="INTEGER"/>
+        <result column="inventory_warning" property="inventoryWarning" jdbcType="INTEGER"/>
         <result column="current_working_stock" property="currentWorkingStock" jdbcType="INTEGER"/>
         <result column="recommend_id" property="recommendId"/>
         <result column="newUnit" property="newUnit"/>
@@ -49,15 +50,19 @@
         <result column="initials" property="initials"></result>
         <result column="photo_type" property="photoType"></result>
         <result column="photo_little" property="photoLittle"></result>
+        <result column="open_catty" property="openCatty"></result>
+        <result column="catty_money" property="cattyMoney"></result>
+        <result column="need_remind" property="needRemind"></result>
+        <result column="gif_url" property="gifUrl"></result>
     </resultMap>
     <sql id="Base_Column_List">
         id, name, name_alias, name_short, photo_big, photo_small, ingredients, description,
         is_empty, sort, activated, state, remain_number, sale_number, show_sale_number, update_time,
         create_time, shop_detail_id, article_family_id, create_user_id, update_user_id, price,
         fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc,
-        is_remind,article_type,stock_working_day,stock_weekend,current_working_stock,
+        is_remind,article_type,stock_working_day,stock_weekend,inventory_warning,current_working_stock,
         recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id,initials,
-        photo_type,photo_little
+        photo_type,photo_little,open_catty,catty_money,need_remind,gif_url
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -80,7 +85,7 @@
         price, fans_price, has_mult_price,
         has_unit, peference, unit,
         show_big, control_color, show_desc,
-        is_remind,article_type,stock_working_day,stock_weekend,
+        is_remind,article_type,stock_working_day,stock_weekend,inventory_warning,
         recommend_id,is_hidden,pId,eleme_name,photo_square,meal_fee_number,
         is_main_food,virtual_id,initials,photo_type,photo_little)
         values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{nameAlias,jdbcType=VARCHAR},
@@ -93,7 +98,7 @@
         #{price,jdbcType=DECIMAL}, #{fansPrice,jdbcType=DECIMAL}, #{hasMultPrice,jdbcType=BIT},
         #{hasUnit,jdbcType=VARCHAR}, #{peference,jdbcType=VARCHAR}, #{unit,jdbcType=VARCHAR},
         #{showBig,jdbcType=BIT}, #{controlColor,jdbcType=VARCHAR}, #{showDesc,jdbcType=BIT},
-        #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},
+        #{isRemind,jdbcType=BIT},#{articleType},#{stockWorkingDay,jdbcType=INTEGER},#{stockWeekend,jdbcType=INTEGER},#{inventoryWarning,jdbcType=INTEGER},
         #{recommendId,jdbcType=VARCHAR},#{isHidden,jdbcType=BIT},#{pId},#{elemeName,jdbcType=VARCHAR},
         #{photoSquare},#{mealFeeNumber},#{isMainFood},#{virtualId,jdbcType=INTEGER},#{initials},
         #{photoType},#{photoLittle})
@@ -203,6 +208,9 @@
             <if test="stockWeekend != null">
                 stock_weekend,
             </if>
+            <if test="inventoryWarning != null">
+                inventory_warning,
+            </if>
             <if test="recommendId != null">
                 recommend_id,
             </if>
@@ -232,6 +240,18 @@
             </if>
             <if test="photoLittle != null">
                 photo_little,
+            </if>
+            <if test="openCatty != null">
+                open_catty,
+            </if>
+            <if test="cattyMoney != null">
+                catty_money,
+            </if>
+            <if test="needRemind != null">
+                need_remind,
+            </if>
+            <if test="gifUrl != null">
+                gif_url,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -337,6 +357,9 @@
             <if test="stockWeekend != null">
                 #{stockWeekend},
             </if>
+            <if test="inventoryWarning != null">
+                #{inventoryWarning},
+            </if>
             <if test="recommendId != null">
                 #{recommendId},
             </if>
@@ -366,6 +389,18 @@
             </if>
             <if test="photoLittle != null">
                 #{photoLittle},
+            </if>
+            <if test="openCatty != null">
+                #{openCatty},
+            </if>
+            <if test="cattyMoney != null">
+                #{cattyMoney},
+            </if>
+            <if test="needRemind != null">
+                #{needRemind},
+            </if>
+            <if test="gifUrl != null">
+                #{gifUrl},
             </if>
         </trim>
     </insert>
@@ -467,6 +502,9 @@
             <if test="stockWeekend != null">
                 stock_weekend = #{stockWeekend},
             </if>
+            <if test="inventoryWarning != null">
+                inventory_warning = #{inventoryWarning},
+            </if>
             <if test="currentWorkingStock != null">
                 current_working_stock = #{currentWorkingStock},
             </if>
@@ -499,6 +537,18 @@
             </if>
             <if test="photoLittle != null">
                 photo_little = #{photoLittle},
+            </if>
+            <if test="openCatty != null">
+                open_catty = #{openCatty},
+            </if>
+            <if test="cattyMoney != null">
+                catty_money = #{cattyMoney},
+            </if>
+            <if test="needRemind != null">
+                need_remind = #{needRemind},
+            </if>
+            <if test="gifUrl != null">
+                gif_url = #{gifUrl},
             </if>
             photo_square = null
         </set>
@@ -539,6 +589,7 @@
         article_type = #{articleType},
         stock_working_day = #{stockWorkingDay,jdbcType=INTEGER},
         stock_weekend = #{stockWeekend,jdbcType=INTEGER},
+        inventory_warning = #{inventoryWarning,jdbcType=INTEGER},
         current_working_stock = #{currentWorkingStock,jdbcType=INTEGER},
         recommend_id = #{recommendId,jdbcType=VARCHAR},
         is_hidden = #{isHidden,isRemind,jdbcType=BIT},
@@ -572,7 +623,7 @@
         a.show_big,	a.description,a.photo_small,a.is_empty,a.meal_fee_number,
         a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,a.virtual_id,
         a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock,
-        a.photo_type,a.photo_little,
+        a.photo_type,a.photo_little,a.open_catty,a.catty_money,a.need_remind,a.gif_url,
         (select  count(1) from tb_article_unit_new where article_id = a.id) as newUnit,
         if(a.recommend_id is not null,1,0) as recommendCount
         FROM tb_article a,tb_article_family f
@@ -606,6 +657,10 @@
             a.likes,
             a.photo_type,
             a.photo_little,
+            a.open_catty,
+            a.catty_money,
+            a.need_remind,
+            a.gif_url,
             a.current_working_stock,
           f.recommend_sort,
             (
@@ -715,7 +770,9 @@ where t.id = t2.article_id
         t.article_type articleType,
         ifnull(t2.empty_remark,t.empty_remark) as empty_remark,
         t.activated,
-        t.is_empty
+        t.is_empty,
+        t.inventory_warning,
+        t.article_family_id
         from tb_article t
         left join tb_article_price t2 on t.id = t2.article_id
         left join tb_article_family t3 on t.article_family_id = t3.id
@@ -1047,6 +1104,29 @@ GROUP BY article_id
     <select id="selectArticleByShopId" resultType="Article">
         SELECT * from tb_article where shop_detail_id = #{shopId}
         and state = 1
+    </select>
+
+
+
+    <select id="findArticleByLastCountTime" parameterType="java.lang.String" resultType="com.resto.shop.web.dto.ArticleSellCountDto">
+        SELECT
+            item.article_id AS `articleId`,
+            item.article_name AS `articleName`,
+            (sum(item.orgin_count) - sum(item.refund_count)) AS `totalCount`,
+            sum(item.meal_fee_number) AS `mealFeeNumber`
+        FROM
+            tb_order o
+        INNER JOIN tb_order_item item ON o.id = item.order_id
+        WHERE  o.shop_detail_id =#{shopId} AND item.create_time > date_format(#{lastCountTime},'%Y-%m-%d %H-%i-%s')
+        GROUP BY
+            articleId
+    </select>
+
+
+
+    <select id="getArticleBefore" resultType="Article">
+        select * from tb_article where need_remind = 1 and shop_detail_id = #{shopId}
+        and state = 1 and activated = 1 and is_empty = 0
     </select>
 
 </mapper>

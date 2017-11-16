@@ -59,4 +59,6 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	 * @param orderId
 	 */
 	void posSyncDeleteByOrderId(String orderId);
+
+	List<OrderItem> getOrderBefore(String tableNumber, String shopId, String customerId);
 }

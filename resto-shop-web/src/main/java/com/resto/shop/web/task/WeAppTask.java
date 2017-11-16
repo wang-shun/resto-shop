@@ -72,7 +72,7 @@
 //                parameterMap.put("password", "Vino.2016");// 527527527
 //                //登录
 //                System.err.println("登入品牌为"+brand.getBrandName());
-//                HttpResponse loginResponse = doPost(client, loginUrl, parameterMap);
+//                HttpResponse loginResponse = doPostAnsc(client, loginUrl, parameterMap);
 //                //得到httpResponse的状态响应码
 //                int statusCode = loginResponse.getStatusLine().getStatusCode();
 //                if (statusCode == 302 && statusCode != HttpStatus.SC_OK) {
@@ -80,7 +80,7 @@
 //                    Map<String, String> requestMap = new HashMap<>();
 //                    requestMap.put("brandName",brand.getBrandName());
 //                    //循环执行 URLMap 中的链接
-//                   HttpResponse httpResponse2 = doPost(client, weUrl, requestMap);
+//                   HttpResponse httpResponse2 = doPostAnsc(client, weUrl, requestMap);
 //                    if (httpResponse2.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 //                        log.info("执行了插入小程序的数据");
 //                    } else {
@@ -99,7 +99,7 @@
 //     * @param parameterMap
 //     * @return
 //     */
-//    public HttpResponse doPost(CloseableHttpClient client,String url,Map<String,String> parameterMap){
+//    public HttpResponse doPostAnsc(CloseableHttpClient client,String url,Map<String,String> parameterMap){
 //        HttpPost httpPost = new HttpPost(url);
 //        //封装请求参数
 //        List<NameValuePair> param = new ArrayList<NameValuePair>();

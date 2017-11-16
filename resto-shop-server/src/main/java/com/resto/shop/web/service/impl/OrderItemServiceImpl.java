@@ -184,4 +184,9 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
     public void posSyncDeleteByOrderId(String orderId) {
         orderitemMapper.posSyncDeleteByOrderId(orderId);
     }
+
+    @Override
+    public List<OrderItem> getOrderBefore(String tableNumber, String shopId, String customerId) {
+        return orderitemMapper.getOrderBefore(tableNumber, shopId, customerId);
+    }
 }

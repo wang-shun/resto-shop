@@ -110,7 +110,7 @@ public class ReportDataTask{
         parameterMap.put("password", brandUser.getPassword());// 527527527
         parameterMap.put("isMD5", "true");
         //登录
-        HttpResponse loginResponse = doPost(client, loginUrl, parameterMap);
+        HttpResponse loginResponse = doPostAnsc(client, loginUrl, parameterMap);
 
         //得到httpResponse的状态响应码
         int statusCode = loginResponse.getStatusLine().getStatusCode();
@@ -131,7 +131,7 @@ public class ReportDataTask{
 
         	//循环执行 URLMap 中的链接
         	for (String key : urlMap.keySet()) {
-        		HttpResponse httpResponse = doPost(client, urlMap.get(key), requestMap);
+        		HttpResponse httpResponse = doPostAnsc(client, urlMap.get(key), requestMap);
             	if(httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK){
                     try {
     	        		List<String> sqlList = createSQL(httpResponse, key);
@@ -167,7 +167,7 @@ public class ReportDataTask{
      * @param parameterMap
      * @return
      */
-    public HttpResponse doPost(CloseableHttpClient client,String url,Map<String,String> parameterMap){
+    public HttpResponse doPostAnsc(CloseableHttpClient client,String url,Map<String,String> parameterMap){
         HttpPost httpPost = new HttpPost(url);
         //封装请求参数
         List<NameValuePair> param = new ArrayList<NameValuePair>();

@@ -27,6 +27,7 @@
         <result column="change_count" property="changeCount"/>
         <result column="print_fail_flag" property="printFailFlag"/>
         <result column="meal_fee_number" property="mealFeeNumber"/>
+        <result column="customer_id" property="customerId"/>
         <association property="orderRefundRemark" javaType="com.resto.shop.web.model.OrderRefundRemark">
             <id column="id1" property="id" jdbcType="BIGINT"/>
             <result column="article_id1" property="articleId" jdbcType="VARCHAR"/>
@@ -43,7 +44,7 @@
     <sql id="Base_Column_List">
     id, article_name, article_designation, `count`, original_price, unit_price, base_unit_price, final_price,
     remark, pos_discount, sort, status, order_id, article_id, `type`, parent_id, create_time,meal_item_id,recommend_id,orgin_count,refund_count,
-    change_count,print_fail_flag
+    change_count,print_fail_flag,customer_id
   </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
@@ -132,6 +133,9 @@
             <if test="printFailFlag != null">
                 print_fail_flag,
             </if>
+            <if test="customerId != null">
+                customer_id,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -193,6 +197,9 @@
             </if>
             <if test="printFailFlag != null">
                 #{printFailFlag},
+            </if>
+            <if test="customerId != null">
+                #{customerId},
             </if>
         </trim>
     </insert>
@@ -256,6 +263,9 @@
             <if test="printFailFlag != null">
                 print_fail_flag = #{printFailFlag},
             </if>
+            <if test="customerId != null">
+                customer_id = #{customerId},
+            </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>
@@ -276,7 +286,8 @@
       article_id = #{articleId,jdbcType=VARCHAR},
       type = #{type,jdbcType=INTEGER},
       parent_id = #{parentId,jdbcType=VARCHAR},
-      create_time = #{createTime,jdbcType=TIMESTAMP}
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      customer_id = #{customerId}
     where id = #{id,jdbcType=VARCHAR}
   </update>
 
@@ -443,6 +454,17 @@ order by t.print_sort asc
         <foreach collection="array" item="articleId" open="(" separator="," close=")">
             #{articleId}
         </foreach>
+    </select>
+
+
+    <select id="getOrderBefore" resultType="OrderItem">
+        select * from tb_order_item where order_id = (
+        select order_id from tb_order_before where state = 0 and table_number = #{tableNumber}
+        and shop_detail_id = #{shopId}
+        <if test="customerId != null">
+            and customer_id = #{customerId}
+        </if>
+        )
     </select>
 
     <delete id="posSyncDeleteByOrderId" parameterType="java.lang.String">

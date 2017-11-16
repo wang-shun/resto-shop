@@ -159,6 +159,11 @@
 	//用于显示描述详情
 	function showDetails(obj){
 		$(".modal-title > strong").html(obj.slogan);
+//		var html='';
+//		for(var i=0;i<obj.length;i++){
+//            html+='<tr><td>'+obj[i].name+'</td><td></td></tr>'
+//		}
+//        $(".modal-body").html(html);
 		$(".modal-body").html(obj.description);
 		$(".modal").modal();
 	}

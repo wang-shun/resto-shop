@@ -5,8 +5,11 @@
  import com.resto.brand.core.util.WeChatUtils;
  import com.resto.brand.web.model.Brand;
  import com.resto.brand.web.model.ShopDetail;
+ import com.resto.brand.web.model.TableQrcode;
+ import com.resto.brand.web.model.WechatConfig;
  import com.resto.brand.web.service.BrandService;
  import com.resto.brand.web.service.ShopDetailService;
+ import com.resto.brand.web.service.WechatConfigService;
  import com.resto.shop.web.controller.GenericController;
  import com.resto.shop.web.util.LogTemplateUtils;
  import com.resto.shop.web.util.RedisUtil;
@@ -35,6 +38,9 @@
      @Resource
      BrandService brandService;
 
+     @Resource
+     WechatConfigService wechatConfigService;
+
      @RequestMapping("/list")
          public void list(){
 
@@ -52,6 +58,16 @@
      @ResponseBody
      public Result modify(ShopDetail shopDetail){
          shopDetail.setId(getCurrentShopId());
+         log.info(shopDetail.getIsOpenTablewareFee() + "22222");
+         if(shopDetail.getIsOpenSauceFee() == null){
+             shopDetail.setIsOpenSauceFee(0);
+         }
+         if(shopDetail.getIsOpenTablewareFee() == null){
+             shopDetail.setIsOpenTablewareFee(0);
+         }
+         if(shopDetail.getIsOpenTowelFee() == null){
+             shopDetail.setIsOpenTowelFee(0);
+         }
 //         switch (shopDetail.getWaitUnit()){
 //             case 1 :
 //                 shopDetail.setTimeOut(shopDetail.getWaitTime());
@@ -184,37 +200,18 @@
          }
      }
 
-     @RequestMapping("/downloadFile")
-     public String donloadFile(String fileName ,HttpServletRequest request,
-                               HttpServletResponse response) throws IOException {
-         response.setContentType("text/html;charset=utf-8");
-         request.setCharacterEncoding("UTF-8");
-         BufferedInputStream bis = null;
-         BufferedOutputStream bos = null;
-         String downLoadPath = getFilePath(request,fileName);
-         try {
-             long fileLength = new File(downLoadPath).length();
-             response.setContentType("application/x-msdownload;");
-             response.setHeader("Content-disposition", "attachment; filename="
-                     + new String(fileName.getBytes("utf-8"), "ISO8859-1"));
-             response.setHeader("Content-Length", String.valueOf(fileLength));
-             bis = new BufferedInputStream(new FileInputStream(downLoadPath));
-             bos = new BufferedOutputStream(response.getOutputStream());
-             byte[] buff = new byte[2048];
-             int bytesRead;
-             while (-1 != (bytesRead = bis.read(buff, 0, buff.length))) {
-                 bos.write(buff, 0, bytesRead);
-             }
-         } catch (Exception e) {
-             e.printStackTrace();
-         } finally {
-             if (bis != null){
-                 bis.close();
-             }
-             if (bos != null){
-                 bos.close();
-             }
-         }
-         return null;
+     @RequestMapping("openQRCode")
+     @ResponseBody
+     public String openQRCode(String shopId, HttpServletRequest request, HttpServletResponse response) throws IOException, WriterException {
+         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+         WechatConfig wechatConfig = wechatConfigService.selectByBrandId(shopDetail.getBrandId());
+         String token = WeChatUtils.getAccessToken(wechatConfig.getAppid(), wechatConfig.getAppsecret());
+         org.json.JSONObject qrParam = new org.json.JSONObject();
+         qrParam.put("QrCodeId", shopId);
+         String result = WeChatUtils.getParamQrCode(token, qrParam.toString());//二维码的附带参数字符串类型，长度不能超过64
+         org.json.JSONObject obj = new org.json.JSONObject(result);
+         String img = obj.has("ticket")?obj.getString("ticket"):"";
+         String conteng = WeChatUtils.showQrcode(img);
+         return conteng;
      }
  }

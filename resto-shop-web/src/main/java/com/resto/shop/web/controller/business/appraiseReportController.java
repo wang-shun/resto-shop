@@ -114,7 +114,7 @@ public class appraiseReportController extends GenericController{
 					fiveStart++;
 				}
 			}
-			//消费的总单数(只计算父订单)
+			//消费的总订单(只计算父订单)
 			if (o.getParentOrderId() == null){
 				totalNum++;
 			}

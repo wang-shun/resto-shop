@@ -1,10 +1,10 @@
 package com.resto.shop.web.dao;
 
-import java.util.List;
-
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.ShopCart;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
     int deleteByPrimaryKey(Integer id);
@@ -41,4 +41,21 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
     ShopCart selectByUuId(String uuid);
 
     void deleteCustomerArticle(@Param("customerId") String customerId,@Param("articleId") String articleId);
+
+    void clearGroupId(Integer id);
+
+    void groupNew(@Param("customerId") String customerId,@Param("shopId") String shopId,@Param("groupId") String groupId);
+
+    Integer checkRepeat(@Param("articleId") String articleId,@Param("groupId") String groupId,@Param("customerId") String customerId);
+
+    List<ShopCart> getListByGroupId(@Param("groupId") String groupId,@Param("ids") List<String> ids);
+
+    void resetGroupId(String groupId);
+
+    List<String>  getListByGroupIdDistinctCustomerId(String groupId);
+
+    void deleteByGroup(String groupId);
+
+    void updateShopCartByGroupId(@Param("groupId") String groupId,@Param("shopId") String shopId
+    ,@Param("customerId") String customerId);
 }

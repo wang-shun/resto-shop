@@ -9,6 +9,7 @@ import com.resto.brand.web.model.AccountSetting;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.model.WechatConfig;
+import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.OffLineOrder;
@@ -290,6 +291,9 @@ public interface OrderService extends GenericService<Order, String> {
 	public Map<String,Object> callMoneyAndNumByDate(String beginDate, String endDate,String brandId, String brandName, List<ShopDetail> shopDetails);
 
 
+
+
+
 	/**
 	 * 根据时间 查询 当前选择店铺已完成的订单的 菜品分类销售详情(品牌端显示)
 	 * @param beginDate
@@ -494,7 +498,9 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	JSONResult createOrderByEmployee(Order order) throws AppException;
 
-	Order getLastOrderByCustomer(String customerId,String shopId);
+	Order getLastOrderByCustomer(String customerId,String shopId,String groupId);
+
+
 
 
     public boolean cancelWXPayOrder(String orderId);
@@ -762,4 +768,17 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	Order selectAfterValidOrderByCustomerId(String customerId);
 
 	Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type);
+
+	/**
+	 * 查询每个店铺的交易笔数
+	 * @param currentBrandId
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	List<OrderNumDto> selectOrderNumByTimeAndBrandId(String currentBrandId, String beginDate, String endDate);
+
+
+	List<Map<String,Object>> callBossAppOrdrReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate);
+
 }

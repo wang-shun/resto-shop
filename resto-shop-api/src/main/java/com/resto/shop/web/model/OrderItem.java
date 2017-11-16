@@ -114,6 +114,8 @@ public class OrderItem implements Serializable {
 
     private Integer changeCount;
 
+    private String customerId;
+
     public Integer getChangeCount() {
         return changeCount;
     }
@@ -434,6 +436,14 @@ public class OrderItem implements Serializable {
 
     public void setPosDiscount(String posDiscount) {
         this.posDiscount = posDiscount;
+    }
+
+    public String getCustomerId() {
+        return customerId;
+    }
+
+    public void setCustomerId(String customerId) {
+        this.customerId = customerId;
     }
 
     @Override

@@ -244,8 +244,9 @@
 //            },
             {
                 title : "其他方式支付(元)",
-                data : "otherPayment",
+                data : "otherPayment"
             }
+
         ]
 
     });
@@ -321,6 +322,10 @@
             {
                 title : "其他方式支付(元)",
                 data : "otherPayment"
+            },
+            {
+                title : "连接率",
+                data : "connctRatio"
             }
         ]
 

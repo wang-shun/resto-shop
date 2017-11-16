@@ -7,6 +7,7 @@ import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.shop.web.dto.ArticleSellCountDto;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticleStock;
 import org.apache.ibatis.annotations.Param;
@@ -178,4 +179,21 @@ public interface ArticleService extends GenericService<Article, String> {
 	 */
 	List<Article> selectArticleByShopId(String shopId);
 
+
+
+	List<ArticleSellCountDto> findArticleByLastCountTime(String shopId,String lastCountTime);
+
+
+	/**
+	 * 获得所有预点餐的菜品
+	 * @param shopId
+	 * @return
+	 */
+	List<Article> getArticleBefore(String shopId,String tableNumber,String customerId);
+
+	/**
+	 * 获取页面端菜品预警库存数量统计
+	 * @return
+	 */
+	/*int[] getStockNum(String shopId);*/
 }

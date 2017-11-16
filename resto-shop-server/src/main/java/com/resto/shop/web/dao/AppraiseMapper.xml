@@ -110,6 +110,7 @@
 
   <select id="selectDeatilByOrderId" resultType="Appraise">select
       <include refid="Base_Column_List"/>from tb_appraise where order_id=#{orderId}
+      <if test="customerId != null"> and customer_id=#{customerId}</if>
   </select>
 
   <select id="selectAppraiseByCustomerId" resultType="Appraise">
@@ -216,4 +217,7 @@
 			 <![CDATA[ a.create_time >= #{beginDate} AND a.create_time <= #{endDate}]]>
 	</select>
 
+    <select id="selectByOrderIdCustomerId" resultType="Appraise">
+        select <include refid="Base_Column_List"/> from tb_appraise where order_id = #{orderId} and customer_id = #{customerId} limit 1
+    </select>
 </mapper>
