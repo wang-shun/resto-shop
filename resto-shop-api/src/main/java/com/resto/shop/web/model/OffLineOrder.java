@@ -115,6 +115,21 @@ public class OffLineOrder implements Serializable {
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
-    
-    
+
+    public OffLineOrder(String id, String shopDetailId, String brandId, Integer resource, BigDecimal enterTotal, Integer enterCount, Integer deliveryOrders, BigDecimal orderBooks, Integer numGuest, Date createTime, Integer state) {
+        this.id = id;
+        this.shopDetailId = shopDetailId;
+        this.brandId = brandId;
+        this.resource = resource;
+        this.enterTotal = enterTotal;
+        this.enterCount = enterCount;
+        this.deliveryOrders = deliveryOrders;
+        this.orderBooks = orderBooks;
+        this.numGuest = numGuest;
+        this.createTime = createTime;
+        this.state = state;
+    }
+
+    public OffLineOrder() {
+    }
 }

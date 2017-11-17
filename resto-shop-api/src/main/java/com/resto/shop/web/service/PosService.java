@@ -1,10 +1,9 @@
 package com.resto.shop.web.service;
 
-import com.resto.shop.web.model.Article;
+import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.posDto.ArticleSupport;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by KONATA on 2017/8/9.
@@ -126,6 +125,14 @@ public interface PosService {
      * @param data
      */
     boolean syncPosLocalOrder(String data);
+
+    /**
+     * Pos端 结店操作
+     * @param brandId
+     * @param shopId
+     * @param offLineOrder
+     */
+    void posCheckOut(String brandId,String shopId, OffLineOrder offLineOrder);
 
     void test();
 }
