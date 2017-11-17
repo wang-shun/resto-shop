@@ -175,7 +175,7 @@
         and group_id = #{groupId} and customer_id != #{customerId}
     </select>
 
-    <select id="checkRepeat" resultType="java.lang.Integer">
+    <select id="checkRepeatRecommend" resultType="java.lang.Integer">
         select ifnull(sum(`number`),0) from tb_shop_cart where article_id = #{articleId}
         and group_id = #{groupId} and shop_type = 4
     </select>
