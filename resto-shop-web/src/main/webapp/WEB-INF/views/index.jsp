@@ -132,6 +132,8 @@
         <!-- END CORE PLUGINS -->
         <!-- BEGIN PAGE LEVEL PLUGINS -->
         <script src="<%=resourcePath%>/assets/global/scripts/datatable.js" type="text/javascript"></script>
+        <script src="<%=resourcePath%>/assets/global/scripts/moment.js" type="text/javascript"></script>
+        <script src="<%=resourcePath%>/assets/global/scripts/moment-with-locales.js" type="text/javascript"></script>
         <script src="<%=resourcePath%>/assets/global/plugins/datatables/datatables.min.js" type="text/javascript"></script>
         <script src="<%=resourcePath%>/assets/global/plugins/datatables/plugins/bootstrap/datatables.bootstrap.js" type="text/javascript"></script>
         <script src="<%=resourcePath%>/assets/global/plugins/jstree/dist/jstree.js"></script>

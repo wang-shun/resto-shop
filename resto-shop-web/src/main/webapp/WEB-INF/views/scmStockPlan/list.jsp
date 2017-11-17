@@ -160,6 +160,7 @@
                     createdCell:function(td,tdData,rowData){
                         var operator=[
                             <s:hasPermission name="scmStockPlan/approve">
+
                             C.createApproveBtn(rowData),
                             </s:hasPermission>
                             <s:hasPermission name="scmStockPlan/showDetails">

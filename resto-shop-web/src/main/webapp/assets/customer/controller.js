@@ -234,6 +234,7 @@ var Controller = function(controlId,datatable){
 		};
 		options  = $.extend(defaults,options);
 		form.submit(function(e){
+			debugger
 			e.preventDefault();
 			form.attr('action',options.formaction||form.attr('action'));
 			_C.ajaxFormEx(form,options);
@@ -506,6 +507,8 @@ var Controller = function(controlId,datatable){
 	}
 
     this.createApproveBtn = function(model,url,urlData){
+		debugger
+		console.info("----model:"+model)
         var button = $("<button class='btn btn-xs red'>审核</button>");
         button.click(function(){
             if(_C.vue){

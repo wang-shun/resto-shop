@@ -1,5 +1,6 @@
  package com.resto.shop.web.controller.business;
 
+ import com.google.zxing.WriterException;
  import com.resto.brand.core.entity.Result;
  import com.resto.brand.core.util.FileToZip;
  import com.resto.brand.core.util.WeChatUtils;

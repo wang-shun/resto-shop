@@ -2,248 +2,250 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <div id="control">
-	<div class="row form-div" v-if="showform">
-		<div class="col-md-offset-3 col-md-6" >
-			<div class="portlet light bordered">
-	            <div class="portlet-title">
-	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki"> 表单</span>
-	                </div>
-	            </div>
-	            <div class="portlet-body">
-	            	<form role="form" action="{{m.id?'scmDocPmsPoHeader/modify':'scmDocPmsPoHeader/create'}}" @submit.prevent="save">
-						<div class="form-body">
-							<div class="form-group">
-    <label>supplierId</label>
-    <input type="text" class="form-control" name="supplierId" v-model="m.supplierId">
-</div>
-<div class="form-group">
-    <label>supPriceHeadId</label>
-    <input type="text" class="form-control" name="supPriceHeadId" v-model="m.supPriceHeadId">
-</div>
-<div class="form-group">
-    <label>shopDetailId</label>
-    <input type="text" class="form-control" name="shopDetailId" v-model="m.shopDetailId">
-</div>
-<div class="form-group">
-    <label>shopName</label>
-    <input type="text" class="form-control" name="shopName" v-model="m.shopName">
-</div>
-<div class="form-group">
-    <label>orderName</label>
-    <input type="text" class="form-control" name="orderName" v-model="m.orderName">
-</div>
-<div class="form-group">
-    <label>orderCode</label>
-    <input type="text" class="form-control" name="orderCode" v-model="m.orderCode">
-</div>
-<div class="form-group">
-    <label>orderStatus</label>
-    <input type="text" class="form-control" name="orderStatus" v-model="m.orderStatus">
-</div>
-<div class="form-group">
-    <label>createrId</label>
-    <input type="text" class="form-control" name="createrId" v-model="m.createrId">
-</div>
-<div class="form-group">
-    <label>createrName</label>
-    <input type="text" class="form-control" name="createrName" v-model="m.createrName">
-</div>
-<div class="form-group">
-    <label>gmtCreate</label>
-    <input type="text" class="form-control" name="gmtCreate" v-model="m.gmtCreate">
-</div>
-<div class="form-group">
-    <label>gmtModified</label>
-    <input type="text" class="form-control" name="gmtModified" v-model="m.gmtModified">
-</div>
-<div class="form-group">
-    <label>auditTime</label>
-    <input type="text" class="form-control" name="auditTime" v-model="m.auditTime">
-</div>
-<div class="form-group">
-    <label>auditName</label>
-    <input type="text" class="form-control" name="auditName" v-model="m.auditName">
-</div>
-<div class="form-group">
-    <label>updaterId</label>
-    <input type="text" class="form-control" name="updaterId" v-model="m.updaterId">
-</div>
-<div class="form-group">
-    <label>updaterName</label>
-    <input type="text" class="form-control" name="updaterName" v-model="m.updaterName">
-</div>
-<div class="form-group">
-    <label>note</label>
-    <input type="text" class="form-control" name="note" v-model="m.note">
-</div>
-<div class="form-group">
-    <label>isDelete</label>
-    <input type="text" class="form-control" name="isDelete" v-model="m.isDelete">
-</div>
-<div class="form-group">
-    <label>tax</label>
-    <input type="text" class="form-control" name="tax" v-model="m.tax">
-</div>
-<div class="form-group">
-    <label>totalAmount</label>
-    <input type="text" class="form-control" name="totalAmount" v-model="m.totalAmount">
-</div>
-<div class="form-group">
-    <label>expectTime</label>
-    <input type="text" class="form-control" name="expectTime" v-model="m.expectTime">
-</div>
-<div class="form-group">
-    <label>payStatus</label>
-    <input type="text" class="form-control" name="payStatus" v-model="m.payStatus">
-</div>
-
-						</div>
-						<input type="hidden" name="id" v-model="m.id" />
-						<input class="btn green"  type="submit"  value="保存"/>
-						<a class="btn default" @click="cancel" >取消</a>
-					</form>
-	            </div>
-	        </div>
-		</div>
-	</div>
-	
-	<div class="table-div">
-		<div class="table-operator">
-			<s:hasPermission name="scmDocPmsPoHeader/add">
-			<button class="btn green pull-right" @click="create">新建</button>
-			</s:hasPermission>
-		</div>
-		<div class="clearfix"></div>
-		<div class="table-filter"></div>
-		<div class="table-body">
-			<table class="table table-striped table-hover table-bordered "></table>
-		</div>
-	</div>
-</div>
+    <!--查看详情-->
+    <div class="row form-div" v-show="details">
+        <div class="col-md-offset-3 col-md-6" style="background: #FFF;">
+            <div class="text-center" style="padding: 20px 0">
+                <span class="caption-subject bold font-blue-hoki">查看详情</span>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label class="col-md-2 control-label">采购单号</label>
+                        <div class="col-md-4">
+                            {{detailsArr.orderCode}}
+                        </div>
+                        <label class="col-md-2 control-label">门店</label>
+                        <div class="col-md-4">
+                            {{detailsArr.shopName}}
+                        </div>
 
 
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2 control-label">采购时间</label>
+                        <div class="col-md-4">
+                            {{detailsArr.gmtCreate | moment }}
+                        </div>
+                        <label class="col-md-2 control-label">预计送达时间</label>
+                        <div class="col-md-4">
+                            {{detailsArr.expectTime | moment}}
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2 control-label">供应商</label>
+                        <div class="col-md-4">
+                            {{detailsArr.supName}}
+                        </div>
+                        <label class="col-md-2 control-label">联系人</label>
+                        <div class="col-md-4">
+                            {{detailsArr.topContact}}
+                        </div>
+
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2 control-label">采购人</label>
+                        <div class="col-md-4">
+                            {{detailsArr.createrName}}
+                        </div>
+                        <label class="col-md-2 control-label">审核人</label>
+                        <div class="col-md-4">
+                            {{detailsArr.auditName}}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <table class="table table-bordered" >
+                            <thead>
+                            <tr>
+                                <th>类型</th>
+                                <th>一级类别</th>
+                                <th>二级类别</th>
+                                <th>品牌名</th>
+                                <th>材料名</th>
+                                <th>编码</th>
+                                <th>规格</th>
+                                <th>产地</th>
+                                <th>报价</th>
+                                <th>数量</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="item in detailsArr.docPmsPoDetailDos">
+                                <td>{{item.materialType}}</td>
+                                <td>{{item.categoryOneName}}</td>
+                                <td>{{item.categoryTwoName}}</td>
+                                <td>{{item.categoryThirdName}}</td>
+                                <td>{{item.materialName}}</td>
+                                <td>{{item.materialCode}}</td>
+                                <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
+                                <td>{{item.provinceName+item.cityName+item.districtName}}</td>
+                                <td>{{item.purchaseRealTaxMoney}}</td>
+                                <td>{{item.actQty}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center" style="padding: 20px 0">
+                <a class="btn default" @click="detailsCli" v-if="detailsBtn">取消</a>
+            </div>
+            <div class="text-center" style="padding: 20px 0" v-if="approveBtn">
+                <a class="btn default" @click="approveCli1" >驳回</a>
+                <a class="btn blue pull-center" @click="approveCli2" >批准</a>
+            </div>
+        </div>
+    </div>
+    <!--查看详情-->
+    <div class="table-div">
+        <div class="table-operator">
+
+        </div>
+        <div class="clearfix"></div>
+        <div class="table-filter"></div>
+        <div class="table-body">
+            <table class="table table-striped table-hover table-bordered "></table>
+        </div>
+    </div>
+</div>
 <script>
-	(function(){
-		var cid="#control";
-		var $table = $(".table-body>table");
-		var tb = $table.DataTable({
-			ajax : {
-				url : "scmDocPmsPoHeader/list_all",
-				dataSrc : ""
-			},
-			columns : [
-				{                 
-	title : "supplierId",
-	data : "supplierId",
-},                 
-{                 
-	title : "supPriceHeadId",
-	data : "supPriceHeadId",
-},                 
-{                 
-	title : "shopDetailId",
-	data : "shopDetailId",
-},                 
-{                 
-	title : "shopName",
-	data : "shopName",
-},                 
-{                 
-	title : "orderName",
-	data : "orderName",
-},                 
-{                 
-	title : "orderCode",
-	data : "orderCode",
-},                 
-{                 
-	title : "orderStatus",
-	data : "orderStatus",
-},                 
-{                 
-	title : "createrId",
-	data : "createrId",
-},                 
-{                 
-	title : "createrName",
-	data : "createrName",
-},                 
-{                 
-	title : "gmtCreate",
-	data : "gmtCreate",
-},                 
-{                 
-	title : "gmtModified",
-	data : "gmtModified",
-},                 
-{                 
-	title : "auditTime",
-	data : "auditTime",
-},                 
-{                 
-	title : "auditName",
-	data : "auditName",
-},                 
-{                 
-	title : "updaterId",
-	data : "updaterId",
-},                 
-{                 
-	title : "updaterName",
-	data : "updaterName",
-},                 
-{                 
-	title : "note",
-	data : "note",
-},                 
-{                 
-	title : "isDelete",
-	data : "isDelete",
-},                 
-{                 
-	title : "tax",
-	data : "tax",
-},                 
-{                 
-	title : "totalAmount",
-	data : "totalAmount",
-},                 
-{                 
-	title : "expectTime",
-	data : "expectTime",
-},                 
-{                 
-	title : "payStatus",
-	data : "payStatus",
-},                 
+    (function(){
+        var cid="#control";
+        var $table = $(".table-body>table");
 
-				{
-					title : "操作",
-					data : "id",
-					createdCell:function(td,tdData,rowData,row){
-						var operator=[
-							<s:hasPermission name="scmDocPmsPoHeader/delete">
-							C.createDelBtn(tdData,"scmDocPmsPoHeader/delete"),
-							</s:hasPermission>
-							<s:hasPermission name="scmDocPmsPoHeader/modify">
-							C.createEditBtn(rowData),
-							</s:hasPermission>
-						];
-						$(td).html(operator);
-					}
-				}],
-		});
-		
-		var C = new Controller(null,tb);
-		var vueObj = new Vue({
-			el:"#control",
-			mixins:[C.formVueMix]
-		});
-		C.vue=vueObj;
-	}());
-	
-	
+        var tb = $table.DataTable({
+            ajax : {
+                url : "scmDocPmsPoHeader/list_all",
+                dataSrc : "data"
+            },
+            columns : [
+                {
+                    title : "采购单号",
+                    data : "orderCode",
+                },
+                {
+                    title : "门店",
+                    data : "shopName",
+                },
+                {
+                    title : "采购单名",
+                    data : "orderName",
+                },
+                {
+                    title: "采购时间",
+                    data: "gmtCreate",
+                    createdCell:function (td,tdData) {//td中的数据
+                          $(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+                    }
+                },
+                {
+                    title : "供应商名称 ",
+                    data : "supName",
+                },
+                {
+                    title : "原料总价 ",
+                    data : "totalAmount",
+                },
+                {
+                    title : "操作人",
+                    data : "createrName",
+                },
+                {
+                    title : "审核人",
+                    data : "auditName",
+                },
 
-	
+//                {
+//                    title : "联系人",
+//                    data : "topContact",
+//                },
+//                {
+//                    title : "联系电话",
+//                    data : "topMobile",
+//                },
+//                {
+//                    title : "备注",
+//                    data : "note",
+//                },
+                {
+                    title : "状态",
+                    data : "orderStatus",
+                    createdCell:function(td,tdData,rowData){
+                        switch(tdData){
+                            case '11':tdData='待审核';break;
+                            case '12':tdData='审核通过';break;
+                            case '13':tdData='已驳回';break;
+                            case '14':tdData='审核失败';break;
+                            case '15':tdData='已失效';break;
+                        }
+                        $(td).html(tdData);
+                    }
+                },
+                {
+                    title : "操作",
+                    data : "id",
+                    createdCell:function(td,tdData,rowData){
+                        var operator=[
+                            <s:hasPermission name="scmDocPmsPoHeader/approve">
+                            C.createApproveBtn(rowData),
+                            </s:hasPermission>
+                            <s:hasPermission name="scmDocPmsPoHeader/showDetails">
+                            C.findBtn(rowData),
+                            </s:hasPermission>
+                        ];
+                        $(td).html(operator);
+                    }
+                },
+            ],
+        });
+        var C = new Controller(null,tb);
+        var vueObj = new Vue({
+            mixins:[C.formVueMix],
+            el:"#control",
+            data:{
+                details:false,//查看详情
+                detailsBtn:false,//查看详情返回按钮
+                approveBtn:false,//查看详情（审核）-审核按钮
+                detailsArr:{},//查看详情对象
+            },
+            methods:{
+                approve:function (data) { //开始审核
+
+                    this.details=true;
+                    this.detailsArr=data;
+                    this.approveBtn=true;
+                },
+                approveCli1:function () { //驳回审核
+                    this.details=false;
+                    this.approveBtn=false;
+                    C.systemButton('scmDocPmsPoHeader/approve',{id:this.detailsArr.id,orderStatus:'13'},['驳回成功','驳回失败']);
+                },
+                approveCli2:function () { //批准审核
+                    this.details=false;
+                    this.approveBtn=false;
+                    debugger
+                    C.systemButton('scmDocPmsPoHeader/approve',{id:this.detailsArr.id,orderStatus:'12'},['审核成功','审核失败']);
+                },
+                showDetails:function (data) { //查看详情
+                    this.details=true;
+                    this.detailsArr=data;
+                    this.detailsBtn=true;
+                },
+                detailsCli:function () { //关闭查看详情
+                    this.details=false;
+                    this.detailsBtn=false;
+                },
+
+            },
+        });
+
+        Vue.filter('moment', function (value, formatString) {
+            formatString = formatString || 'YYYY-MM-DD HH:mm:ss';
+            return moment(value).format(formatString);
+        });
+        C.vue=vueObj;
+    }());
+
+
 </script>
