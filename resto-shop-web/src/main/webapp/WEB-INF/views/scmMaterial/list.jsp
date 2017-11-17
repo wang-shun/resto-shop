@@ -224,8 +224,6 @@
 								</div>
 							</div>
 
-
-
 							<div class="form-group row">
 								<label class="col-md-4 control-label">一级分类<span style="color:#FF0000;">*</span></label>
 								<div class="col-md-3">

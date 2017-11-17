@@ -506,6 +506,22 @@ var Controller = function(controlId,datatable){
 		return button;
 	}
 
+
+    this.findCommonBtn = function(model,btnName,url,urlData){
+        var button = $("<button class='btn btn-xs btn-primary'>"+btnName+"</button>");
+        button.click(function(){
+            if(_C.vue){
+                _C.vue.showDetails(model);
+            }else{
+                _C.loadForm({
+                    url:url,
+                    data:{id:model},
+                    formaction:urlData
+                });
+            }
+        });
+        return button;
+    }
     this.createApproveBtn = function(model,url,urlData){
 		debugger
 		console.info("----model:"+model)

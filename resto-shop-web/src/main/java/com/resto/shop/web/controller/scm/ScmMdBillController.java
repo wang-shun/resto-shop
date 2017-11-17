@@ -1,20 +1,18 @@
  package com.resto.shop.web.controller.scm;
 
-import java.util.List;
+ import com.resto.brand.core.entity.Result;
+ import com.resto.brand.web.model.BrandSetting;
+ import com.resto.brand.web.service.BrandSettingService;
+ import com.resto.scm.web.model.MdBill;
+ import com.resto.scm.web.service.MdBillService;
+ import com.resto.shop.web.constant.Common;
+ import com.resto.shop.web.controller.GenericController;
+ import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestMapping;
+ import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import javax.validation.Valid;
-
-import com.resto.brand.web.model.BrandSetting;
-import com.resto.shop.web.constant.Common;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import com.resto.brand.web.service.BrandSettingService;
-import com.resto.shop.web.controller.GenericController;
-import com.resto.brand.core.entity.Result;
-import com.resto.scm.web.model.MdBill;
-import com.resto.scm.web.service.MdBillService;
+ import javax.annotation.Resource;
+ import javax.validation.Valid;
 
 @Controller
 @RequestMapping("scmMdBill")
@@ -40,8 +38,8 @@ public class ScmMdBillController extends GenericController{
 
 	@RequestMapping("/list_all")
 	@ResponseBody
-	public List<MdBill> listData(){
-		return mdBillService.queryJoin4Page(getCurrentShopId());
+	public Result listData(String beginDate,String endDate){
+		return getSuccessResult(mdBillService.queryJoin4Page(getCurrentShopId(),beginDate,endDate));
 	}
 	
 	@RequestMapping("list_one")

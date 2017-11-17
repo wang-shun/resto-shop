@@ -62,7 +62,7 @@ public abstract class GenericController{
 		String shopDetailId = getCurrentShopId() == null ? null : getCurrentShopId();
 		String brandId = getCurrentBrandId() == null ? null : getCurrentBrandId();
 		log.error("店铺id:"+ shopDetailId+",品牌id:"+brandId+",ErrorType:"+ex.toString()+",请求url:"+request.getRequestURL().toString()
-				+",ErrorMsg:"+ex.getMessage());
+				+",ErrorMsg:"+ex.getMessage(),ex);
 	}
 
 

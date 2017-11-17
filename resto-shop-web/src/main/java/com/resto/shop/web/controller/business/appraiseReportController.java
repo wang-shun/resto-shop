@@ -12,8 +12,8 @@
  import com.resto.brand.web.dto.AppraiseDto;
  import com.resto.brand.web.dto.AppraiseShopDto;
  import com.resto.brand.web.model.Brand;
- import com.resto.brand.web.model.TableQrcode;
  import com.resto.brand.web.model.ShopDetail;
+ import com.resto.brand.web.model.TableQrcode;
  import com.resto.brand.web.service.BrandService;
  import com.resto.brand.web.service.ShopDetailService;
  import com.resto.brand.web.service.TableQrcodeService;
@@ -22,7 +22,6 @@
  import com.resto.shop.web.model.Order;
  import com.resto.shop.web.service.AppraiseService;
  import com.resto.shop.web.service.OrderService;
- import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;

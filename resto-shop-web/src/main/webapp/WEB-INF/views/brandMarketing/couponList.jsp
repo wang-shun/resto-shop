@@ -91,8 +91,7 @@
 			  	   <strong style="margin-right:100px;font-size:22px">店铺优惠券报表</strong>
 			  </div>
 			  <div class="panel-body">
-			  	<table id="shopCouponList" class="table table-striped table-bordered table-hover"
-			  		style="width: 100%;">
+			  	<table id="shopCouponList" class="table table-striped table-bordered table-hover" style="width: 100%;">
 			  	</table>
 			  </div>
 			</div>
