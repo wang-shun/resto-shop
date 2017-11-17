@@ -48,6 +48,8 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
 
     Integer checkRepeat(@Param("articleId") String articleId,@Param("groupId") String groupId,@Param("customerId") String customerId);
 
+    Integer checkRepeatRecommend(@Param("articleId") String articleId,@Param("groupId") String groupId);
+
     List<ShopCart> getListByGroupId(@Param("groupId") String groupId,@Param("ids") List<String> ids);
 
     void resetGroupId(String groupId);
