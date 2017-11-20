@@ -50,6 +50,7 @@ public class TableGroupServiceImpl extends GenericServiceImpl<TableGroup, Long> 
 
     @Override
     public TableGroup insertGroup(TableGroup tableGroup) {
+        log.error("当前的tableGroup的tableNumber为：" + tableGroup.getTableNumber());
          tableGroupMapper.insertSelective(tableGroup);
          return tableGroup;
     }
