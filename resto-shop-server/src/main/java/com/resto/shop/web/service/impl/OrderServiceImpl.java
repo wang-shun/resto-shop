@@ -7482,7 +7482,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         customerMap.put("brandName", brand.getBrandName());
         customerMap.put("fileName", customer != null ? customer.getId() : "Pos下单 ");
         customerMap.put("type", "UserAction");
-        customerMap.put("content", "系统向用户:" + customer != null ? customer.getNickname() : "Pos下单不" + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        customerMap.put("content", "系统向用户:" + (customer != null ? customer.getNickname() : "Pos下单不") + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(LogUtils.url, customerMap);
         Order newOrder = new Order();
         newOrder.setId(order.getId());
