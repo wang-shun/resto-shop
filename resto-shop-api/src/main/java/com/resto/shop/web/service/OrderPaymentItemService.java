@@ -89,4 +89,11 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
      * @param orderId
      */
     void posSyncDeleteByOrderId(String orderId);
+
+    /**
+     * Pos 2.0 数据同步方法，根据 orderId 查询订单支付项
+     * @param orderId
+     * @return
+     */
+    List<OrderPaymentItem> posSyncListByOrderId(String orderId);
 }

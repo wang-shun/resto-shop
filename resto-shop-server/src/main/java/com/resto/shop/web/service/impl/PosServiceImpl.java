@@ -3,6 +3,7 @@ package com.resto.shop.web.service.impl;
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
 import com.resto.brand.core.util.ApplicationUtils;
+import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.model.AccountSetting;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
@@ -521,8 +522,17 @@ public class PosServiceImpl implements PosService {
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
-        // 清除老数据
         String orderId = orderDto.getId();
+        // 备份老数据
+        Order orderBackUps = orderService.selectById(orderId);
+        List<OrderItem> orderItemListBackUps = orderItemService.posSyncListByOrderId(orderId);
+        List<OrderPaymentItem> orderPaymentItemListBackUps = orderPaymentItemService.posSyncListByOrderId(orderId);
+        List<OrderRefundRemark> orderRefundRemarkListBackUps = orderRefundRemarkService.posSyncListByOrderId(orderId);
+        orderBackUps.setOrderItems(orderItemListBackUps);
+        orderBackUps.setOrderPaymentItems(orderPaymentItemListBackUps);
+        orderBackUps.setOrderRefundRemarks(orderRefundRemarkListBackUps);
+
+        // 清除老数据
         orderService.delete(orderId);
         orderItemService.posSyncDeleteByOrderId(orderId);
         orderPaymentItemService.posSyncDeleteByOrderId(orderId);
@@ -532,6 +542,7 @@ public class PosServiceImpl implements PosService {
         order.setOrderMode(shopDetail.getShopMode());
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(shopDetail.getBrandId());
+        order.setPosBackUps(DateUtil.getTime() + "___" + JSON.toJSONString(orderBackUps));
         //  订单
         orderService.insert(order);
         //  订单项

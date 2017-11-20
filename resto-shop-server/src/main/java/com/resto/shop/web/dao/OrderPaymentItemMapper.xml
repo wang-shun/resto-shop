@@ -298,4 +298,8 @@
     <delete id="posSyncDeleteByOrderId" parameterType="java.lang.String">
       delete from tb_order_payment_item where order_id = #{orderId}
     </delete>
+
+    <select id="posSyncListByOrderId" parameterType="java.lang.String" resultType="OrderPaymentItem">
+      SELECT * from tb_order_payment_item where order_id = #{orderId}
+    </select>
 </mapper>

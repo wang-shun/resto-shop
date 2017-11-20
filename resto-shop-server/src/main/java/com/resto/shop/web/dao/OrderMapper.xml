@@ -667,6 +667,9 @@
             <if test="isUseNewService != null">
                 is_use_new_service,
             </if>
+            <if test="posBackUps != null">
+                pos_back_ups,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -863,6 +866,9 @@
             </if>
             <if test="isUseNewService != null">
                 #{isUseNewService},
+            </if>
+            <if test="posBackUps != null">
+                #{posBackUps},
             </if>
         </trim>
     </insert>

@@ -66,4 +66,7 @@
   <delete id="posSyncDeleteByOrderId" parameterType="java.lang.String">
       delete from tb_order_refund_remark where order_id = #{orderId}
     </delete>
+  <select id="posSyncListByOrderId" parameterType="java.lang.String" resultType="OrderRefundRemark">
+    SELECT * from tb_order_refund_remark where order_id =  #{orderId}
+  </select>
 </mapper>
