@@ -299,7 +299,7 @@
       delete from tb_order_payment_item where order_id = #{orderId}
     </delete>
 
-    <select id="posSyncListByOrderId" parameterType="java.lang.String" resultType="com.resto.shop.web.model.OrderPaymentItem">
+    <select id="posSyncListByOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
       SELECT * from tb_order_payment_item where order_id = #{orderId}
     </select>
 </mapper>

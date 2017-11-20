@@ -471,7 +471,7 @@ order by t.print_sort asc
       DELETE FROM tb_order_item where order_id = #{orderId}
     </delete>
 
-    <select id="posSyncListByOrderId" parameterType="java.lang.String" resultType="com.resto.shop.web.model.OrderItem">
+    <select id="posSyncListByOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
         SELECT * from tb_order_item where order_id = #{orderId}
     </select>
 </mapper>

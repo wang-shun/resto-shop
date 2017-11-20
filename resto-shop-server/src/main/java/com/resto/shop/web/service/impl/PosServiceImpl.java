@@ -525,9 +525,13 @@ public class PosServiceImpl implements PosService {
         String orderId = orderDto.getId();
         // 备份老数据
         Order orderBackUps = orderService.selectById(orderId);
+        log.info("----orderItemListBackUps");
         List<OrderItem> orderItemListBackUps = orderItemService.posSyncListByOrderId(orderId);
+        log.info("----orderPaymentItemListBackUps");
         List<OrderPaymentItem> orderPaymentItemListBackUps = orderPaymentItemService.posSyncListByOrderId(orderId);
+        log.info("----orderRefundRemarkListBackUps");
         List<OrderRefundRemark> orderRefundRemarkListBackUps = orderRefundRemarkService.posSyncListByOrderId(orderId);
+        log.info("----end");
         orderBackUps.setOrderItems(orderItemListBackUps);
         orderBackUps.setOrderPaymentItems(orderPaymentItemListBackUps);
         orderBackUps.setOrderRefundRemarks(orderRefundRemarkListBackUps);
