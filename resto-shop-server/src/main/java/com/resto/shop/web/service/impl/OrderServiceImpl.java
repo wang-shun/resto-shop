@@ -7461,8 +7461,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             customerMap.put("type", "UserAction");
             customerMap.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
             doPostAnsc(LogUtils.url, customerMap);
+            WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
         }
-        WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+
 
         Order parent = null;
         if (order.getParentOrderId() != null) {
@@ -7474,7 +7475,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuffer msg = new StringBuffer();
         msg.append("商家已在收银电脑处更新了您的订单信息：" + "\n");
         msg.append(pushMessage.toString());
-        WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
+
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "订单发送推送：" + msg.toString());
         Map customerMap = new HashMap(4);
