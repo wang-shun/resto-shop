@@ -11,6 +11,7 @@ import com.resto.shop.web.service.TableGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -50,6 +51,7 @@ public class TableGroupServiceImpl extends GenericServiceImpl<TableGroup, Long> 
 
     @Override
     public TableGroup insertGroup(TableGroup tableGroup) {
+        log.error("当前的tableGroup的tableNumber为：" + tableGroup.getTableNumber());
          tableGroupMapper.insertSelective(tableGroup);
          return tableGroup;
     }
@@ -66,6 +68,11 @@ public class TableGroupServiceImpl extends GenericServiceImpl<TableGroup, Long> 
             //把组内所有人的购物车重置为自己的
             shopCartService.resetGroupId(tableGroup.getGroupId());
         }
+    }
+
+    @Override
+    public void releaseTableGroup(Date time) {
+        tableGroupMapper.releaseTableGroup(time);
     }
 
     @Override

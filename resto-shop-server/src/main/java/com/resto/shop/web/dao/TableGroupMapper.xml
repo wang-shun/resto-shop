@@ -99,8 +99,6 @@
        and t2.shop_detail_id = #{shopId} and t.state = #{state}
   </select>
 
-
-
   <select id="getTableGroupByCustomer" resultType="TableGroup">
      select * from tb_table_group
      where create_customer_id = #{customerId} and shop_detail_id = #{shopId}
@@ -110,4 +108,10 @@
   <select id="selectByGroupId" resultType="TableGroup">
     select * from tb_table_group where group_id = #{groupId}
   </select>
+
+  <update id="releaseTableGroup">
+    update tb_table_group
+    set state = 2
+    where now() > create_time
+  </update>
 </mapper>
