@@ -282,7 +282,7 @@ public class LogTemplateUtils {
     /**
      * 添加购物车
      */
-    public  static  void getUpdateShopcart(String brandName,Customer customer,String shopName,Article article){
+    public  static  void getUpdateShopcart(String brandName,Customer customer,String shopName,Article article,ShopCart shopCart){
         Map map=getOrderBaseMap(brandName,customer.getId(),USERTYPE);
         StringBuilder sb = new StringBuilder();
         String articleTypeName=OrderItemType.getPayModeName(article.getArticleType());
@@ -290,7 +290,7 @@ public class LogTemplateUtils {
                 .append("将菜品id:"+article.getId())
                 .append("菜品类型为:")
                 .append(articleTypeName).append("菜品名字为:")
-                .append(article.getName()).append("的菜品加入到购物车").append("加入的店铺为:"+shopName);
+                .append(article.getName()).append("x"+shopCart.getNumber()).append("的菜品加入到购物车").append("加入的店铺为:"+shopName);
         map.put("content",sb.toString()+"请求服务器地址为:"+MQSetting.getLocalIP());
         doPostAnsc(url,map);
     }
