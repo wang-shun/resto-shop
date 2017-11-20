@@ -2263,7 +2263,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 	@Override
     public int printUpdate(String orderId) {
-		Order o = new Order();
+		Order o = orderMapper.selectByPrimaryKey(orderId);
 		o.setId(orderId);
 		o.setProductionStatus(ProductionStatus.GET_IT);
 		int count = orderMapper.updateByPrimaryKeySelective(o);
