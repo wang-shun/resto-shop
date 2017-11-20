@@ -338,8 +338,8 @@ public class MQMessageProducer {
 		JSONObject obj  = new JSONObject();
         obj.put("shopId",shopId);
         obj.put("orderNumber",orderNumber);
-		//Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_RECEIPT_PRINT_SUCCESS,obj.toJSONString().getBytes());
-		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,"",obj.toJSONString().getBytes());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_RECEIPT_PRINT_SUCCESS,obj.toJSONString().getBytes());
+//		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,"",obj.toJSONString().getBytes());
 		sendMessageASync(message);
 	}
 
