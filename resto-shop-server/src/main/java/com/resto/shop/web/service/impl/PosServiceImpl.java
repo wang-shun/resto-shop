@@ -525,16 +525,14 @@ public class PosServiceImpl implements PosService {
         String orderId = orderDto.getId();
         // 备份老数据
         Order orderBackUps = orderService.selectById(orderId);
-        log.info("----orderItemListBackUps");
-        List<OrderItem> orderItemListBackUps = orderItemService.posSyncListByOrderId(orderId);
-        log.info("----orderPaymentItemListBackUps");
-        List<OrderPaymentItem> orderPaymentItemListBackUps = orderPaymentItemService.posSyncListByOrderId(orderId);
-        log.info("----orderRefundRemarkListBackUps");
-        List<OrderRefundRemark> orderRefundRemarkListBackUps = orderRefundRemarkService.posSyncListByOrderId(orderId);
-        log.info("----end");
-        orderBackUps.setOrderItems(orderItemListBackUps);
-        orderBackUps.setOrderPaymentItems(orderPaymentItemListBackUps);
-        orderBackUps.setOrderRefundRemarks(orderRefundRemarkListBackUps);
+        if(orderBackUps != null){
+            List<OrderItem> orderItemListBackUps = orderItemService.posSyncListByOrderId(orderId);
+            List<OrderPaymentItem> orderPaymentItemListBackUps = orderPaymentItemService.posSyncListByOrderId(orderId);
+            List<OrderRefundRemark> orderRefundRemarkListBackUps = orderRefundRemarkService.posSyncListByOrderId(orderId);
+            orderBackUps.setOrderItems(orderItemListBackUps);
+            orderBackUps.setOrderPaymentItems(orderPaymentItemListBackUps);
+            orderBackUps.setOrderRefundRemarks(orderRefundRemarkListBackUps);
+        }
 
         // 清除老数据
         orderService.delete(orderId);
