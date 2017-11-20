@@ -2668,11 +2668,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             ticketPrinter.addAll(printerService.selectPrintByType(order.getShopDetailId(),PrinterType.RECEPTION));
         }
         for (Printer printer : ticketPrinter) {
-            if (shopDetail.getIsPosNew().equals(Common.YES)) {
-                getTurnTableModelNew(order, printer,shopDetail,printTask,oldtableNumber);
-            } else {
+//            if (shopDetail.getIsPosNew().equals(Common.YES)) {
+//                getTurnTableModelNew(order, printer,shopDetail,printTask,oldtableNumber);
+//            } else {
                 getTurnTableModel(order, printer, printTask,oldtableNumber);
-            }
+//            }
         }
         Brand brand = brandService.selectById(order.getBrandId());
         JSONArray json = new JSONArray(printTask);
@@ -2753,16 +2753,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //保存基本信息
         Map<String, Object> print = new HashMap<String, Object>();
+        print.put("ADD_TIME", System.currentTimeMillis());
         print.put("PORT", printer.getPort());
         print.put("OID", order.getId());
         print.put("IP", printer.getIp());
-        print.put("PRINT_STATUS", order.getPrintKitchenFlag());
+        print.put("PRINT_STATUS", 0);
+        print.put("TABLE_NO",tableNumber);
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID",print_id);
-        print.put("TASK_ID", "");
+        print.put("TASK_ID", ApplicationUtils.randomUUID());
         print.put("TASK_ORDER_ID", order.getId());
         print.put("LINE_WIDTH", shopDetail.getPageSize() == 0 ? 48 : 42);
         Map<String, Object> data = new HashMap<String, Object>();
+        print.put("ORDER_ID", serialNumber);
         data.put("ORDER_ID", serialNumber);
         data.put("DATETIME", DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss")); //下单时间
         //从缓存里取当前订单的转台单打印次数， 如果为空则是第一次打印则当前打印次数为1
@@ -2790,15 +2793,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> items = new ArrayList<Map<String, Object>>();
         Map<String, Object> itemOld = new HashMap<String, Object>();
         itemOld.put("ARTICLE_COUNT","台号");
-        itemOld.put("ARTICLE_NAME","               "+oldtableNumber);
+        itemOld.put("ARTICLE_NAME",""+oldtableNumber);
         items.add(itemOld);
         Map<String, Object> itemNew = new HashMap<String, Object>();
-        itemNew.put("ARTICLE_COUNT","转至");
-        itemNew.put("ARTICLE_NAME","               "+tableNumber);
+        itemNew.put("ARTICLE_COUNT",3);
+        itemNew.put("ARTICLE_NAME",""+tableNumber);
         items.add(itemNew);
         data.put("ITEMS", items);
         data.put("CUSTOMER_SATISFACTION", "");
-        data.put("CUSTOMER_SATISFACTION_DEGREE", "");
+        data.put("CUSTOMER_SATISFACTION_DEGREE", 0);
         data.put("CUSTOMER_PROPERTY", "");
         print.put("DATA", data);
         print.put("STATUS", "0");
@@ -2971,7 +2974,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         print.put("OID", order.getId());
         print.put("IP", printer.getIp());
         String print_id = ApplicationUtils.randomUUID();
-        print.put("PRINT_STATUS", order.getPrintKitchenFlag());
+        print.put("PRINT_STATUS", 0);
         ArticleRecommend articleRecommend = articleRecommendMapper.getRecommendById(recommendId);
         print.put("PRINT_TASK_ID", ApplicationUtils.randomUUID());
         print.put("TASK_ID", recommendId);
