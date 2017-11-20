@@ -9202,6 +9202,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public void fixErrorOrder() {
         orderMapper.fixAllowContinueOrder(new Date());
+        tableGroupService.releaseTableGroup(new Date());
 //        List<Order> orders = orderMapper.getAllowAppraise();
 //        for (Order order : orders) {
 //            confirmOrder(order);
