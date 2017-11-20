@@ -2263,46 +2263,47 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 	@Override
     public int printUpdate(String orderId) {
-		Order o = orderMapper.selectByPrimaryKey(orderId);
+		Order o = new Order();
 		o.setId(orderId);
 		o.setProductionStatus(ProductionStatus.GET_IT);
 		int count = orderMapper.updateByPrimaryKeySelective(o);
 		//yz 2017/08/03 计费系统 添加账户设置(简单版) ---resto+外卖订单
+        try {
             Brand brand = brandService.selectByPrimaryKey(o.getBrandId());
             BrandSetting brandSetting = brandSettingService.selectById(brand.getBrandSettingId());
 //			BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
 
-			if (brandSetting != null && JifeiType.TOTAL_ORDER_DRAWAL.equals(brandSetting.getOpenBrandAccount())) {//说明开启了品牌账户
-				//查询品牌账户设置
-				AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-				//定义抽成的金额
-				BigDecimal money = BigDecimal.ZERO;
+            if (brandSetting != null && JifeiType.TOTAL_ORDER_DRAWAL.equals(brandSetting.getOpenBrandAccount())) {//说明开启了品牌账户
+                //查询品牌账户设置
+                AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+                //定义抽成的金额
+                BigDecimal money = BigDecimal.ZERO;
 
-				if (JifeiType.TOTAL_ORDER_DRAWAL.equals(accountSetting.getOpenOutFoodOrder())) {//开启resto外卖订单 并且按订单总额抽成
-					//计算resto外卖 的 抽成金额 (外卖都是先付所以就直接计算)
-					money = o.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? o.getAmountWithChildren() : o.getOrderMoney();
-				} else if (JifeiType.TOTAL_ORDER_DRAWAL.equals(accountSetting.getOpenOutFoodOrder())) {//开启resto外卖订单 并且按实际支付 抽成
-					List<OrderPaymentItem> orderPaymentItemList = orderPaymentItemService.selectByOrderId(o.getId());
-					if(orderPaymentItemList!=null && !orderPaymentItemList.isEmpty()){
-						for (OrderPaymentItem oi : orderPaymentItemList) {
-							//实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
-							if(oi.getPaymentModeId()==PayMode.CHARGE_PAY||oi.getPaymentModeId()==PayMode.WEIXIN_PAY||
-									oi.getPaymentModeId()==PayMode.ALI_PAY||oi.getPaymentModeId()==PayMode.BANK_CART_PAY||
-									oi.getPaymentModeId()==PayMode.CRASH_PAY||oi.getPaymentModeId()==PayMode.SHANHUI_PAY||
-									oi.getPaymentModeId()==PayMode.INTEGRAL_PAY
-									){
-								money = money.add(oi.getPayValue());
-							}
-						}
-					}
-				}
-				//记录日志 和更新账户
-				BrandAccount brandAccount = brandAccountService.selectByBrandId(o.getBrandId());
-				ShopDetail s = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
-				if(brandAccount == null || accountSetting == null){
-                    log.error("店铺"+s.getName()+"品牌账户异常或者品牌账户设置异常。。");
-                    return  count;
-                }else {
+                if (JifeiType.TOTAL_ORDER_DRAWAL.equals(accountSetting.getOpenOutFoodOrder())) {//开启resto外卖订单 并且按订单总额抽成
+                    //计算resto外卖 的 抽成金额 (外卖都是先付所以就直接计算)
+                    money = o.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? o.getAmountWithChildren() : o.getOrderMoney();
+                } else if (JifeiType.TOTAL_ORDER_DRAWAL.equals(accountSetting.getOpenOutFoodOrder())) {//开启resto外卖订单 并且按实际支付 抽成
+                    List<OrderPaymentItem> orderPaymentItemList = orderPaymentItemService.selectByOrderId(o.getId());
+                    if (orderPaymentItemList != null && !orderPaymentItemList.isEmpty()) {
+                        for (OrderPaymentItem oi : orderPaymentItemList) {
+                            //实际支付 1.充值 2.微信 3支付宝 4刷卡 5现金 6闪慧 7会员
+                            if (oi.getPaymentModeId() == PayMode.CHARGE_PAY || oi.getPaymentModeId() == PayMode.WEIXIN_PAY ||
+                                    oi.getPaymentModeId() == PayMode.ALI_PAY || oi.getPaymentModeId() == PayMode.BANK_CART_PAY ||
+                                    oi.getPaymentModeId() == PayMode.CRASH_PAY || oi.getPaymentModeId() == PayMode.SHANHUI_PAY ||
+                                    oi.getPaymentModeId() == PayMode.INTEGRAL_PAY
+                                    ) {
+                                money = money.add(oi.getPayValue());
+                            }
+                        }
+                    }
+                }
+                //记录日志 和更新账户
+                BrandAccount brandAccount = brandAccountService.selectByBrandId(o.getBrandId());
+                ShopDetail s = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
+                if (brandAccount == null || accountSetting == null) {
+                    log.error("店铺" + s.getName() + "品牌账户异常或者品牌账户设置异常。。");
+                    return count;
+                } else {
                     BigDecimal remain = brandAccount.getAccountBalance().subtract(money);
                     BrandAccountLog blog = new BrandAccountLog();
                     blog.setSerialNumber(o.getSerialNumber());
@@ -2314,13 +2315,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     blog.setAccountId(brandAccount.getId());
                     blog.setRemain(remain);
                     blog.setOrderMoney(o.getOrderMoney());
-                    if(o.getParentOrderId()!=null){
+                    if (o.getParentOrderId() != null) {
                         blog.setIsParent(true);
                     }
-                    if(JifeiType.TOTAL_ORDER_DRAWAL.equals(accountSetting.getOpenOutFoodOrder())){//Resto+外卖订单抽成
+                    if (JifeiType.TOTAL_ORDER_DRAWAL.equals(accountSetting.getOpenOutFoodOrder())) {//Resto+外卖订单抽成
                         blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_SELL);
                     }
-                    if(JifeiType.ACTUAL_ORDER_DRAWAL.equals(accountSetting.getOpenOutFoodOrder())){ //Resto+外卖订单实付抽成
+                    if (JifeiType.ACTUAL_ORDER_DRAWAL.equals(accountSetting.getOpenOutFoodOrder())) { //Resto+外卖订单实付抽成
                         blog.setDetail(DetailType.RESTO_OUT_FOOD_ORDER_REAL_SELL);
                     }
 
@@ -2339,8 +2340,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //拉取最新的brandAccount
                     BrandAccount brandAccount2 = brandAccountService.selectById(brandAccount.getId());
 
-                    Result result =  BrandAccountSendUtil.sendSms(brandAccount2,noticeList,brand.getBrandName(),accountSetting);
-                    if(result.isSuccess()){
+                    Result result = BrandAccountSendUtil.sendSms(brandAccount2, noticeList, brand.getBrandName(), accountSetting);
+                    if (result.isSuccess()) {
                         Long accountSettingId = accountSetting.getId();
                         AccountSetting as = new AccountSetting();
                         as.setId(accountSettingId);
@@ -2352,10 +2353,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         MQMessageProducer.sendBrandAccountSms(brand.getId(), MQSetting.DELAY_TIME);
                     }
                 }
-
-			}
-		   return  count;
-		}
+            }
+        } catch (Exception e){
+            log.info("resto外卖订单抽成出错 "+e.getMessage());
+            e.printStackTrace();
+        }finally{
+            return count;
+        }
+    }
 
     @Override
     public List<Order> selectTodayOrder(String shopId, int[] proStatus) {
