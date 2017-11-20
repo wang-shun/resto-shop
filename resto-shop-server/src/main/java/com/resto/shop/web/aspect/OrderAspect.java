@@ -1879,7 +1879,7 @@ public class OrderAspect {
      */
     private final void sendNotificationMessage(Brand brand, ShopDetail shopDetail, Appraise appraise, String warningKey) {
         //信息模板
-        String sendMessage = "餐加提醒您：${customer}为${telephone}的${sex}用户，评价了${datetime}在${shopname}消费的订单，评价内容包含${warningkey}关键词，请及时处理！";
+        String sendMessage = "餐加提醒您：${customer}为${telephone}的${sex}用户，评价了${datetime}在${shopname}消费的订单，包含${warningkey}关键词。评价内容：${appraise}请及时处理！";
         //存储关键信息
         com.alibaba.fastjson.JSONObject stringMap = new com.alibaba.fastjson.JSONObject();
         //查询相关信息
@@ -1900,6 +1900,7 @@ public class OrderAspect {
         stringMap.put("datetime", format.format(order.getCreateTime()));
         stringMap.put("shopname", shopDetail.getName());
         stringMap.put("warningkey", warningKey);
+        stringMap.put("appraise", appraise.getContent());
         //格式转换
         //模板转换工具类
         StrSubstitutor substitutor = new StrSubstitutor(stringMap);
