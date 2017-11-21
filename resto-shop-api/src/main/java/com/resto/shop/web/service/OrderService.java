@@ -781,4 +781,10 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	List<Map<String,Object>> callBossAppOrdrReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate);
 
+	/**
+	 * Pos 2.0 数据同步方法，根据 orderId 查询订单信息
+	 * @param orderId
+	 * @return
+	 */
+	Order posSyncSelectById(String orderId);
 }

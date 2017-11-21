@@ -3473,6 +3473,8 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         o.shop_detail_id;
     </select>
 
-
+    <select id="posSyncSelectById" parameterType="java.lang.String" resultType="Order">
+        SELECT * from tb_order where id = #{orderId}
+    </select>
 
 </mapper>

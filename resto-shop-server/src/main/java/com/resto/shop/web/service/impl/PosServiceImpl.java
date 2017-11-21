@@ -523,8 +523,9 @@ public class PosServiceImpl implements PosService {
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
         String orderId = orderDto.getId();
+        StringBuffer backUps = new StringBuffer();
         // 备份老数据
-        Order orderBackUps = orderService.selectById(orderId);
+        Order orderBackUps = orderService.posSyncSelectById(orderId);
         if(orderBackUps != null){
             List<OrderItem> orderItemListBackUps = orderItemService.posSyncListByOrderId(orderId);
             List<OrderPaymentItem> orderPaymentItemListBackUps = orderPaymentItemService.posSyncListByOrderId(orderId);
@@ -532,6 +533,7 @@ public class PosServiceImpl implements PosService {
             orderBackUps.setOrderItems(orderItemListBackUps);
             orderBackUps.setOrderPaymentItems(orderPaymentItemListBackUps);
             orderBackUps.setOrderRefundRemarks(orderRefundRemarkListBackUps);
+            backUps.append(DateUtil.getTime()).append("___").append(JSON.toJSONString(orderBackUps));
         }
 
         // 清除老数据
@@ -544,7 +546,7 @@ public class PosServiceImpl implements PosService {
         order.setOrderMode(shopDetail.getShopMode());
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(shopDetail.getBrandId());
-        order.setPosBackUps(DateUtil.getTime() + "___" + JSON.toJSONString(orderBackUps));
+        order.setPosBackUps(backUps.toString());
         //  订单
         orderService.insert(order);
         //  订单项

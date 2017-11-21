@@ -9918,6 +9918,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
+    @Override
+    public Order posSyncSelectById(String orderId) {
+        return orderMapper.posSyncSelectById(orderId);
+    }
+
     private List<ShopOrderReportDto> getBossAppOrderReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate) {
         List<ShopOrderReportDto> shopOrderReportDtoLists = new ArrayList<>();
         for(int i = 0; i < shopDetailList.size(); i++){
