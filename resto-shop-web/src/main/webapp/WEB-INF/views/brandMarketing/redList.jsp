@@ -143,12 +143,12 @@
                 endDate : "",
             },
             redTypeList:[
-                {typeName:"全部红包",typeValue:"0"},
-                {typeName:"评论红包",typeValue:"1"},
-                {typeName:"分享返利红包",typeValue:"2"},
-                {typeName:"退菜红包",typeValue:"3"},
-                {typeName:"充值赠送红包",typeValue:"4"},
-                {typeName:"等位红包",typeValue:"5"}
+                {typeName:"全部红包",typeValue:0},
+                {typeName:"评论红包",typeValue:1},
+                {typeName:"分享返利红包",typeValue:2},
+                {typeName:"退菜红包",typeValue:3},
+                {typeName:"充值赠送红包",typeValue:4},
+                {typeName:"等位红包",typeValue:5}
             ],
             redType:0,
             shopRedInfoTable:{}
