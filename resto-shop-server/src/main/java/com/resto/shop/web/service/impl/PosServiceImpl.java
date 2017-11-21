@@ -546,7 +546,7 @@ public class PosServiceImpl implements PosService {
         order.setOrderMode(shopDetail.getShopMode());
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(shopDetail.getBrandId());
-        order.setPosBackUps(backUps.toString());
+        order.setPosBackUps(StringUtils.isEmpty(backUps.toString()) ? null : backUps.toString());
         //  订单
         orderService.insert(order);
         //  订单项
