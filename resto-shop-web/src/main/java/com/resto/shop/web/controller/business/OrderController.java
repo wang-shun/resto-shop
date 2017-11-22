@@ -670,20 +670,24 @@ public class OrderController extends GenericController{
 									orderReportDto.setPeopleCount(orderReportDto.getPeopleCount() + (order.getCustomerCount() == null ? 0 : order.getCustomerCount()));
 									//当日订单数累加
 									orderReportDto.setOrderCount(orderReportDto.getOrderCount() + 1);
+									if (order.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){ //就餐模式为堂食
+										//堂食订单数累加
+										orderReportDto.setTangshiCount(orderReportDto.getTangshiCount() + 1);
+									}else if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)){ //就餐模式为外带
+										//外带订单数累加
+										orderReportDto.setWaidaiCount(orderReportDto.getWaidaiCount() + 1);
+									}else if (order.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){ //就餐模式为外卖
+										//外卖订单数累加
+										orderReportDto.setWaimaiCount(orderReportDto.getWaimaiCount() + 1);
+									}
 								}
 								if (order.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){ //就餐模式为堂食
-									//堂食订单数累加
-									orderReportDto.setTangshiCount(orderReportDto.getTangshiCount() + 1);
 									//堂食订单总额累加
 									orderReportDto.setTangshiPrice(orderReportDto.getTangshiPrice().add(order.getOrderMoney()));
 								}else if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)){ //就餐模式为外带
-									//外带订单数累加
-									orderReportDto.setWaidaiCount(orderReportDto.getWaidaiCount() + 1);
 									//外带订单额累加
 									orderReportDto.setWaidaiPrice(orderReportDto.getWaidaiPrice().add(order.getOrderMoney()));
 								}else if (order.getDistributionModeId().equals(DistributionType.DELIVERY_MODE_ID)){ //就餐模式为外卖
-									//外卖订单数累加
-									orderReportDto.setWaimaiCount(orderReportDto.getWaimaiCount() + 1);
 									//外卖订单额累加
 									orderReportDto.setWaimaiPrice(orderReportDto.getWaimaiPrice().add(order.getOrderMoney()));
 								}
