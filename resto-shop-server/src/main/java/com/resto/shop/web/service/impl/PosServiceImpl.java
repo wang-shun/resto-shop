@@ -317,6 +317,7 @@ public class PosServiceImpl implements PosService {
             orderService.insert(order);
             orderItemService.insertItems(orderItems);
         }
+        // 更新库存
         Boolean updateStockSuccess = false;
         try {
             updateStockSuccess = orderService.updateStock(orderService.getOrderInfo(order.getId()));
