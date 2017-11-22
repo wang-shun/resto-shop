@@ -316,6 +316,15 @@ public class PosServiceImpl implements PosService {
             orderService.insert(order);
             orderItemService.insertItems(orderItems);
         }
+        Boolean updateStockSuccess = false;
+        try {
+            updateStockSuccess = orderService.updateStock(orderService.getOrderInfo(order.getId()));
+        } catch (AppException e) {
+            e.printStackTrace();
+        }
+        if (!updateStockSuccess) {
+            log.info("库存变更失败:" + order.getId());
+        }
     }
 
     @Override
