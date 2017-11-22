@@ -396,15 +396,12 @@ public class PosServiceImpl implements PosService {
                 OrderItem item = orderItemService.selectById(orderItem.getId());
                 orderService.updateOrderItem(item.getOrderId(),item.getCount() - orderItem.getCount(),orderItem.getId(), 1);
             }
-
         }else{
-
             orderService.refundItem(order);
             orderService.refundArticleMsg(order);
         }
 
         //判断是否清空
-
         boolean flag = true;
         for (OrderItem item : refundOrder.getOrderItems()) {
             if (item.getCount() > 0) {
@@ -440,20 +437,16 @@ public class PosServiceImpl implements PosService {
             }
             orderService.update(refundOrder);
         }
-        // TODO: 2017/10/13  需统一回调格式
-//        JSONObject jsonObject = new JSONObject();
-//        jsonObject.put("dataType","updatePayment");
-//        jsonObject.put("orderId",order.getId());
-//        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
-//        if(!CollectionUtils.isEmpty(payItemsList)){
-//            List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
-//            for(OrderPaymentItem orderPaymentItem : payItemsList){
-//                OrderPaymentDto orderPaymentDto = new OrderPaymentDto(orderPaymentItem);
-//                orderPaymentDtos.add(orderPaymentDto);
-//            }
-//            jsonObject.put("orderPayment", orderPaymentDtos);
-//        }
-//        return jsonObject.toString();
+        // 还原库存
+        Boolean addStockSuccess = false;
+        try {
+            addStockSuccess = orderService.addStock(orderService.getOrderInfo(order.getId()));
+        } catch (AppException e) {
+            e.printStackTrace();
+        }
+        if (!addStockSuccess) {
+            log.info("库存还原失败:" + order.getId());
+        }
         return null;
     }
 
