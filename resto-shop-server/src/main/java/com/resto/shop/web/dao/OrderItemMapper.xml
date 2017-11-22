@@ -470,4 +470,8 @@ order by t.print_sort asc
     <delete id="posSyncDeleteByOrderId" parameterType="java.lang.String">
       DELETE FROM tb_order_item where order_id = #{orderId}
     </delete>
+
+    <select id="posSyncListByOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * from tb_order_item where order_id = #{orderId}
+    </select>
 </mapper>

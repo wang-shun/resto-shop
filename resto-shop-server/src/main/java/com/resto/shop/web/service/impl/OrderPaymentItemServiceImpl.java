@@ -172,4 +172,9 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     public void posSyncDeleteByOrderId(String orderId) {
         orderpaymentitemMapper.posSyncDeleteByOrderId(orderId);
     }
+
+    @Override
+    public List<OrderPaymentItem> posSyncListByOrderId(String orderId) {
+        return orderpaymentitemMapper.posSyncListByOrderId(orderId);
+    }
 }

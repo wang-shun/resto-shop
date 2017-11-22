@@ -299,6 +299,11 @@ public class Order implements Serializable {
 
     private String beforeId;
 
+    // 订单退款备注
+    private List<OrderRefundRemark> orderRefundRemarks;
+    // Pos 2.0 字段，用于备份原始订单
+    private String posBackUps;
+
     //新版服务费的集合 包括：餐具费、纸巾费、酱料费
     private List<JSONObject> serviceList;
 
@@ -1294,5 +1299,19 @@ public class Order implements Serializable {
     public Order() {
     }
 
+    public List<OrderRefundRemark> getOrderRefundRemarks() {
+        return orderRefundRemarks;
+    }
 
+    public void setOrderRefundRemarks(List<OrderRefundRemark> orderRefundRemarks) {
+        this.orderRefundRemarks = orderRefundRemarks;
+    }
+
+    public String getPosBackUps() {
+        return posBackUps;
+    }
+
+    public void setPosBackUps(String posBackUps) {
+        this.posBackUps = posBackUps;
+    }
 }

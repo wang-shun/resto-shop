@@ -123,4 +123,6 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
     int deleteByOrderId(String orderId);
 
     void posSyncDeleteByOrderId(String orderId);
+
+    List<OrderPaymentItem> posSyncListByOrderId(@Param("orderId") String orderId);
 }

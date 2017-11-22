@@ -195,6 +195,11 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     }
 
     @Override
+    public Integer checkRepeatRecommend(String articleId, String groupId) {
+        return shopcartMapper.checkRepeatRecommend(articleId, groupId) ;
+    }
+
+    @Override
     public List<ShopCart> getListByGroupId(String groupId) {
         List<String> customerIdList = getListByGroupIdDistinctCustomerId(groupId);
         if(CollectionUtils.isEmpty(customerIdList)){
