@@ -9277,6 +9277,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
+    public void fixErrorGroup() {
+        tableGroupService.releaseTableGroup(new Date());
+//        List<Order> orders = orderMapper.getAllowAppraise();
+//        for (Order order : orders) {
+//            confirmOrder(order);
+//        }
+    }
+
+    @Override
     public List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap) {
         return orderMapper.callProcDayAllOrderItem(selectMap);
     }
