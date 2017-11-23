@@ -129,7 +129,7 @@
 
     <select id="selectUseRedOrder" resultType="java.util.Map">
         select CONCAT_WS(',',(
-        IFNULL((select COUNT(r.count) from (
+        IFNULL((select COUNT(1) from (
         select COUNT(1) count from tb_order td
         inner join tb_order_payment_item top
         on td.id = top.order_id

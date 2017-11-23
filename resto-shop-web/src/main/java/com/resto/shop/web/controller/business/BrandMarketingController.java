@@ -433,6 +433,7 @@ public class BrandMarketingController extends GenericController{
                 useCouponCount = useCouponCount.add(couponDto.getUseCouponCount() == null ? BigDecimal.ZERO : couponDto.getUseCouponCount());
                 useCouponMoney = useCouponMoney.add(couponDto.getUseCouponMoney() == null ? BigDecimal.ZERO : couponDto.getUseCouponMoney());
                 useCouponOrderCount = useCouponOrderCount.add(couponDto.getUseCouponOrderCount());
+                useCouponOrderMoney = useCouponOrderMoney.add(couponDto.getUseCouponOrderMoney());
                 customerCount = customerCount.add(couponDto.getCustomerCount());
             }
             object.put("shopCouponInfoList",couponDtos);
@@ -443,6 +444,7 @@ public class BrandMarketingController extends GenericController{
             brandCouponInfo.put("useCouponCount",useCouponCount);
             brandCouponInfo.put("useCouponMoney",useCouponMoney);
             brandCouponInfo.put("useCouponOrderCount",useCouponOrderCount);
+            brandCouponInfo.put("useCouponOrderMoney", useCouponOrderMoney);
             brandCouponInfo.put("customerCount",customerCount);
             if (!couponCount.equals(BigDecimal.ZERO)){
                 useCouponCountRatio = useCouponCount.divide(couponCount,2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%";
