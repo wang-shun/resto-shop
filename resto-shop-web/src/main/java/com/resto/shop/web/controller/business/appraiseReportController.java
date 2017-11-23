@@ -516,7 +516,7 @@ public class appraiseReportController extends GenericController{
 								}
 							}
 							appraiseDto.setAppraiseNum(appraiseCount);
-							appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : new BigDecimal(appraiseCount).divide(new BigDecimal(orderCount), 2, BigDecimal.ROUND_HALF_UP) + "%");
+							appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : new BigDecimal(appraiseCount).divide(new BigDecimal(orderCount), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
 							orderIterator = orders.iterator();
 							orders = new ArrayList<>();
 						}
@@ -582,7 +582,7 @@ public class appraiseReportController extends GenericController{
 							}
 						}
 						appraiseDto.setAppraiseNum(appraiseCount);
-						appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : new BigDecimal(appraiseCount).divide(new BigDecimal(orderCount), 2, BigDecimal.ROUND_HALF_UP) + "%");
+						appraiseDto.setAppraiseRatio(orderCount == 0 ? "0.00%" : new BigDecimal(appraiseCount).divide(new BigDecimal(orderCount), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) + "%");
 						orderIterator = orders.iterator();
 						orders = new ArrayList<>();
 					}

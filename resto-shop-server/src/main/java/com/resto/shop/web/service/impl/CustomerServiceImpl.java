@@ -171,6 +171,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 			accountService.update(account);
 			//修改tb_third_customer表
 			thirdCustomer.setType(0);
+			thirdCustomer.setMoney(new BigDecimal(0));
 			thirdCustomerService.update(thirdCustomer);
 			//添加余额日志表
 			AccountLog acclog = new AccountLog();

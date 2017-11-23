@@ -85,12 +85,11 @@
 	            //datatable对象
 	            that.shopArticleTable=$("#shopArticleTable").DataTable({
 	                lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
-	                order: [[ 3, "desc" ]],
+	                order: [[ 0, "asc" ]],
 	                columns : [
 	                    {
 	                        title : "店铺名称",
-	                        data : "shopName",
-	                        orderable : false
+	                        data : "shopName"
 	                    },
 	                    {
 	                        title : "菜品销量(份)",
