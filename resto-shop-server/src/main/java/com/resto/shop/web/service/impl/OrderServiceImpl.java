@@ -3675,64 +3675,82 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (order.getIsUseNewService().equals(Common.YES)) { //用的是新版服务费
                     if (shopDetail.getIsOpenSauceFee().equals(Common.YES)){
                         Map<String, Object> item = new HashMap<>();
-                        item.put("SUBTOTAL", shopDetail.getSauceFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
-                        item.put("ARTICLE_NAME", shopDetail.getSauceFeeName());
-                        item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
-                        items.add(item);
-                        if (!order.getSauceFeeCount().equals(order.getCustomerCount())) {
-                            Map<String, Object> refundItem = new HashMap<>();
-                            refundItem.put("SUBTOTAL", -shopDetail.getSauceFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getSauceFeeCount()))).doubleValue());
-                            refundItem.put("ARTICLE_NAME", shopDetail.getSauceFeeName() + "(退)");
-                            refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getSauceFeeCount()));
-                            refundItems.add(refundItem);
+                        if (order.getSauceFeeCount() > order.getBaseCustomerCount()){
+                            item.put("SUBTOTAL", order.getSauceFeePrice());
+                            item.put("ARTICLE_NAME", shopDetail.getSauceFeeName());
+                            item.put("ARTICLE_COUNT", order.getSauceFeeCount());
+                        }else {
+                            item.put("SUBTOTAL", shopDetail.getSauceFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+                            item.put("ARTICLE_NAME", shopDetail.getSauceFeeName());
+                            item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+                            items.add(item);
+                            if (order.getSauceFeeCount() < order.getCustomerCount()) { //减掉或退掉了
+                                Map<String, Object> refundItem = new HashMap<>();
+                                refundItem.put("SUBTOTAL", -shopDetail.getSauceFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getSauceFeeCount()))).doubleValue());
+                                refundItem.put("ARTICLE_NAME", shopDetail.getSauceFeeName() + "(退)");
+                                refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getSauceFeeCount()));
+                                refundItems.add(refundItem);
+                            }
                         }
                     }
                     if (shopDetail.getIsOpenTowelFee().equals(Common.YES)){
                         Map<String, Object> item = new HashMap<>();
-                        item.put("SUBTOTAL", shopDetail.getTowelFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
-                        item.put("ARTICLE_NAME", shopDetail.getTowelFeeName());
-                        item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
-                        items.add(item);
-                        if (!order.getTowelFeeCount().equals(order.getCustomerCount())) {
-                            Map<String, Object> refundItem = new HashMap<>();
-                            refundItem.put("SUBTOTAL", -shopDetail.getTowelFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getTowelFeeCount()))).doubleValue());
-                            refundItem.put("ARTICLE_NAME", shopDetail.getTowelFeeName() + "(退)");
-                            refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getTowelFeeCount()));
-                            refundItems.add(refundItem);
+                        if (order.getTowelFeeCount() > order.getBaseCustomerCount()){
+                            item.put("SUBTOTAL", order.getTowelFeePrice());
+                            item.put("ARTICLE_NAME", shopDetail.getTowelFeeName());
+                            item.put("ARTICLE_COUNT", order.getTowelFeeCount());
+                        }else {
+                            item.put("SUBTOTAL", shopDetail.getTowelFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+                            item.put("ARTICLE_NAME", shopDetail.getTowelFeeName());
+                            item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+                            items.add(item);
+                            if (order.getTowelFeeCount() < order.getBaseCustomerCount()) { //减掉或退掉了
+                                Map<String, Object> refundItem = new HashMap<>();
+                                refundItem.put("SUBTOTAL", -shopDetail.getTowelFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getTowelFeeCount()))).doubleValue());
+                                refundItem.put("ARTICLE_NAME", shopDetail.getTowelFeeName() + "(退)");
+                                refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getTowelFeeCount()));
+                                refundItems.add(refundItem);
+                            }
                         }
                     }
                     if (shopDetail.getIsOpenTablewareFee().equals(Common.YES)){
                         Map<String, Object> item = new HashMap<>();
-                        item.put("SUBTOTAL", shopDetail.getTablewareFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
-                        item.put("ARTICLE_NAME", shopDetail.getTablewareFeeName());
-                        item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
-                        items.add(item);
-                        if (!order.getTablewareFeeCount().equals(order.getCustomerCount())) {
-                            Map<String, Object> refundItem = new HashMap<>();
-                            refundItem.put("SUBTOTAL", -shopDetail.getTablewareFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getTablewareFeeCount()))).doubleValue());
-                            refundItem.put("ARTICLE_NAME", shopDetail.getTablewareFeeName() + "(退)");
-                            refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getTablewareFeeCount()));
-                            refundItems.add(refundItem);
+                        if (order.getTablewareFeeCount() > order.getBaseCustomerCount()){
+                            item.put("SUBTOTAL", order.getTablewareFeePrice());
+                            item.put("ARTICLE_NAME", shopDetail.getTablewareFeeName());
+                            item.put("ARTICLE_COUNT", order.getTablewareFeeCount());
+                        }else{
+                            item.put("SUBTOTAL", shopDetail.getTablewareFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+                            item.put("ARTICLE_NAME", shopDetail.getTablewareFeeName());
+                            item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+                            items.add(item);
+                            if (order.getTablewareFeeCount() < order.getBaseCustomerCount()) {
+                                Map<String, Object> refundItem = new HashMap<>();
+                                refundItem.put("SUBTOTAL", -shopDetail.getTablewareFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getTablewareFeeCount()))).doubleValue());
+                                refundItem.put("ARTICLE_NAME", shopDetail.getTablewareFeeName() + "(退)");
+                                refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getTablewareFeeCount()));
+                                refundItems.add(refundItem);
+                            }
                         }
                     }
                 } else {
                     Map<String, Object> item = new HashMap<>();
-                    item.put("SUBTOTAL", shopDetail.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
-                    item.put("ARTICLE_NAME", shopDetail.getServiceName());
-                    if ("27f56b31669f4d43805226709874b530".equals(brand.getId())) {
-                        item.put("ARTICLE_NAME", "就餐人数");
-                    }
-                    item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
-                    items.add(item);
-                    if (!order.getBaseCustomerCount().equals(order.getCustomerCount())) {
-                        Map<String, Object> refundItem = new HashMap<>();
-                        refundItem.put("SUBTOTAL", -shopDetail.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))).doubleValue());
-                        refundItem.put("ARTICLE_NAME", shopDetail.getServiceName() + "(退)");
-                        if ("27f56b31669f4d43805226709874b530".equals(brand.getId())) {
-                            refundItem.put("ARTICLE_NAME", "就餐人数" + "(退)");
+                    if (order.getCustomerCount() > order.getBaseCustomerCount()){ //如果服务费加了则直接现在当前服务费信息
+                        item.put("SUBTOTAL", order.getServicePrice());
+                        item.put("ARTICLE_NAME", shopDetail.getServiceName());
+                        item.put("ARTICLE_COUNT", order.getCustomerCount());
+                    }else {
+                        item.put("SUBTOTAL", shopDetail.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+                        item.put("ARTICLE_NAME", shopDetail.getServiceName());
+                        item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+                        items.add(item);
+                        if (order.getCustomerCount() < order.getBaseCustomerCount()) { //如果当前customerCount小于原始customerCount则说明退掉或编辑了服务费
+                            Map<String, Object> refundItem = new HashMap<>();
+                            refundItem.put("SUBTOTAL", -shopDetail.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))).doubleValue());
+                            refundItem.put("ARTICLE_NAME", shopDetail.getServiceName() + "(退)");
+                            refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getCustomerCount()));
+                            refundItems.add(refundItem);
                         }
-                        refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getCustomerCount()));
-                        refundItems.add(refundItem);
                     }
                 }
             }
@@ -4047,64 +4065,82 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 if (order.getIsUseNewService().equals(Common.YES)) { //用的是新版服务费
                     if (shopDetail.getIsOpenSauceFee().equals(Common.YES)){
                         Map<String, Object> item = new HashMap<>();
-                        item.put("SUBTOTAL", shopDetail.getSauceFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
-                        item.put("ARTICLE_NAME", shopDetail.getSauceFeeName());
-                        item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
-                        items.add(item);
-                        if (!order.getSauceFeeCount().equals(order.getCustomerCount())) {
-                            Map<String, Object> refundItem = new HashMap<>();
-                            refundItem.put("SUBTOTAL", -shopDetail.getSauceFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getSauceFeeCount()))).doubleValue());
-                            refundItem.put("ARTICLE_NAME", shopDetail.getSauceFeeName() + "(退)");
-                            refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getSauceFeeCount()));
-                            refundItems.add(refundItem);
+                        if (order.getSauceFeeCount() > order.getBaseCustomerCount()){
+                            item.put("SUBTOTAL", order.getSauceFeePrice());
+                            item.put("ARTICLE_NAME", shopDetail.getSauceFeeName());
+                            item.put("ARTICLE_COUNT", order.getSauceFeeCount());
+                        }else {
+                            item.put("SUBTOTAL", shopDetail.getSauceFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+                            item.put("ARTICLE_NAME", shopDetail.getSauceFeeName());
+                            item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+                            items.add(item);
+                            if (order.getSauceFeeCount() < order.getCustomerCount()) { //减掉或退掉了
+                                Map<String, Object> refundItem = new HashMap<>();
+                                refundItem.put("SUBTOTAL", -shopDetail.getSauceFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getSauceFeeCount()))).doubleValue());
+                                refundItem.put("ARTICLE_NAME", shopDetail.getSauceFeeName() + "(退)");
+                                refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getSauceFeeCount()));
+                                refundItems.add(refundItem);
+                            }
                         }
                     }
                     if (shopDetail.getIsOpenTowelFee().equals(Common.YES)){
                         Map<String, Object> item = new HashMap<>();
-                        item.put("SUBTOTAL", shopDetail.getTowelFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
-                        item.put("ARTICLE_NAME", shopDetail.getTowelFeeName());
-                        item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
-                        items.add(item);
-                        if (!order.getTowelFeeCount().equals(order.getCustomerCount())) {
-                            Map<String, Object> refundItem = new HashMap<>();
-                            refundItem.put("SUBTOTAL", -shopDetail.getTowelFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getTowelFeeCount()))).doubleValue());
-                            refundItem.put("ARTICLE_NAME", shopDetail.getTowelFeeName() + "(退)");
-                            refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getTowelFeeCount()));
-                            refundItems.add(refundItem);
+                        if (order.getTowelFeeCount() > order.getBaseCustomerCount()){
+                            item.put("SUBTOTAL", order.getTowelFeePrice());
+                            item.put("ARTICLE_NAME", shopDetail.getTowelFeeName());
+                            item.put("ARTICLE_COUNT", order.getTowelFeeCount());
+                        }else {
+                            item.put("SUBTOTAL", shopDetail.getTowelFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+                            item.put("ARTICLE_NAME", shopDetail.getTowelFeeName());
+                            item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+                            items.add(item);
+                            if (order.getTowelFeeCount() < order.getBaseCustomerCount()) { //减掉或退掉了
+                                Map<String, Object> refundItem = new HashMap<>();
+                                refundItem.put("SUBTOTAL", -shopDetail.getTowelFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getTowelFeeCount()))).doubleValue());
+                                refundItem.put("ARTICLE_NAME", shopDetail.getTowelFeeName() + "(退)");
+                                refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getTowelFeeCount()));
+                                refundItems.add(refundItem);
+                            }
                         }
                     }
                     if (shopDetail.getIsOpenTablewareFee().equals(Common.YES)){
                         Map<String, Object> item = new HashMap<>();
-                        item.put("SUBTOTAL", shopDetail.getTablewareFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
-                        item.put("ARTICLE_NAME", shopDetail.getTablewareFeeName());
-                        item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
-                        items.add(item);
-                        if (!order.getTablewareFeeCount().equals(order.getCustomerCount())) {
-                            Map<String, Object> refundItem = new HashMap<>();
-                            refundItem.put("SUBTOTAL", -shopDetail.getTablewareFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getTablewareFeeCount()))).doubleValue());
-                            refundItem.put("ARTICLE_NAME", shopDetail.getTablewareFeeName() + "(退)");
-                            refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getTablewareFeeCount()));
-                            refundItems.add(refundItem);
+                        if (order.getTablewareFeeCount() > order.getBaseCustomerCount()){
+                            item.put("SUBTOTAL", order.getTablewareFeePrice());
+                            item.put("ARTICLE_NAME", shopDetail.getTablewareFeeName());
+                            item.put("ARTICLE_COUNT", order.getTablewareFeeCount());
+                        }else{
+                            item.put("SUBTOTAL", shopDetail.getTablewareFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+                            item.put("ARTICLE_NAME", shopDetail.getTablewareFeeName());
+                            item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+                            items.add(item);
+                            if (order.getTablewareFeeCount() < order.getBaseCustomerCount()) {
+                                Map<String, Object> refundItem = new HashMap<>();
+                                refundItem.put("SUBTOTAL", -shopDetail.getTablewareFeePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getTablewareFeeCount()))).doubleValue());
+                                refundItem.put("ARTICLE_NAME", shopDetail.getTablewareFeeName() + "(退)");
+                                refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getTablewareFeeCount()));
+                                refundItems.add(refundItem);
+                            }
                         }
                     }
                 } else {
                     Map<String, Object> item = new HashMap<>();
-                    item.put("SUBTOTAL", shopDetail.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
-                    item.put("ARTICLE_NAME", shopDetail.getServiceName());
-                    if ("27f56b31669f4d43805226709874b530".equals(brand.getId())) {
-                        item.put("ARTICLE_NAME", "就餐人数");
-                    }
-                    item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
-                    items.add(item);
-                    if (!order.getBaseCustomerCount().equals(order.getCustomerCount())) {
-                        Map<String, Object> refundItem = new HashMap<>();
-                        refundItem.put("SUBTOTAL", -shopDetail.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))).doubleValue());
-                        refundItem.put("ARTICLE_NAME", shopDetail.getServiceName() + "(退)");
-                        if ("27f56b31669f4d43805226709874b530".equals(brand.getId())) {
-                            refundItem.put("ARTICLE_NAME", "就餐人数" + "(退)");
+                    if (order.getCustomerCount() > order.getBaseCustomerCount()){ //如果服务费加了则直接现在当前服务费信息
+                        item.put("SUBTOTAL", order.getServicePrice());
+                        item.put("ARTICLE_NAME", shopDetail.getServiceName());
+                        item.put("ARTICLE_COUNT", order.getCustomerCount());
+                    }else {
+                        item.put("SUBTOTAL", shopDetail.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
+                        item.put("ARTICLE_NAME", shopDetail.getServiceName());
+                        item.put("ARTICLE_COUNT", order.getBaseCustomerCount());
+                        items.add(item);
+                        if (order.getCustomerCount() < order.getBaseCustomerCount()) { //如果当前customerCount小于原始customerCount则说明退掉或编辑了服务费
+                            Map<String, Object> refundItem = new HashMap<>();
+                            refundItem.put("SUBTOTAL", -shopDetail.getServicePrice().multiply(new BigDecimal((order.getBaseCustomerCount() - order.getCustomerCount()))).doubleValue());
+                            refundItem.put("ARTICLE_NAME", shopDetail.getServiceName() + "(退)");
+                            refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getCustomerCount()));
+                            refundItems.add(refundItem);
                         }
-                        refundItem.put("ARTICLE_COUNT", -(order.getBaseCustomerCount() - order.getCustomerCount()));
-                        refundItems.add(refundItem);
                     }
                 }
             }
