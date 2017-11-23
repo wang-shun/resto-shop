@@ -774,17 +774,6 @@
 							</div>
 						</div>
 					</div>
-					<div class="form-group">
-						<label class="col-md-4 control-label" :class="{ formBox : m.orderBefore == 1}">餐品预点餐：</label>
-						<div  class="col-md-6 radio-list">
-							<label class="radio-inline">
-								<input type="radio" name="orderBefore"v-model="m.orderBefore" value="1">开启
-							</label>
-							<label class="radio-inline">
-								<input type="radio" name="orderBefore" v-model="m.orderBefore" value="0"> 未开启
-							</label>
-						</div>
-					</div>
 
 					<div class="form-group">
 						<label class="col-md-4 control-label" :class="{ formBox : m.openBadWarning == 1}">开启差评预警：</label>
@@ -815,18 +804,6 @@
 						<div  class="col-md-6">
 							<textarea class="form-control" v-model="m.warningKey" name="warningKey">
 							</textarea><font color="red">*多个关键词中间以英文状态下的逗号(,)隔开</font>
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label class="col-md-4 control-label">是否开启多人点餐：</label>
-						<div  class="col-md-6 radio-list">
-							<label class="radio-inline">
-								<input type="radio" name="openManyCustomerOrder"v-model="m.openManyCustomerOrder" value="1">是
-							</label>
-							<label class="radio-inline">
-								<input type="radio" name="openManyCustomerOrder" v-model="m.openManyCustomerOrder" value="0">否
-							</label>
 						</div>
 					</div>
 
