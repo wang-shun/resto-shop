@@ -4,6 +4,7 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.TableGroup;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -21,4 +22,6 @@ public interface TableGroupMapper extends GenericDao<TableGroup, Long>{
             ,@Param("shopId") String shopId);
 
     TableGroup selectByGroupId(String groupId);
+
+    void releaseTableGroup (Date time);
 }

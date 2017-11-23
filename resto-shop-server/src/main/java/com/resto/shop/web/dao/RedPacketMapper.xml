@@ -173,7 +173,7 @@
         and td.parent_order_id is null
         GROUP BY td.id) r),0)),(
         IFNULL((select SUM(r.orderMoney) from (
-        select SUM(td.order_money) orderMoney from tb_order td
+        select td.order_money orderMoney from tb_order td
         inner join tb_order_payment_item top
         on td.id = top.order_id
         where td.order_state in (2,10,11,12)

@@ -72,15 +72,15 @@ public class BrandMarketingController extends GenericController{
     @RequestMapping("/selectRedList")
     @ResponseBody
     public Result selectRedList(String grantBeginDate, String grantEndDate, String useBeginDate, String useEndDate, Integer redType){
-        JSONObject object = new JSONObject();
+        JSONObject object = new JSONObject(); //封装最后的返回值
         try{
-            BigDecimal redCount = new BigDecimal(0);
-            BigDecimal redMoney = new BigDecimal(0);
-            BigDecimal useRedCount = new BigDecimal(0);
-            BigDecimal useRedMoney = new BigDecimal(0);
-            BigDecimal useRedOrderCount = new BigDecimal(0);
-            BigDecimal useRedOrderMoney = new BigDecimal(0);
-            List<RedPacketDto> redPacketDtoList = new ArrayList<RedPacketDto>();
+            BigDecimal redCount = BigDecimal.ZERO; //红包发放数量
+            BigDecimal redMoney = BigDecimal.ZERO; //红包发放金额
+            BigDecimal useRedCount = BigDecimal.ZERO; //红包使用数量
+            BigDecimal useRedMoney = BigDecimal.ZERO; //红包使用金额
+            BigDecimal useRedOrderCount = BigDecimal.ZERO; //拉动订单笔数
+            BigDecimal useRedOrderMoney = BigDecimal.ZERO; //拉动订单金额
+            List<RedPacketDto> redPacketDtoList = new ArrayList<RedPacketDto>(); //存放各店铺下红包的发放信息
             List<ShopDetail> shopDetailList = getCurrentShopDetails();
             if(getCurrentShopDetails() == null){
                 shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
@@ -89,35 +89,35 @@ public class BrandMarketingController extends GenericController{
                 RedPacketDto redPacketDto = new RedPacketDto(shopDetail.getId(),shopDetail.getName(),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),new BigDecimal(0),"0.00%","0.00%",new BigDecimal(0),new BigDecimal(0));
                 redPacketDtoList.add(redPacketDto);
             }
-            List<RedPacketDto> selectRedPackets = null;
+            List<RedPacketDto> selectRedPackets = null; //存放每次红包查询的结果
             switch (redType){
-                case 0:
+                case 0: //全部红包
                     selectRedPackets = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate,
                         RedType.APPRAISE_RED+","+RedType.SHARE_RED+","+RedType.REFUND_ARTICLE_RED ,
-                        PayMode.APPRAISE_RED_PAY+","+PayMode.SHARE_RED_PAY+","+PayMode.REFUND_ARTICLE_RED_PAY);
+                        PayMode.APPRAISE_RED_PAY+","+PayMode.SHARE_RED_PAY+","+PayMode.REFUND_ARTICLE_RED_PAY); //查询全部红包
                     redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     selectRedPackets = selectChargeRedPacket(grantBeginDate,grantEndDate,useBeginDate,useEndDate);
                     redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     selectRedPackets = selectGetNumberRed(grantBeginDate,grantEndDate,useBeginDate,useEndDate);
                     redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
-                case 1:
+                case 1: //评论红包
                     selectRedPackets = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate, String.valueOf(RedType.APPRAISE_RED) ,String.valueOf(PayMode.APPRAISE_RED_PAY));
                     redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
-                case 2:
+                case 2: //分享返利红包
                     selectRedPackets = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate,String.valueOf(RedType.SHARE_RED),String.valueOf(PayMode.SHARE_RED_PAY));
                     redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
-                case 3:
+                case 3: //退菜红包
                     selectRedPackets = selectRedPacketLog(grantBeginDate,grantEndDate,useBeginDate,useEndDate,String.valueOf(RedType.REFUND_ARTICLE_RED),String.valueOf(PayMode.REFUND_ARTICLE_RED_PAY));
                     redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
-                case 4:
+                case 4: //充值赠送红包
                     selectRedPackets = selectChargeRedPacket(grantBeginDate,grantEndDate,useBeginDate,useEndDate);
                     redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;
-                case 5:
+                case 5: //等位红包
                     selectRedPackets = selectGetNumberRed(grantBeginDate,grantEndDate,useBeginDate,useEndDate);
                     redPacketDtoList = selectRedPackets(selectRedPackets,redPacketDtoList);
                     break;

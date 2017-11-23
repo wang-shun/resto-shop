@@ -684,6 +684,8 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
     //修复加菜时间过后 任然允许加菜的bug
     void fixErrorOrder();
 
+	//修复加菜时间过后 任然允许加菜的bug
+	void fixErrorGroup();
 
 	Order customerByOrderForMyPage(String customerId, String shopId);
 	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate);
