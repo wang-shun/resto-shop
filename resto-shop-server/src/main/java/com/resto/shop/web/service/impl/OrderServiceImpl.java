@@ -3679,6 +3679,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             item.put("SUBTOTAL", order.getSauceFeePrice());
                             item.put("ARTICLE_NAME", shopDetail.getSauceFeeName());
                             item.put("ARTICLE_COUNT", order.getSauceFeeCount());
+                            items.add(item);
                         }else {
                             item.put("SUBTOTAL", shopDetail.getSauceFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
                             item.put("ARTICLE_NAME", shopDetail.getSauceFeeName());
@@ -3699,6 +3700,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             item.put("SUBTOTAL", order.getTowelFeePrice());
                             item.put("ARTICLE_NAME", shopDetail.getTowelFeeName());
                             item.put("ARTICLE_COUNT", order.getTowelFeeCount());
+                            items.add(item);
                         }else {
                             item.put("SUBTOTAL", shopDetail.getTowelFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
                             item.put("ARTICLE_NAME", shopDetail.getTowelFeeName());
@@ -3719,6 +3721,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             item.put("SUBTOTAL", order.getTablewareFeePrice());
                             item.put("ARTICLE_NAME", shopDetail.getTablewareFeeName());
                             item.put("ARTICLE_COUNT", order.getTablewareFeeCount());
+                            items.add(item);
                         }else{
                             item.put("SUBTOTAL", shopDetail.getTablewareFeePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
                             item.put("ARTICLE_NAME", shopDetail.getTablewareFeeName());
@@ -3739,6 +3742,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         item.put("SUBTOTAL", order.getServicePrice());
                         item.put("ARTICLE_NAME", shopDetail.getServiceName());
                         item.put("ARTICLE_COUNT", order.getCustomerCount());
+                        items.add(item);
                     }else {
                         item.put("SUBTOTAL", shopDetail.getServicePrice().multiply(new BigDecimal(order.getBaseCustomerCount())));
                         item.put("ARTICLE_NAME", shopDetail.getServiceName());
