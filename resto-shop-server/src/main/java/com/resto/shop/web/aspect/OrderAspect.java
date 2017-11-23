@@ -1900,7 +1900,7 @@ public class OrderAspect {
         stringMap.put("datetime", format.format(order.getCreateTime()));
         stringMap.put("shopname", shopDetail.getName());
         stringMap.put("warningkey", warningKey);
-        stringMap.put("appraise", appraise.getContent());
+        stringMap.put("appraise", "\""+appraise.getContent()+"\"");
         //格式转换
         //模板转换工具类
         StrSubstitutor substitutor = new StrSubstitutor(stringMap);
