@@ -14,6 +14,12 @@ public interface OrderRefundRemarkService extends GenericService<OrderRefundRema
     void posSyncDeleteByOrderId(String orderId);
 
     /**
+     *
+     * @param orderRefundRemarks
+     */
+    void posSyncInsertList(List<OrderRefundRemark> orderRefundRemarks);
+
+    /**
      * Pos 2.0 数据同步方法，根据 orderId 查询订单  退款项
      * @param orderId
      * @return

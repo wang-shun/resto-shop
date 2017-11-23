@@ -30,6 +30,15 @@ public class OrderRefundRemarkServiceImpl extends GenericServiceImpl<OrderRefund
     }
 
     @Override
+    public void posSyncInsertList(List<OrderRefundRemark> orderRefundRemarks) {
+        if(orderRefundRemarks != null){
+            for(OrderRefundRemark orderRefundRemark : orderRefundRemarks){
+                orderrefundremarkMapper.insertSelective(orderRefundRemark);
+            }
+        }
+    }
+
+    @Override
     public List<OrderRefundRemark> posSyncListByOrderId(String orderId) {
         return orderrefundremarkMapper.posSyncListByOrderId(orderId);
     }

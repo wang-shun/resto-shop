@@ -437,10 +437,12 @@ public class PosServiceImpl implements PosService {
             }
             orderService.update(refundOrder);
         }
+        // 插入退款备注
+        orderRefundRemarkService.posSyncInsertList(order.getOrderRefundRemarks());
         // 还原库存
         Boolean addStockSuccess = false;
         try {
-            addStockSuccess = orderService.addStock(orderService.getOrderInfo(order.getId()));
+            addStockSuccess = orderService.addStock(order);
         } catch (AppException e) {
             e.printStackTrace();
         }
