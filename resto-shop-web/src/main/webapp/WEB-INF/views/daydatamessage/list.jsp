@@ -104,6 +104,7 @@
                                 d.type = that.type;
                         }
                     },
+                    order: [[ 0, "asc" ]],
                     columns : [
                         {
                             title : "店铺名称",

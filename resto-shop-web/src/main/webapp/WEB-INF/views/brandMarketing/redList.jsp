@@ -168,11 +168,11 @@
                 var that = this;
                 that.shopRedInfoTable = $("#shopRedList").DataTable({
                     lengthMenu: [ [50, 75, 100, -1], [50, 75, 100, "All"] ],
+                    order: [[ 0, "asc" ]],
                     columns : [
                         {
                             title : "店铺名称",
-                            data : "shopName",
-                            orderable : false
+                            data : "shopName"
                         },
                         {
                             title : "发放总数",
