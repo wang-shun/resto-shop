@@ -47,7 +47,9 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
      */
     Integer checkRepeat(String articleId,String groupId,String customerId);
 
-    Integer checkRepeatRecommend(String articleId,String groupId);
+    Integer checkRepeatRecommendGroupId(String articleId,String groupId);
+
+    Integer checkRepeatRecommendCustomerId(String articleId,String customerId);
 
     List<ShopCart> getListByGroupId(String groupId);
 
