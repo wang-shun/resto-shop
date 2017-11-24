@@ -355,6 +355,8 @@ public class PosServiceImpl implements PosService {
 
             RedisUtil.set(order.getShopDetailId()+order.getTableNumber()+"status",true);
             orderService.confirmBossOrder(order);
+        }else{
+            log.info("\n\n\n\n订单为更改状态 ...    " + order.getId() + "\n\n\n\n\n");
         }
     }
 
