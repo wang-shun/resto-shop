@@ -4917,7 +4917,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public void updateAllowContinue(String id, boolean b) {
         orderMapper.changeAllowContinue(id, b);
         Order order = selectById(id);
-        if(!StringUtils.isEmpty(order.getGroupId())){
+        if(order != null && !StringUtils.isEmpty(order.getGroupId())){
             //如果订单是在组里的
             //禁止加菜后，组释放，并且删除所有 人与组的关系，并且删除该组的购物车
             TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
