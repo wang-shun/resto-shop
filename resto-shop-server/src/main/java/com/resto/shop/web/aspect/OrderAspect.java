@@ -648,6 +648,23 @@ public class OrderAspect {
         Order o = orderService.getOrderAccount(order.getShopDetailId());
         RedisUtil.set(order.getShopDetailId() + "shopOrderCount", o.getOrderCount());
         RedisUtil.set(order.getShopDetailId() + "shopOrderTotal", o.getOrderTotal());
+
+        if (!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT) {
+            orderBeforeService.updateState(order.getBeforeId(), 1);
+            Order before = orderService.selectById(order.getBeforeId());
+            before.setOrderState(OrderState.CANCEL);
+            orderService.update(before);
+            List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
+            if (!CollectionUtils.isEmpty(orderItems)) {
+                for (OrderItem orderItem : orderItems) {
+                    orderItem.setOrderId(order.getId());
+                    orderItem.setStatus(2);
+                    orderItemService.update(orderItem);
+                }
+            }
+        }
+
+
         MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
         if (order.getParentOrderId() == null) {
             MQMessageProducer.sendPlaceOrderMessage(order);
