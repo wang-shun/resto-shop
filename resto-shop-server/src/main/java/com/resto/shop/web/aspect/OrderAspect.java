@@ -913,7 +913,7 @@ public class OrderAspect {
 
     }
 
-    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", argNames = "joinPoint,order", returning = "order")
+    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()", argNames = "joinPoint,order", returning = "order")
     public void pushOrderAfter(JoinPoint joinPoint, Order order) throws Throwable {
         log.info("切面pushOrderAfter" + joinPoint.getSignature().getName());
         if (order != null) {
