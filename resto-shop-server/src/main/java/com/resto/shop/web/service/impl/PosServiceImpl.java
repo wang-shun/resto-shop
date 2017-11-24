@@ -340,9 +340,9 @@ public class PosServiceImpl implements PosService {
                 OrderPaymentItem orderPaymentItem = new OrderPaymentItem(orderPaymentDto);
                 orderPaymentItemService.insert(orderPaymentItem);
             }
-            if(order.getCustomerId() != null){
-                order.setIsPosPay(Common.YES);
-            }
+//            if(order.getCustomerId() != null){
+//                order.setIsPosPay(Common.YES);
+//            }
             order.setOrderState(OrderState.PAYMENT);
             order.setPaymentAmount(BigDecimal.valueOf(0));
             order.setAllowCancel(false);
