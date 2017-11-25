@@ -420,7 +420,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Boolean bool = (Boolean) RedisUtil.get(order.getCustomerId()+order.getGroupId());
             if(!bool){
                 jsonResult.setSuccess(false);
-                jsonResult.setMessage("万分抱歉，菜品发生变动，请重新变动！");
+                jsonResult.setMessage("万分抱歉，菜品发生变动，请重新获取~");
                 return jsonResult;
             }
 
