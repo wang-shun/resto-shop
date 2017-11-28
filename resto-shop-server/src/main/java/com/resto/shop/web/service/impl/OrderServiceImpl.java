@@ -6993,6 +6993,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }else{
             order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime());
         }
+        //如果是存在组 则把该人的当前购物车添加进入组
         if(order.getGroupId() != null){
             List<ShopCart> shopCartList = shopCartService.listUserShopCart(customerId, shopId, 1);
             for(ShopCart shopCart : shopCartList){
