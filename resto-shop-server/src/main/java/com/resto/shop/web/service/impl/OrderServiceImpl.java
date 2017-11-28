@@ -6993,6 +6993,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }else{
             order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime());
         }
+        if(order.getGroupId() != null){
+            List<ShopCart> shopCartList = shopCartService.listUserShopCart(customerId, shopId, 1);
+            for(ShopCart shopCart : shopCartList){
+                shopCart.setGroupId(order.getGroupId());
+                shopCartService.update(shopCart);
+            }
+        }
         if (order != null && order.getParentOrderId() != null) {
             Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
             if (parent != null && parent.getAllowContinueOrder()) {
