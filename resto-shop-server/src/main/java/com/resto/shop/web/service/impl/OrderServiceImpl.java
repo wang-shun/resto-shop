@@ -6995,7 +6995,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         //如果是存在组 则把该人的当前购物车添加进入组
         if(order != null && order.getGroupId() != null){
-            shopCartService.groupNew(customerId, shopId, order.getGroupId());
+            shopCartService.updateGroupNew(customerId, shopId, order.getGroupId());
         }
         if (order != null && order.getParentOrderId() != null) {
             Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
