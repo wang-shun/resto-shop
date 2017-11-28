@@ -6981,7 +6981,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public Order getLastOrderByCustomer(String customerId, String shopId,String groupId) {
+    public Order lastOrderByCustomer(String customerId, String shopId,String groupId) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
         //得到自己购买的最新的一比允许加菜的订单
