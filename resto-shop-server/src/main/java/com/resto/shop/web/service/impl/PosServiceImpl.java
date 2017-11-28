@@ -340,9 +340,10 @@ public class PosServiceImpl implements PosService {
                 OrderPaymentItem orderPaymentItem = new OrderPaymentItem(orderPaymentDto);
                 orderPaymentItemService.insert(orderPaymentItem);
             }
-//            if(order.getCustomerId() != null){
-//                order.setIsPosPay(Common.YES);
-//            }
+            //  根据 pos 传输的数据为准
+            if(json.has("isPosPay")){
+                order.setIsPosPay(json.getInt("isPosPay"));
+            }
             order.setOrderState(OrderState.PAYMENT);
             order.setPaymentAmount(BigDecimal.valueOf(0));
             order.setAllowCancel(false);
@@ -355,8 +356,6 @@ public class PosServiceImpl implements PosService {
 
             RedisUtil.set(order.getShopDetailId()+order.getTableNumber()+"status",true);
             orderService.confirmBossOrder(order);
-        }else{
-            log.info("\n\n\n\n订单为更改状态 ...    " + order.getId() + "\n\n\n\n\n");
         }
     }
 
@@ -554,6 +553,10 @@ public class PosServiceImpl implements PosService {
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(shopDetail.getBrandId());
         order.setPosBackUps(StringUtils.isEmpty(backUps.toString()) ? null : backUps.toString());
+        // 如果 服务器端数据状态 为 已确认 或者 已评论，则以服务器为基准
+        if(orderBackUps != null && (orderBackUps.getOrderState() == OrderState.CONFIRM || orderBackUps.getOrderState() == OrderState.HASAPPRAISE)){
+            order.setOrderState(orderBackUps.getOrderState());
+        }
         //  订单
         orderService.insert(order);
         //  订单项
