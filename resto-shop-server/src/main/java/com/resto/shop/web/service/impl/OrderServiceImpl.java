@@ -420,7 +420,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Boolean bool = (Boolean) RedisUtil.get(order.getCustomerId()+order.getGroupId());
             if(!bool){
                 jsonResult.setSuccess(false);
-                jsonResult.setMessage("万分抱歉，菜品发生变动，请重新变动！");
+                jsonResult.setMessage("万分抱歉，菜品发生变动，请重新获取~");
                 return jsonResult;
             }
 
@@ -4917,7 +4917,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public void updateAllowContinue(String id, boolean b) {
         orderMapper.changeAllowContinue(id, b);
         Order order = selectById(id);
-        if(!StringUtils.isEmpty(order.getGroupId())){
+        if(order != null && !StringUtils.isEmpty(order.getGroupId())){
             //如果订单是在组里的
             //禁止加菜后，组释放，并且删除所有 人与组的关系，并且删除该组的购物车
             TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
@@ -6981,7 +6981,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public Order getLastOrderByCustomer(String customerId, String shopId,String groupId) {
+    public Order lastOrderByCustomer(String customerId, String shopId,String groupId) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
         //得到自己购买的最新的一比允许加菜的订单
@@ -6992,6 +6992,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order = orderMapper.getGroupOrderByGroupId(groupId);
         }else{
             order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime());
+        }
+        //如果是存在组 则把该人的当前购物车添加进入组
+        if(order != null && order.getGroupId() != null){
+            shopCartService.updateGroupNew(customerId, shopId, order.getGroupId());
         }
         if (order != null && order.getParentOrderId() != null) {
             Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());

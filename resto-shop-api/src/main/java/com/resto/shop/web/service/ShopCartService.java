@@ -40,14 +40,16 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
      * @param shopId
      * @param groupId
      */
-    void groupNew(String customerId,String shopId,String groupId);
+    void updateGroupNew(String customerId,String shopId,String groupId);
 
     /**
      * 判断菜品是否重复
      */
     Integer checkRepeat(String articleId,String groupId,String customerId);
 
-    Integer checkRepeatRecommend(String articleId,String groupId);
+    Integer checkRepeatRecommendGroupId(String articleId,String groupId);
+
+    Integer checkRepeatRecommendCustomerId(String articleId,String customerId);
 
     List<ShopCart> getListByGroupId(String groupId);
 
