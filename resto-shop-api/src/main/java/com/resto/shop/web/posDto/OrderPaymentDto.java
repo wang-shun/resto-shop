@@ -19,7 +19,7 @@ public class OrderPaymentDto implements Serializable {
         this.payTime = orderPaymentItem.getPayTime().getTime() ;
         this.orderId = orderPaymentItem.getOrderId() == null ? "" : orderPaymentItem.getOrderId();
         this.paymentModeId = orderPaymentItem.getPaymentModeId() == null ? 0 : orderPaymentItem.getPaymentModeId();
-        this.resultData = orderPaymentItem.getResultData() == null ? "" : orderPaymentItem.getResultData();
+        this.resultData = "请在服务器查看";
     }
 
     //主键
