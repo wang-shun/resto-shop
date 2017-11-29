@@ -56,6 +56,7 @@ public class Order implements Serializable {
         this.mealAllNumber = orderDto.getMealAllNumber() == null ? 0 : orderDto.getMealAllNumber();
         this.mealFeePrice = orderDto.getMealFeePrice() == null ? BigDecimal.valueOf(0) : orderDto.getMealFeePrice();
         this.verCode = orderDto.getVerCode() == null ? "" : orderDto.getVerCode();
+        this.allowAppraise = orderDto.getAllowAppraise() == null ? false : orderDto.getAllowAppraise();
     }
 
 

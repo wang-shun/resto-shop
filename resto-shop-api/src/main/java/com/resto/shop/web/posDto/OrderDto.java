@@ -51,6 +51,7 @@ public class OrderDto implements Serializable {
         this.mealAllNumber = order.getMealAllNumber();
         this.mealFeePrice = order.getMealFeePrice();
         this.isPosPay = order.getIsPosPay();
+        this.allowAppraise = order.getAllowAppraise();
     }
 
     //订单id
@@ -121,6 +122,8 @@ public class OrderDto implements Serializable {
     private Integer mealAllNumber;
 
     private BigDecimal mealFeePrice;
+
+    private Boolean allowAppraise;
 
     private List<OrderDto> childrenOrders;
 
@@ -414,5 +417,13 @@ public class OrderDto implements Serializable {
 
     public void setChildrenOrders(List<OrderDto> childrenOrders) {
         this.childrenOrders = childrenOrders;
+    }
+
+    public Boolean getAllowAppraise() {
+        return allowAppraise;
+    }
+
+    public void setAllowAppraise(Boolean allowAppraise) {
+        this.allowAppraise = allowAppraise;
     }
 }
