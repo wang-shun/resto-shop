@@ -298,7 +298,7 @@
   	 sum(final_price) as final_price,tb_order_item.*
   	 from tb_order_item where order_id = #{orderId}
   	 and type not in (3,4)
-  	GROUP BY article_id,article_name
+  	GROUP BY article_id,article_name,type
   	ORDER BY create_time
   </select>
 
