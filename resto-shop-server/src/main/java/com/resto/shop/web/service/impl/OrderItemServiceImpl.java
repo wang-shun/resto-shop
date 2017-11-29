@@ -42,10 +42,10 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
     }
 
     @Override
-    public List<OrderItem> listByOrderId(String orderId) {
-        List<OrderItem> orderItems = orderitemMapper.listByOrderId(orderId);
+    public List<OrderItem> listByOrderId(Map<String, String> param) {
+        List<OrderItem> orderItems = orderitemMapper.listByOrderId(param);
 
-        List<OrderItem> other = orderitemMapper.listTotalByOrderId(orderId);
+        List<OrderItem> other = orderitemMapper.listTotalByOrderId(param.get("orderId"));
 
         orderItems.addAll(other);
 

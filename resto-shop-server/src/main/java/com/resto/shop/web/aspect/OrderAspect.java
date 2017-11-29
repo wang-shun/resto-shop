@@ -150,7 +150,9 @@ public class OrderAspect {
                 Order before = orderService.selectById(order.getBeforeId());
                 before.setOrderState(OrderState.CANCEL);
                 orderService.update(before);
-                List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
+                Map<String, String> param = new HashMap<>();
+                param.put("orderId", order.getBeforeId());
+                List<OrderItem> orderItems = orderItemService.listByOrderId(param);
                 if (!CollectionUtils.isEmpty(orderItems)) {
                     for (OrderItem orderItem : orderItems) {
                         orderItem.setOrderId(order.getId());
@@ -248,7 +250,9 @@ public class OrderAspect {
                 msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
             }
             msg.append("订单明细：\n");
-            List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", order.getId());
+            List<OrderItem> orderItem = orderItemService.listByOrderId(param);
             for (OrderItem item : orderItem) {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
@@ -302,7 +306,9 @@ public class OrderAspect {
                         keyword3.put("value", shop.getName());
                         keyword3.put("color", "#000000");
                         Map<String, Object> keyword4 = new HashMap<String, Object>();
-                        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                        Map<String, String> param = new HashMap<>();
+                        param.put("orderId", order.getId());
+                        List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                         StringBuffer msg = new StringBuffer();
                         for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                             OrderItem item = orderItem.get(i);
@@ -391,7 +397,9 @@ public class OrderAspect {
                         keyword3.put("value", shop.getName());
                         keyword3.put("color", "#000000");
                         Map<String, Object> keyword4 = new HashMap<String, Object>();
-                        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                        Map<String, String> param = new HashMap<>();
+                        param.put("orderId", order.getId());
+                        List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                         StringBuffer msg = new StringBuffer();
                         for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                             OrderItem item = orderItem.get(i);
@@ -488,7 +496,9 @@ public class OrderAspect {
                         keyword4.put("value", "￥" + order.getOrderMoney());
                         keyword4.put("color", "#000000");
                         Map<String, Object> keyword5 = new HashMap<String, Object>();
-                        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                        Map<String, String> param = new HashMap<>();
+                        param.put("orderId", order.getId());
+                        List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                         StringBuffer msg = new StringBuffer();
                         for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                             OrderItem item = orderItem.get(i);
@@ -654,7 +664,9 @@ public class OrderAspect {
             Order before = orderService.selectById(order.getBeforeId());
             before.setOrderState(OrderState.CANCEL);
             orderService.update(before);
-            List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", order.getBeforeId());
+            List<OrderItem> orderItems = orderItemService.listByOrderId(param);
             if (!CollectionUtils.isEmpty(orderItems)) {
                 for (OrderItem orderItem : orderItems) {
                     orderItem.setOrderId(order.getId());
@@ -725,7 +737,9 @@ public class OrderAspect {
             Order before = orderService.selectById(order.getBeforeId());
             before.setOrderState(OrderState.CANCEL);
             orderService.update(before);
-            List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", order.getBeforeId());
+            List<OrderItem> orderItems = orderItemService.listByOrderId(param);
             if (!CollectionUtils.isEmpty(orderItems)) {
                 for (OrderItem orderItem : orderItems) {
                     orderItem.setOrderId(order.getId());
@@ -1102,7 +1116,9 @@ public class OrderAspect {
                     sum = sum.add(child.getOrderMoney());
                 }
                 msg.append("订单明细：\n");
-                List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                Map<String, String> param = new HashMap<>();
+                param.put("orderId", order.getId());
+                List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                 for (OrderItem item : orderItem) {
                     msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
                 }
@@ -1172,7 +1188,9 @@ public class OrderAspect {
                     keyword4.put("value", "￥" + sum);
                     keyword4.put("color", "#000000");
                     Map<String, Object> keyword5 = new HashMap<String, Object>();
-                    List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                    Map<String, String> param = new HashMap<>();
+                    param.put("orderId", order.getId());
+                    List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                     StringBuffer msg = new StringBuffer();
                     for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                         OrderItem item = orderItem.get(i);
@@ -1668,7 +1686,9 @@ public class OrderAspect {
                         msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
                     }
                     msg.append("订单明细：\n");
-                    List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                    Map<String, String> param = new HashMap<>();
+                    param.put("orderId", order.getId());
+                    List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                     for (OrderItem item : orderItem) {
                         if (item.getCount() > 0) {
                             msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
@@ -1822,7 +1842,9 @@ public class OrderAspect {
         sb.append("店铺名：" + order.getShopName() + "\n");
         sb.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
         sb.append("订单明细：\n");
-        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+        Map<String, String> param = new HashMap<>();
+        param.put("orderId", order.getId());
+        List<OrderItem> orderItem = orderItemService.listByOrderId(param);
         for (OrderItem item : orderItem) {
             sb.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
         }

@@ -1360,7 +1360,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     || (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY))) {
                 return findCustomerNewOrder(customerId, shopId, order.getParentOrderId());
             }
-            List<OrderItem> itemList = orderItemService.listByOrderId(order.getId());
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", order.getId());
+            List<OrderItem> itemList = orderItemService.listByOrderId(param);
             order.setOrderItems(itemList);
             if (order.getOrderState() != OrderState.SUBMIT || order.getOrderMode() == ShopMode.HOUFU_ORDER
                     || (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY)) {
@@ -3580,8 +3582,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         //查询店铺
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+        Map<String, String> param = new HashMap<>();
+        param.put("orderId", order.getId());
         // 查询订单菜品
-        List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
+        List<OrderItem> orderItems = orderItemService.listByOrderId(param);
 
 //        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
         List<OrderItem> child = orderItemService.listByParentId(orderId);
@@ -4645,7 +4649,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             order.setServiceList(objectList);
         }
-        List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
+        Map<String, String> param = new HashMap<>();
+        param.put("orderId", order.getId());
+        List<OrderItem> orderItems = orderItemService.listByOrderId(param);
         order.setOrderItems(orderItems);
         Customer cus = customerService.selectById(order.getCustomerId());
         order.setCustomer(cus);
@@ -4748,7 +4754,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 return printTask;
             }
         }
-        List<OrderItem> items = orderItemService.listByOrderId(orderId);
+        Map<String, String> param = new HashMap<>();
+        param.put("orderId", order.getId());
+        List<OrderItem> items = orderItemService.listByOrderId(param);
 
 
         TableQrcode tableQrcode = tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(), Integer.valueOf(order.getTableNumber()));
@@ -4849,9 +4857,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
-
-
         //如果是外带，添加一张外带小票
         if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF) && setting.getIsPrintPayAfter().equals(Common.NO)) {
             List<Printer> packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
@@ -4867,6 +4872,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
+
+        param.put("typeGroup", "true");
+        items = orderItemService.listByOrderId(param);
+        List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 
         if (!kitchenTicket.isEmpty() && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getProductionStatus() == ProductionStatus.HAS_ORDER) {
             printTask.addAll(kitchenTicket);
@@ -5586,7 +5595,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMapper.updateByPrimaryKeySelective(order);
         }
         ShopDetail shop = shopDetailService.selectById(order.getShopDetailId());
-        List<OrderItem> items = orderItemService.listByOrderId(orderId);
+        Map<String, String> param = new HashMap<>();
+        param.put("orderId", order.getId());
+        param.put("typeGroup", "true");
+        List<OrderItem> items = orderItemService.listByOrderId(param);
         List<Map<String, Object>> printTask = new ArrayList<>();
 //        List<Printer> ticketPrinter = printerService.selectByShopAndType(shop.getId(), PrinterType.RECEPTION);
 //        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -5623,6 +5635,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //如果是外带，添加一张外带小票
         if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)) {
             List<Printer> packagePrinter = printerService.selectByShopAndType(order.getShopDetailId(), PrinterType.PACKAGE); //查找外带的打印机
+            param = new HashMap<>();
+            param.put("orderId", order.getId());
+            items = orderItemService.listByOrderId(param);
             for (Printer printer : packagePrinter) {
                 Map<String, Object> packageTicket = printTicket(order, items, shop, printer);
                 if (packageTicket != null) {
@@ -8925,7 +8940,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<String[]> result = new ArrayList<>();
 
         for (Order o : orderList) {
-            List<OrderItem> orderItems = orderItemService.listByOrderId(o.getId());
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", o.getId());
+            List<OrderItem> orderItems = orderItemService.listByOrderId(param);
 //            Order order = getOrderInfo(o.getId());
             String[] data = new String[size];
             switch (brandSign) {

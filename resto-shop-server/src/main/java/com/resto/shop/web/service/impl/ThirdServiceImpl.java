@@ -161,7 +161,9 @@ public class ThirdServiceImpl implements ThirdService {
         if(order==null){
             //R+外卖打印总单
             Order oder = orderService.selectById(platformOrderId);
-            List<OrderItem> orderItems = orderItemService.listByOrderId(platformOrderId);
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", platformOrderId);
+            List<OrderItem> orderItems = orderItemService.listByOrderId(param);
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(oder.getShopDetailId());
             List<Printer> ticketPrinter = printerService.selectByShopAndType(oder.getShopDetailId(), PrinterType.RECEPTION);
 
@@ -1872,7 +1874,9 @@ public class ThirdServiceImpl implements ThirdService {
                 hungerOrder.setShopName(shopDetailService.selectById(o.getShopDetailId()).getName());
             }
             List<HungerOrderDetail> orderDetail= new ArrayList<HungerOrderDetail>();
-            List<OrderItem> olist=orderItemService.listByOrderId(o.getId());
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", o.getId());
+            List<OrderItem> olist=orderItemService.listByOrderId(param);
             if(olist!=null && !olist.isEmpty()){
                 for(OrderItem orderItem:olist){
                     HungerOrderDetail h=new HungerOrderDetail();
@@ -1906,7 +1910,9 @@ public class ThirdServiceImpl implements ThirdService {
            /* Map<String, Object> s=orderService.printReceipt(orderId,selectPrinterId);
             return s;*/
             Order oder = orderService.selectById(orderId);
-            List<OrderItem> orderItems = orderItemService.listByOrderId(orderId);
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", order.getId());
+            List<OrderItem> orderItems = orderItemService.listByOrderId(param);
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(oder.getShopDetailId());
 
             if (selectPrinterId == null) {
@@ -1966,7 +1972,9 @@ public class ThirdServiceImpl implements ThirdService {
            /* List<Map<String, Object>> list= orderService.printKitchenReceipt(oid);
             return list;*/
             Order oder = orderService.selectById(oid);
-            List<OrderItem> orderItems = orderItemService.listByOrderId(oid);
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", order.getId());
+            List<OrderItem> orderItems = orderItemService.listByOrderId(param);
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(oder.getShopDetailId());
 
             List<Map<String, Object>> kitchenTicket = new ArrayList<>();
