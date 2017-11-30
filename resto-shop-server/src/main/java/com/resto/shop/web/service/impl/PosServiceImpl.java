@@ -172,6 +172,9 @@ public class PosServiceImpl implements PosService {
         List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
         for(OrderPaymentItem  paymentItem: payItemsList){
             OrderPaymentDto orderPaymentDto = new OrderPaymentDto(paymentItem);
+            if(orderPaymentDto.getPaymentModeId() == PayMode.WEIXIN_PAY || orderPaymentDto.getPaymentModeId() == PayMode.ALI_PAY){
+                orderPaymentDto.setResultData("请在服务器查看");
+            }
             orderPaymentDtos.add(orderPaymentDto);
         }
         jsonObject.put("orderPayment", orderPaymentDtos);
