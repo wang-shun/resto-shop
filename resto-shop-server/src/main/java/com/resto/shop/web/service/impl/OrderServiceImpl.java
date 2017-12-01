@@ -7911,8 +7911,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //修改菜品数量
         Order order = getOrderInfo(refundOrder.getId());
         int customerCount = 0;
-        BigDecimal newServicePrice = BigDecimal.ZERO; //用来记录新版服务费在执行此次退菜前的服务费金额
-        BigDecimal servicePrice = new BigDecimal(0);
+        BigDecimal newServicePrice = order.getServicePrice(); //用来记录新版服务费在执行此次退菜前的服务费金额
+        BigDecimal servicePrice = BigDecimal.ZERO;
         Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         for (OrderItem orderItem : refundOrder.getOrderItems()) {
@@ -7992,6 +7992,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 serviceOrder.setSauceFeeCount(order.getSauceFeeCount() - refundCount); //减去订单中的餐具数量
                 serviceOrder.setSauceFeePrice(order.getSauceFeePrice().subtract(refundPrice)); //减去订单中的餐具费
                 serviceOrder.setServicePrice(newServicePrice.subtract(refundPrice));
+                newServicePrice.subtract(refundPrice); //将本次退菜前的服务费在每次退菜后重新赋值(减去本次退掉的服务费)
                 update(serviceOrder);
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
@@ -8013,6 +8014,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 serviceOrder.setTowelFeeCount(order.getTowelFeeCount() - refundCount);//减去订单中的纸巾数量
                 serviceOrder.setTowelFeePrice(order.getTowelFeePrice().subtract(refundPrice));//减去订单中的纸巾费
                 serviceOrder.setServicePrice(newServicePrice.subtract(refundPrice));
+                newServicePrice.subtract(refundPrice); //将本次退菜前的服务费在每次退菜后重新赋值(减去本次退掉的服务费)
                 update(serviceOrder);
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
@@ -8034,6 +8036,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 serviceOrder.setTablewareFeeCount(order.getTablewareFeeCount() - refundCount);//减去订单中的酱料数量
                 serviceOrder.setTablewareFeePrice(order.getTablewareFeePrice().subtract(refundPrice));//减去订单中的酱料费
                 serviceOrder.setServicePrice(newServicePrice.subtract(refundPrice));
+                newServicePrice.subtract(refundPrice); //将本次退菜前的服务费在每次退菜后重新赋值(减去本次退掉的服务费)
                 update(serviceOrder);
                 Map map = new HashMap(4);
                 map.put("brandName", brand.getBrandName());
