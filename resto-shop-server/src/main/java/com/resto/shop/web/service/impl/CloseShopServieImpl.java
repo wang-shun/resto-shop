@@ -31,7 +31,6 @@ import static com.resto.brand.core.util.OrderCountUtils.formatDouble;
 import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
 @SuppressWarnings("ALL")
 @RpcService
-@Component
 /**
  * @author yanjuan
  * @date 17/10/19 上午11:45

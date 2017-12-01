@@ -61,7 +61,6 @@ import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
  *
  */
 @RpcService
-@Component
 public class OrderServiceImpl extends GenericServiceImpl<Order, String> implements OrderService {
 
     //用来添加打印小票的序号

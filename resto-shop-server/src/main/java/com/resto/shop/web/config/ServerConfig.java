@@ -123,15 +123,15 @@ public class ServerConfig {
         return proxy.create(WetherService.class);
     }
 
-    @Bean
-    public DayDataMessageService dayDataMessageService(){
-        return proxy.create(DayDataMessageService.class);
-    }
-
-    @Bean
-    public DayAppraiseMessageService dayAppraiseMessageService(){
-        return proxy.create(DayAppraiseMessageService.class);
-    }
+//    @Bean
+//    public DayDataMessageService dayDataMessageService(){
+//        return proxy.create(DayDataMessageService.class);
+//    }
+//
+//    @Bean
+//    public DayAppraiseMessageService dayAppraiseMessageService(){
+//        return proxy.create(DayAppraiseMessageService.class);
+//    }
 
     //品牌账户
 	@Bean
@@ -169,10 +169,10 @@ public class ServerConfig {
 		return proxy.create(AccountNoticeService.class);
 	}
 
-	@Bean
-	public CloseShopService closeShopService(){
-		return proxy.create(CloseShopService.class);
-	}
+//	@Bean
+//	public CloseShopService closeShopService(){
+//		return proxy.create(CloseShopService.class);
+//	}
 
     @Bean
     public TemplateService templateService(){
