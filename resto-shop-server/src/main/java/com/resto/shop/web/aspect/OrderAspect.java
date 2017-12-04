@@ -150,7 +150,9 @@ public class OrderAspect {
                 Order before = orderService.selectById(order.getBeforeId());
                 before.setOrderState(OrderState.CANCEL);
                 orderService.update(before);
-                List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
+                Map<String, String> param = new HashMap<>();
+                param.put("orderId", order.getBeforeId());
+                List<OrderItem> orderItems = orderItemService.listByOrderId(param);
                 if (!CollectionUtils.isEmpty(orderItems)) {
                     for (OrderItem orderItem : orderItems) {
                         orderItem.setOrderId(order.getId());
@@ -256,7 +258,9 @@ public class OrderAspect {
                 msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
             }
             msg.append("订单明细：\n");
-            List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", order.getId());
+            List<OrderItem> orderItem = orderItemService.listByOrderId(param);
             for (OrderItem item : orderItem) {
                 msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
             }
@@ -264,10 +268,10 @@ public class OrderAspect {
             if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getOrderBefore() == null) {
                 String url = "";
                 if (order.getParentOrderId() == null) {
-                    url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                    url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                 } else {
                     Order o = orderService.selectById(order.getParentOrderId());
-                    url = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                    url = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                 }
                 msg.append("<a href='" + url + "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
             }
@@ -310,7 +314,9 @@ public class OrderAspect {
                         keyword3.put("value", shop.getName());
                         keyword3.put("color", "#000000");
                         Map<String, Object> keyword4 = new HashMap<String, Object>();
-                        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                        Map<String, String> param = new HashMap<>();
+                        param.put("orderId", order.getId());
+                        List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                         StringBuffer msg = new StringBuffer();
                         for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                             OrderItem item = orderItem.get(i);
@@ -376,10 +382,10 @@ public class OrderAspect {
                         String templateId = templateFlowList.get(0).getTemplateId();
                         String jumpUrl = "";
                         if (order.getParentOrderId() == null) {
-                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                         } else {
                             Order o = orderService.selectById(order.getParentOrderId());
-                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                         }
                         Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                         Map<String, Object> first = new HashMap<String, Object>();
@@ -399,7 +405,9 @@ public class OrderAspect {
                         keyword3.put("value", shop.getName());
                         keyword3.put("color", "#000000");
                         Map<String, Object> keyword4 = new HashMap<String, Object>();
-                        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                        Map<String, String> param = new HashMap<>();
+                        param.put("orderId", order.getId());
+                        List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                         StringBuffer msg = new StringBuffer();
                         for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                             OrderItem item = orderItem.get(i);
@@ -465,10 +473,10 @@ public class OrderAspect {
                         String templateId = templateFlowList.get(0).getTemplateId();
                         String jumpUrl = "";
                         if (order.getParentOrderId() == null) {
-                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                         } else {
                             Order o = orderService.selectById(order.getParentOrderId());
-                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                         }
                         Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                         Map<String, Object> first = new HashMap<String, Object>();
@@ -496,7 +504,9 @@ public class OrderAspect {
                         keyword4.put("value", "￥" + order.getOrderMoney());
                         keyword4.put("color", "#000000");
                         Map<String, Object> keyword5 = new HashMap<String, Object>();
-                        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                        Map<String, String> param = new HashMap<>();
+                        param.put("orderId", order.getId());
+                        List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                         StringBuffer msg = new StringBuffer();
                         for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                             OrderItem item = orderItem.get(i);
@@ -656,6 +666,25 @@ public class OrderAspect {
         Order o = orderService.getOrderAccount(order.getShopDetailId());
         RedisUtil.set(order.getShopDetailId() + "shopOrderCount", o.getOrderCount());
         RedisUtil.set(order.getShopDetailId() + "shopOrderTotal", o.getOrderTotal());
+
+        if (!StringUtils.isEmpty(order.getBeforeId()) && order.getOrderState() == OrderState.PAYMENT) {
+            orderBeforeService.updateState(order.getBeforeId(), 1);
+            Order before = orderService.selectById(order.getBeforeId());
+            before.setOrderState(OrderState.CANCEL);
+            orderService.update(before);
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", order.getBeforeId());
+            List<OrderItem> orderItems = orderItemService.listByOrderId(param);
+            if (!CollectionUtils.isEmpty(orderItems)) {
+                for (OrderItem orderItem : orderItems) {
+                    orderItem.setOrderId(order.getId());
+                    orderItem.setStatus(2);
+                    orderItemService.update(orderItem);
+                }
+            }
+        }
+
+
         MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
         if (order.getParentOrderId() == null) {
             MQMessageProducer.sendPlaceOrderMessage(order);
@@ -719,7 +748,9 @@ public class OrderAspect {
             Order before = orderService.selectById(order.getBeforeId());
             before.setOrderState(OrderState.CANCEL);
             orderService.update(before);
-            List<OrderItem> orderItems = orderItemService.listByOrderId(order.getBeforeId());
+            Map<String, String> param = new HashMap<>();
+            param.put("orderId", order.getBeforeId());
+            List<OrderItem> orderItems = orderItemService.listByOrderId(param);
             if (!CollectionUtils.isEmpty(orderItems)) {
                 for (OrderItem orderItem : orderItems) {
                     orderItem.setOrderId(order.getId());
@@ -917,7 +948,7 @@ public class OrderAspect {
 
     }
 
-    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()||payOrderModeFive()||payPrice()|| createOrderByEmployee()||payOrderWXModeFive()", argNames = "joinPoint,order", returning = "order")
+    @AfterReturning(value = "pushOrder()||callNumber()||printSuccess()", argNames = "joinPoint,order", returning = "order")
     public void pushOrderAfter(JoinPoint joinPoint, Order order) throws Throwable {
         log.info("切面pushOrderAfter" + joinPoint.getSignature().getName());
         if (order != null) {
@@ -1106,7 +1137,9 @@ public class OrderAspect {
                     sum = sum.add(child.getOrderMoney());
                 }
                 msg.append("订单明细：\n");
-                List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                Map<String, String> param = new HashMap<>();
+                param.put("orderId", order.getId());
+                List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                 for (OrderItem item : orderItem) {
                     msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
                 }
@@ -1114,10 +1147,10 @@ public class OrderAspect {
                 if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4 && order.getOrderBefore() == null) {
                     String url = "";
                     if (order.getParentOrderId() == null) {
-                        url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                        url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                     } else {
                         Order o = orderService.selectById(order.getParentOrderId());
-                        url = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                        url = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                     }
                     msg.append("<a href='" + url + "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
                 }
@@ -1139,10 +1172,10 @@ public class OrderAspect {
                     String jumpUrl = "";
                     if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4) {
                         if (order.getParentOrderId() == null) {
-                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                         } else {
                             Order o = orderService.selectById(order.getParentOrderId());
-                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                            jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                         }
                     }
                     Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
@@ -1176,7 +1209,9 @@ public class OrderAspect {
                     keyword4.put("value", "￥" + sum);
                     keyword4.put("color", "#000000");
                     Map<String, Object> keyword5 = new HashMap<String, Object>();
-                    List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                    Map<String, String> param = new HashMap<>();
+                    param.put("orderId", order.getId());
+                    List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                     StringBuffer msg = new StringBuffer();
                     for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
                         OrderItem item = orderItem.get(i);
@@ -1672,7 +1707,9 @@ public class OrderAspect {
                         msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
                     }
                     msg.append("订单明细：\n");
-                    List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+                    Map<String, String> param = new HashMap<>();
+                    param.put("orderId", order.getId());
+                    List<OrderItem> orderItem = orderItemService.listByOrderId(param);
                     for (OrderItem item : orderItem) {
                         if (item.getCount() > 0) {
                             msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
@@ -1826,7 +1863,9 @@ public class OrderAspect {
         sb.append("店铺名：" + order.getShopName() + "\n");
         sb.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
         sb.append("订单明细：\n");
-        List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+        Map<String, String> param = new HashMap<>();
+        param.put("orderId", order.getId());
+        List<OrderItem> orderItem = orderItemService.listByOrderId(param);
         for (OrderItem item : orderItem) {
             sb.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
         }
@@ -1921,7 +1960,7 @@ public class OrderAspect {
         stringMap.put("datetime", format.format(order.getCreateTime()));
         stringMap.put("shopname", shopDetail.getName());
         stringMap.put("warningkey", warningKey);
-        stringMap.put("appraise", appraise.getContent());
+        stringMap.put("appraise", "\""+appraise.getContent()+"\"");
         //格式转换
         //模板转换工具类
         StrSubstitutor substitutor = new StrSubstitutor(stringMap);

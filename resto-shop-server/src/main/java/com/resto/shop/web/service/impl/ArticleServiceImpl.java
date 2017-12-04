@@ -814,7 +814,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                     //存在未支付的预点餐餐品
                     return null;
                 }
-                Order order = orderService.getLastOrderByCustomer(customerId,shopId,null);
+                Order order = orderService.lastOrderByCustomer(customerId,shopId,null);
                 if(order == null){
                     return articleList;
                 }else if (!order.getAllowContinueOrder()){
@@ -834,7 +834,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 TableGroup groupList = tableGroupService.getTableGroupByState(shopId,customerId, tableNumber, 1);
                 if(groupList != null){
                     //只有用户在已支付的组内才有可能可以加菜
-                    Order order = orderService.getLastOrderByCustomer(customerId,shopId,groupList.getGroupId());
+                    Order order = orderService.lastOrderByCustomer(customerId,shopId,groupList.getGroupId());
                     if(order == null){
                         return articleList;
                     }else if (!order.getAllowContinueOrder()){

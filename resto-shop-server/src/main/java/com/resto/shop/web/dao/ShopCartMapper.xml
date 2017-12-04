@@ -163,7 +163,7 @@
         where id = #{id}
     </update>
 
-    <update id="groupNew">
+    <update id="updateGroupNew">
         update tb_shop_cart
         set group_id = #{groupId}
         where shop_detail_id = #{shopId}
@@ -175,9 +175,14 @@
         and group_id = #{groupId} and customer_id != #{customerId}
     </select>
 
-    <select id="checkRepeatRecommend" resultType="java.lang.Integer">
+    <select id="checkRepeatRecommendGroupId" resultType="java.lang.Integer">
         select ifnull(sum(`number`),0) from tb_shop_cart where article_id = #{articleId}
         and group_id = #{groupId} and shop_type = 4
+    </select>
+
+    <select id="checkRepeatRecommendCustomerId" resultType="java.lang.Integer">
+        select ifnull(sum(`number`),0) from tb_shop_cart where article_id = #{articleId}
+        and customer_id = #{customerId} and shop_type = 4
     </select>
 
     <select id="getListByGroupId" resultType="ShopCart">

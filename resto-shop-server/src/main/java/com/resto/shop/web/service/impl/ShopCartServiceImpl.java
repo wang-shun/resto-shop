@@ -184,8 +184,8 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     }
 
     @Override
-    public void groupNew(String customerId, String shopId, String groupId) {
-        shopcartMapper.groupNew(customerId, shopId, groupId);
+    public void updateGroupNew(String customerId, String shopId, String groupId) {
+        shopcartMapper.updateGroupNew(customerId, shopId, groupId);
     }
 
 
@@ -195,8 +195,13 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     }
 
     @Override
-    public Integer checkRepeatRecommend(String articleId, String groupId) {
-        return shopcartMapper.checkRepeatRecommend(articleId, groupId) ;
+    public Integer checkRepeatRecommendGroupId(String articleId, String groupId) {
+        return shopcartMapper.checkRepeatRecommendGroupId(articleId, groupId) ;
+    }
+
+    @Override
+    public Integer checkRepeatRecommendCustomerId(String articleId, String customerId) {
+        return shopcartMapper.checkRepeatRecommendCustomerId(articleId, customerId) ;
     }
 
     @Override

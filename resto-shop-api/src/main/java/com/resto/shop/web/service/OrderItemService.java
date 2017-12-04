@@ -10,10 +10,10 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	
 	/**
 	 * 根据订单ID查询订单项
-	 * @param orderId
+	 * @param param
 	 * @return
 	 */
-	public List<OrderItem> listByOrderId(String orderId);
+	public List<OrderItem> listByOrderId(Map<String, String> param);
 
 	public List<OrderItem> listByParentId(String orderId);
 

@@ -72,6 +72,14 @@
                                 </label>
                             </div>
                         </div>
+
+						<div  class="form-group">
+							<label class="col-md-4 control-label">粉丝价名称：</label>
+							<div class="col-sm-6">
+								<input type="text"  name="fansName"  class="form-control"  v-model="m.fansName">
+							</div>
+						</div>
+
 						<div class="form-group" v-if="m.isMealFee==1">
 							<label class="col-md-4 control-label" :class="{ formBox : m.isMealFee == 1}">名称：</label>
 							<div  class="col-md-6">

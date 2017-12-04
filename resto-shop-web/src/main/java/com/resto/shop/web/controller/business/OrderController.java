@@ -92,7 +92,7 @@ public class OrderController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"shopName","shop_orderCount","shop_orderPrice","shop_orderCount","shop_peopleCount","shop_orderCount","shop_tangshiCount","shop_tangshiPrice","shop_waidaiCount","shop_waidaiPrice","shop_waimaiCount","shop_waimaiPrice"};
+		String[]columns={"shopName","shop_orderCount","shop_orderPrice","shop_singlePrice","shop_peopleCount","shop_perPersonPrice","shop_tangshiCount","shop_tangshiPrice","shop_waidaiCount","shop_waidaiPrice","shop_waimaiCount","shop_waimaiPrice"};
 		//定义数据
 		//List<OrderPayDto>  result = new ArrayList<>();
 		List<ShopOrderReportDto>  result = new ArrayList<>();

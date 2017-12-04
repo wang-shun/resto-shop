@@ -31,7 +31,6 @@ import static com.resto.brand.core.util.OrderCountUtils.formatDouble;
 import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
 @SuppressWarnings("ALL")
 @RpcService
-@Component
 /**
  * @author yanjuan
  * @date 17/10/19 上午11:45
@@ -220,7 +219,9 @@ public class CloseShopServieImpl implements CloseShopService{
 			sb.append("店铺名：" + order.getShopName() + "\n");
 			sb.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
 			sb.append("订单明细：\n");
-			List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+			Map<String, String> param = new HashMap<>();
+			param.put("orderId", order.getId());
+			List<OrderItem> orderItem = orderItemService.listByOrderId(param);
 			for (OrderItem item : orderItem) {
 				sb.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
 			}
