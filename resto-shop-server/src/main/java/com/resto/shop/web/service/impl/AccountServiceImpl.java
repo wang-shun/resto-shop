@@ -455,4 +455,9 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 	public List<Account> selectRebate() {
 		return accountMapper.selectRebate();
 	}
+
+	@Override
+	public Account selectAccountByCustomerId(String customerId) {
+		return accountMapper.selectAccountByCustomerId(customerId);
+	}
 }

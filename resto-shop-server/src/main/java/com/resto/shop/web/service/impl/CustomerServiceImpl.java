@@ -2,6 +2,7 @@ package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +33,10 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
     private CustomerMapper customerMapper;
     @Resource
     private AccountService accountService;
-    @Resource
-    private RedPacketService redPacketService;
+	@Resource
+	private RedPacketService redPacketService;
+	@Resource
+	private AppraiseService appraiseService;
 
 	@Resource
 	ThirdCustomerService thirdCustomerService;
@@ -374,4 +377,36 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public Customer selectByAccountId(String accountId) {
 		return customerMapper.selectByAccountId(accountId);
 	}
+
+    @Override
+    public Map getCustomerConsumeInfo(String shopId, String customerId) {
+		Double average = 0.0;
+		int lastScore = 0;
+		StringBuffer balanceSb = new StringBuffer();
+
+		Account account = accountService.selectAccountByCustomerId(customerId);
+		if(account != null){
+			balanceSb.append("【余额:" + account.getRemain() + "】");
+		}
+
+		List<Appraise> appraiseList = appraiseService.selectAllAppraiseByShopIdAndCustomerId(shopId, customerId);
+		if(appraiseList != null && appraiseList.size() > 0){
+			Double sum = 0.0;
+			for(Appraise appraise : appraiseList){
+				sum += appraise.getLevel();
+			}
+			average = sum / appraiseList.size();
+			lastScore = appraiseList.get(0).getLevel();
+			balanceSb.append("【消费" + appraiseList.size() + "次】");
+		}
+
+		Map consumeInfo = new HashMap();
+		// 	平均分
+		consumeInfo.put("CUSTOMER_SATISFACTION_DEGREE", average);
+		// 上次评分
+		consumeInfo.put("CUSTOMER_SATISFACTION", lastScore);
+		// 用户余额
+		consumeInfo.put("CUSTOMER_PROPERTY", balanceSb);
+        return consumeInfo;
+    }
 }
