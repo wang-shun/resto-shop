@@ -2995,6 +2995,7 @@ GROUP BY oi.article_name
         o.print_order_time,
         o.customer_id,
         o.order_money,
+        o.parent_order_id,
         o.create_time,
         o.amount_with_children,
         oi.id orderPaymentItem_id,

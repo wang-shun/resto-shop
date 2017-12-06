@@ -14,13 +14,10 @@ import com.resto.shop.web.constant.*;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
-import com.resto.shop.web.util.JdbcSmsUtils;
-import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -95,13 +92,29 @@ public class CloseShopServieImpl implements CloseShopService{
 	@Override
 	public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand) {
 
-		//定位数据库
+		/**
+		 * 查询时的日期
+		 */
+		Date cleanDate = offLineOrder.getCreateDate();
+
+		OffLineOrder offLineOrder1 = offLineOrderService.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopDetail.getId(), DateUtil.getDateBegin(cleanDate), DateUtil.getDateEnd(cleanDate));
+		if (null != offLineOrder1) {
+			offLineOrder1.setState(0);
+			offLineOrderService.update(offLineOrder1);
+		}
+		offLineOrder.setId(ApplicationUtils.randomUUID());
+		offLineOrder.setState(1);
+		offLineOrder.setResource(OfflineOrderSource.OFFLINE_POS);
+		offLineOrder.setBrandId(brand.getId());
+		offLineOrder.setShopDetailId(shopDetail.getId());
+
+		offLineOrderService.insert(offLineOrder);
 		
 		/**
 		 * 1.结店退款
 		 * 2查询天气
 		 */
-		Wether wether = wetherService.selectDateAndShopId(shopDetail.getId(), DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
+		Wether wether = wetherService.selectDateAndShopId(shopDetail.getId(), DateUtil.formatDate(cleanDate,"yyyy-MM-dd"));
 		if(wether==null){
 			//说明没有调用定时任务 ---
 			//手动去查
@@ -117,12 +130,12 @@ public class CloseShopServieImpl implements CloseShopService{
 				wether.setDayTemperature(jsonObject.getInteger("day_air_temperature"));
 				wether.setWeekady(jsonObject.getInteger("weekday"));
 			}
-
-
 		}
+
+
 		WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());
 		//短信第一版用来发日结短信
-		Map<String, String> dayMapByFirstEdtion = querryDateDataByFirstEdtion(shopDetail, offLineOrder);
+		Map<String, String> dayMapByFirstEdtion = querryDateDataByFirstEdtion(shopDetail,cleanDate);
 		//3发短信推送/微信推送
 		pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand);
 		//3判断是否需要发送旬短信
@@ -244,25 +257,14 @@ public class CloseShopServieImpl implements CloseShopService{
 	 * @param offLineOrder
 	 * @return
 	 */
-	private Map<String,String> querryDateDataByFirstEdtion(ShopDetail shopDetail, OffLineOrder offLineOrder) {
-		// 查询该店铺是否结过店
-		OffLineOrder offLineOrder1 = offLineOrderService.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopDetail.getId(), DateUtil.getDateBegin(new Date()), DateUtil.getDateEnd(new Date()));
-		if (null != offLineOrder1) {
-			offLineOrder1.setState(0);
-			offLineOrderService.update(offLineOrder1);
-		}
-		offLineOrder.setId(ApplicationUtils.randomUUID());
-		offLineOrder.setState(1);
-		offLineOrder.setResource(OfflineOrderSource.OFFLINE_POS);
-		offLineOrderService.insert(offLineOrder);
+	private Map<String,String> querryDateDataByFirstEdtion(ShopDetail shopDetail, Date cleanDate) {
 
-		//----1.定义时间---
-		Date todayBegin = DateUtil.getDateBegin(new Date());
-		Date todayEnd = DateUtil.getDateEnd(new Date());
-		//本月的开始时间 本月结束时间
-		String beginMonth = DateUtil.getMonthBegin();
-		Date begin = DateUtil.getDateBegin(DateUtil.fomatDate(beginMonth));
-		Date end = todayEnd;
+		//----1.定义时间(指定日期的开始时间)---
+		Date todayBegin = DateUtil.getDateBegin(cleanDate);
+		Date todayEnd = DateUtil.getDateEnd(cleanDate);
+		//指定日期本月的开始时间 本月结束时间
+		DateTime beginMonth = DateUtil.beginOfMonth(cleanDate);
+		Date endMonth = todayEnd;
 		//三.定义线下订单
 		//本日线下订单总数(堂吃)
 		int todayEnterCount = 0;
@@ -295,7 +297,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		}
 
 
-		List<OffLineOrder> monthOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), begin, end, OfflineOrderSource.OFFLINE_POS);
+		List<OffLineOrder> monthOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), beginMonth, endMonth, OfflineOrderSource.OFFLINE_POS);
 		if (!monthOffLineOrderList.isEmpty()) {
 			for (OffLineOrder of : monthOffLineOrderList) {
 				monthEnterCount += of.getEnterCount();
@@ -407,7 +409,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		//新增用户比率
 		String todayNewCustomerRatio = "";
 
-		List<Order> monthOrders = orderService.selectCompleteByShopIdAndTime(shopDetail.getId(),begin, end);
+		List<Order> monthOrders = orderService.selectCompleteByShopIdAndTime(shopDetail.getId(),beginMonth, endMonth);
 		if (!monthOrders.isEmpty()) {
 			for (Order o : monthOrders) {
 				//封装   1.resto订单总额     3.resto订单总数  4订单中的实收总额  5新增用户的订单总额  6自然到店的用户总额  7分享到店的用户总额
@@ -422,7 +424,7 @@ public class CloseShopServieImpl implements CloseShopService{
 
 				if (o.getCreateTime().compareTo(todayBegin) > 0 && o.getCreateTime().compareTo(todayEnd) < 0) {
 					//1.resto订单总额 今日内订单
-					todayRestoTotal = todayRestoTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
+					todayRestoTotal = todayRestoTotal.add(getOrderMoney( o.getParentOrderId(), o.getOrderMoney(), o.getAmountWithChildren()));
 
 					//11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
 					if (!o.getOrderPaymentItems().isEmpty()) {
@@ -498,7 +500,7 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		//单独查询评价和分数
 
-		List<Appraise> appraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), begin, end);
+		List<Appraise> appraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), beginMonth, endMonth);
 
 		if (!appraises.isEmpty()) {
 			for (Appraise a : appraises) {
@@ -551,7 +553,7 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		todayContent.append("{")
 				.append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
-				.append("datetime:").append("'").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss")).append("'").append(",")
+				.append("datetime:").append("'").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd HH:mm:ss")).append("'").append(",")
 				//到店总笔数(r+线下)-----
 				.append("arriveCount:").append("'").append(todayEnterCount + todayRestoCount).append("'").append(",")
 				//到店消费总额 我们的总额+线下的总额，不包含外卖金额
@@ -612,7 +614,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		StringBuilder sb = new StringBuilder();
 		sb
 				.append("店铺名称:").append(shopDetail.getName()).append("\n")
-				.append("时间:").append(DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss")).append("\n")
+				.append("时间:").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd HH:mm:ss")).append("\n")
 				.append("到店总笔数:").append(todayEnterCount + todayRestoCount).append("\n")
 				.append("到店消费总额:").append(todayEnterTotal.add(todayRestoTotal)).append("\n")
 				.append("---------------------").append("\n")
@@ -658,10 +660,11 @@ public class CloseShopServieImpl implements CloseShopService{
 		if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
 			//截取电话号码
 			String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
+			telephones = "13317182430";
 			String[] tels = telephones.split(",");
+
 			for (String telephone : tels) {
 				//String brandId, String shopId,int smsType, String sign, String code_temp,String phone,JSONObject jsonObject
-
 				JSONObject smsResult = smsLogService.sendMessage(brand.getId(),shopDetail.getId(),SmsLogType.DAYMESSGAGE,SMSUtils.SIGN,SMSUtils.DAY_SMS_SEND,telephone,JSONObject.parseObject(querryMap.get("sms")));
 				//JSONObject smsResult = SMSUtils.sendMessage(s, JSONObject.parseObject(querryMap.get("sms")), "餐加", "SMS_46725122", null);//推送本日信息
 				log.info("短信返回内容："+smsResult);
