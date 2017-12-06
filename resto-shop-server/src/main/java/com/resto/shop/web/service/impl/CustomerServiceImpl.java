@@ -1,13 +1,6 @@
 package com.resto.shop.web.service.impl;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
@@ -21,7 +14,13 @@ import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 
-import cn.restoplus.rpc.server.RpcService;
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -407,7 +406,7 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 
 		Map consumeInfo = new HashMap();
 		// 	平均分
-		consumeInfo.put("CUSTOMER_SATISFACTION_DEGREE", average);
+		consumeInfo.put("CUSTOMER_SATISFACTION_DEGREE", new BigDecimal(average).setScale(2, RoundingMode.UP));
 		// 上次评分
 		consumeInfo.put("CUSTOMER_SATISFACTION", lastScore);
 		// 用户余额
