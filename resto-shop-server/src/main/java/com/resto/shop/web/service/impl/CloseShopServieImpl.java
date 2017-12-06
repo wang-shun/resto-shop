@@ -96,10 +96,13 @@ public class CloseShopServieImpl implements CloseShopService{
 		 */
 		Date cleanDate = offLineOrder.getCreateDate();
 
+
 		//如果是当日结当日的店则获取具体结店时间
-		if(DateUtil.getDateBegin(cleanDate).getTime()==DateUtil.getDateBegin(new Date()).getTime()){
-			cleanDate = new Date();
-		}
+//		if(DateUtil.getDateBegin(cleanDate).getTime()==DateUtil.getDateBegin(new Date()).getTime()){
+//			cleanDate = new Date();
+//		}
+
+
 		OffLineOrder offLineOrder1 = offLineOrderService.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopDetail.getId(), DateUtil.getDateBegin(cleanDate), DateUtil.getDateEnd(cleanDate));
 		if (null != offLineOrder1) {
 			offLineOrder1.setState(0);
