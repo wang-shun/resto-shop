@@ -798,4 +798,12 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
 	Order posSyncSelectById(@Param("orderId") String orderId);
+
+	/**
+	 *
+	 * @param shopId
+	 * @param customerId
+	 * @return
+	 */
+	Integer selectCompleteOrderCount(@Param("shopId") String shopId, @Param("customerId") String customerId);
 }

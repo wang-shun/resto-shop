@@ -3477,4 +3477,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         SELECT * from tb_order where id = #{orderId}
     </select>
 
+    <select id="selectCompleteOrderCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(id) from tb_order where order_state in (2, 10, 11 ,12) and customer_id = #{customerId} and shop_detail_id = #{shopId}
+    </select>
 </mapper>

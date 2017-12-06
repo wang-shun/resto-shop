@@ -789,4 +789,13 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	 * @return
 	 */
 	Order posSyncSelectById(String orderId);
+
+	/**
+	 * 根据 店铺ID 和 用户ID 查询此用户在该店消费订单数量
+	 * pos2.0 使用
+	 * @param shopId
+	 * @param customerId
+	 * @return
+	 */
+	Integer selectCompleteOrderCount(String shopId, String customerId);
 }

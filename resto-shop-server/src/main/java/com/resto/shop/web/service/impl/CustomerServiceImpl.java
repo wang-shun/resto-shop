@@ -37,6 +37,8 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	private RedPacketService redPacketService;
 	@Resource
 	private AppraiseService appraiseService;
+	@Resource
+	private OrderService orderService;
 
 	@Resource
 	ThirdCustomerService thirdCustomerService;
@@ -397,8 +399,11 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 			}
 			average = sum / appraiseList.size();
 			lastScore = appraiseList.get(0).getLevel();
-			balanceSb.append("【消费" + appraiseList.size() + "次】");
 		}
+
+		// 消费次数
+		Integer consumptionCount = orderService.selectCompleteOrderCount(shopId, customerId);
+		balanceSb.append("【消费" + consumptionCount + "次】");
 
 		Map consumeInfo = new HashMap();
 		// 	平均分
