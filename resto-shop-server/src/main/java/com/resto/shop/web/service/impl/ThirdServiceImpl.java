@@ -222,7 +222,10 @@ public class ThirdServiceImpl implements ThirdService {
         if (!kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
         }
-
+        if(printTask != null){
+            order.setProductionStatus(1);
+            platformOrderService.update(order);
+        }
         return printTask;
     }
 
