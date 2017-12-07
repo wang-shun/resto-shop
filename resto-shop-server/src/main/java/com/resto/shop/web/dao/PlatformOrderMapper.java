@@ -46,5 +46,5 @@ public interface PlatformOrderMapper  extends GenericDao<PlatformOrder,String> {
      * @param dateEnd
      * @return
      */
-    List<Order> selectPlatFormErrorOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
+    List<PlatformOrder> selectPlatFormErrorOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
 }

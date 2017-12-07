@@ -66,5 +66,5 @@ public interface PlatformOrderService extends GenericService<PlatformOrder, Stri
      * @param date
      * @return
      */
-    List<Order> selectPlatFormErrorOrderList(String currentShopId, Date date);
+    List<PlatformOrder> selectPlatFormErrorOrderList(String currentShopId, Date date);
 }

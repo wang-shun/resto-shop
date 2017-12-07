@@ -81,7 +81,7 @@ public class PlatformOrderServiceImpl extends GenericServiceImpl<PlatformOrder, 
     }
 
     @Override
-    public List<Order> selectPlatFormErrorOrderList(String currentShopId, Date date) {
+    public List<PlatformOrder> selectPlatFormErrorOrderList(String currentShopId, Date date) {
         Date begin = DateUtil.getDateBegin(date);
         Date end = DateUtil.getDateEnd(date);
         return platformorderMapper.selectPlatFormErrorOrderList(currentShopId, begin, end);
