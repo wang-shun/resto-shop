@@ -182,7 +182,7 @@
     <select id="selectPlatFormErrorOrderList" resultType="Order">
         SELECT * FROM tb_platform_order WHERE
         shop_detail_id=#{shopId} AND <![CDATA[ create_time >= #{dateBegin} AND create_time <= #{dateEnd}]]>
-        and production_status = 0 order by create_time;
+        and production_status = 0 and `type` = 1 order by create_time;
     </select>
 
 </mapper>
