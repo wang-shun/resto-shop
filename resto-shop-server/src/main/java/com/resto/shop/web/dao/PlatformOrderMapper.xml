@@ -16,11 +16,12 @@
     <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
     <result column="pay_type" property="payType" jdbcType="VARCHAR"/>
     <result column="remark" property="remark" jdbcType="VARCHAR"/>
+    <result column="production_status" property="productionStatus"/>
   </resultMap>
   <resultMap id="ResultMapWithBLOBs" type="com.resto.shop.web.model.PlatformOrder" extends="BaseResultMap">
     <result column="source_text" property="sourceText" jdbcType="LONGVARCHAR"/>
   </resultMap>
-  <sql id="Base_Column_List">id, type, platform_order_id, shop_detail_id, original_price, total_price, address, phone, name, order_create_time, create_time, pay_type, remark</sql>
+  <sql id="Base_Column_List">id, type, platform_order_id, shop_detail_id, original_price, total_price, address, phone, name, order_create_time, create_time, pay_type, remark, production_status</sql>
   <sql id="Blob_Column_List">source_text</sql>
   <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String">select 
     <include refid="Base_Column_List"/> , 
@@ -43,7 +44,8 @@
       <if test="createTime != null">create_time,</if>  
       <if test="payType != null">pay_type,</if>  
       <if test="remark != null">remark,</if>  
-      <if test="sourceText != null">source_text,</if> 
+      <if test="sourceText != null">source_text,</if>
+      <if test="productionStatus != null">production_status,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=VARCHAR},</if>  
@@ -59,7 +61,8 @@
       <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>  
       <if test="payType != null">#{payType,jdbcType=VARCHAR},</if>  
       <if test="remark != null">#{remark,jdbcType=VARCHAR},</if>  
-      <if test="sourceText != null">#{sourceText,jdbcType=LONGVARCHAR},</if> 
+      <if test="sourceText != null">#{sourceText,jdbcType=LONGVARCHAR},</if>
+      <if test="productionStatus != null">#{productionStatus},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.PlatformOrder">update tb_platform_order 
@@ -76,7 +79,8 @@
       <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if>  
       <if test="payType != null">pay_type = #{payType,jdbcType=VARCHAR},</if>  
       <if test="remark != null">remark = #{remark,jdbcType=VARCHAR},</if>  
-      <if test="sourceText != null">source_text = #{sourceText,jdbcType=LONGVARCHAR},</if> 
+      <if test="sourceText != null">source_text = #{sourceText,jdbcType=LONGVARCHAR},</if>
+      <if test="productionStatus != null">production_status = #{productionStatus},</if>
     </set> where id = #{id,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.resto.shop.web.model.PlatformOrder">update tb_platform_order set type = #{type,jdbcType=INTEGER}, platform_order_id = #{platformOrderId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, original_price = #{originalPrice,jdbcType=DECIMAL}, total_price = #{totalPrice,jdbcType=DECIMAL}, address = #{address,jdbcType=VARCHAR}, phone = #{phone,jdbcType=VARCHAR}, name = #{name,jdbcType=VARCHAR}, order_create_time = #{orderCreateTime,jdbcType=TIMESTAMP}, create_time = #{createTime,jdbcType=TIMESTAMP}, pay_type = #{payType,jdbcType=VARCHAR}, remark = #{remark,jdbcType=VARCHAR}, source_text = #{sourceText,jdbcType=LONGVARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
@@ -111,6 +115,7 @@
           <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
           <result column="pay_type" property="payType" jdbcType="VARCHAR"/>
           <result column="remark" property="remark" jdbcType="VARCHAR"/>
+          <result column="production_status" property="productionStatus"/>
           <collection property="platformOrderDetails" javaType="List" ofType="com.resto.shop.web.model.PlatformOrderDetail">
               <id column="did" property="id" jdbcType="VARCHAR"/>
               <result column="dplatform_order_id" property="platformOrderId" jdbcType="VARCHAR"/>
@@ -173,5 +178,11 @@
     }
   </select>
 
+
+    <select id="selectPlatFormErrorOrderList" resultType="Order">
+        SELECT * FROM tb_platform_order WHERE
+        shop_detail_id=#{shopId} AND <![CDATA[ create_time >= #{dateBegin} AND create_time <= #{dateEnd}]]>
+        and production_status = 0 order by create_time;
+    </select>
 
 </mapper>

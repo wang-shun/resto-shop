@@ -38,6 +38,8 @@ public class PlatformOrder {
 
     private String sourceText;
 
+    private Integer productionStatus;
+
     private List<PlatformOrderDetail> platformOrderDetails;
 
     private List<Map<String, Object>> shopAppraises;
@@ -178,6 +180,14 @@ public class PlatformOrder {
 
     public void setSourceText(String sourceText) {
         this.sourceText = sourceText == null ? null : sourceText.trim();
+    }
+
+    public Integer getProductionStatus() {
+        return productionStatus;
+    }
+
+    public void setProductionStatus(Integer productionStatus) {
+        this.productionStatus = productionStatus;
     }
 
     public PlatformOrder(){}
