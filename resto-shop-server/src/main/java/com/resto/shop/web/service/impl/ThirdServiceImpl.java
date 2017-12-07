@@ -1943,7 +1943,8 @@ public class ThirdServiceImpl implements ThirdService {
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
 
-
+        order.setProductionStatus(1);
+        platformOrderService.update(order);
         if (selectPrinterId == null) {
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             if (printer.size() > 0) {
