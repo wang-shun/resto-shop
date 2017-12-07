@@ -5119,7 +5119,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         //菜品总数单独算是因为 要出去套餐的数量
-        List<Integer> totalNums = orderMapper.selectBrandArticleNum(begin, end, brandId);
+        Integer totalNums = orderMapper.selectBrandArticleNum(begin, end, brandId);
         //查询菜品总额，退菜总数，退菜金额
         brandArticleReportDto bo = new brandArticleReportDto(brandName, 0, BigDecimal.ZERO, 0, BigDecimal.ZERO, BigDecimal.ZERO);
         List<brandArticleReportDto> articleReportDto = orderMapper.selectConfirmMoney(begin, end, brandId);
@@ -5131,14 +5131,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 bo.setRefundTotal(bo.getRefundTotal().add(reportDto.getRefundTotal()));
             }
         }
-        //存储菜品总销量
-        Integer totalNum = 0;
-        if (totalNums != null && !totalNums.isEmpty()) {
-            for (Integer num : totalNums) {
-                totalNum += num;
-            }
-        }
-        bo.setTotalNum(totalNum == null ? 0 : totalNum);
+        bo.setTotalNum(totalNums);
         return bo;
     }
 
