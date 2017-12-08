@@ -716,10 +716,11 @@ public class ThirdServiceImpl implements ThirdService {
         if (orderDetailList != null) {
             for (PlatformOrderDetail detail : orderDetailList) {
                 //得到当前菜品 所关联的厨房信息
-                Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
-                if (article == null) {
+                List<Article> articles = articleMapper.selectByName(detail.getName(), shopDetail.getId());
+                if (articles.size() == 0 || articles.size() > 1) {
                     continue;
                 }
+                Article article = articles.get(0);
                 String articleId = article.getId();
                 List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 
@@ -849,10 +850,11 @@ public class ThirdServiceImpl implements ThirdService {
         if (orderDetailList != null) {
             for (PlatformOrderDetail detail : orderDetailList) {
                 //得到当前菜品 所关联的厨房信息
-                Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
-                if (article == null) {
+                List<Article> articles = articleMapper.selectByName(detail.getName(), shopDetail.getId());
+                if (articles.size() == 0 || articles.size() > 1) {
                     continue;
                 }
+                Article article = articles.get(0);
                 String articleId = article.getId();
                 List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 
@@ -1123,10 +1125,11 @@ public class ThirdServiceImpl implements ThirdService {
         if (orderDetailList != null) {
             for (OrderItem detail : orderDetailList) {
                 //得到当前菜品 所关联的厨房信息
-                Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
-                if (article == null) {
+                List<Article> articles = articleMapper.selectByName(detail.getName(), shopDetail.getId());
+                if (articles.size() == 0 || articles.size() > 1) {
                     continue;
                 }
+                Article article = articles.get(0);
                 String articleId = article.getId();
                 List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 
@@ -1287,10 +1290,11 @@ public class ThirdServiceImpl implements ThirdService {
         //遍历 订单集合
         for (HungerOrderDetail item : articleList) {
             //得到当前菜品 所关联的厨房信息
-            Article article = articleMapper.selectByName(item.getName(), shopDetail.getId());
-            if (article == null) {
+            List<Article> articles = articleMapper.selectByName(item.getName(), shopDetail.getId());
+            if (articles.size() == 0 || articles.size() > 1) {
                 continue;
             }
+            Article article = articles.get(0);
             String articleId = article.getId();
             List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 
