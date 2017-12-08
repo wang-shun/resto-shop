@@ -91,4 +91,9 @@
     <select id="selectOrderRemarkByShopId" resultType="com.resto.shop.web.model.OrderRemark" parameterType="java.lang.String">
         select * from tb_order_remark where shop_detail_id = #{shopId}
     </select>
+
+    <select id="selectOpenOrderRemarkByShopId" resultType="com.resto.shop.web.model.OrderRemark" parameterType="java.lang.String">
+        select * from tb_order_remark sor inner join resto_brand.tb_order_remark bor on bor.id = sor.bo_order_remark_id
+         and sor.shop_detail_id = #{shopId}
+    </select>
 </mapper>

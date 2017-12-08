@@ -66,7 +66,7 @@ public class OrderRemarkServiceImpl extends GenericServiceImpl<OrderRemark, Stri
 	    // 先判断 当前店铺是否开启 订单备注的功能
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         if(shopDetail.getOpenOrderRemark() != null && shopDetail.getOpenOrderRemark() == 1){
-            return  orderRemarkMapper.selectOrderRemarkByShopId(shopId);
+            return  orderRemarkMapper.selectOpenOrderRemarkByShopId(shopId);
         }else{
             return null;
         }
