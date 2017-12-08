@@ -47,7 +47,6 @@ public class OrderDto implements Serializable {
         this.customerAddressId = order.getCustomerAddressId() == null ? "" : order.getCustomerAddressId();
         this.verCode = order.getVerCode() == null ? "" : order.getVerCode();
         this.payMode = order.getPayMode();
-        this.servicePrice = order.getServicePrice();
         this.mealAllNumber = order.getMealAllNumber();
         this.mealFeePrice = order.getMealFeePrice();
         this.isPosPay = order.getIsPosPay();
