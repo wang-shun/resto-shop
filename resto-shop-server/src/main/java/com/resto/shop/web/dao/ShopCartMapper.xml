@@ -108,7 +108,10 @@
         shop_detail_id =#{shopDetailId}
         <if test="groupId != null and groupId != ''">
             and group_id = #{groupId}
-        </if> and uuid = #{uuid}
+        </if>
+        <if test="uuid != null and uuid != ''">
+            and uuid = #{uuid}
+        </if>
          limit 1
     </select>
 
