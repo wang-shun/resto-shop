@@ -66,11 +66,7 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
             ShopCart shopCartItem = shopcartMapper.selectByPrimaryKey(shopCart.getId());
             if(shopCartItem.getShopType().equals(ShopCarType.CAOBAO)){
                 shopCartItem.setNumber(shopCart.getNumber());
-                if(shopCartItem.getNumber() == 0){
-                    shopcartMapper.deleteByPrimaryKey(shopCartItem.getId());
-                }else{
-                    shopcartMapper.updateShopCartItem(shopCartItem);
-                }
+                shopcartMapper.updateShopCartItem(shopCartItem);
                 shopcartMapper.delMealItem(shopCartItem.getId().toString());
                 return shopCartItem.getId();
             }
@@ -100,7 +96,11 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
                 return shopCart.getId();
             }else{
                 shopCartItem.setNumber(shopCart.getNumber());
-                shopcartMapper.updateShopCartItem(shopCartItem);
+                if(shopCartItem.getNumber() == 0){
+                    shopcartMapper.deleteByPrimaryKey(shopCartItem.getId());
+                }else{
+                    shopcartMapper.updateShopCartItem(shopCartItem);
+                }
                 shopcartMapper.delMealItem(shopCartItem.getId().toString());
                 return shopCartItem.getId();
             }
