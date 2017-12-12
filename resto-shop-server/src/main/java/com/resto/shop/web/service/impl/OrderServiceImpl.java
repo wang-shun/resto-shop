@@ -7630,7 +7630,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                         StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                             }
                             if (result.containsKey("ERROR")) {
-                                throw new RuntimeException("微信退款失败！失败信息：" + new JSONObject(result).toString());
+                                log.error("微信退款失败！失败信息：" + new JSONObject(result).toString());
+                                throw new RuntimeException(new JSONObject(result).toString());
                             }
                             BigDecimal realBack = maxWxRefund.doubleValue() > order.getRefundMoney().doubleValue() ? order.getRefundMoney() : maxWxRefund;
                             item.setResultData(new JSONObject(result).toString());
@@ -7709,7 +7710,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             map.put("out_request_no", newPayItemId);
                             String resultJson = AliPayUtils.refundPay(map);
                             if (resultJson.indexOf("ERROR") != -1) {
-                                throw new RuntimeException("支付宝退款失败！失败信息：" + resultJson);
+                                log.error("支付宝退款失败！失败信息：" + resultJson);
+                                throw new RuntimeException(resultJson);
                             }
                             item.setId(newPayItemId);
                             item.setResultData(new JSONObject(resultJson).toString());
