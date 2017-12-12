@@ -189,7 +189,6 @@ public class ThirdServiceImpl implements ThirdService {
             if (!kitchenTicket.isEmpty()) {
                 printTask.addAll(kitchenTicket);
             }
-
             return printTask;
         }
 
