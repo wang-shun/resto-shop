@@ -193,6 +193,10 @@ public class ThirdServiceImpl implements ThirdService {
             return printTask;
         }
 
+        if(order.getProductionStatus() == 1){
+            return null;
+        }
+
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(platformOrderId);
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(platformOrderId);
 
@@ -1941,6 +1945,9 @@ public class ThirdServiceImpl implements ThirdService {
                 }
 
             }
+        }
+        if(order.getProductionStatus() == 1){
+            return null;
         }
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(order.getPlatformOrderId());
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(order.getPlatformOrderId());
