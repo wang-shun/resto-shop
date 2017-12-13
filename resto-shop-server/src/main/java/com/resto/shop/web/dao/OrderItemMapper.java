@@ -31,6 +31,8 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
 
     List<OrderItem> listByParentId(String orderId);
 
+    void updateOrderIdByBeforeId(@Param("orderId") String orderId, @Param("beforeId") String beforeId);
+
 	void insertBatch(List<OrderItem> orderItems);
 
 	

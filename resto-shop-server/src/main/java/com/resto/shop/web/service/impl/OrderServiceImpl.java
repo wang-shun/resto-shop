@@ -786,6 +786,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             payMoney = payMoney.add(before.getOrderMoney());
             totalMoney = totalMoney.add(before.getOrderMoney());
             originMoney = originMoney.add(before.getOriginalAmount());
+            if(order.getPayType() == PayType.NOPAY){
+                before.setOrderState(OrderState.CANCEL);
+                orderMapper.updateByPrimaryKey(before);
+                orderItemService.updateOrderIdByBeforeId(order.getId(), before.getId());
+            }
         }
 
         if (customer != null) {

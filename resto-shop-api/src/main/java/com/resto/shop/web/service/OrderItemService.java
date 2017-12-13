@@ -17,6 +17,13 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 
 	public List<OrderItem> listByParentId(String orderId);
 
+	/**
+	 * 更新预点餐的orderItmer到新的订单项内
+	 * @param orderId
+	 * @param beforeId
+     */
+	public void updateOrderIdByBeforeId(String orderId, String beforeId);
+
 	public void insertItems(List<OrderItem> orderItems);
 
 	/**
