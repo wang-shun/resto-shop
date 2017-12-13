@@ -376,9 +376,9 @@ order by t.print_sort asc
     )
   </select>
 
-    <select id="selectByOrderId" resultType="OrderItem">
+    <update id="updateOrderIdByBeforeId">
         update tb_order_item set order_id = #{orderId} where order_id = #{beforeId}
-    </select>
+    </update>
 
     <select id="getOrderItemByRecommendId" resultType="OrderItem">
     select sum(count) as count,article_name,sum(final_price) as final_price,article_id  from tb_order_item
