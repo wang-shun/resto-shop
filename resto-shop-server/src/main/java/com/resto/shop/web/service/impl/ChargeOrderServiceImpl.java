@@ -174,7 +174,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setPayTime(new Date());
 				item.setPayValue(useCharge);
 				item.setRemark("充值余额支付:" + item.getPayValue());
-				item.setResultData(chargeOrder.getId());
+//				item.setResultData(chargeOrder.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+				item.setToPayId(chargeOrder.getId());
 				orderPaymentItemService.insert(item);
 				//记录充值余额支付 orderAction
                 LogTemplateUtils.getChargeByOrderType(brandName,item.getPayValue(),order.getId());
@@ -188,7 +189,8 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 				item.setPayTime(new Date());
 				item.setPayValue(useReward);
 				item.setRemark("赠送余额支付:" + item.getPayValue());
-				item.setResultData(chargeOrder.getId());
+//				item.setResultData(chargeOrder.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+				item.setToPayId(chargeOrder.getId());
 				orderPaymentItemService.insert(item);
 				//记录充值赠送余额支付 orderActon
                 LogTemplateUtils.getChargeRewardByOrderType(brandName,item.getPayValue(),order.getId());

@@ -307,7 +307,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setPayTime(order.getCreateTime());
             item.setPayValue(order.getWaitMoney());
             item.setRemark("等位红包支付:" + order.getWaitMoney());
-            item.setResultData(order.getWaitId());
+//            item.setResultData(order.getWaitId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+            item.setToPayId(order.getWaitId());
             orderPaymentItemService.insert(item);
 
             GetNumber getNumber = getNumberService.selectById(order.getWaitId());
@@ -329,7 +330,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setPayTime(order.getCreateTime());
                 item.setPayValue(coupon.getValue());
                 item.setRemark("优惠券支付:" + item.getPayValue());
-                item.setResultData(coupon.getId());
+//                item.setResultData(coupon.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+                item.setToPayId(coupon.getId());
                 orderPaymentItemService.insert(item);
                 payment = payment.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
             }
@@ -798,7 +800,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setPayTime(order.getCreateTime());
                 item.setPayValue(order.getWaitMoney());
                 item.setRemark("等位红包支付:" + order.getWaitMoney());
-                item.setResultData(order.getWaitId());
+//                item.setResultData(order.getWaitId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+                item.setToPayId(order.getWaitId());
                 if (order.getWaitMoney().doubleValue() > 0) {
                     orderPaymentItemService.insert(item);
                 }
@@ -837,7 +840,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayTime(order.getCreateTime());
                     item.setPayValue(coupon.getValue());
                     item.setRemark("优惠券支付:" + item.getPayValue());
-                    item.setResultData(coupon.getId());
+//                    item.setResultData(coupon.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+                    item.setToPayId(coupon.getId());
                     orderPaymentItemService.insert(item);
 //                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                        "订单使用优惠券支付了：" + item.getPayValue());
@@ -8044,7 +8048,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayValue(coupon.getValue());
                     item.setRemark("优惠券支付:" + item.getPayValue());
                     price = price.subtract(item.getPayValue());
-                    item.setResultData(coupon.getId());
+//                    item.setResultData(coupon.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+                    item.setToPayId(coupon.getId());
                     orderPaymentItemService.insert(item);
                     UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                             "订单使用优惠券支付了：" + item.getPayValue());
@@ -8063,7 +8068,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setPayTime(new Date());
                 item.setPayValue(order.getWaitMoney());
                 item.setRemark("等位红包支付:" + order.getWaitMoney());
-                item.setResultData(order.getWaitId());
+//                item.setResultData(order.getWaitId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+                item.setToPayId(order.getWaitId());
                 orderPaymentItemService.insert(item);
                 UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                         "订单使用等位红包支付了：" + item.getPayValue());
