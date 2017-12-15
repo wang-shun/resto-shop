@@ -10,11 +10,12 @@
         <result column="payment_mode_id" property="paymentModeId" jdbcType="INTEGER"/>
         <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
         <result column="is_use_bonus" property="isUseBonus"/>
+        <result column="to_pay_id" property="toPayId"/>
     </resultMap>
     <resultMap id="ResultMapWithBLOBs" type="com.resto.shop.web.model.OrderPaymentItem" extends="BaseResultMap">
         <result column="result_data" property="resultData" jdbcType="LONGVARCHAR"/>
     </resultMap>
-    <sql id="Base_Column_List">id, pay_time, pay_value, remark, payment_mode_id, order_id, is_use_bonus</sql>
+    <sql id="Base_Column_List">id, pay_time, pay_value, remark, payment_mode_id, order_id, is_use_bonus, to_pay_id</sql>
     <sql id="Blob_Column_List">result_data</sql>
     <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="java.lang.String">select
         <include refid="Base_Column_List"/> ,
@@ -36,6 +37,7 @@
             <if test="orderId != null">order_id,</if>
             <if test="resultData != null">result_data,</if>
             <if test="isUseBonus != null">is_use_bonus,</if>
+            <if test="toPayId != null">to_pay_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=VARCHAR},</if>
@@ -46,6 +48,7 @@
             <if test="orderId != null">#{orderId,jdbcType=VARCHAR},</if>
             <if test="resultData != null">#{resultData,jdbcType=LONGVARCHAR},</if>
             <if test="isUseBonus != null">#{isUseBonus},</if>
+            <if test="toPayId != null">#{toPayId},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OrderPaymentItem">update
@@ -58,6 +61,7 @@
             <if test="orderId != null">order_id = #{orderId,jdbcType=VARCHAR},</if>
             <if test="resultData != null">result_data = #{resultData,jdbcType=LONGVARCHAR},</if>
             <if test="isUseBonus != null">is_use_bonus = #{isUseBonus},</if>
+            <if test="toPayId != null">to_pay_id = #{toPayId},</if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
     </update>

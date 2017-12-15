@@ -193,7 +193,8 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			item.setPayTime(new Date());
 			item.setPayValue(redPay);
 			item.setRemark("余额(红包)支付:" + item.getPayValue());
-			item.setResultData(account.getId());
+//			item.setResultData(account.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+			item.setToPayId(account.getId());
 			orderPaymentItemService.insert(item);
 //			UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //					"订单使用余额(红包)支付了：" + item.getPayValue());
@@ -247,7 +248,8 @@ public class AccountServiceImpl extends GenericServiceImpl<Account, String> impl
 			item.setPayTime(new Date());
 			item.setPayValue(redPay);
 			item.setRemark("余额(红包)支付:" + item.getPayValue());
-			item.setResultData(account.getId());
+//			item.setResultData(account.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+			item.setToPayId(account.getId());
 			orderPaymentItemService.insert(item);
 		}
 		return realPay;

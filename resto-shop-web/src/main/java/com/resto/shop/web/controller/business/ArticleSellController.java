@@ -20,6 +20,7 @@ import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.AppendToExcelUtil;
 import com.resto.shop.web.constant.Common;
+import com.resto.shop.web.constant.OrderItemType;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,30 +96,39 @@ public class ArticleSellController extends GenericController{
         JSONObject object = new JSONObject();
         try {
             Map<String, Object> selectMap = new HashMap<String, Object>();
+            //得到当前品牌菜品的所有类别信息
             List<ArticleSellDto> brandArticleType = articleFamilyService.selectByShopId(null);
-            BigDecimal brandSellNum = new BigDecimal(0);
-            BigDecimal salles = new BigDecimal(0);
+            BigDecimal brandSellNum = BigDecimal.ZERO;
+            BigDecimal salles = BigDecimal.ZERO;
+            //获取品牌总的销售信息
             brandArticleReportDto brandCount = orderService.callBrandArticleNum(beginDate, endDate, getCurrentBrandId(), getBrandName());
             object.put("brandReport", brandCount);
             selectMap.put("beginDate", beginDate);
             selectMap.put("endDate", endDate);
             selectMap.put("type", ArticleType.SIMPLE_ARTICLE);
+            //查询卖出的菜品销售信息
             List<ArticleSellDto> articleUnitSellDtos = articleService.callOrderArtcile(selectMap);
+            //查询所有的菜品销售信息
             List<ArticleSellDto> articleUnitSell = articleService.selectArticleByType(selectMap);
+            //查出单品或套餐总的销售量及销售额
+            selectMap.put("type", OrderItemType.ARTICLE + "," + OrderItemType.UNITPRICE + "," + OrderItemType.UNIT_NEW + "," + OrderItemType.RECOMMEND);
             Map<String, Object> unitMap = articleService.callArticleOrderCount(selectMap);
             for (ArticleSellDto articleUnitSellDto : articleUnitSellDtos){
+                //计算销售量占比
                 if (unitMap.get("sellNum").toString().equalsIgnoreCase("0")){
                     articleUnitSellDto.setNumRatio("0.00%");
                 }else{
                     articleUnitSellDto.setNumRatio(new BigDecimal(articleUnitSellDto.getBrandSellNum()).divide(new BigDecimal(
                             unitMap.get("sellNum").toString()),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%");
                 }
+                //计算销售额占比
                 if (unitMap.get("salles").toString().equalsIgnoreCase("0")){
                     articleUnitSellDto.setSalesRatio("0.00%");
                 }else{
                     articleUnitSellDto.setSalesRatio(articleUnitSellDto.getSalles().divide(new BigDecimal(
                             unitMap.get("salles").toString()),2,BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)) +"%");
                 }
+                //循环所有菜品
                 for (ArticleSellDto articleSellDto : articleUnitSell){
                     if (articleSellDto.getArticleId().equalsIgnoreCase(articleUnitSellDto.getArticleId())){
                         articleUnitSell.remove(articleSellDto);
@@ -135,6 +145,8 @@ public class ArticleSellController extends GenericController{
                         articleSellDto.setRefundCount(new BigDecimal(articleSellDto.getRefundCount()).add(new BigDecimal(articleUnitSellDto.getRefundCount())).intValue());
                         articleSellDto.setRefundTotal(articleSellDto.getRefundTotal().add(articleUnitSellDto.getRefundTotal()));
                         articleSellDto.setLikes(new BigDecimal(articleSellDto.getLikes()).add(new BigDecimal(articleUnitSellDto.getLikes())).intValue());
+                        //得到当前菜品所属类别名称
+                        articleUnitSellDto.setArticleFamilyName(articleSellDto.getArticleFamilyName());
                         break;
                     }
                 }
@@ -153,6 +165,7 @@ public class ArticleSellController extends GenericController{
             selectMap.put("type", ArticleType.TOTAL_ARTICLE);
             List<ArticleSellDto> articleFamilySellDtos = articleService.callOrderArtcile(selectMap);
             List<ArticleSellDto> articleFamilySell = articleService.selectArticleByType(selectMap);
+            selectMap.put("type", OrderItemType.SETMEALS + "," + OrderItemType.MEALS_CHILDREN );
             Map<String, Object> familyMap = articleService.callArticleOrderCount(selectMap);
             for (ArticleSellDto articleFamilySellDto : articleFamilySellDtos){
                 if (familyMap.get("sellNum").toString().equalsIgnoreCase("0")){
@@ -560,6 +573,7 @@ public class ArticleSellController extends GenericController{
             BigDecimal salles = new BigDecimal(0);
             List<ArticleSellDto> articleUnitSellDtos = articleService.callOrderArtcile(selectMap);
             List<ArticleSellDto> articleUnitSell = articleService.selectArticleByType(selectMap);
+            selectMap.put("type", OrderItemType.ARTICLE + "," + OrderItemType.UNITPRICE + "," + OrderItemType.UNIT_NEW + "," + OrderItemType.RECOMMEND);
             Map<String, Object> unitMap = articleService.callArticleOrderCount(selectMap);
             for (ArticleSellDto articleUnitSellDto : articleUnitSellDtos) {
                 if (unitMap.get("sellNum").toString().equalsIgnoreCase("0") || Double.parseDouble(unitMap.get("sellNum").toString()) == 0) {
@@ -590,6 +604,7 @@ public class ArticleSellController extends GenericController{
                         articleSellDto.setRefundCount(new BigDecimal(articleSellDto.getRefundCount()).add(new BigDecimal(articleUnitSellDto.getRefundCount())).intValue());
                         articleSellDto.setRefundTotal(articleSellDto.getRefundTotal().add(articleUnitSellDto.getRefundTotal()));
                         articleSellDto.setLikes(new BigDecimal(articleSellDto.getLikes()).add(new BigDecimal(articleUnitSellDto.getLikes())).intValue());
+                        articleUnitSellDto.setArticleFamilyName(articleSellDto.getArticleFamilyName());
                         break;
                     }
                 }
@@ -608,6 +623,7 @@ public class ArticleSellController extends GenericController{
             selectMap.put("type", ArticleType.TOTAL_ARTICLE);
             List<ArticleSellDto> articleFamilySellDtos = articleService.callOrderArtcile(selectMap);
             List<ArticleSellDto> articleFamilySell = articleService.selectArticleByType(selectMap);
+            selectMap.put("type", OrderItemType.SETMEALS + "," + OrderItemType.MEALS_CHILDREN );
             Map<String, Object> familyMap = articleService.callArticleOrderCount(selectMap);
             for (ArticleSellDto articleFamilySellDto : articleFamilySellDtos) {
                 if (familyMap.get("sellNum").toString().equalsIgnoreCase("0") || Double.parseDouble(familyMap.get("sellNum").toString()) == 0) {

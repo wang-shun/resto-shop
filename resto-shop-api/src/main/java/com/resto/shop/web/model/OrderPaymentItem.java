@@ -34,6 +34,16 @@ public class OrderPaymentItem implements Serializable {
 
     private Integer isUseBonus;
 
+    private String toPayId;
+
+    public String getToPayId() {
+        return toPayId;
+    }
+
+    public void setToPayId(String toPayId) {
+        this.toPayId = toPayId;
+    }
+
     public Integer getIsUseBonus() {
         return isUseBonus;
     }

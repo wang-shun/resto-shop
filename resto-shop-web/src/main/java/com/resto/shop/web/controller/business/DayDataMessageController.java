@@ -12,7 +12,11 @@ import javax.validation.Valid;
 
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.ExcelUtil;
+import com.resto.brand.web.model.Brand;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.constant.MessageType;
+import org.dom4j.Branch;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -29,6 +33,10 @@ public class DayDataMessageController extends GenericController{
 
 	@Resource
 	DayDataMessageService daydatamessageService;
+
+
+	@Resource
+     ShopDetailService shopDetailService;
 
 	@RequestMapping("/list")
     public ModelAndView list(){
@@ -84,13 +92,22 @@ public class DayDataMessageController extends GenericController{
      //根据状态(正常/删除) 时间 类型(1,2,3日/旬/月)
      private   List<DayDataMessage> getData(String date, Integer type) {
          List<DayDataMessage> dayDataMessageList = daydatamessageService.selectListByTime(MessageType.NORMAL,date,type);
+         List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
+         List<String> shopIds = new ArrayList<>();
+         for(ShopDetail shopDetail:shopDetailList){
+             shopIds.add(shopDetail.getId());
+         }
 
          //结店时候 如果存在 当日（旬/月） 当前shopId 有多条数据的时候取最新的一条
          Map<String,DayDataMessage> map = new HashMap<>();
 
          if(dayDataMessageList!=null&&!dayDataMessageList.isEmpty()){
+
             for(DayDataMessage dayDataMessage:dayDataMessageList){
-                map.put(dayDataMessage.getShopId(),dayDataMessage);
+
+                if(shopIds.contains(dayDataMessage.getShopId())){
+                    map.put(dayDataMessage.getShopId(),dayDataMessage);
+                }
             }
          }
          Collection<DayDataMessage> list =  map.values();
@@ -102,6 +119,7 @@ public class DayDataMessageController extends GenericController{
              }
          }
 
+
          if(dayDataMessages!=null&&!dayDataMessages.isEmpty()){
              for(DayDataMessage dm:dayDataMessages){
                  dm.setNewCustomerOrder(dm.getNewCuostomerOrderNum()+"笔/"+dm.getNewCustomerOrderSum()+"元");//新用户消费
@@ -112,9 +130,6 @@ public class DayDataMessageController extends GenericController{
                  dm.setBackTwoMoreCustomerOrder(dm.getBackTwoMoreCustomerOrderNum()+"笔/"+dm.getBackTwoMoreCustomerOrderSum()+"元");//多次回头用户消费
              }
          }
-
-
-
 
         return dayDataMessages;
 
