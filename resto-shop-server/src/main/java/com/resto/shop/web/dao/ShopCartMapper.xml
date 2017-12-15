@@ -111,6 +111,7 @@
         </if>
         <if test="uuid != null and uuid != ''">
             and uuid = #{uuid}
+            and shop_type = #{shopType}
         </if>
          limit 1
     </select>
