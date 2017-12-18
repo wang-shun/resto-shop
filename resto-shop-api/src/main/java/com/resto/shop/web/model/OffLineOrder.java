@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -24,6 +26,9 @@ public class OffLineOrder implements Serializable {
     private Integer numGuest;
 
     private Date createTime;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date createDate;
 
     private Integer state;
 
@@ -131,5 +136,13 @@ public class OffLineOrder implements Serializable {
     }
 
     public OffLineOrder() {
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }

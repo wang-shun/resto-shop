@@ -193,6 +193,10 @@ public class ThirdServiceImpl implements ThirdService {
             return printTask;
         }
 
+        if(order.getProductionStatus() == 1){
+            return null;
+        }
+
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(platformOrderId);
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(platformOrderId);
 
@@ -222,7 +226,10 @@ public class ThirdServiceImpl implements ThirdService {
         if (!kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
         }
-
+        if(printTask != null){
+            order.setProductionStatus(1);
+            platformOrderService.update(order);
+        }
         return printTask;
     }
 
@@ -713,10 +720,11 @@ public class ThirdServiceImpl implements ThirdService {
         if (orderDetailList != null) {
             for (PlatformOrderDetail detail : orderDetailList) {
                 //得到当前菜品 所关联的厨房信息
-                Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
-                if (article == null) {
+                List<Article> articles = articleMapper.selectByName(detail.getName(), shopDetail.getId());
+                if (articles.size() == 0 || articles.size() > 1) {
                     continue;
                 }
+                Article article = articles.get(0);
                 String articleId = article.getId();
                 List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 
@@ -846,10 +854,11 @@ public class ThirdServiceImpl implements ThirdService {
         if (orderDetailList != null) {
             for (PlatformOrderDetail detail : orderDetailList) {
                 //得到当前菜品 所关联的厨房信息
-                Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
-                if (article == null) {
+                List<Article> articles = articleMapper.selectByName(detail.getName(), shopDetail.getId());
+                if (articles.size() == 0 || articles.size() > 1) {
                     continue;
                 }
+                Article article = articles.get(0);
                 String articleId = article.getId();
                 List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 
@@ -1120,10 +1129,11 @@ public class ThirdServiceImpl implements ThirdService {
         if (orderDetailList != null) {
             for (OrderItem detail : orderDetailList) {
                 //得到当前菜品 所关联的厨房信息
-                Article article = articleMapper.selectByName(detail.getName(), shopDetail.getId());
-                if (article == null) {
+                List<Article> articles = articleMapper.selectByName(detail.getName(), shopDetail.getId());
+                if (articles.size() == 0 || articles.size() > 1) {
                     continue;
                 }
+                Article article = articles.get(0);
                 String articleId = article.getId();
                 List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 
@@ -1284,10 +1294,11 @@ public class ThirdServiceImpl implements ThirdService {
         //遍历 订单集合
         for (HungerOrderDetail item : articleList) {
             //得到当前菜品 所关联的厨房信息
-            Article article = articleMapper.selectByName(item.getName(), shopDetail.getId());
-            if (article == null) {
+            List<Article> articles = articleMapper.selectByName(item.getName(), shopDetail.getId());
+            if (articles.size() == 0 || articles.size() > 1) {
                 continue;
             }
+            Article article = articles.get(0);
             String articleId = article.getId();
             List<Kitchen> kitchenList = kitchenService.selectInfoByArticleId(articleId);
 
@@ -1935,12 +1946,16 @@ public class ThirdServiceImpl implements ThirdService {
 
             }
         }
+        if(order.getProductionStatus() == 1){
+            return null;
+        }
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(order.getPlatformOrderId());
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(order.getPlatformOrderId());
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
 
-
+        order.setProductionStatus(1);
+        platformOrderService.update(order);
         if (selectPrinterId == null) {
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             if (printer.size() > 0) {

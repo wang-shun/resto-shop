@@ -1001,10 +1001,10 @@ GROUP BY article_id
     <select id="selectArticleOrderCount" parameterType="java.util.Map" resultType="java.util.Map">
         CALL
         <if test="shopDetailId != null">
-            proc_article_order_count_shop(#{beginDate},#{endDate},${type},#{shopDetailId})
+            proc_article_order_count_shop(#{beginDate},#{endDate},#{type},#{shopDetailId})
         </if>
         <if test="shopDetailId == null">
-            proc_article_order_count(#{beginDate},#{endDate},${type})
+            proc_article_order_count(#{beginDate},#{endDate},#{type})
         </if>
     </select>
 

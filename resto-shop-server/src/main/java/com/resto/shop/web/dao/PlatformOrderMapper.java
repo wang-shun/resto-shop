@@ -1,6 +1,7 @@
 package com.resto.shop.web.dao;
 
 import com.resto.brand.web.dto.PlatformReportDto;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.PlatformOrder;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.RecommendCategory;
@@ -37,4 +38,13 @@ public interface PlatformOrderMapper  extends GenericDao<PlatformOrder,String> {
 
     //根据三方品台订单id查询该订单详细信息
     List<PlatformOrder> getPlatformOrderDetailList(String platformOrderId);
+
+    /**
+     * 查询某天的异常订单
+     * @param currentShopId
+     * @param dateBegin
+     * @param dateEnd
+     * @return
+     */
+    List<PlatformOrder> selectPlatFormErrorOrderList(@Param("shopId")String currentShopId, @Param("dateBegin")Date dateBegin, @Param("dateEnd")Date dateEnd);
 }

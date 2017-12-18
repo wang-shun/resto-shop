@@ -132,7 +132,8 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
         item.setPayTime(order.getCreateTime());
         item.setPayValue(getNumber.getFinalMoney());
         item.setRemark("退还等位红包:" + order.getWaitMoney());
-        item.setResultData(getNumber.getId());
+//        item.setResultData(getNumber.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+        item.setToPayId(getNumber.getId());
         orderPaymentItemService.insert(item);
     }
 
