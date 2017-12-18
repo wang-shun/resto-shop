@@ -202,6 +202,7 @@ public class ArticleSellController extends GenericController{
                         articleSellDto.setRefundCount(new BigDecimal(articleSellDto.getRefundCount()).add(new BigDecimal(articleFamilySellDto.getRefundCount())).intValue());
                         articleSellDto.setRefundTotal(articleSellDto.getRefundTotal().add(articleFamilySellDto.getRefundTotal()));
                         articleSellDto.setLikes(new BigDecimal(articleSellDto.getLikes()).add(new BigDecimal(articleFamilySellDto.getLikes())).intValue());
+                        articleFamilySellDto.setArticleFamilyName(articleSellDto.getArticleFamilyName());
                         break;
                     }
                 }
@@ -654,6 +655,7 @@ public class ArticleSellController extends GenericController{
                         articleSellDto.setRefundCount(new BigDecimal(articleSellDto.getRefundCount()).add(new BigDecimal(articleFamilySellDto.getRefundCount())).intValue());
                         articleSellDto.setRefundTotal(articleSellDto.getRefundTotal().add(articleFamilySellDto.getRefundTotal()));
                         articleSellDto.setLikes(new BigDecimal(articleSellDto.getLikes()).add(new BigDecimal(articleFamilySellDto.getLikes())).intValue());
+                        articleFamilySellDto.setArticleFamilyName(articleSellDto.getArticleFamilyName());
                         break;
                     }
                 }
