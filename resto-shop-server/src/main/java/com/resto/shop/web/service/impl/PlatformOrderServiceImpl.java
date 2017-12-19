@@ -9,6 +9,7 @@ import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.dto.MeiTuanOrderDto;
 import com.resto.brand.web.dto.PlatformReportDto;
 import com.resto.shop.web.dao.PlatformOrderMapper;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.PlatformOrder;
 import com.resto.shop.web.service.PlatformOrderDetailService;
 import com.resto.shop.web.service.PlatformOrderExtraService;
@@ -77,6 +78,13 @@ public class PlatformOrderServiceImpl extends GenericServiceImpl<PlatformOrder, 
     @Override
     public List<PlatformOrder> getPlatformOrderDetailList(String platformOrderId) {
         return platformorderMapper.getPlatformOrderDetailList(platformOrderId);
+    }
+
+    @Override
+    public List<PlatformOrder> selectPlatFormErrorOrderList(String currentShopId, Date date) {
+        Date begin = DateUtil.getDateBegin(date);
+        Date end = DateUtil.getDateEnd(date);
+        return platformorderMapper.selectPlatFormErrorOrderList(currentShopId, begin, end);
     }
 
     @Override

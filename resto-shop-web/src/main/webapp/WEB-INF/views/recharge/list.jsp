@@ -171,12 +171,11 @@
                 var that = this;
                 that.shopChargeLogTable = $("#shopChargeLogTable").DataTable({
                     lengthMenu: [ [50, 75, 100, 150], [50, 75, 100, "All"] ],
-                    order: [[ 1, "desc" ]],
+                    order: [[ 0, "asc" ]],
                     columns : [
                         {
                             title:"店铺名称",
-                            data:"shopName",
-                            orderable : false
+                            data:"shopName"
                         },
                         {
                             title : "充值单数",

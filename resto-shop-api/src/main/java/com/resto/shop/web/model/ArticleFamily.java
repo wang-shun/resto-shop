@@ -25,6 +25,8 @@ public class ArticleFamily implements Serializable{
     @NotNull(message="{就餐模式   不能为空}")
     private Integer distributionModeId;
 
+    private Integer inventoryWarningNum;
+
     private List<Article> articleList;
 
     public List<Article> getArticleList() {
@@ -89,5 +91,13 @@ public class ArticleFamily implements Serializable{
 
     public void setDistributionModeId(Integer distributionModeId) {
         this.distributionModeId = distributionModeId;
+    }
+
+    public Integer getInventoryWarningNum() {
+        return inventoryWarningNum;
+    }
+
+    public void setInventoryWarningNum(Integer inventoryWarningNum) {
+        this.inventoryWarningNum = inventoryWarningNum;
     }
 }

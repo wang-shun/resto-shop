@@ -17,8 +17,9 @@
         <result column="recommend_article_id" property="recommendArticleId"/>
         <result column="unit_new_id" property="unitNewId"/>
         <result column="uuid" property="uuid"/>
+        <result column="group_id" property="groupId"/>
     </resultMap>
-    <sql id="Base_Column_List">id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, shop_type, pid, user_id, attr_id,recommend_id,recommend_article_id,unit_new_id,uuid</sql>
+    <sql id="Base_Column_List">id, number, customer_id, article_id, shop_detail_id, distribution_mode_id, shop_type, pid, user_id, attr_id,recommend_id,recommend_article_id,unit_new_id,uuid, group_id</sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select
         <include refid="Base_Column_List"/> from tb_shop_cart where id = #{id,jdbcType=INTEGER}
     </select>
@@ -40,6 +41,7 @@
             <if test="recommendArticleId != null">recommend_article_id,</if>
             <if test="unitNewId != null">unit_new_id,</if>
             <if test="uuid != null">uuid,</if>
+            <if test="groupId != null">group_id,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=INTEGER},</if>
@@ -56,6 +58,7 @@
             <if test="recommendArticleId != null">#{recommendArticleId},</if>
             <if test="unitNewId != null">#{unitNewId},</if>
             <if test="uuid != null">#{uuid},</if>
+            <if test="groupId != null">#{groupId},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart
@@ -73,6 +76,7 @@
             <if test="recommendArticleId != null">recommend_article_id = #{recommendArticleId},</if>
             <if test="unitNewId != null">unit_new_id = #{unitNewId},</if>
             <if test="uuid != null">uuid = #{uuid},</if>
+            <if test="groupId != null">group_id = #{groupId},</if>
         </set> where id = #{id,jdbcType=INTEGER}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart set number = #{number,jdbcType=INTEGER}, customer_id = #{customerId,jdbcType=VARCHAR}, article_id = #{articleId,jdbcType=VARCHAR}, shop_detail_id = #{shopDetailId,jdbcType=VARCHAR}, distribution_mode_id = #{distributionModeId,jdbcType=INTEGER}, shop_type = #{shopType,jdbcType=VARCHAR}, pid = #{pid,jdbcType=INTEGER}, user_id = #{userId,jdbcType=VARCHAR}, attr_id = #{attrId,jdbcType=VARCHAR}, unit_new_id = #{unitNewId}, uuid = #{uuid} where id = #{id,jdbcType=INTEGER}</update>
@@ -80,28 +84,35 @@
 
     <!-- 查询购物车明细 -->
     <select id="listUserAndShop" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid,group_id from tb_shop_cart
         where distribution_mode_id=#{distributionModeId} and customer_id=#{customerId} and shop_detail_id=#{shopDetailId}
     </select>
 
     <select id="listUserShopCart" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_article_id,unit_new_id,uuid from tb_shop_cart
-        where  user_id=#{0} and shop_detail_id=#{1} and distribution_mode_id=#{2} order by id
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_article_id,unit_new_id,uuid,group_id from tb_shop_cart
+        where  customer_id =#{0} and shop_detail_id=#{1} and distribution_mode_id=#{2} order by id
     </select>
 
     <select id="selectByUuId" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid,group_id from tb_shop_cart
         where uuid = #{uuid};
     </select>
 
     <select id="selectShopCartItem" parameterType="com.resto.shop.web.model.ShopCart" resultType="com.resto.shop.web.model.ShopCart">
-        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid from tb_shop_cart
+        select id,number,customer_id,article_id,shop_detail_id,distribution_mode_id,shop_type,pid,user_id,attr_id,recommend_id,recommend_article_id,unit_new_id,uuid,group_id from tb_shop_cart
         where
         distribution_mode_id =#{distributionModeId} and
         article_id = #{articleId} and
         customer_id =#{customerId} and
         pid = 0 and shop_type = #{shopType} and
-        shop_detail_id =#{shopDetailId} limit 1
+        shop_detail_id =#{shopDetailId}
+        <if test="groupId != null and groupId != ''">
+            and group_id = #{groupId}
+        </if>
+        <if test="uuid != null and uuid != ''">
+            and uuid = #{uuid}
+        </if>
+         limit 1
     </select>
 
     <update id="updateShopCartItem" parameterType="com.resto.shop.web.model.ShopCart">update tb_shop_cart
@@ -119,6 +130,7 @@
             <if test="recommendArticleId != null">recommend_article_id = #{recommendArticleId,jdbcType=VARCHAR},</if>
             <if test="unitNewId != null">unit_new_id = #{unitNewId},</if>
             <if test="uuid != null">uuid = #{uuid},</if>
+            <if test="groupId != null">group_id = #{groupId},</if>
         </set> where id = #{id,jdbcType=INTEGER}
     </update>
 
@@ -147,4 +159,64 @@
     <delete id="deleteCustomerArticle">
         delete from tb_shop_cart where customer_id = #{customerId} and article_id = #{articleId}
     </delete>
+
+    <update id="clearGroupId">
+        update tb_shop_cart
+        set group_id = null
+        where id = #{id}
+    </update>
+
+    <update id="updateGroupNew">
+        update tb_shop_cart
+        set group_id = #{groupId}
+        where shop_detail_id = #{shopId}
+        and customer_id = #{customerId}
+    </update>
+
+    <select id="checkRepeat" resultType="java.lang.Integer">
+        select ifnull(sum(`number`),0) from tb_shop_cart where article_id = #{articleId}
+        and group_id = #{groupId} and customer_id != #{customerId}
+    </select>
+
+    <select id="checkRepeatRecommendGroupId" resultType="java.lang.Integer">
+        select ifnull(sum(`number`),0) from tb_shop_cart where article_id = #{articleId}
+        and group_id = #{groupId} and shop_type = 4
+    </select>
+
+    <select id="checkRepeatRecommendCustomerId" resultType="java.lang.Integer">
+        select ifnull(sum(`number`),0) from tb_shop_cart where article_id = #{articleId}
+        and customer_id = #{customerId} and shop_type = 4
+    </select>
+
+    <select id="getListByGroupId" resultType="ShopCart">
+        select * from tb_shop_cart where group_id = #{groupId}
+        <if test="ids != null">
+            and customer_id in
+            <foreach collection="ids" index="index" item="item"  open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+
+    </select>
+
+    <update id="resetGroupId">
+        update tb_shop_cart
+        set group_id = null
+        where group_id = #{groupId}
+    </update>
+
+    <select id="getListByGroupIdDistinctCustomerId" resultType="java.lang.String">
+        select DISTINCT customer_id from tb_shop_cart where group_id = #{groupId}
+    </select>
+
+    <delete id="deleteByGroup">
+        delete from tb_shop_cart where group_id = #{groupId}
+    </delete>
+
+    <update id="updateShopCartByGroupId">
+        update tb_shop_cart
+        set group_id = #{groupId}
+        where shop_detail_id = #{shopId}
+        and customer_id = #{customerId}
+    </update>
 </mapper>

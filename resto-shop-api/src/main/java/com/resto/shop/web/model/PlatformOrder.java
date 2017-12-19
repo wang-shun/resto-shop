@@ -38,6 +38,8 @@ public class PlatformOrder {
 
     private String sourceText;
 
+    private Integer productionStatus;
+
     private List<PlatformOrderDetail> platformOrderDetails;
 
     private List<Map<String, Object>> shopAppraises;
@@ -180,6 +182,14 @@ public class PlatformOrder {
         this.sourceText = sourceText == null ? null : sourceText.trim();
     }
 
+    public Integer getProductionStatus() {
+        return productionStatus;
+    }
+
+    public void setProductionStatus(Integer productionStatus) {
+        this.productionStatus = productionStatus;
+    }
+
     public PlatformOrder(){}
 
     public PlatformOrder(HungerOrder order) {
@@ -207,11 +217,7 @@ public class PlatformOrder {
         originalPrice = new BigDecimal(order.getOriginalPrice());
         totalPrice = new BigDecimal(order.getTotalPrice());
         address = order.getAddress();
-        String phoneList = "";
-        for(int i = 0; i < order.getPhoneList().size(); i++){
-            phoneList = order.getPhoneList().get(i) + ",";
-        }
-        phone = phoneList;
+        phone = order.getPhoneList().toString();
         name = order.getConsignee();
         orderCreateTime = order.getCreatedAt();
         createTime = new Date();

@@ -11,6 +11,7 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.brand.web.service.WetherService;
 import com.resto.shop.web.constant.*;
+import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.JdbcSmsUtils;
@@ -28,8 +29,12 @@ import java.util.*;
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.OrderCountUtils.formatDouble;
 import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
+@SuppressWarnings("ALL")
 @RpcService
-@Component
+/**
+ * @author yanjuan
+ * @date 17/10/19 上午11:45
+ */
 public class CloseShopServieImpl implements CloseShopService{
 
 
@@ -90,12 +95,15 @@ public class CloseShopServieImpl implements CloseShopService{
 	@Override
 	public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand) {
 
-		//1.结店退款
-	//	refundShopDetailOrder(shopDetail);
-		//2查询天气
+		//定位数据库
+		
+		/**
+		 * 1.结店退款
+		 * 2查询天气
+		 */
 		Wether wether = wetherService.selectDateAndShopId(shopDetail.getId(), DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
-		if(wether==null){//说明没有调用定时任务 ---
-
+		if(wether==null){
+			//说明没有调用定时任务 ---
 			//手动去查
 			JSONObject jsonObject = AliWetherUtil.getWetherGps(shopDetail.getLatitude(),shopDetail.getLongitude());
 			if(jsonObject==null){
@@ -139,6 +147,9 @@ public class CloseShopServieImpl implements CloseShopService{
 				pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand);
 				break;
 
+			default:
+				break;
+
 		}
 
 		//第二版短信内容由于模板原因无法发送短信 因此保留第一版短信 第二版数据存到大数据库数据库中
@@ -147,12 +158,15 @@ public class CloseShopServieImpl implements CloseShopService{
 	}
 
 	private void refundShopDetailOrder(ShopDetail shopDetail) {
-		String[] orderStates = new String[]{OrderState.SUBMIT + "", OrderState.PAYMENT + ""};//未付款和未全部付款和已付款
-		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER + ""};//已付款未下单
+		//未付款和未全部付款和已付款
+		String[] orderStates = new String[]{OrderState.SUBMIT + "", OrderState.PAYMENT + ""};
+		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER + ""};
+		//已付款未下单
 		List<Order> orderList = orderService.selectByOrderSatesAndProductionStates(shopDetail.getId(), orderStates, productionStates);
 		if(!orderList.isEmpty()){
 			for (Order order : orderList) {
-				if (!order.getClosed()) {//判断订单是否已被关闭，只对未被关闭的订单做退单处理
+				//判断订单是否已被关闭，只对未被关闭的订单做退单处理
+				if (!order.getClosed()) {
 					sendWxRefundMsg(order);
 				}
 			}
@@ -182,7 +196,8 @@ public class CloseShopServieImpl implements CloseShopService{
 			Brand brand = brandService.selectById(customer.getBrandId());
 			ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
 			StringBuilder sb = null;
-			if (order.getOrderState().equals(OrderState.SUBMIT)) {//未支付和未完成支付
+			if (order.getOrderState().equals(OrderState.SUBMIT)) {
+				//未支付和未完成支付
 				sb = new StringBuilder("亲,今日未完成支付的订单已被商家取消,欢迎下次再来本店消费\n");
 			} else {//已支付未消费
 				sb = new StringBuilder("亲,今日未消费订单已自动退款,欢迎下次再来本店消费\n");
@@ -204,14 +219,14 @@ public class CloseShopServieImpl implements CloseShopService{
 			sb.append("店铺名：" + order.getShopName() + "\n");
 			sb.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
 			sb.append("订单明细：\n");
-			List<OrderItem> orderItem = orderItemService.listByOrderId(order.getId());
+			Map<String, String> param = new HashMap<>();
+			param.put("orderId", order.getId());
+			List<OrderItem> orderItem = orderItemService.listByOrderId(param);
 			for (OrderItem item : orderItem) {
 				sb.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
 			}
 			sb.append("订单金额：" + order.getOrderMoney() + "\n");
 			WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-//            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
-//                    "订单发送推送：" + sb.toString());
 			Map map = new HashMap(4);
 			map.put("brandName", brand.getBrandName());
 			map.put("fileName", customer.getId());
@@ -267,26 +282,29 @@ public class CloseShopServieImpl implements CloseShopService{
 		int monthDeliverOrder = 0;
 		//本月外卖订单总额
 		BigDecimal monthOrderBooks = BigDecimal.ZERO;
-		//查询pos端店铺录入信息(线下订单+外卖订单都是pos端录入的)
-		List<OffLineOrder> offLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), begin, end, OfflineOrderSource.OFFLINE_POS);
-		if (!offLineOrderList.isEmpty()) {
-			for (OffLineOrder of : offLineOrderList) {
-				List<Integer> getTime = DateUtil.getDayByToday(of.getCreateTime());
-				if (getTime.contains(2)) {//本日中
-					todayEnterCount += of.getEnterCount();
-					todayEnterTotal = todayEnterTotal.add(of.getEnterTotal());
-					todayDeliverOrders += of.getDeliveryOrders();
-					todayOrderBooks = todayOrderBooks.add(of.getOrderBooks());
-				}
-				if (getTime.contains(10)) {
-					monthEnterCount += of.getEnterCount();
-					monthEnterTotal = monthEnterTotal.add(of.getEnterTotal());
-					monthDeliverOrder += of.getDeliveryOrders();
-					monthOrderBooks = monthOrderBooks.add(of.getOrderBooks());
-				}
+
+
+		List<OffLineOrder> todayOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), todayBegin,todayEnd, OfflineOrderSource.OFFLINE_POS);
+		if (!todayOffLineOrderList.isEmpty()) {
+			for (OffLineOrder of : todayOffLineOrderList) {
+				todayEnterCount += of.getEnterCount();
+				todayEnterTotal = todayEnterTotal.add(of.getEnterTotal());
+				todayDeliverOrders += of.getDeliveryOrders();
+				todayOrderBooks = todayOrderBooks.add(of.getOrderBooks());
 			}
 		}
-		//查询当日新增用户的订单
+
+
+		List<OffLineOrder> monthOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), begin, end, OfflineOrderSource.OFFLINE_POS);
+		if (!monthOffLineOrderList.isEmpty()) {
+			for (OffLineOrder of : monthOffLineOrderList) {
+				monthEnterCount += of.getEnterCount();
+				monthEnterTotal = monthEnterTotal.add(of.getEnterTotal());
+				monthDeliverOrder += of.getDeliveryOrders();
+				monthOrderBooks = monthOrderBooks.add(of.getOrderBooks());
+			}
+		}
+
 		List<Order> newCustomerOrders = orderService.selectNewCustomerOrderByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
 		//新增用户的订单总数
 		int newCustomerOrderNum = 0;
@@ -304,7 +322,8 @@ public class CloseShopServieImpl implements CloseShopService{
 			for (Order o : newCustomerOrders) {
 				newCustomerOrderNum++;
 				newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
+				//是分享用户
+				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) {
 					newShareCustomerOrderNum++;
 					newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				} else {
@@ -324,7 +343,8 @@ public class CloseShopServieImpl implements CloseShopService{
 		if (!backCustomerDtos.isEmpty()) {
 			for (BackCustomerDto b : backCustomerDtos) {
 				backCustomerId.add(b.getCustomerId());
-				if (b.getNum() == 1) { //只要以前出现过一次那么就是二次回头用户 而非 ==2
+				//只要以前出现过一次那么就是二次回头用户 而非 ==2
+				if (b.getNum() == 1) {
 					backTwoCustomerId.add(b.getCustomerId());
 				} else if (b.getNum() > 1) {
 					backTwoMoreCustomerId.add(b.getCustomerId());
@@ -400,8 +420,8 @@ public class CloseShopServieImpl implements CloseShopService{
 				 *
 				 */
 
-				if (o.getCreateTime().compareTo(todayBegin) > 0 && o.getCreateTime().compareTo(todayEnd) < 0) {//今日内订单
-					//1.resto订单总额
+				if (o.getCreateTime().compareTo(todayBegin) > 0 && o.getCreateTime().compareTo(todayEnd) < 0) {
+					//1.resto订单总额 今日内订单
 					todayRestoTotal = todayRestoTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 
 					//11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
@@ -455,14 +475,19 @@ public class CloseShopServieImpl implements CloseShopService{
 		String theTenDaySatisfaction = "";
 		//本月满意度
 		String monthSatisfaction = "";
+		//当日评价的总单数
+		int dayAppraiseNum = 0;
+		//本旬评价的总单数
+		int xunAppraiseNum = 0;
+		//本月评价的单数
+		int monthAppraiseSum = 0;
 
-		int dayAppraiseNum = 0;//当日评价的总单数
-		int xunAppraiseNum = 0;//本旬评价的总单数
-		int monthAppraiseSum = 0;//本月评价的单数
-
-		double dayAppraiseSum = 0;//当日所有评价的总分数
-		double xunAppraiseSum = 0;//上旬所有评价的总分数
-		double monthAppraiseNum = 0;//本月所有评价的总分数
+		//当日所有评价的总分数
+		double dayAppraiseSum = 0;
+		//上旬所有评价的总分数
+		double xunAppraiseSum = 0;
+		//本月所有评价的总分数
+		double monthAppraiseNum = 0;
 
 		/**
 		 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
@@ -622,7 +647,7 @@ public class CloseShopServieImpl implements CloseShopService{
 				.append("今日总营业额:").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("\n")
 				.append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("\n");
 
-		Map<String, String> map = new HashMap<>();
+		Map<String, String> map = new HashMap<>(128);
 		map.put("sms", todayContent.toString());
 		map.put("wechat", sb.toString());
 		return map;
@@ -677,7 +702,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		List<OffLineOrder> offLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), xunBegin, xunEnd, OfflineOrderSource.OFFLINE_POS);
 		if (!offLineOrderList.isEmpty()) {
 			for (OffLineOrder of : offLineOrderList) {
-				xunEnterTotal = xunEnterTotal.add(of.getEnterTotal());//
+				xunEnterTotal = xunEnterTotal.add(of.getEnterTotal());
 				xunEnterCount += of.getEnterCount();
 				xunDeliverOrders += of.getDeliveryOrders();
 				xunOrderBooks = xunOrderBooks.add(of.getOrderBooks());
@@ -701,7 +726,8 @@ public class CloseShopServieImpl implements CloseShopService{
 			for (Order o : newCustomerOrders) {
 				newCustomerOrderNum++;
 				newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
+				//是分享用户
+				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) {
 					newShareCustomerOrderNum++;
 					newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				} else {
@@ -721,7 +747,8 @@ public class CloseShopServieImpl implements CloseShopService{
 		if (!backCustomerDtos.isEmpty()) {
 			for (BackCustomerDto b : backCustomerDtos) {
 				backCustomerId.add(b.getCustomerId());
-				if (b.getNum() == 1) { //只要以前出现过一次那么就是二次回头用户 而非 ==2
+				//只要以前出现过一次那么就是二次回头用户 而非 ==2
+				if (b.getNum() == 1) {
 					backTwoCustomerId.add(b.getCustomerId());
 				} else if (b.getNum() > 1) {
 					backTwoMoreCustomerId.add(b.getCustomerId());
@@ -834,9 +861,10 @@ public class CloseShopServieImpl implements CloseShopService{
 		//3定义满意度
 		//本旬满意度
 		String theTenDaySatisfaction = "";
-
-		int xunAppraiseNum = 0;//本旬评价的总单数
-		double xunAppraiseSum = 0;//本旬所有评价的总分数
+		//本旬评价的总单数
+		int xunAppraiseNum = 0;
+		//本旬所有评价的总分数
+		double xunAppraiseSum = 0;
 
 		/**
 		 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
@@ -928,10 +956,11 @@ public class CloseShopServieImpl implements CloseShopService{
 				.append("本旬红榜top10：").append("\n");
 
 		//封装好评top10
-		if (goodNum == 0) {//无好评
+		//无好评
+		if (goodNum == 0) {
 			sb.append("------无-----");
 		} else {
-			if (!goodList.isEmpty()) {//
+			if (!goodList.isEmpty()) {
 				for (int i = 0; i < goodList.size(); i++) {
 					//1、27% 剁椒鱼头
 					sb.append(i + 1).append(".").append(NumberUtil.getFormat(goodList.get(i).getNum(), goodNum)).append("%").append(" ").append(goodList.get(i).getName()).append("\n");
@@ -942,17 +971,18 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		sb.append("本旬黑榜top10：").append("\n");
 		//封装差评top10
-		if (badNum == 0) {//无差评
+		//无差评
+		if (badNum == 0) {
 			sb.append("------无-----");
 		} else {
-			if (!badList.isEmpty()) {//
+			if (!badList.isEmpty()) {
 				for (int i = 0; i < badList.size(); i++) {
 					//1、27% 剁椒鱼头
 					sb.append(i + 1).append(".").append(NumberUtil.getFormat(badList.get(i).getNum(), badNum)).append("%").append(" ").append(badList.get(i).getName()).append("\n");
 				}
 			}
 		}
-		Map<String, String> map = new HashMap<>();
+		Map<String, String> map = new HashMap<>(128);
 		map.put("wechat", sb.toString());
 		return map;
 	}
@@ -983,7 +1013,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		List<OffLineOrder> offLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), monthBegin, monthEnd, OfflineOrderSource.OFFLINE_POS);
 		if (!offLineOrderList.isEmpty()) {
 			for (OffLineOrder of : offLineOrderList) {
-				monthEnterTotal = monthEnterTotal.add(of.getEnterTotal());//
+				monthEnterTotal = monthEnterTotal.add(of.getEnterTotal());
 				monthEnterCount += of.getEnterCount();
 				monthDeliverOrders += of.getDeliveryOrders();
 				monthOrderBooks = monthOrderBooks.add(of.getOrderBooks());
@@ -1007,11 +1037,13 @@ public class CloseShopServieImpl implements CloseShopService{
 			for (Order o : newCustomerOrders) {
 				newCustomerOrderNum++;
 				newCustomerOrderTotal = newCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
+				//是分享用户
+				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) {
 					newShareCustomerOrderNum++;
 					newShareCustomerOrderTotal = newShareCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				} else {
-					newNormalCustomerOrderNum++; //是新增用户
+					//是新增用户
+					newNormalCustomerOrderNum++;
 					newNormalCustomerOrderTotal = newNormalCustomerOrderTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				}
 			}
@@ -1027,7 +1059,8 @@ public class CloseShopServieImpl implements CloseShopService{
 		if (!backCustomerDtos.isEmpty()) {
 			for (BackCustomerDto b : backCustomerDtos) {
 				backCustomerId.add(b.getCustomerId());
-				if (b.getNum() == 1) { //只要以前出现过一次那么就是二次回头用户 而非 ==2
+				//只要以前出现过一次那么就是二次回头用户 而非 ==2
+				if (b.getNum() == 1) {
 					backTwoCustomerId.add(b.getCustomerId());
 				} else if (b.getNum() > 1) {
 					backTwoMoreCustomerId.add(b.getCustomerId());
@@ -1140,9 +1173,10 @@ public class CloseShopServieImpl implements CloseShopService{
 		//3定义满意度
 		//本月满意度
 		String monthSatisfaction = "";
-
-		int monthAppraiseNum = 0;//本月评价的总单数
-		double monthAppraiseSum = 0;//本月所有评价的总分数
+		//本月评价的总单数
+		int monthAppraiseNum = 0;
+		//本月所有评价的总分数
+		double monthAppraiseSum = 0;
 
 		/**
 		 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
@@ -1234,10 +1268,10 @@ public class CloseShopServieImpl implements CloseShopService{
 				.append("本月红榜top10：").append("\n");
 
 		//封装好评top10
-		if (goodNum == 0) {//无好评
+		if (goodNum == 0) {
 			sb.append("------无-----");
 		} else {
-			if (!goodList.isEmpty()) {//
+			if (!goodList.isEmpty()) {
 				for (int i = 0; i < goodList.size(); i++) {
 					//1、27% 剁椒鱼头
 					sb.append(i + 1).append(".").append(NumberUtil.getFormat(goodList.get(i).getNum(), goodNum)).append("%").append(" ").append(goodList.get(i).getName()).append("\n");
@@ -1247,17 +1281,17 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		sb.append("本月黑榜top10：").append("\n");
 		//封装差评top10
-		if (badNum == 0) {//无差评
+		if (badNum == 0) {
 			sb.append("------无-----");
 		} else {
-			if (!badList.isEmpty()) {//
+			if (!badList.isEmpty()) {
 				for (int i = 0; i < badList.size(); i++) {
 					//1、27% 剁椒鱼头
 					sb.append(i + 1).append(".").append(NumberUtil.getFormat(badList.get(i).getNum(), badNum)).append("%").append(" ").append(badList.get(i).getName()).append("\n");
 				}
 			}
 		}
-		Map<String, String> map = new HashMap<>();
+		Map<String, String> map = new HashMap<>(128);
 		map.put("wechat", sb.toString());
 		return map;
 	}
@@ -1289,12 +1323,13 @@ public class CloseShopServieImpl implements CloseShopService{
 		Date xunBegin = new Date() ;
 		Date xunEnd = todayEnd;
 
-		int temp = DateUtil.getEarlyMidLate(new Date());//1.上旬 2.中旬 3下旬
-		if(temp==1){
+		int temp = DateUtil.getEarlyMidLate(new Date());
+		//1.上旬 2.中旬 3下旬
+		if(temp==XunType.EARLY){
 			xunBegin = monthBegin;
-		}else if(temp==2){
+		}else if(temp==XunType.MIDDLE){
 			xunBegin = DateUtil.getAfterDayDate(monthBegin,10);
-		}else if(temp==3){
+		}else if(temp==XunType.LAST){
 			xunBegin = DateUtil.getAfterDayDate(monthBegin,20);
 		}
 
@@ -1382,7 +1417,7 @@ public class CloseShopServieImpl implements CloseShopService{
 			for (Order o : todayNewCustomerOrders) {
 				todayNewCustomerOrderNum++;
 				todayNewCustomerOrderTotal = todayNewCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
-				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) { //是分享用户
+				if (o.getCustomer() != null && !StringUtils.isEmpty(o.getCustomer().getShareCustomer())) {
 					todayNewShareCustomerOrderNum++;
 					todayNewShareCustomerOrderTotal = todayNewShareCustomerOrderTotal.add(getOrderMoney( o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 				} else {
@@ -1404,7 +1439,8 @@ public class CloseShopServieImpl implements CloseShopService{
 		if (!todayBackCustomerDtos.isEmpty()) {
 			for (BackCustomerDto b : todayBackCustomerDtos) {
 				todayBackCustomerId.add(b.getCustomerId());
-				if (b.getNum() == 1) { //只要以前出现过一次那么就是二次回头用户 而非 ==2
+				//只要以前出现过一次那么就是二次回头用户 而非 ==2
+				if (b.getNum() == 1) {
 					todayBackTwoCustomerId.add(b.getCustomerId());
 				} else if (b.getNum() > 1) {
 					todayBackTwoMoreCustomerId.add(b.getCustomerId());
@@ -1481,7 +1517,8 @@ public class CloseShopServieImpl implements CloseShopService{
 				 *
 				 */
 				List<Integer> getTime = DateUtil.getDayByToday(o.getCreateTime());
-				if (getTime.contains(2)) {//今日内订单
+				//今日内订单
+				if (getTime.contains(2)) {
 					//1.resto订单总额
 					todayRestoTotal = todayRestoTotal.add(getOrderMoney(o.getPayType(), o.getOrderMoney(), o.getAmountWithChildren()));
 					//11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
@@ -1552,13 +1589,19 @@ public class CloseShopServieImpl implements CloseShopService{
 		//本月满意度
 		String monthSatisfaction = "";
 
-		int todayAppraiseNum = 0;//当日评价的总单数
-		int xunAppraiseNum = 0;//本旬评价的总单数
-		int monthAppraiseSum = 0;//本月评价的单数
+		//当日评价的总单数
+		int todayAppraiseNum = 0;
+		//本旬评价的总单数
+		int xunAppraiseNum = 0;
+		//本月评价的单数
+		int monthAppraiseSum = 0;
 
-		double todayAppraiseSum = 0;//当日所有评价的总分数
-		double xunAppraiseSum = 0;//上旬所有评价的总分数
-		double monthAppraiseNum = 0;//本月所有评价的总分数
+		//当日所有评价的总分数
+		double todayAppraiseSum = 0;
+		//上旬所有评价的总分数
+		double xunAppraiseSum = 0;
+		//本月所有评价的总分数
+		@SuppressWarnings("AlibabaAvoidCommentBehindStatement") double monthAppraiseNum = 0;
 
 		/**
 		 * 评价 和 满意度 错误的原因 用户可能今天 下单 但是隔天
@@ -1571,16 +1614,6 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		//查本日
 		List<Appraise> todayAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), todayBegin, todayEnd);
-
-		// 不存 z
-//		//存评论数据
-//		if(!todayAppraises.isEmpty()){
-//			for(Appraise a:todayAppraises){
-//				JdbcSmsUtils.saveTodayAppraise(a,brand.getId(),shopDetail.getId());
-//			}
-//
-//		}
-
 
 		if (!todayAppraises.isEmpty()) {
 			for (Appraise a : todayAppraises) {
@@ -1652,8 +1685,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		}
 
 		//存满意度
-		//JdbcSmsUtils.saveStations(todaySatisfaction,xunSatisfaction,monthSatisfaction,brand.getId(),shopDetail.getId());
-
 
 		//查询菜品今日top10
 		//1.查询好评的总数(本日)
@@ -1675,20 +1706,24 @@ public class CloseShopServieImpl implements CloseShopService{
 		DayDataMessage ds = new DayDataMessage();
 		ds.setId(ApplicationUtils.randomUUID());
 		ds.setShopId(shopDetail.getId());
-		ds.setType(DayMessageType.DAY_TYPE);//日结
+		//日结
+		ds.setType(DayMessageType.DAY_TYPE);
 		ds.setShopName(shopDetail.getName());
 		ds.setWeekDay(wether.getWeekady());
 		ds.setDate(new Date());
 		ds.setWether(wether.getDayWeather());
 		ds.setTemperature(wether.getDayTemperature());
-		ds.setOrderNumber(todayEnterCount + todayRestoCount);//到店总笔数
-		ds.setOrderSum(todayEnterTotal.add(todayRestoTotal));//到店消费总额
+		//到店总笔数
+		ds.setOrderNumber(todayEnterCount + todayRestoCount);
+		//到店消费总额
+		ds.setOrderSum(todayEnterTotal.add(todayRestoTotal));
 		ds.setCustomerOrderNumber(todayRestoCount);
 		ds.setCustomerOrderSum(todayRestoTotal);
 		ds.setCustomerOrderRatio(todayCustomerRatio+"%");
 		ds.setNewCustomerOrderRatio(todayNewCustomerRatio+"%");
 		ds.setBackCustomerOrderRatio(todayBackCustomerRatio+"%");
-		ds.setNewCuostomerOrderNum(todayNewCustomerOrderNum);//新用户订单数
+		//新用户订单数
+		ds.setNewCuostomerOrderNum(todayNewCustomerOrderNum);
 		ds.setNewCustomerOrderSum(todayNewCustomerOrderTotal);
 		ds.setNewNormalCustomerOrderNum(todayNewNormalCustomerOrderNum);
 		ds.setNewNormalCustomerOrderSum(todayNewNormalCustomerOrderTotal);
@@ -1706,11 +1741,13 @@ public class CloseShopServieImpl implements CloseShopService{
 		ds.setChargeReward(chargeReturn);
 		ds.setDiscountRatio(discountRatio);
 		ds.setTakeawayTotal(todayOrderBooks);
-		ds.setBussinessTotal(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks));//本日营业总额
-		ds.setMonthTotal(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal));//本月营业总额
+		//本日营业总额
+		ds.setBussinessTotal(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks));
+		//本月营业总额
+		ds.setMonthTotal(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal));
+		//yz 2017-10-18 设置--
+		DataSourceContextHolder.setDataSourceName(brand.getId());
 		dayDataMessageService.insert(ds);
-		//JdbcSmsUtils.saveDayDataMessage(ds,shopDetail.getId());
-
 
 		//删除今日top10数据
 		goodTopService.deleteByTodayAndShopId(brand.getId(),shopDetail.getId(),MessageType.DAY_MESSAGE,new Date());
@@ -1739,7 +1776,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		//存今日BadTop10
 		if(todayBadList!=null&&!todayBadList.isEmpty()){
 			for(int i=0;i<todayBadList.size();i++){
-				//JdbcSmsUtils.saveBadTop(todayBadList.get(i),brand,shopDetail,MessageType.DAY_MESSAGE,todayBadNum,(i+1));
 				BadTop badTop = new BadTop();
 				badTop.setName(todayBadList.get(i).getName());
 				badTop.setPrecent(NumberUtil.getFormat(todayBadList.get(i).getNum(),todayBadNum));
@@ -1771,7 +1807,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		//存本旬goodTop10
 		if(xunGoodList!=null&&!xunGoodList.isEmpty()){
 			for(int i=0;i<xunGoodList.size();i++){
-				//JdbcSmsUtils.saveGoodTop(xunGoodList.get(i),brand,shopDetail,MessageType.XUN_MESSAGE,xunGoodNum,(i+1));
 				GoodTop goodTop = new GoodTop();
 				goodTop.setName(xunGoodList.get(i).getName());
 				goodTop.setPrecent(NumberUtil.getFormat(xunGoodList.get(i).getNum(),xunGoodNum));
@@ -1790,7 +1825,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		//存本旬BadTop10
 		if(xunBadList!=null&&!xunBadList.isEmpty()){
 			for(int i=0;i<xunBadList.size();i++){
-				//JdbcSmsUtils.saveBadTop(xunBadList.get(i),brand,shopDetail,MessageType.XUN_MESSAGE,xunBadNum,(i+1));
 				BadTop badTop = new BadTop();
 				badTop.setName(xunBadList.get(i).getName());
 				badTop.setPrecent(NumberUtil.getFormat(xunBadList.get(i).getNum(),xunBadNum));
@@ -1824,7 +1858,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		//存本月goodTop10
 		if(monthGoodList!=null&&!monthGoodList.isEmpty()){
 			for(int i=0;i<monthGoodList.size();i++){
-				//JdbcSmsUtils.saveGoodTop(monthGoodList.get(i),brand,shopDetail,MessageType.MONTH_MESSAGE,monthGoodNum,(i+1));
 				GoodTop goodTop = new GoodTop();
 				goodTop.setName(monthGoodList.get(i).getName());
 				goodTop.setPrecent(NumberUtil.getFormat(monthGoodList.get(i).getNum(),monthGoodNum));
@@ -1876,7 +1909,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		dm.setDaySatisfaction(todaySatisfaction);
 		dm.setXunSatisfaction(xunSatisfaction);
 		dm.setMonthSatisfaction(monthSatisfaction);
-		if (todayGoodNum == 0) {//无好评
+		if (todayGoodNum == 0) {
 			dm.setRedList("----无好评----");
 		} else {
 			if (!todayGoodList.isEmpty()) {
@@ -1891,14 +1924,13 @@ public class CloseShopServieImpl implements CloseShopService{
 				dm.setRedList(com.alibaba.fastjson.JSONObject.toJSONString(redJson));
 			}
 		}
-		if (todayBadNum == 0) {//无差评
+		if (todayBadNum == 0) {
 			dm.setBadList("------无差评-----");
 		} else {
 			if (!todayBadList.isEmpty()) {
 				com.alibaba.fastjson.JSONObject bakcJson = new com.alibaba.fastjson.JSONObject();
 				for (int i = 0; i < todayBadList.size(); i++) {
 					//1、27% 剁椒鱼头
-					//sbScore.append("top"+(i + 1)).append("：").append(NumberUtil.getFormat(todayBadList.get(i).getNum(), todayBadNum)).append("%").append(" ").append(todayBadList.get(i).getName()).append("\n");
 					StringBuilder sb = new StringBuilder();
 					sb.append(NumberUtil.getFormat(todayBadList.get(i).getNum(), todayBadNum)).append("%").append(" ").append(todayBadList.get(i).getName());
 					bakcJson.put("top"+(i+1),sb.toString());
@@ -1906,6 +1938,7 @@ public class CloseShopServieImpl implements CloseShopService{
 				dm.setBadList(com.alibaba.fastjson.JSONObject.toJSONString(bakcJson));
 			}
 		}
+		DataSourceContextHolder.setDataSourceName(brand.getId());
 		dayAppraiseMessageService.insert(dm);
 
 

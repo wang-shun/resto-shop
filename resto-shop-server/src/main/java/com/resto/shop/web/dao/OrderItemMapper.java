@@ -23,7 +23,7 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
     int updateByPrimaryKey(OrderItem record);
     
     //根据订单ID查询订单项
-    List<OrderItem> listByOrderId(@Param("orderId") String orderId);
+    List<OrderItem> listByOrderId(Map<String, String> param);
 
     //套餐
     List<OrderItem> listTotalByOrderId(@Param("orderId") String orderId);
@@ -81,4 +81,7 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
     List<OrderItem> selectRefundArticleItem(@Param("orderId") String orderId);
 
     List<OrderItem> selectByArticleIds(String[] articleIds);
+
+    List<OrderItem> getOrderBefore(@Param("tableNumber") String tableNumber,
+                                   @Param("shopId") String shopId,@Param("customerId") String customerId);
 }

@@ -62,6 +62,7 @@ public class BrandSettingController extends GenericController{
 			RedisUtil.remove(getCurrentBrandId()+"setting");
 		}*/
 		Brand brand = brandService.selectByPrimaryKey(getCurrentBrandId());
+		RedisUtil.clean(brand.getId(), brand.getBrandSign());
 		ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(getCurrentShopId());
 		LogTemplateUtils.brandSettingEdit(brand.getBrandName(), shopDetail.getName(), getCurrentBrandUser().getUsername());
 

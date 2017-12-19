@@ -3,8 +3,10 @@ package com.resto.shop.web.service;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.MeiTuanOrderDto;
 import com.resto.brand.web.dto.PlatformReportDto;
+import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.PlatformOrder;
 
+import java.util.Date;
 import java.util.List;
 
 public interface PlatformOrderService extends GenericService<PlatformOrder, String> {
@@ -57,4 +59,12 @@ public interface PlatformOrderService extends GenericService<PlatformOrder, Stri
      * @return
      */
     List<PlatformOrder> getPlatformOrderDetailList(String platformOrderId);
+
+    /**
+     * 异常打印第三方外卖异常订单
+     * @param currentShopId
+     * @param date
+     * @return
+     */
+    List<PlatformOrder> selectPlatFormErrorOrderList(String currentShopId, Date date);
 }

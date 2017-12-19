@@ -68,7 +68,7 @@ public class ReportExceptionTask {
                     parameterMap.put("password", "Vino.2016");// 527527527
                     //登录
                     System.err.println("登入品牌为"+brand.getBrandName());
-                    HttpResponse loginResponse = doPost(client, loginUrl, parameterMap);
+                    HttpResponse loginResponse = doPostAnsc(client, loginUrl, parameterMap);
 
                     //得到httpResponse的状态响应码
                     int statusCode = loginResponse.getStatusLine().getStatusCode();
@@ -80,8 +80,8 @@ public class ReportExceptionTask {
                         requestMap.put("endDate", "2017-03-17");
                         requestMap.put("brandName",brand.getBrandName());
                         //循环执行 URLMap 中的链接
-                        HttpResponse httpResponse = doPost(client, orderExceptionUrl, requestMap);
-                        HttpResponse httpResponse2 = doPost(client, orderPayMentItemExceptionUrl, requestMap);
+                        HttpResponse httpResponse = doPostAnsc(client, orderExceptionUrl, requestMap);
+                        HttpResponse httpResponse2 = doPostAnsc(client, orderPayMentItemExceptionUrl, requestMap);
                         if (httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                             log.info("执行了插入异常订单的请求");
                         } else {
@@ -129,7 +129,7 @@ public class ReportExceptionTask {
      * @param parameterMap
      * @return
      */
-    public HttpResponse doPost(CloseableHttpClient client,String url,Map<String,String> parameterMap){
+    public HttpResponse doPostAnsc(CloseableHttpClient client,String url,Map<String,String> parameterMap){
         HttpPost httpPost = new HttpPost(url);
         //封装请求参数
         List<NameValuePair> param = new ArrayList<NameValuePair>();

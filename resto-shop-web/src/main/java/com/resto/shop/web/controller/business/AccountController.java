@@ -60,7 +60,7 @@ public class AccountController extends GenericController{
 
 	@RequestMapping("test")
 	public void test(){
-		RedisUtil.set("test","1",100l);
+		RedisUtil.set("test","1",100L);
 		String value = String.valueOf(RedisUtil.get("test"));
 		System.out.println(RedisUtil.get("test"));
 	}

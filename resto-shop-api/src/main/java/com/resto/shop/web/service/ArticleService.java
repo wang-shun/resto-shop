@@ -173,4 +173,18 @@ public interface ArticleService extends GenericService<Article, String> {
 
 
 	List<ArticleSellCountDto> findArticleByLastCountTime(String shopId,String lastCountTime);
+
+
+	/**
+	 * 获得所有预点餐的菜品
+	 * @param shopId
+	 * @return
+	 */
+	List<Article> getArticleBefore(String shopId,String tableNumber,String customerId);
+
+	/**
+	 * 获取页面端菜品预警库存数量统计
+	 * @return
+	 */
+	/*int[] getStockNum(String shopId);*/
 }

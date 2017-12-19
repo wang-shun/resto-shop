@@ -269,6 +269,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
                 coupon.setCouponSource(CouponSource.getCouponSourceByType(coupon.getCouponType()));
                 coupon.setCustomerId(customer.getId());
                 coupon.setRecommendDelayTime(0);
+                coupon.setNewCustomCouponId(customCoupon.getId());
                 for(int i = 0; i < customCoupon.getCouponNumber(); i++){
                     insertCoupon(coupon);
                     coupons.add(coupon);

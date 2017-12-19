@@ -109,7 +109,7 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 
 	Article selectByPid(@Param("pId") String pId,@Param("shopId") String shopId);
 
-	Article selectByName(@Param("name") String name,@Param("shopId") String shopId);
+	List<Article> selectByName(@Param("name") String name,@Param("shopId") String shopId);
 
 	List<Article> delCheckArticle(String id);
 
@@ -192,4 +192,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	Integer selectSumByMonthlySales(@Param("articleId") String articleId, @Param("time") String time);
 
     List<ArticleSellCountDto> findArticleByLastCountTime(@Param("shopId")String shopId ,@Param("lastCountTime") String lastCountTime);
+
+	List<Article> getArticleBefore(String shopId);
 }

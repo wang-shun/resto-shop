@@ -1,5 +1,7 @@
 package com.resto.shop.web.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -35,6 +37,8 @@ public class ShopCart implements Serializable {
     private List<ShopCart> unitList;
 
     private String uuid;
+
+    private String groupId;
 
     public String getUuid() {
         return uuid;
@@ -146,5 +150,36 @@ public class ShopCart implements Serializable {
 
     public void setDistributionModeId(Integer distributionModeId) {
         this.distributionModeId = distributionModeId;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("id", id)
+                .append("number", number)
+                .append("customerId", customerId)
+                .append("articleId", articleId)
+                .append("shopDetailId", shopDetailId)
+                .append("distributionModeId", distributionModeId)
+                .append("userId", userId)
+                .append("shopType", shopType)
+                .append("pid", pid)
+                .append("currentItem", currentItem)
+                .append("attrId", attrId)
+                .append("recommendId", recommendId)
+                .append("recommendArticleId", recommendArticleId)
+                .append("unitNewId", unitNewId)
+                .append("unitList", unitList)
+                .append("uuid", uuid)
+                .append("groupId", groupId)
+                .toString();
     }
 }

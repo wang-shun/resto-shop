@@ -321,9 +321,12 @@
 				},
 				downloadQRcode: function () {
 					var that = this;
-					$.post("shopDetailManage/download", {id: that.m.id}, function (data) {
-						if (data.success) {
-							window.location.href = "shopDetailManage/downloadFile?fileName=" + data.message;
+					$.ajax({
+						url: "shopDetailManage/openQRCode",
+						type: "post",
+						data: {"shopId": this.m.id},
+						success: function (data) {
+							window.open(data);
 						}
 					})
 				},

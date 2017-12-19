@@ -253,6 +253,7 @@
                                 否
                             </label>
                         </div>
+
                         <div v-if="m.openCommentRecommend==1">
 
                             <div class="form-group">
@@ -275,6 +276,45 @@
                             </div>
                         </div>
 
+                        <div class="form-group">
+                            <div class="control-label">礼品优惠券提醒方式：</div>
+                            <label>
+                                <input type="checkbox" name="wechatPushGiftCoupons" v-model="m.wechatPushGiftCoupons" value="1">
+                                微信推送
+                            </label>
+                            <label>
+                                <input type="checkbox" name="smsPushGiftCoupons" v-model="m.smsPushGiftCoupons" value="1">
+                                短信推送
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label>loading页面的文字颜色/label>
+                            <div>
+                                <input type="text" class="form-control color-mini" name="loadingTextColor"
+                                       data-position="bottom left" v-model="m.loadingTextColor">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>loading页面的logo图</label>
+                            <input type="hidden" name="loadingLogo" v-model="m.loadingLogo">
+                            <img-file-upload class="form-control" @success="uploadSuccessLogo"
+                                             @error="uploadError"></img-file-upload>
+                            <img v-if="m.loadingLogo" :src="m.loadingLogo"
+                                 onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px"
+                                 class="img-rounded">
+                        </div>
+
+                        <div class="form-group">
+                            <label>loading页面的背景图片</label>
+                            <input type="hidden" name="loadingBackground" v-model="m.loadingBackground">
+                            <img-file-upload class="form-control" @success="uploadSuccessBackground"
+                                             @error="uploadError"></img-file-upload>
+                            <img v-if="m.loadingBackground" :src="m.loadingBackground"
+                                 onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px"
+                                 class="img-rounded">
+                        </div>
                     </div>
                     <input type="hidden" name="id" v-model="m.id"/>
                     <input class="btn green" type="submit" value="保存"/>
@@ -315,7 +355,7 @@
                 'm.closeContinueTime': 'timeTips'
 
             },
-            created : function () {
+            created: function () {
                 var that = this;
                 $.ajax({
                     url: "brandSetting/list_one",
@@ -323,6 +363,20 @@
                         console.log(result.data);
                         vueObj.m = result.data;
                         that.initEditor();
+                    }
+                });
+                var n = $('.color-mini').minicolors({
+                    change: function (hex, opacity) {
+                        if (!hex) return;
+                        if (typeof console === 'object') {
+                            $(this).attr("value", hex);
+                        }
+                    },
+                    theme: 'bootstrap'
+                });
+                this.$watch("m", function () {
+                    if (this.m.id) {
+                        $('.color-mini').minicolors("value", this.m.loadingTextColor);
                     }
                 });
             },
@@ -376,6 +430,14 @@
                 setRedPackage: function (url) {
                     $("[name='redPackageLogo']").val(url).trigger("change");
                     toastr.success("上传logo成功！");
+                },
+                uploadSuccessLogo: function (url) {
+                    $("[name='loadingLogo']").val(url).trigger("change");
+                    toastr.success("上传成功！");
+                },
+                uploadSuccessBackground: function (url) {
+                    $("[name='loadingBackground']").val(url).trigger("change");
+                    toastr.success("上传成功！");
                 },
                 uploadError: function (msg) {
                     toastr.error("上传失败");

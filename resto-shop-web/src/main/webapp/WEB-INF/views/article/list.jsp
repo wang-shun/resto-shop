@@ -185,6 +185,26 @@
                                 <div class="col-md-7">无图</div>
                             </div>
 
+                            <div class="form-group col-md-4">
+                                <label class="col-md-5 control-label">开启提醒</label>
+                                <div class="col-md-7 radio-list">
+                                    <label class="radio-inline">
+                                        <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
+                                               v-model="m.needRemind">提示
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label class="col-md-5 control-label">gif动图</label>
+                                <div class="col-md-7">
+                                    <input type="hidden" name="gifUrl" v-model="m.gifUrl">
+                                    <img-file-upload cut="false" class="form-control" @success="uploadSuccessGif"
+                                                     @error="uploadError"></img-file-upload>
+                                    <img v-if="m.gifUrl" :src="m.gifUrl" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
+                                </div>
+                            </div>
+
                             <div class="form-group col-md-5">
                                 <label class="col-md-5 control-label">菜品图片显示类型</label>
                                 <div  class="col-md-7">
@@ -255,8 +275,26 @@
                                                            id="stockWeekend"/>
                                                 </div>
                                             </div>
+                                            <%--<div class="form-group col-sm-4 ">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">菜品预警库存</div>
+                                                    <input name="inventoryWarning"
+                                                           class="form-control" v-model="m.inventoryWarning"
+                                                           id="inventoryWarning"/>
+                                                </div>
+                                            </div>--%>
                                         </div>
                                     </div>
+                                    <div class="form-group  col-md-12">
+                                        <label class="col-sm-2 control-label ">菜品预警库存</label>
+                                        <div class="col-md-8">
+                                            <div class="form-group col-sm-4">
+                                                <div class="input-group">
+                                                    <input name="inventoryWarning" class="form-control" v-model="m.inventoryWarning" id="inventoryWarning"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                     </div>
                                 </div>
                                 <div class="form-group col-md-4">
                                     <label class="col-md-5 control-label">标记为主菜</label>
@@ -1082,6 +1120,13 @@
                             $("[name='photoLittle']").val(url).trigger("change");
                             C.simpleMsg("上传成功");
                             $("#photoLittle").attr("src", "/" + url);
+                        }
+                        ,
+                        uploadSuccessGif: function (url) {
+                            console.log(url);
+                            $("[name='gifUrl']").val(url).trigger("change");
+                            C.simpleMsg("上传成功");
+                            $("#gifUrl").attr("src", "/" + url);
                         }
                         ,
                         uploadError: function (msg) {
