@@ -43,9 +43,6 @@
 		</property>
 	</bean>
 
-
-
-
 	<!-- jedis 配置 -->
 	<bean id="poolConfig" class="redis.clients.jedis.JedisPoolConfig" >
 		<property name="maxIdle" value="${redis.maxIdle}" />
@@ -60,6 +57,7 @@
 		<property name="password" value="${redis.password}" />
 		<property name="timeout" value="${redis.timeout}" ></property>
 	</bean >
+
 	<bean id="redisTemplate" class="org.springframework.data.redis.core.RedisTemplate" >
 		<property name="connectionFactory" ref="connectionFactory" />
 		<property name="keySerializer" >
@@ -70,13 +68,9 @@
 		</property>
 	</bean >
 
-
 	<bean id="redisUtil" class="com.resto.shop.web.util.RedisUtil" >
 		<property name="redisTemplate" ref="redisTemplate" />
 	</bean >
-
-
-
 
 	<!-- Rpc 配置 -->
 	<bean id="serviceRegistry"	class="cn.restoplus.rpc.registry.zookeeper.ZooKeeperServiceRegistry">
@@ -84,7 +78,7 @@
 	</bean>
 
 	<bean id="rpcServer" class="cn.restoplus.rpc.server.RpcServer">
-		<constructor-arg name="serviceAddress" value="${rpc.service_address}" />
+		<constructor-arg name="serviceAddress" value="${rpc.service_address}"/>
 		<constructor-arg name="serviceRegistry" ref="serviceRegistry" />
 	</bean>
 
