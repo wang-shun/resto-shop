@@ -209,7 +209,8 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         item.setPayTime(new Date());
         item.setPayValue(coupon.getValue());
         item.setRemark("优惠券支付:" + item.getPayValue());
-        item.setResultData(coupon.getId());
+//        item.setResultData(coupon.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+        item.setToPayId(coupon.getId());
         orderPaymentItemService.insert(item);
     }
 
