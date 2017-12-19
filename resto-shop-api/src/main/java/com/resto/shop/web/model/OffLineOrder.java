@@ -121,7 +121,7 @@ public class OffLineOrder implements Serializable {
         this.createTime = createTime;
     }
 
-    public OffLineOrder(String id, String shopDetailId, String brandId, Integer resource, BigDecimal enterTotal, Integer enterCount, Integer deliveryOrders, BigDecimal orderBooks, Integer numGuest, Date createTime, Integer state) {
+    public OffLineOrder(String id, String shopDetailId, String brandId, Integer resource, BigDecimal enterTotal, Integer enterCount, Integer deliveryOrders, BigDecimal orderBooks, Integer numGuest, Date createTime, Date createDate, Integer state) {
         this.id = id;
         this.shopDetailId = shopDetailId;
         this.brandId = brandId;
@@ -132,6 +132,7 @@ public class OffLineOrder implements Serializable {
         this.orderBooks = orderBooks;
         this.numGuest = numGuest;
         this.createTime = createTime;
+        this.createDate = createDate;
         this.state = state;
     }
 
