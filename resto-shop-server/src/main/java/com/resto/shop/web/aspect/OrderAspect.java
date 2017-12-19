@@ -719,6 +719,7 @@ public class OrderAspect {
             MQMessageProducer.sendPrintSuccess(shopId);
         }
         if(order.getPayMode() != OrderPayMode.WX_PAY || order.getPayMode() != OrderPayMode.ALI_PAY){
+            log.info("\n\n lmx test   afterPay  \n\n\n");
             MQMessageProducer.sendOrderPay(order);
         }
     }
@@ -822,6 +823,7 @@ public class OrderAspect {
 //            orderService.confirmOrder(order);
         }
         if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+            log.info("\n\n lmx test   orderPayAfter  \n\n\n");
             MQMessageProducer.sendOrderPay(order);
         }
     }
