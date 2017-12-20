@@ -134,5 +134,12 @@ public interface PosService {
      */
     void posCheckOut(String brandId,String shopId, OffLineOrder offLineOrder);
 
+    /**
+     * Pos端 取消订单  目前只支持，未支付的订单
+     * @param shopId
+     * @param orderId
+     */
+    void posCancelOrder(String shopId, String orderId);
+
     void test();
 }

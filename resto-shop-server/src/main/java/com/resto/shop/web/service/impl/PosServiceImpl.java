@@ -533,6 +533,23 @@ public class PosServiceImpl implements PosService {
         closeShopService.cleanShopOrder(shopDetail, offLineOrder, brand);
     }
 
+    @Override
+    public void posCancelOrder(String shopId, String orderId) {
+        Order order = orderService.selectById(orderId);
+        if(order != null){
+            if(order.getOrderState() == OrderState.SUBMIT){
+                Order updateOrder = new Order();
+                updateOrder.setId(orderId);
+                updateOrder.setOrderState(OrderState.CANCEL);
+                orderService.update(updateOrder);
+            }
+            //  如果绑定的有桌位，则释放桌位
+            if(StringUtils.isNotEmpty(order.getTableNumber())){
+                RedisUtil.set(shopId+order.getTableNumber()+"status", true);
+            }
+        }
+    }
+
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
         String orderId = orderDto.getId();
         StringBuffer backUps = new StringBuffer();

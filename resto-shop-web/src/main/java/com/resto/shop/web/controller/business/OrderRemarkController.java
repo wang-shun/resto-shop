@@ -6,6 +6,7 @@ import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.OrderRemark;
 import com.resto.shop.web.service.OrderRemarkService;
+import com.resto.shop.web.service.PosService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,6 +21,9 @@ public class OrderRemarkController extends GenericController{
 
     @Resource
     OrderRemarkService orderRemarkService;
+
+    @Resource
+    PosService posService;
 
     @Resource
     com.resto.brand.web.service.OrderRemarkService boOrderRemarkService;
@@ -72,6 +76,7 @@ public class OrderRemarkController extends GenericController{
             }else{
                 orderRemarkService.deleteByBoOrderRemarkId(boOrderRemarkId);
             }
+            posService.shopMsgChange(getCurrentShopId());
             return getSuccessResult();
         }catch (Exception e){
             e.printStackTrace();

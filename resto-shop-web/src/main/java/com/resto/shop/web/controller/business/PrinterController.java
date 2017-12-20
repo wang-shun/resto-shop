@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import com.resto.shop.web.constant.PrinterRange;
+import com.resto.shop.web.service.PosService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -23,6 +24,9 @@ public class PrinterController extends GenericController{
 
 	@Resource
 	PrinterService printerService;
+
+	@Resource
+	PosService posService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -53,6 +57,7 @@ public class PrinterController extends GenericController{
 	public Result create(@Valid Printer printer,HttpServletRequest request){
 		printer.setShopDetailId(request.getSession().getAttribute(SessionKey.CURRENT_SHOP_ID).toString());
 		printerService.insert(printer);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
@@ -66,6 +71,7 @@ public class PrinterController extends GenericController{
 			printer.setBillOfConsumption(0);
 		}
 		printerService.update(printer);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
@@ -73,6 +79,7 @@ public class PrinterController extends GenericController{
 	@ResponseBody
 	public Result delete(Integer id){
 		printerService.delete(id);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 }
