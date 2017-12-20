@@ -175,6 +175,9 @@ public class PosServiceImpl implements PosService {
             if(orderPaymentDto.getPaymentModeId() == PayMode.WEIXIN_PAY || orderPaymentDto.getPaymentModeId() == PayMode.ALI_PAY){
                 orderPaymentDto.setResultData("请在服务器查看");
             }
+            if(orderPaymentDto.getPaymentModeId() == PayMode.ACCOUNT_PAY){
+                orderPaymentDto.setResultData("手机端完成的余额支付");
+            }
             orderPaymentDtos.add(orderPaymentDto);
         }
         jsonObject.put("orderPayment", orderPaymentDtos);
