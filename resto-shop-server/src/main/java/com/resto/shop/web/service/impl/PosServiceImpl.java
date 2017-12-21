@@ -144,6 +144,9 @@ public class PosServiceImpl implements PosService {
                 List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
                 for(OrderPaymentItem orderPaymentItem : payItemsList){
                     OrderPaymentDto orderPaymentDto = new OrderPaymentDto(orderPaymentItem);
+                    if(orderPaymentDto.getPaymentModeId() == PayMode.ACCOUNT_PAY){
+                        orderPaymentDto.setResultData("手机端完成的余额支付");
+                    }
                     orderPaymentDtos.add(orderPaymentDto);
                 }
                 jsonObject.put("orderPayment", orderPaymentDtos);
