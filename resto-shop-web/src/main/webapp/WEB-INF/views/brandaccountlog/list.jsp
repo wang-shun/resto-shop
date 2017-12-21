@@ -92,7 +92,7 @@
                                 }
                             },
                             {
-                                title: "主题",
+                                title: "主体",
                                 data: "groupName",
                             },
                             {
@@ -168,7 +168,7 @@
                         switch (i) {
                             case 1: /*如果是第二列*/
                                 var column = api.column(i);
-                                var select = $('<select><option value="">主题</option></select>')
+                                var select = $('<select><option value="">主体</option></select>')
                                     .appendTo($(column.header()).empty())
                                     .on('change', function () {
                                         var val = $.fn.dataTable.util.escapeRegex(

@@ -62,7 +62,7 @@
 							<button class="btn btn-success" type="button" @click="yesterDayInfo(2)">昨日</button>
 							<button class="btn btn-success" type="button" @click="weekInfo(3)">本周</button>
 							<button class="btn btn-success" type="button" @click="monthInfo(4)" >本月</button>
-							<button class="btn btn-success" type="button">查看详情</button>
+							<a class="btn btn-success ajaxify" href="brandaccountlog/list">查看详情</a>
 						</div>
 					</div>
 				</div>

@@ -307,7 +307,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setPayTime(order.getCreateTime());
             item.setPayValue(order.getWaitMoney());
             item.setRemark("等位红包支付:" + order.getWaitMoney());
-            item.setResultData(order.getWaitId());
+//            item.setResultData(order.getWaitId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+            item.setToPayId(order.getWaitId());
             orderPaymentItemService.insert(item);
 
             GetNumber getNumber = getNumberService.selectById(order.getWaitId());
@@ -329,7 +330,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setPayTime(order.getCreateTime());
                 item.setPayValue(coupon.getValue());
                 item.setRemark("优惠券支付:" + item.getPayValue());
-                item.setResultData(coupon.getId());
+//                item.setResultData(coupon.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+                item.setToPayId(coupon.getId());
                 orderPaymentItemService.insert(item);
                 payment = payment.subtract(item.getPayValue()).setScale(2, BigDecimal.ROUND_HALF_UP);
             }
@@ -798,7 +800,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setPayTime(order.getCreateTime());
                 item.setPayValue(order.getWaitMoney());
                 item.setRemark("等位红包支付:" + order.getWaitMoney());
-                item.setResultData(order.getWaitId());
+//                item.setResultData(order.getWaitId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+                item.setToPayId(order.getWaitId());
                 if (order.getWaitMoney().doubleValue() > 0) {
                     orderPaymentItemService.insert(item);
                 }
@@ -837,7 +840,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayTime(order.getCreateTime());
                     item.setPayValue(coupon.getValue());
                     item.setRemark("优惠券支付:" + item.getPayValue());
-                    item.setResultData(coupon.getId());
+//                    item.setResultData(coupon.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+                    item.setToPayId(coupon.getId());
                     orderPaymentItemService.insert(item);
 //                UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                        "订单使用优惠券支付了：" + item.getPayValue());
@@ -2870,16 +2874,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder star = new StringBuilder();
         BigDecimal level = new BigDecimal(0);
         if (appraise != null) {
-            if (appraise != null && appraise.getLevel() < 5) {
-                for (int i = 0; i < appraise.getLevel(); i++) {
-                    star.append("★");
-                }
-                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
-                    star.append("☆");
-                }
-            } else if (appraise != null && appraise.getLevel() == 5) {
-                star.append("★★★★★");
-            }
+            star.append("★★★★★☆☆☆☆☆".substring(5 - appraise.getLevel(), 10 - appraise.getLevel()));
             Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
             level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
                     .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
@@ -3004,16 +2999,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder star = new StringBuilder();
         BigDecimal level = new BigDecimal(0);
         if (appraise != null) {
-            if (appraise != null && appraise.getLevel() < 5) {
-                for (int i = 0; i < appraise.getLevel(); i++) {
-                    star.append("★");
-                }
-                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
-                    star.append("☆");
-                }
-            } else if (appraise != null && appraise.getLevel() == 5) {
-                star.append("★★★★★");
-            }
+            star.append("★★★★★☆☆☆☆☆".substring(5 - appraise.getLevel(), 10 - appraise.getLevel()));
             Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
             level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
                     .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
@@ -3317,16 +3303,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder star = new StringBuilder();
         BigDecimal level = new BigDecimal(0);
         if (appraise != null) {
-            if (appraise != null && appraise.getLevel() < 5) {
-                for (int i = 0; i < appraise.getLevel(); i++) {
-                    star.append("★");
-                }
-                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
-                    star.append("☆");
-                }
-            } else if (appraise != null && appraise.getLevel() == 5) {
-                star.append("★★★★★");
-            }
+            star.append("★★★★★☆☆☆☆☆".substring(5 - appraise.getLevel(), 10 - appraise.getLevel()));
             Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
             level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
                     .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
@@ -3476,16 +3453,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder star = new StringBuilder();
         BigDecimal level = new BigDecimal(0);
         if (appraise != null) {
-            if (appraise != null && appraise.getLevel() < 5) {
-                for (int i = 0; i < appraise.getLevel(); i++) {
-                    star.append("★");
-                }
-                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
-                    star.append("☆");
-                }
-            } else if (appraise != null && appraise.getLevel() == 5) {
-                star.append("★★★★★");
-            }
+            star.append("★★★★★☆☆☆☆☆".substring(5 - appraise.getLevel(), 10 - appraise.getLevel()));
             Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
             level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
                     .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
@@ -3845,16 +3813,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder star = new StringBuilder();
         BigDecimal level = new BigDecimal(0);
         if (appraise != null) {
-            if (appraise != null && appraise.getLevel() < 5) {
-                for (int i = 0; i < appraise.getLevel(); i++) {
-                    star.append("★");
-                }
-                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
-                    star.append("☆");
-                }
-            } else if (appraise != null && appraise.getLevel() == 5) {
-                star.append("★★★★★");
-            }
+            star.append("★★★★★☆☆☆☆☆".substring(5 - appraise.getLevel(), 10 - appraise.getLevel()));
             Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
             level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
                     .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
@@ -4234,16 +4193,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder star = new StringBuilder();
         BigDecimal level = new BigDecimal(0);
         if (appraise != null) {
-            if (appraise != null && appraise.getLevel() < 5) {
-                for (int i = 0; i < appraise.getLevel(); i++) {
-                    star.append("★");
-                }
-                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
-                    star.append("☆");
-                }
-            } else if (appraise != null && appraise.getLevel() == 5) {
-                star.append("★★★★★");
-            }
+            star.append("★★★★★☆☆☆☆☆".substring(5 - appraise.getLevel(), 10 - appraise.getLevel()));
             Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
             level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
                     .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
@@ -5160,30 +5110,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-    @Override
     /**
-     * 2016-11-2
+     * 查询菜品销售报表
+     * @param beginDate
+     * @param endDate
+     * @param brandId
+     * @param brandName
+     * @return
      */
+    @Override
     public brandArticleReportDto callBrandArticleNum(String beginDate, String endDate, String brandId, String brandName) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        Integer totalNum = 0;
-        BigDecimal sellIncome = new BigDecimal(0);
-        BigDecimal refundTotal = new BigDecimal(0);
-        BigDecimal discountTotal = new BigDecimal(0);
-        Integer refundCount = 0;
-        //brandArticleReportDto bo = orderMapper.selectArticleSumCountByData(begin, end, brandId);
-        //totalNum = orderMapper.selectArticleSumCountByData(begin, end, brandId);
-        /**
-         * 菜品总数单独算是因为 要出去套餐的数量
-         */
-        List<Integer> totalNums = orderMapper.selectBrandArticleNum(begin, end, brandId);
+        //菜品总数单独算是因为 要出去套餐的数量
+        Integer totalNums = orderMapper.selectBrandArticleNum(begin, end, brandId);
         //查询菜品总额，退菜总数，退菜金额
-        brandArticleReportDto bo = new brandArticleReportDto();
-        bo.setSellIncome(sellIncome);
-        bo.setRefundCount(refundCount);
-        bo.setDiscountTotal(discountTotal);
-        bo.setRefundTotal(refundTotal);
+        brandArticleReportDto bo = new brandArticleReportDto(brandName, 0, BigDecimal.ZERO, 0, BigDecimal.ZERO, BigDecimal.ZERO);
         List<brandArticleReportDto> articleReportDto = orderMapper.selectConfirmMoney(begin, end, brandId);
         if (articleReportDto != null && !articleReportDto.isEmpty()) {
             for (brandArticleReportDto reportDto : articleReportDto) {
@@ -5193,13 +5135,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 bo.setRefundTotal(bo.getRefundTotal().add(reportDto.getRefundTotal()));
             }
         }
-        if (totalNums != null && !totalNums.isEmpty()) {
-            for (Integer num : totalNums) {
-                totalNum += num;
-            }
-        }
-        bo.setTotalNum(totalNum == null ? 0 : totalNum);
-        bo.setBrandName(brandName);
+        bo.setTotalNum(totalNums);
         return bo;
     }
 
@@ -7574,16 +7510,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder star = new StringBuilder();
         BigDecimal level = new BigDecimal(0);
         if (appraise != null) {
-            if (appraise != null && appraise.getLevel() < 5) {
-                for (int i = 0; i < appraise.getLevel(); i++) {
-                    star.append("★");
-                }
-                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
-                    star.append("☆");
-                }
-            } else if (appraise != null && appraise.getLevel() == 5) {
-                star.append("★★★★★");
-            }
+            star.append("★★★★★☆☆☆☆☆".substring(5 - appraise.getLevel(), 10 - appraise.getLevel()));
             Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
             level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
                     .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
@@ -7726,7 +7653,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                         StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                             }
                             if (result.containsKey("ERROR")) {
-                                throw new RuntimeException("微信退款失败！失败信息：" + new JSONObject(result).toString());
+                                log.error("微信退款失败！失败信息：" + new JSONObject(result).toString());
+                                throw new RuntimeException(new JSONObject(result).toString());
                             }
                             BigDecimal realBack = maxWxRefund.doubleValue() > order.getRefundMoney().doubleValue() ? order.getRefundMoney() : maxWxRefund;
                             item.setResultData(new JSONObject(result).toString());
@@ -7805,7 +7733,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             map.put("out_request_no", newPayItemId);
                             String resultJson = AliPayUtils.refundPay(map);
                             if (resultJson.indexOf("ERROR") != -1) {
-                                throw new RuntimeException("支付宝退款失败！失败信息：" + resultJson);
+                                log.error("支付宝退款失败！失败信息：" + resultJson);
+                                throw new RuntimeException(resultJson);
                             }
                             item.setId(newPayItemId);
                             item.setResultData(new JSONObject(resultJson).toString());
@@ -8138,7 +8067,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     item.setPayValue(coupon.getValue());
                     item.setRemark("优惠券支付:" + item.getPayValue());
                     price = price.subtract(item.getPayValue());
-                    item.setResultData(coupon.getId());
+//                    item.setResultData(coupon.getId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+                    item.setToPayId(coupon.getId());
                     orderPaymentItemService.insert(item);
                     UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                             "订单使用优惠券支付了：" + item.getPayValue());
@@ -8157,7 +8087,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 item.setPayTime(new Date());
                 item.setPayValue(order.getWaitMoney());
                 item.setRemark("等位红包支付:" + order.getWaitMoney());
-                item.setResultData(order.getWaitId());
+//                item.setResultData(order.getWaitId()); //现在resultData字段只用来存放微信、支付宝支付的回调  20171213 wtl
+                item.setToPayId(order.getWaitId());
                 orderPaymentItemService.insert(item);
                 UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
                         "订单使用等位红包支付了：" + item.getPayValue());
@@ -8803,16 +8734,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         StringBuilder star = new StringBuilder();
         BigDecimal level = new BigDecimal(0);
         if (appraise != null) {
-            if (appraise != null && appraise.getLevel() < 5) {
-                for (int i = 0; i < appraise.getLevel(); i++) {
-                    star.append("★");
-                }
-                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
-                    star.append("☆");
-                }
-            } else if (appraise != null && appraise.getLevel() == 5) {
-                star.append("★★★★★");
-            }
+            star.append("★★★★★☆☆☆☆☆".substring(5 - appraise.getLevel(), 10 - appraise.getLevel()));
             Map<String, Object> appriseCount = appraiseService.selectCustomerAppraiseAvg(order.getCustomerId());
             level = new BigDecimal(Integer.valueOf(appriseCount.get("sum").toString()))
                     .divide(new BigDecimal(Integer.valueOf(appriseCount.get("count").toString())), 2, BigDecimal.ROUND_HALF_UP);
@@ -9743,16 +9665,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //得到当前评论星级
         StringBuilder star = new StringBuilder();
         if (appraise != null) {
-            if (appraise != null && appraise.getLevel() < 5) {
-                for (int i = 0; i < appraise.getLevel(); i++) {
-                    star.append("★");
-                }
-                for (int i = 0; i < 5 - appraise.getLevel(); i++) {
-                    star.append("☆");
-                }
-            } else if (appraise != null && appraise.getLevel() == 5) {
-                star.append("★★★★★");
-            }
+            star.append("★★★★★☆☆☆☆☆".substring(5 - appraise.getLevel(), 10 - appraise.getLevel()));
         } else {
             star.append("☆☆☆☆☆");
         }
