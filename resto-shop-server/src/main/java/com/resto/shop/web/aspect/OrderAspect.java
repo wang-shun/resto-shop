@@ -637,11 +637,6 @@ public class OrderAspect {
 
     ;
 
-    @Pointcut("execution(* com.resto.shop.web.service.OrderService.orderAliPaySuccess(..))")
-    public void orderAliPaySuccess() {
-    }
-
-    ;
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.afterPay(..))")
     public void afterPay() {
@@ -1011,6 +1006,15 @@ public class OrderAspect {
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                     }
                 } else if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.NOPAY) {
+                    if(!org.apache.commons.lang3.StringUtils.isEmpty(order.getBeforeId())){
+                        //如果这个后付订单之前存在预点餐的餐品
+                        Order before = orderService.selectById(order.getBeforeId());
+                        //取消预点餐订单      ------后付
+                        before.setOrderState(OrderState.CANCEL);
+                        orderService.update(before);
+                        //更新预点餐的orderItmer到新的订单项内
+                        orderItemService.updateOrderIdByBeforeId(order.getId(), before.getId());
+                    }
                     MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
                 } else if (order.getOrderMode() != ShopMode.HOUFU_ORDER) {
                     MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜

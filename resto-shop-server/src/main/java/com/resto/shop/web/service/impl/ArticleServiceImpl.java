@@ -153,7 +153,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             List<ArticlePrice> prices = articlePriceServer.selectByArticleId(id);
             article.setArticlePrices(prices);
         } else {
-            List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(id, show);
+            List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(id, show,null);
             article.setMealAttrs(mealAttrs);
         }
         List<Integer> supportTimesIds = supportTimeService.selectByIdsArticleId(id);
@@ -252,7 +252,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                     a.setArticlePrices(prices);
                 }
             } else if (a.getArticleType() == Article.ARTICLE_TYPE_MEALS) {//套餐
-                List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(a.getId(), show);
+                List<MealAttr> mealAttrs = mealAttrService.selectFullByArticleId(a.getId(), show, articleMap);
                 a.setMealAttrs(mealAttrs);
             }
             if (!articleMap.containsKey(a.getId())) {

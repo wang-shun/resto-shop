@@ -106,7 +106,7 @@
 		 map.put("reportTitle", "品牌账户流水");//表的名字
 		 map.put("timeType", "yyyy-MM-dd HH:mm:ss");
 
-		 String[][] headers = {{"时间","25"},{"主题","25"},{"行为","25"},{"流水号","25"},{"详情","25"},{"资金变动","25"},{"余额","25"}};
+		 String[][] headers = {{"时间","25"},{"主体","25"},{"行为","25"},{"流水号","25"},{"详情","25"},{"资金变动","25"},{"余额","25"}};
 		 //定义excel工具类对象
 		 ExcelUtil<BrandAccountLog> excelUtil=new ExcelUtil<>();
 		 try{
