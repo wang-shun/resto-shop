@@ -293,7 +293,7 @@ public class PosServiceImpl implements PosService {
         if(serverDataBaseOrder != null){  //  判断服务器数据库是否已经存在此订单
             return;
         }
-        if(!StringUtils.isEmpty(orderDto.getParentOrderId())){
+        if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){
             Order order = orderService.selectById(orderDto.getParentOrderId());
             orderDto.setCustomerId(order.getCustomerId());
         }
