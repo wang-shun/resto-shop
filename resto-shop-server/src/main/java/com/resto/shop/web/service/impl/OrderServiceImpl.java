@@ -561,7 +561,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         int articleCount = 0;
         BigDecimal extraMoney = BigDecimal.ZERO;
 
-//记录订单菜品-------------------------------
+        //记录订单菜品-------------------------------
         for (OrderItem item : order.getOrderItems()) {
             Article a = null;
             BigDecimal org_price = null;
