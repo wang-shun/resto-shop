@@ -10,5 +10,5 @@ import java.util.List;
  * Created by KONATA on 2017/8/9.
  */
 public interface PosMapper  {
-   List<ArticleSupport>  selectArticleSupport(@Param("articleList") List<Article> articleList);
+   List<ArticleSupport>  selectArticleSupport(@Param("shopId") String shopId);
 }
