@@ -147,6 +147,9 @@ public class PosServiceImpl implements PosService {
                     if(orderPaymentDto.getPaymentModeId() == PayMode.ACCOUNT_PAY){
                         orderPaymentDto.setResultData("手机端完成的余额支付");
                     }
+                    if(orderPaymentDto.getPaymentModeId() == PayMode.COUPON_PAY){
+                        orderPaymentDto.setResultData("手机端完成的优惠券支付");
+                    }
                     orderPaymentDtos.add(orderPaymentDto);
                 }
                 jsonObject.put("orderPayment", orderPaymentDtos);
@@ -180,6 +183,9 @@ public class PosServiceImpl implements PosService {
             }
             if(orderPaymentDto.getPaymentModeId() == PayMode.ACCOUNT_PAY){
                 orderPaymentDto.setResultData("手机端完成的余额支付");
+            }
+            if(orderPaymentDto.getPaymentModeId() == PayMode.COUPON_PAY){
+                orderPaymentDto.setResultData("手机端完成的优惠券支付");
             }
             orderPaymentDtos.add(orderPaymentDto);
         }
