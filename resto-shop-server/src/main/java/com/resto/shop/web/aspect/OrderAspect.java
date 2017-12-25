@@ -170,13 +170,38 @@ public class OrderAspect {
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
             log.info("tttttttttttttt----------");
             if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
-                if(Integer.parseInt(order.getTableNumber()) <= 20){
-                    for(int i = 0 ; i < Integer.parseInt(order.getTableNumber()) ; i++ ){
-                        MQMessageProducer.sendCreateOrderMessage(order);
-                    }
-                }else{
-                    MQMessageProducer.sendCreateOrderMessage(order);
-                }
+                MQMessageProducer.sendCreateOrderMessage(order);
+
+
+
+
+
+                orderService.selectById("70c4563ab0ab4c22b77f00121653f5ab");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("328203f33eb94f789fc78077d9089acb");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("0b8326ecf77849c8b38a91250e27bb6b");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("47701af77de44208ae8d007f081e199d");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("bdb5367805d44736a8f973303794ae06");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("fbd286641f1447819467946375b56372");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("324c3bc1bdee455d90d6e5cca835c880");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("6bfe087b338a40f6a6a6a792389256a4");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("74dc5765170341b9906ff1834ced0e28");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("15920a456b064cf2872ef0b67eaa5c77");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("cb3bd7c6d9b44c4cb5243fade6fcd0cb");
+                MQMessageProducer.sendCreateOrderMessage(order);
+                orderService.selectById("faa3f399807f46d58f944d91974202f0");
+                MQMessageProducer.sendCreateOrderMessage(order);
+
+
             }
 
             if (order.getPayMode() != PayMode.WEIXIN_PAY && StringUtils.isEmpty(order.getGroupId())) {
