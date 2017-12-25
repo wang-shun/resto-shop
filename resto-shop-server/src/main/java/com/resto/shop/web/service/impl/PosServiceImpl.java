@@ -4,6 +4,7 @@ import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
+import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.web.model.AccountSetting;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
@@ -556,6 +557,16 @@ public class PosServiceImpl implements PosService {
                 RedisUtil.set(shopId+order.getTableNumber()+"status", true);
             }
         }
+    }
+
+    @Override
+    public void serverError(String brandId, String shopId) {
+        RedisUtil.set(shopId + "loginStatus", false);
+        com.alibaba.fastjson.JSONObject param = new com.alibaba.fastjson.JSONObject();
+        Brand brand = brandService.selectByPrimaryKey(brandId);
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+        param.put("service" , "【" + brand.getBrandName() + "】-" + shopDetail.getName());
+        SMSUtils.sendMessage("17671111590",param ,SMSUtils.SIGN, SMSUtils.SMS_SERVER_ERROR);
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){

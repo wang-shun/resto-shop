@@ -141,5 +141,12 @@ public interface PosService {
      */
     void posCancelOrder(String shopId, String orderId);
 
+    /**
+     *  服务器异常，设置店铺不在线，不允许微信端下单
+     * @param brandId
+     * @param shopId
+     */
+    void serverError(String brandId,String shopId);
+
     void test();
 }
