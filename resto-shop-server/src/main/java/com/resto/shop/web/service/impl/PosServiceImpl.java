@@ -565,7 +565,7 @@ public class PosServiceImpl implements PosService {
         com.alibaba.fastjson.JSONObject param = new com.alibaba.fastjson.JSONObject();
         Brand brand = brandService.selectByPrimaryKey(brandId);
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
-        param.put("service" , "【" + brand.getBrandName() + "】-" + shopDetail.getName());
+        param.put("service" , "【" + brand.getBrandName() + "】-" + shopDetail.getName() + "  Pos2.0系统");
         SMSUtils.sendMessage("17671111590",param ,SMSUtils.SIGN, SMSUtils.SMS_SERVER_ERROR);
     }
 
