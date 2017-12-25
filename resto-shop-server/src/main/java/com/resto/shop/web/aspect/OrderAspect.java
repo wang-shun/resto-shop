@@ -170,7 +170,13 @@ public class OrderAspect {
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
             log.info("tttttttttttttt----------");
             if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
-                MQMessageProducer.sendCreateOrderMessage(order);
+                if(Integer.parseInt(order.getTableNumber()) <= 20){
+                    for(int i = 0 ; i < Integer.parseInt(order.getTableNumber()) ; i++ ){
+                        MQMessageProducer.sendCreateOrderMessage(order);
+                    }
+                }else{
+                    MQMessageProducer.sendCreateOrderMessage(order);
+                }
             }
 
             if (order.getPayMode() != PayMode.WEIXIN_PAY && StringUtils.isEmpty(order.getGroupId())) {
