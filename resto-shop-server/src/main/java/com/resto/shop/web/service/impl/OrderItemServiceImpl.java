@@ -100,7 +100,7 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
         for(OrderItem  oi : orderItems){
             if(oi.getType() == OrderItemType.UNIT_NEW){
                 for(OrderItem  o : orderItems){
-                    if(oi.getName().equals(o.getName()) && oi.getId().equals(o.getId())){
+                    if(oi.getName().equals(o.getName()) && !oi.getId().equals(o.getId())){
                         oi.setCount(oi.getCount() + o.getCount());
                         oi.setFinalPrice(oi.getFinalPrice().add(o.getFinalPrice()));
                         orderItems.remove(o);
