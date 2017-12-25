@@ -97,12 +97,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		Date cleanDate = offLineOrder.getCreateDate();
 
 
-		//如果是当日结当日的店则获取具体结店时间
-//		if(DateUtil.getDateBegin(cleanDate).getTime()==DateUtil.getDateBegin(new Date()).getTime()){
-//			cleanDate = new Date();
-//		}
-
-
 		OffLineOrder offLineOrder1 = offLineOrderService.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopDetail.getId(), DateUtil.getDateBegin(cleanDate), DateUtil.getDateEnd(cleanDate));
 		if (null != offLineOrder1) {
 			offLineOrder1.setState(0);
@@ -117,7 +111,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		offLineOrderService.insert(offLineOrder);
 		
 		/**
-		 * 1.结店退款
 		 * 2查询天气
 		 */
 		Wether wether = wetherService.selectDateAndShopId(shopDetail.getId(), DateUtil.formatDate(cleanDate,"yyyy-MM-dd"));
@@ -175,6 +168,9 @@ public class CloseShopServieImpl implements CloseShopService{
 		insertDateData(shopDetail,offLineOrder,wether,brand,cleanDate);
 
 	}
+
+
+
 
 	private void refundShopDetailOrder(ShopDetail shopDetail) {
 		//未付款和未全部付款和已付款
@@ -269,8 +265,33 @@ public class CloseShopServieImpl implements CloseShopService{
 		Date todayBegin = DateUtil.getDateBegin(cleanDate);
 		Date todayEnd = DateUtil.getDateEnd(cleanDate);
 		//指定日期本月的开始时间 本月结束时间
-		DateTime beginMonth = DateUtil.beginOfMonth(cleanDate);
+		Date beginMonth = DateUtil.beginOfMonth(cleanDate);
 		Date endMonth = todayEnd;
+
+		//判断当前传入的日期是在哪旬中
+		int temp = DateUtil.getEarlyMidLate(cleanDate);
+
+		Date xunBegin = beginMonth;
+		Date xunEnd = endMonth;
+		switch (temp){
+			case 1:
+				xunBegin = beginMonth;
+				xunEnd = todayEnd;
+				break;
+			case 2:
+				xunBegin = DateUtil.getAfterDayDate(beginMonth,10);
+				xunEnd = todayEnd;
+				break;
+			case 3:
+				xunBegin = DateUtil.getAfterDayDate(beginMonth,20);
+				xunEnd = todayEnd;
+				break;
+			default:
+				break;
+
+		}
+
+
 		//三.定义线下订单
 		//本日线下订单总数(堂吃)
 		int todayEnterCount = 0;
@@ -372,9 +393,9 @@ public class CloseShopServieImpl implements CloseShopService{
 		BigDecimal backTwoCustomerOrderTotal = BigDecimal.ZERO;
 		//多次回头用户的订单总额
 		BigDecimal backTwoMoreCustomerOrderTotal = BigDecimal.ZERO;
-		List<Order> orders = orderService.selectCompleteByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
-		if (!orders.isEmpty()) {
-			for (Order o : orders) {
+		List<Order> todayOrders = orderService.selectCompleteByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
+		if (!todayOrders.isEmpty()) {
+			for (Order o : todayOrders) {
 					if (backCustomerId.contains(o.getCustomerId())) {
 						backCustomerOrderNum++;
 						backCustomerOrderTotal = backCustomerOrderTotal.add(getOrderMoney( o.getParentOrderId(), o.getOrderMoney(), o.getAmountWithChildren()));
@@ -416,47 +437,41 @@ public class CloseShopServieImpl implements CloseShopService{
 		String todayNewCustomerRatio = "";
 
 		List<Order> monthOrders = orderService.selectCompleteByShopIdAndTime(shopDetail.getId(),beginMonth, endMonth);
-		if (!monthOrders.isEmpty()) {
+		if (monthOrders!=null&&!monthOrders.isEmpty()) {
 			for (Order o : monthOrders) {
-				//封装   1.resto订单总额     3.resto订单总数  4订单中的实收总额  5新增用户的订单总额  6自然到店的用户总额  7分享到店的用户总额
-				//8回头用户的订单总额  9二次回头用户的订单总额  10多次回头用户的订单总额 11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-				//本日 begin-----------------------
-				// if (DateUtil.getDayByToday(o.getCreateTime()).contains(2)) {
-				/**
-				 * 报表数据中的订单数  如果子订单和父订单算是一个订单
-				 * 小程序+每日短信里的子订单和父订单算是两个订单
-				 *
-				 */
-
-				if (o.getCreateTime().compareTo(todayBegin) > 0 && o.getCreateTime().compareTo(todayEnd) < 0) {
-					//1.resto订单总额 今日内订单
-					todayRestoTotal = todayRestoTotal.add(getOrderMoney( o.getParentOrderId(), o.getOrderMoney(), o.getAmountWithChildren()));
-
-					//11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-					if (!o.getOrderPaymentItems().isEmpty()) {
-						//订单支付项
-						for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
-							if (oi.getPaymentModeId() == PayMode.ACCOUNT_PAY) {
-								redPackTotal = redPackTotal.add(oi.getPayValue());
-							} else if (oi.getPaymentModeId() == PayMode.COUPON_PAY) {
-								couponTotal = couponTotal.add(oi.getPayValue());
-							} else if (oi.getPaymentModeId() == PayMode.REWARD_PAY) {
-								chargeReturn = chargeReturn.add(oi.getPayValue());
-							}
-						}
-					}
-					discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
-					if (todayRestoTotal.add(discountTotal).compareTo(BigDecimal.ZERO) > 0) {
-						discountRatio = discountTotal.divide(todayRestoTotal.add(discountTotal), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
-					}
-				}
-				//本日end----------
-				//本月开始------
-				//订单总额
 				monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getParentOrderId(), o.getOrderMoney(), o.getAmountWithChildren()));
 				//本月结束
 			}
 		}
+
+		if(todayOrders!=null && !todayOrders.isEmpty()){
+			for(Order o:todayOrders) {
+				//1.resto订单总额 今日内订单
+				todayRestoTotal = todayRestoTotal.add(getOrderMoney(o.getParentOrderId(), o.getOrderMoney(), o.getAmountWithChildren()));
+				//11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
+				if (!o.getOrderPaymentItems().isEmpty()) {
+					//订单支付项
+					for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
+						if (oi.getPaymentModeId() == PayMode.ACCOUNT_PAY) {
+							redPackTotal = redPackTotal.add(oi.getPayValue());
+						} else if (oi.getPaymentModeId() == PayMode.COUPON_PAY) {
+							couponTotal = couponTotal.add(oi.getPayValue());
+						} else if (oi.getPaymentModeId() == PayMode.REWARD_PAY) {
+							chargeReturn = chargeReturn.add(oi.getPayValue());
+						}
+					}
+				}
+			}
+
+			//循环后求和
+			discountTotal = redPackTotal.add(couponTotal).add(chargeReturn);
+			if (todayRestoTotal.add(discountTotal).compareTo(BigDecimal.ZERO) > 0) {
+				discountRatio = discountTotal.divide(todayRestoTotal.add(discountTotal), 2, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal(100)).toString();
+			}
+
+		}
+
+
 
 		//本日用户消费比率 R+线下+外卖
 		//到店总笔数 线上+线下
@@ -506,51 +521,48 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		//单独查询评价和分数
 
-		List<Appraise> appraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), beginMonth, endMonth);
-
-		if (!appraises.isEmpty()) {
-			for (Appraise a : appraises) {
-				//本日 begin-----------------------
-				if (DateUtil.getDayByToday(a.getCreateTime()).contains(2)) {
-					dayAppraiseNum++;
-					dayAppraiseSum += a.getLevel() * 20;
-					if (a.getLevel() == 5) {
-						fiveStar++;
-					} else if (a.getLevel() == 4) {
-						fourStar++;
-					} else {
-						oneToThreeStar++;
-					}
+		List<Appraise> todayAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), todayBegin, todayEnd);
+		if(todayAppraises!=null && !todayAppraises.isEmpty()){
+			for(Appraise a:todayAppraises){
+				dayAppraiseNum++;
+				dayAppraiseSum += a.getLevel() * 20;
+				if (a.getLevel() == 5) {
+					fiveStar++;
+				} else if (a.getLevel() == 4) {
+					fourStar++;
+				} else {
+					oneToThreeStar++;
 				}
-				//本旬开始
-				if (DateUtil.getDayByToday(a.getCreateTime()).contains(12)) {
-					//2.满意度
-					xunAppraiseNum++;
-					xunAppraiseSum += a.getLevel() * 20;
-				}
-				//本旬结束
+			}
+		}
 
-				//本月开始------
-				//.满意度
+		List<Appraise> xunAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), xunBegin, xunEnd);
+		if(xunAppraises!=null && !xunAppraises.isEmpty()){
+			for(Appraise a:xunAppraises){
+				//2.满意度
+				xunAppraiseNum++;
+				xunAppraiseSum += a.getLevel() * 20;
+			}
+		}
 
+		List<Appraise> monthAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), beginMonth, endMonth);
+		if(monthAppraises!=null && !monthAppraises.isEmpty()){
+			for(Appraise a:monthAppraises){
+				//2.满意度
 				monthAppraiseNum++;
 				monthAppraiseSum += a.getLevel() * 20;
+			}
+		}
 
-				//本月结束
-			}
-			//循环完之后操作--
-			if (dayAppraiseNum != 0) {
-				todaySatisfaction = formatDouble(dayAppraiseSum / dayAppraiseNum);
-			}
-			if (xunAppraiseNum != 0) {
-				theTenDaySatisfaction = formatDouble(xunAppraiseSum / xunAppraiseNum);
-			}
+		if (dayAppraiseNum != 0) {
+			todaySatisfaction = formatDouble(dayAppraiseSum / dayAppraiseNum);
+		}
+		if (xunAppraiseNum != 0) {
+			theTenDaySatisfaction = formatDouble(xunAppraiseSum / xunAppraiseNum);
+		}
 
-			if (monthAppraiseNum != 0) {
-				monthSatisfaction = formatDouble(monthAppraiseSum / monthAppraiseNum);
-			}
-
-			//评论结束------------------------
+		if (monthAppraiseNum != 0) {
+			monthSatisfaction = formatDouble(monthAppraiseSum / monthAppraiseNum);
 		}
 
 		//发送本日信息 本月信息 上旬信息
@@ -663,7 +675,7 @@ public class CloseShopServieImpl implements CloseShopService{
 
 
 	private void pushMessageByFirstEdtion(Map<String, String> querryMap, ShopDetail shopDetail, WechatConfig wechatConfig, Brand brand) {
-		if (1 == shopDetail.getIsOpenSms() && null != shopDetail.getnoticeTelephone()) {
+		if (Common.YES.equals(shopDetail.getIsOpenSms())&& null != shopDetail.getnoticeTelephone()) {
 			//截取电话号码
 			String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
 			String[] tels = telephones.split(",");
@@ -820,14 +832,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		List<Order> xunOrders = orderService.selectCompleteByShopIdAndTime(shopDetail.getId(),xunBegin, xunEnd);
 		if (!xunOrders.isEmpty()) {
 			for (Order o : xunOrders) {
-				//封装   1.resto订单总额     3.resto订单总数  4订单中的实收总额  5新增用户的订单总额  6自然到店的用户总额  7分享到店的用户总额
-				//8回头用户的订单总额  9二次回头用户的订单总额  10多次回头用户的订单总额 11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
-				//本日 begin-----------------------
-				/**
-				 * 报表数据中的订单数  如果子订单和父订单算是一个订单
-				 * 小程序+每日短信里的子订单和父订单算是两个订单
-				 *
-				 */
 				//1.resto订单总额
 				xunRestoTotal = xunRestoTotal.add(getOrderMoney(o.getParentOrderId(), o.getOrderMoney(), o.getAmountWithChildren()));
 				//11折扣合计 12红包 13优惠券 14 充值赠送 15折扣比率
@@ -1317,18 +1321,9 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		//旬开始时间 旬结束时间
 
-		Date xunBegin = new Date() ;
+		Date xunBegin = DateUtil.getDateBegin(DateUtil.getAfterDayDate(cleanDate,-10)) ;
 		Date xunEnd = todayEnd;
-
-		int temp = DateUtil.getEarlyMidLate(cleanDate);
-		//1.上旬 2.中旬 3下旬
-		if(temp==XunType.EARLY){
-			xunBegin = monthBegin;
-		}else if(temp==XunType.MIDDLE){
-			xunBegin = DateUtil.getAfterDayDate(monthBegin,10);
-		}else if(temp==XunType.LAST){
-			xunBegin = DateUtil.getAfterDayDate(monthBegin,20);
-		}
+		int temp = DateUtil.getEarlyMidLateEnd(cleanDate);
 
 		//三.定义线下订单
 		//本日线下订单总数(堂吃)
@@ -1939,6 +1934,11 @@ public class CloseShopServieImpl implements CloseShopService{
 		dayAppraiseMessageService.insert(dm);
 
 
+	}
+
+	public static void main(String[] args) {
+		int temp = DateUtil.getEarlyMidLateEnd(DateUtil.fomatDate("2017-12-24 00:00:01"));
+		System.out.println("temp: "+temp);
 	}
 
 
