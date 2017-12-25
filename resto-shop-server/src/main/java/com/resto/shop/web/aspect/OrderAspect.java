@@ -178,28 +178,40 @@ public class OrderAspect {
 
                 orderService.selectById("70c4563ab0ab4c22b77f00121653f5ab");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("70c4563ab0ab4c22b77f00121653f5ab    1");
                 orderService.selectById("328203f33eb94f789fc78077d9089acb");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("328203f33eb94f789fc78077d9089acb    2");
                 orderService.selectById("0b8326ecf77849c8b38a91250e27bb6b");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("0b8326ecf77849c8b38a91250e27bb6b    3");
                 orderService.selectById("47701af77de44208ae8d007f081e199d");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("47701af77de44208ae8d007f081e199d    4");
                 orderService.selectById("bdb5367805d44736a8f973303794ae06");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("bdb5367805d44736a8f973303794ae06    5");
                 orderService.selectById("fbd286641f1447819467946375b56372");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("fbd286641f1447819467946375b56372    6");
                 orderService.selectById("324c3bc1bdee455d90d6e5cca835c880");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("324c3bc1bdee455d90d6e5cca835c880    7");
                 orderService.selectById("6bfe087b338a40f6a6a6a792389256a4");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("6bfe087b338a40f6a6a6a792389256a4    8");
                 orderService.selectById("74dc5765170341b9906ff1834ced0e28");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("74dc5765170341b9906ff1834ced0e28    9");
                 orderService.selectById("15920a456b064cf2872ef0b67eaa5c77");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("15920a456b064cf2872ef0b67eaa5c77    10");
                 orderService.selectById("cb3bd7c6d9b44c4cb5243fade6fcd0cb");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("cb3bd7c6d9b44c4cb5243fade6fcd0cb    11");
                 orderService.selectById("faa3f399807f46d58f944d91974202f0");
                 MQMessageProducer.sendCreateOrderMessage(order);
+                log.info("faa3f399807f46d58f944d91974202f0    12");
 
 
             }
