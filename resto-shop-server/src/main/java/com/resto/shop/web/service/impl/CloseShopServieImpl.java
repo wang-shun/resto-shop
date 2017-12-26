@@ -92,27 +92,66 @@ public class CloseShopServieImpl implements CloseShopService{
 	@Override
 	public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand) {
 		/**
-		 * 查询时的日期
+		 * 查询结店时选择的日期
 		 */
 		Date cleanDate = offLineOrder.getCreateDate();
 
+		//存储线下订单
+		insertOffLineOrder(brand.getId(),shopDetail.getId(),cleanDate,offLineOrder);
 
-		OffLineOrder offLineOrder1 = offLineOrderService.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopDetail.getId(), DateUtil.getDateBegin(cleanDate), DateUtil.getDateEnd(cleanDate));
-		if (null != offLineOrder1) {
-			offLineOrder1.setState(0);
-			offLineOrderService.update(offLineOrder1);
-		}
-		offLineOrder.setId(ApplicationUtils.randomUUID());
-		offLineOrder.setState(1);
-		offLineOrder.setResource(OfflineOrderSource.OFFLINE_POS);
-		offLineOrder.setBrandId(brand.getId());
-		offLineOrder.setShopDetailId(shopDetail.getId());
-
-		offLineOrderService.insert(offLineOrder);
-		
 		/**
-		 * 2查询天气
+		 * 获取天气数据
 		 */
+		Wether wether = getWether(shopDetail,cleanDate);
+
+
+		//第一版短信数据通过短信或和微信推送发送发送
+		sendMessageByFirst(brand,shopDetail,cleanDate,offLineOrder);
+
+		//第二版短信内容由于模板原因无法发送短信 将数据存在数据库
+		insertDateData(shopDetail,offLineOrder,wether,brand,cleanDate);
+
+
+	}
+
+	private void sendMessageByFirst(Brand brand,ShopDetail shopDetail,Date cleanDate,OffLineOrder offLineOrder) {
+
+		WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());
+		//短信第一版用来发日结短信
+		Map<String, String> dayMapByFirstEdtion = querryDateDataByFirstEdtion(shopDetail.getId(),shopDetail.getName(),cleanDate);
+		//3发短信推送/微信推送
+
+		pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig,brand);
+		//3判断是否需要发送旬短信
+		int temp = DateUtil.getEarlyMidLate(cleanDate);
+		switch (temp){
+			case  DayMessageType.DAY_TYPE:
+				//第一版旬结短信
+				Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail,cleanDate);
+				pushMessageByFirstEdtion(xunMapByFirstEdtion, shopDetail, wechatConfig, brand);
+				break;
+
+			case DayMessageType.XUN_TYPE:
+				Map<String, String> xunMapByFirstEdtion2 = querryXunDataByFirstEditon(shopDetail,cleanDate);
+				pushMessageByFirstEdtion(xunMapByFirstEdtion2, shopDetail, wechatConfig, brand);
+				break;
+
+			case DayMessageType.MONTH_TYPE:
+				Map<String, String> xunMapByFirstEdtion3 = querryXunDataByFirstEditon(shopDetail,cleanDate);
+				pushMessageByFirstEdtion(xunMapByFirstEdtion3, shopDetail, wechatConfig, brand);
+
+				Map<String, String> monthMapByFirstEdtion = querryMonthDataByFirstEditon(shopDetail, offLineOrder,cleanDate);
+				pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand);
+				break;
+			default:
+				break;
+
+		}
+
+
+	}
+
+	private Wether getWether(ShopDetail shopDetail,Date cleanDate) {
 		Wether wether = wetherService.selectDateAndShopId(shopDetail.getId(), DateUtil.formatDate(cleanDate,"yyyy-MM-dd"));
 		if(wether==null){
 			//说明没有调用定时任务 ---
@@ -130,43 +169,22 @@ public class CloseShopServieImpl implements CloseShopService{
 				wether.setWeekady(jsonObject.getInteger("weekday"));
 			}
 		}
+		return  wether;
 
+	}
 
-		WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());
-		//短信第一版用来发日结短信
-		Map<String, String> dayMapByFirstEdtion = querryDateDataByFirstEdtion(shopDetail,cleanDate);
-		//3发短信推送/微信推送
-		pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig, brand);
-		//3判断是否需要发送旬短信
-		int temp = DateUtil.getEarlyMidLate(cleanDate);
-		switch (temp){
-			case  1:
-				//第一版旬结短信
-				Map<String, String> xunMapByFirstEdtion = querryXunDataByFirstEditon(shopDetail,cleanDate);
-				pushMessageByFirstEdtion(xunMapByFirstEdtion, shopDetail, wechatConfig, brand);
-				break;
-
-			case 2:
-				Map<String, String> xunMapByFirstEdtion2 = querryXunDataByFirstEditon(shopDetail,cleanDate);
-				pushMessageByFirstEdtion(xunMapByFirstEdtion2, shopDetail, wechatConfig, brand);
-				break;
-
-			case 3:
-				Map<String, String> xunMapByFirstEdtion3 = querryXunDataByFirstEditon(shopDetail,cleanDate);
-				pushMessageByFirstEdtion(xunMapByFirstEdtion3, shopDetail, wechatConfig, brand);
-
-				Map<String, String> monthMapByFirstEdtion = querryMonthDataByFirstEditon(shopDetail, offLineOrder,cleanDate);
-				pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand);
-				break;
-
-			default:
-				break;
-
+	private void insertOffLineOrder(String brandId, String shopId, Date cleanDate, OffLineOrder offLineOrder) {
+		OffLineOrder offLineOrder1 = offLineOrderService.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopId, DateUtil.getDateBegin(cleanDate), DateUtil.getDateEnd(cleanDate));
+		if (null != offLineOrder1) {
+			offLineOrder1.setState(Common.NO);
+			offLineOrderService.update(offLineOrder1);
 		}
-
-		//第二版短信内容由于模板原因无法发送短信 因此保留第一版短信 第二版数据存到大数据库数据库中
-		insertDateData(shopDetail,offLineOrder,wether,brand,cleanDate);
-
+		offLineOrder.setId(ApplicationUtils.randomUUID());
+		offLineOrder.setState(Common.YES);
+		offLineOrder.setResource(OfflineOrderSource.OFFLINE_POS);
+		offLineOrder.setBrandId(brandId);
+		offLineOrder.setShopDetailId(shopId);
+		offLineOrderService.insert(offLineOrder);
 	}
 
 
@@ -259,37 +277,20 @@ public class CloseShopServieImpl implements CloseShopService{
 	 * @param offLineOrder
 	 * @return
 	 */
-	private Map<String,String> querryDateDataByFirstEdtion(ShopDetail shopDetail, Date cleanDate) {
+	private Map<String,String> querryDateDataByFirstEdtion(String shopId, String shopName,Date cleanDate) {
 
 		//----1.定义时间(指定日期的开始时间)---
 		Date todayBegin = DateUtil.getDateBegin(cleanDate);
 		Date todayEnd = DateUtil.getDateEnd(cleanDate);
+
 		//指定日期本月的开始时间 本月结束时间
-		Date beginMonth = DateUtil.beginOfMonth(cleanDate);
-		Date endMonth = todayEnd;
+		Date monthBegin = DateUtil.beginOfMonth(cleanDate);
+		Date monthEnd = todayEnd;
 
-		//判断当前传入的日期是在哪旬中
-		int temp = DateUtil.getEarlyMidLate(cleanDate);
 
-		Date xunBegin = beginMonth;
-		Date xunEnd = endMonth;
-		switch (temp){
-			case 1:
-				xunBegin = beginMonth;
-				xunEnd = todayEnd;
-				break;
-			case 2:
-				xunBegin = DateUtil.getAfterDayDate(beginMonth,10);
-				xunEnd = todayEnd;
-				break;
-			case 3:
-				xunBegin = DateUtil.getAfterDayDate(beginMonth,20);
-				xunEnd = todayEnd;
-				break;
-			default:
-				break;
-
-		}
+		//定义本旬的开始时间和结束时间
+		Date xunBegin = getXunBegin(cleanDate,monthBegin);
+		Date xunEnd = todayEnd;
 
 
 		//三.定义线下订单
@@ -313,7 +314,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		BigDecimal monthOrderBooks = BigDecimal.ZERO;
 
 
-		List<OffLineOrder> todayOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), todayBegin,todayEnd, OfflineOrderSource.OFFLINE_POS);
+		List<OffLineOrder> todayOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopId, todayBegin,todayEnd, OfflineOrderSource.OFFLINE_POS);
 		if (!todayOffLineOrderList.isEmpty()) {
 			for (OffLineOrder of : todayOffLineOrderList) {
 				todayEnterCount += of.getEnterCount();
@@ -324,7 +325,8 @@ public class CloseShopServieImpl implements CloseShopService{
 		}
 
 
-		List<OffLineOrder> monthOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopDetail.getId(), beginMonth, endMonth, OfflineOrderSource.OFFLINE_POS);
+
+		List<OffLineOrder> monthOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopId, monthBegin, monthEnd, OfflineOrderSource.OFFLINE_POS);
 		if (!monthOffLineOrderList.isEmpty()) {
 			for (OffLineOrder of : monthOffLineOrderList) {
 				monthEnterCount += of.getEnterCount();
@@ -334,7 +336,11 @@ public class CloseShopServieImpl implements CloseShopService{
 			}
 		}
 
-		List<Order> newCustomerOrders = orderService.selectNewCustomerOrderByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
+
+
+
+
+		List<Order> newCustomerOrders = orderService.selectNewCustomerOrderByShopIdAndTime(shopId, todayBegin, todayEnd);
 		//新增用户的订单总数
 		int newCustomerOrderNum = 0;
 		//新增用户的订单总额
@@ -362,7 +368,7 @@ public class CloseShopServieImpl implements CloseShopService{
 			}
 		}
 		//查询回头用户的
-		List<BackCustomerDto> backCustomerDtos = orderService.selectBackCustomerByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
+		List<BackCustomerDto> backCustomerDtos = orderService.selectBackCustomerByShopIdAndTime(shopId, todayBegin, todayEnd);
 		//回头用户
 		Set<String> backCustomerId = new HashSet<>();
 		//二次回头用户
@@ -393,7 +399,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		BigDecimal backTwoCustomerOrderTotal = BigDecimal.ZERO;
 		//多次回头用户的订单总额
 		BigDecimal backTwoMoreCustomerOrderTotal = BigDecimal.ZERO;
-		List<Order> todayOrders = orderService.selectCompleteByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
+		List<Order> todayOrders = orderService.selectCompleteByShopIdAndTime(shopId, todayBegin, todayEnd);
 		if (!todayOrders.isEmpty()) {
 			for (Order o : todayOrders) {
 					if (backCustomerId.contains(o.getCustomerId())) {
@@ -436,7 +442,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		//新增用户比率
 		String todayNewCustomerRatio = "";
 
-		List<Order> monthOrders = orderService.selectCompleteByShopIdAndTime(shopDetail.getId(),beginMonth, endMonth);
+		List<Order> monthOrders = orderService.selectCompleteByShopIdAndTime(shopId,monthBegin, monthEnd);
 		if (monthOrders!=null&&!monthOrders.isEmpty()) {
 			for (Order o : monthOrders) {
 				monthRestoTotal = monthRestoTotal.add(getOrderMoney(o.getParentOrderId(), o.getOrderMoney(), o.getAmountWithChildren()));
@@ -521,7 +527,7 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		//单独查询评价和分数
 
-		List<Appraise> todayAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), todayBegin, todayEnd);
+		List<Appraise> todayAppraises = appraiseService.selectByTimeAndShopId(shopId, todayBegin, todayEnd);
 		if(todayAppraises!=null && !todayAppraises.isEmpty()){
 			for(Appraise a:todayAppraises){
 				dayAppraiseNum++;
@@ -536,7 +542,7 @@ public class CloseShopServieImpl implements CloseShopService{
 			}
 		}
 
-		List<Appraise> xunAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), xunBegin, xunEnd);
+		List<Appraise> xunAppraises = appraiseService.selectByTimeAndShopId(shopId, xunBegin, xunEnd);
 		if(xunAppraises!=null && !xunAppraises.isEmpty()){
 			for(Appraise a:xunAppraises){
 				//2.满意度
@@ -545,7 +551,7 @@ public class CloseShopServieImpl implements CloseShopService{
 			}
 		}
 
-		List<Appraise> monthAppraises = appraiseService.selectByTimeAndShopId(shopDetail.getId(), beginMonth, endMonth);
+		List<Appraise> monthAppraises = appraiseService.selectByTimeAndShopId(shopId, monthBegin, monthEnd);
 		if(monthAppraises!=null && !monthAppraises.isEmpty()){
 			for(Appraise a:monthAppraises){
 				//2.满意度
@@ -570,7 +576,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		StringBuilder todayContent = new StringBuilder();
 
 		todayContent.append("{")
-				.append("shopName:").append("'").append(shopDetail.getName()).append("'").append(",")
+				.append("shopName:").append("'").append(shopName).append("'").append(",")
 				.append("datetime:").append("'").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd HH:mm:ss")).append("'").append(",")
 				//到店总笔数(r+线下)-----
 				.append("arriveCount:").append("'").append(todayEnterCount + todayRestoCount).append("'").append(",")
@@ -631,7 +637,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		//封装微信推送文本
 		StringBuilder sb = new StringBuilder();
 		sb
-				.append("店铺名称:").append(shopDetail.getName()).append("\n")
+				.append("店铺名称:").append(shopName).append("\n")
 				.append("时间:").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd HH:mm:ss")).append("\n")
 				.append("到店总笔数:").append(todayEnterCount + todayRestoCount).append("\n")
 				.append("到店消费总额:").append(todayEnterTotal.add(todayRestoTotal)).append("\n")
@@ -671,6 +677,27 @@ public class CloseShopServieImpl implements CloseShopService{
 		map.put("sms", todayContent.toString());
 		map.put("wechat", sb.toString());
 		return map;
+	}
+
+	private Date getXunBegin(Date cleanDate,Date monthBegin) {
+
+		//判断当前传入的日期是在哪旬中
+		int temp = DateUtil.getEarlyMidLate(cleanDate);
+		Date xunBegin = new Date();
+		switch (temp){
+			case DayMessageType.DAY_TYPE:
+				xunBegin = monthBegin;
+				break;
+			case DayMessageType.XUN_TYPE:
+				xunBegin = DateUtil.getAfterDayDate(monthBegin,10);
+				break;
+			case DayMessageType.MONTH_TYPE:
+				xunBegin = DateUtil.getAfterDayDate(monthBegin,20);
+				break;
+			default:
+				break;
+		}
+		return xunBegin;
 	}
 
 
