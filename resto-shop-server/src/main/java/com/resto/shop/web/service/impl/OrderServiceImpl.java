@@ -456,13 +456,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 
-        if(customer != null) {
-            if (!MemcachedUtils.add(customer.getId() + "createOrder", 1, 15)) {
-                jsonResult.setSuccess(false);
-                jsonResult.setMessage("下单过于频繁，请稍后再试！");
-                return jsonResult;
-            }
-        }
+//        if(customer != null) {
+//            if (!MemcachedUtils.add(customer.getId() + "createOrder", 1, 15)) {
+//                jsonResult.setSuccess(false);
+//                jsonResult.setMessage("下单过于频繁，请稍后再试！");
+//                return jsonResult;
+//            }
+//        }
 
         if (customer == null && "wechat".equals(order.getCreateOrderByAddress())) {
             throw new AppException(AppException.CUSTOMER_NOT_EXISTS);
