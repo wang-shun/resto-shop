@@ -14,7 +14,6 @@ import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.*;
-import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;

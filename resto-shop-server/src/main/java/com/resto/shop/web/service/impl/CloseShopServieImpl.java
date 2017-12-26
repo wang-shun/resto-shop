@@ -12,6 +12,7 @@ import com.resto.brand.web.service.WechatConfigService;
 import com.resto.brand.web.service.WetherService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
+import com.resto.shop.web.dto.UnderLineOrderDto;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
@@ -104,7 +105,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		 */
 		Wether wether = getWether(shopDetail,cleanDate);
 
-
 		//第一版短信数据通过短信或和微信推送发送发送
 		sendMessageByFirst(brand,shopDetail,cleanDate,offLineOrder);
 
@@ -189,88 +189,6 @@ public class CloseShopServieImpl implements CloseShopService{
 
 
 
-
-	private void refundShopDetailOrder(ShopDetail shopDetail) {
-		//未付款和未全部付款和已付款
-		String[] orderStates = new String[]{OrderState.SUBMIT + "", OrderState.PAYMENT + ""};
-		String[] productionStates = new String[]{ProductionStatus.NOT_ORDER + ""};
-		//已付款未下单
-		List<Order> orderList = orderService.selectByOrderSatesAndProductionStates(shopDetail.getId(), orderStates, productionStates);
-		if(!orderList.isEmpty()){
-			for (Order order : orderList) {
-				//判断订单是否已被关闭，只对未被关闭的订单做退单处理
-				if (!order.getClosed()) {
-					sendWxRefundMsg(order);
-				}
-			}
-		}
-
-		// 查询已付款且有支付项但是生产状态没有改变的订单
-		List<Order> orderstates = orderService.selectHasPayNoChangeStatus(shopDetail.getId(), DateUtil.getDateBegin(new Date()), DateUtil.getDateEnd(new Date()));
-		if (!orderstates.isEmpty()) {
-			for (Order o : orderstates) {
-				if (o.getOrderMode() == ShopMode.CALL_NUMBER) {
-					o.setProductionStatus(ProductionStatus.HAS_CALL);
-				} else {
-					o.setProductionStatus(ProductionStatus.PRINTED);
-				}
-				orderService.update(o);
-			}
-		}
-
-	}
-
-	public void sendWxRefundMsg(Order order) {
-		if (orderService.checkRefundLimit(order)) {
-			orderService.autoRefundOrder(order.getId());
-			log.info("款项自动退还到相应账户:" + order.getId());
-			Customer customer = customerService.selectById(order.getCustomerId());
-			WechatConfig config = wechatConfigService.selectByBrandId(order.getBrandId());
-			Brand brand = brandService.selectById(customer.getBrandId());
-			ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-			StringBuilder sb = null;
-			if (order.getOrderState().equals(OrderState.SUBMIT)) {
-				//未支付和未完成支付
-				sb = new StringBuilder("亲,今日未完成支付的订单已被商家取消,欢迎下次再来本店消费\n");
-			} else {//已支付未消费
-				sb = new StringBuilder("亲,今日未消费订单已自动退款,欢迎下次再来本店消费\n");
-			}
-			sb.append("订单编号:" + order.getSerialNumber() + "\n");
-			if (order.getOrderMode() != null) {
-				switch (order.getOrderMode()) {
-					case ShopMode.TABLE_MODE:
-						sb.append("桌号:" + (order.getTableNumber() != null ? order.getTableNumber() : "无") + "\n");
-						break;
-					default:
-						sb.append("消费码：" + (order.getVerCode() != null ? order.getVerCode() : "无") + "\n");
-						break;
-				}
-			}
-			if (order.getShopName() == null || "".equals(order.getShopName())) {
-				order.setShopName(shopDetailService.selectById(order.getShopDetailId()).getName());
-			}
-			sb.append("店铺名：" + order.getShopName() + "\n");
-			sb.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
-			sb.append("订单明细：\n");
-			Map<String, String> param = new HashMap<>();
-			param.put("orderId", order.getId());
-			List<OrderItem> orderItem = orderItemService.listByOrderId(param);
-			for (OrderItem item : orderItem) {
-				sb.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
-			}
-			sb.append("订单金额：" + order.getOrderMoney() + "\n");
-			WeChatUtils.sendCustomerMsgASync(sb.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-			Map map = new HashMap(4);
-			map.put("brandName", brand.getBrandName());
-			map.put("fileName", customer.getId());
-			map.put("type", "UserAction");
-			map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + sb.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-			doPostAnsc(LogUtils.url, map);
-		} else {
-			log.info("款项自动退还到相应账户失败，订单状态不是已付款或商品状态不是已付款未下单");
-		}
-	}
-
 	/**
 	 * 第一版短信 日结数据封装
 	 * @param shopDetail
@@ -280,7 +198,7 @@ public class CloseShopServieImpl implements CloseShopService{
 	private Map<String,String> querryDateDataByFirstEdtion(String shopId, String shopName,Date cleanDate) {
 
 		//----1.定义时间(指定日期的开始时间)---
-		Date todayBegin = DateUtil.getDateBegin(cleanDate);
+		final Date todayBegin = DateUtil.getDateBegin(cleanDate);
 		Date todayEnd = DateUtil.getDateEnd(cleanDate);
 
 		//指定日期本月的开始时间 本月结束时间
@@ -293,51 +211,18 @@ public class CloseShopServieImpl implements CloseShopService{
 		Date xunEnd = todayEnd;
 
 
-		//三.定义线下订单
-		//本日线下订单总数(堂吃)
-		int todayEnterCount = 0;
-		//本日线下订单总额(堂吃)
-		BigDecimal todayEnterTotal = BigDecimal.ZERO;
-		//本月线下订单总数
-		int monthEnterCount = 0;
-		//本月线下订单总额
-		BigDecimal monthEnterTotal = BigDecimal.ZERO;
-
-		//4.外卖订单
-		//本日外卖订单数
-		int todayDeliverOrders = 0;
-		//本日外卖订单总额
-		BigDecimal todayOrderBooks = BigDecimal.ZERO;
-		//本月外卖订单数
-		int monthDeliverOrder = 0;
-		//本月外卖订单总额
-		BigDecimal monthOrderBooks = BigDecimal.ZERO;
-
-
-		List<OffLineOrder> todayOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopId, todayBegin,todayEnd, OfflineOrderSource.OFFLINE_POS);
-		if (!todayOffLineOrderList.isEmpty()) {
-			for (OffLineOrder of : todayOffLineOrderList) {
-				todayEnterCount += of.getEnterCount();
-				todayEnterTotal = todayEnterTotal.add(of.getEnterTotal());
-				todayDeliverOrders += of.getDeliveryOrders();
-				todayOrderBooks = todayOrderBooks.add(of.getOrderBooks());
-			}
-		}
-
-
-
 		List<OffLineOrder> monthOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopId, monthBegin, monthEnd, OfflineOrderSource.OFFLINE_POS);
-		if (!monthOffLineOrderList.isEmpty()) {
-			for (OffLineOrder of : monthOffLineOrderList) {
-				monthEnterCount += of.getEnterCount();
-				monthEnterTotal = monthEnterTotal.add(of.getEnterTotal());
-				monthDeliverOrder += of.getDeliveryOrders();
-				monthOrderBooks = monthOrderBooks.add(of.getOrderBooks());
-			}
-		}
 
 
+		//本日线下订单
+		OffLineOrder todayOffLineOrder = monthOffLineOrderList.stream().filter(order -> order.getCreateTime().getTime()>todayBegin.getTime() && order.getCreateTime().getTime()<todayEnd.getTime()).reduce(OffLineOrder.init(),(s1,s2) ->s1.sumOrder(s2));
 
+		UnderLineOrderDto dto = new UnderLineOrderDto();
+		dto.initTodayOffLineOrder(todayOffLineOrder);
+
+		//本月线下订单
+		OffLineOrder monthOffLineOrder = monthOffLineOrderList.stream().reduce(OffLineOrder.init(),(s1,s2) ->s1.sumOrder(s2));
+		dto.initMonthOffLineOrder(monthOffLineOrder);
 
 
 		List<Order> newCustomerOrders = orderService.selectNewCustomerOrderByShopIdAndTime(shopId, todayBegin, todayEnd);
@@ -481,7 +366,8 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		//本日用户消费比率 R+线下+外卖
 		//到店总笔数 线上+线下
-		double dmax = todayEnterCount + todayRestoCount;
+		//double dmax = todayEnterCount + todayRestoCount;
+		double dmax = 100;
 		if (dmax != 0) {
 			//本日用户消费比率
 			todayCustomerRatio = formatDouble((todayRestoCount / dmax) * 100);
@@ -579,9 +465,9 @@ public class CloseShopServieImpl implements CloseShopService{
 				.append("shopName:").append("'").append(shopName).append("'").append(",")
 				.append("datetime:").append("'").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd HH:mm:ss")).append("'").append(",")
 				//到店总笔数(r+线下)-----
-				.append("arriveCount:").append("'").append(todayEnterCount + todayRestoCount).append("'").append(",")
-				//到店消费总额 我们的总额+线下的总额，不包含外卖金额
-				.append("arriveTotalAmount:").append("'").append(todayEnterTotal.add(todayRestoTotal)).append("'").append(",")
+//				.append("arriveCount:").append("'").append(todayEnterCount + todayRestoCount).append("'").append(",")
+//				//到店消费总额 我们的总额+线下的总额，不包含外卖金额
+//				.append("arriveTotalAmount:").append("'").append(todayEnterTotal.add(todayRestoTotal)).append("'").append(",")
 				//用户消费笔数  R+订单总数
 				.append("customerPayCount:").append("'").append(todayRestoCount).append("'").append(",")
 				//用户消费金额: (r+订单总额)
@@ -627,11 +513,11 @@ public class CloseShopServieImpl implements CloseShopService{
 				//本月满意度
 				.append("satisfied3:").append("'").append(monthSatisfaction).append("'").append(",")
 				//今日外卖金额
-				.append("outFoodTotal:").append("'").append(todayOrderBooks).append("'").append(",")
-				//总营业额
-				.append("totalOrderMoney:").append("'").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("'").append(",")
-				//本月总额
-				.append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("'")
+//				.append("outFoodTotal:").append("'").append(todayOrderBooks).append("'").append(",")
+//				//总营业额
+//				.append("totalOrderMoney:").append("'").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("'").append(",")
+//				//本月总额
+//				.append("monthTotalMoney:").append("'").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("'")
 				.append("}");
 
 		//封装微信推送文本
@@ -639,8 +525,8 @@ public class CloseShopServieImpl implements CloseShopService{
 		sb
 				.append("店铺名称:").append(shopName).append("\n")
 				.append("时间:").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd HH:mm:ss")).append("\n")
-				.append("到店总笔数:").append(todayEnterCount + todayRestoCount).append("\n")
-				.append("到店消费总额:").append(todayEnterTotal.add(todayRestoTotal)).append("\n")
+//				.append("到店总笔数:").append(todayEnterCount + todayRestoCount).append("\n")
+//				.append("到店消费总额:").append(todayEnterTotal.add(todayRestoTotal)).append("\n")
 				.append("---------------------").append("\n")
 				.append("用户消费比数:").append(todayRestoCount).append("\n")
 				.append("用户消费金额").append(todayRestoTotal).append("\n")
@@ -668,10 +554,10 @@ public class CloseShopServieImpl implements CloseShopService{
 				.append("本日满意度:").append(todaySatisfaction).append("\n")
 				.append("本旬满意度:").append(theTenDaySatisfaction).append("\n")
 				.append("本月满意度:").append(monthSatisfaction).append("\n")
-				.append("---------------------").append("\n")
-				.append("今日外卖金额:").append(todayOrderBooks).append("\n")
-				.append("今日总营业额:").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("\n")
-				.append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("\n");
+				.append("---------------------").append("\n");
+//				.append("今日外卖金额:").append(todayOrderBooks).append("\n")
+//				.append("今日总营业额:").append(todayEnterTotal.add(todayRestoTotal).add(todayOrderBooks)).append("\n")
+//				.append("本月总额:").append(monthOrderBooks.add(monthEnterTotal).add(monthRestoTotal)).append("\n");
 
 		Map<String, String> map = new HashMap<>(128);
 		map.put("sms", todayContent.toString());
