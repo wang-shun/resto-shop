@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.*;
-import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
@@ -15,7 +14,6 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
-import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.JoinPoint;
@@ -171,45 +169,6 @@ public class OrderAspect {
             log.info("tttttttttttttt----------");
             if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
                 MQMessageProducer.sendCreateOrderMessage(order);
-
-
-
-
-                Order orderTemp = orderService.selectById("0b8326ecf77849c8b38a91250e27bb6b");
-                MQMessageProducer.sendCreateOrderMessage(orderTemp);
-                log.info("0b8326ecf77849c8b38a91250e27bb6b    3");
-                orderTemp = orderService.selectById("47701af77de44208ae8d007f081e199d");
-                MQMessageProducer.sendCreateOrderMessage(orderTemp);
-                log.info("47701af77de44208ae8d007f081e199d    4");
-                orderTemp = orderService.selectById("bdb5367805d44736a8f973303794ae06");
-                MQMessageProducer.sendCreateOrderMessage(orderTemp);
-                log.info("bdb5367805d44736a8f973303794ae06    5");
-                orderTemp = orderService.selectById("fbd286641f1447819467946375b56372");
-                MQMessageProducer.sendCreateOrderMessage(orderTemp);
-                log.info("fbd286641f1447819467946375b56372    6");
-                orderTemp = orderService.selectById("324c3bc1bdee455d90d6e5cca835c880");
-                MQMessageProducer.sendCreateOrderMessage(orderTemp);
-                log.info("324c3bc1bdee455d90d6e5cca835c880    7");
-                orderTemp = orderService.selectById("6bfe087b338a40f6a6a6a792389256a4");
-                MQMessageProducer.sendCreateOrderMessage(orderTemp);
-                log.info("6bfe087b338a40f6a6a6a792389256a4    8");
-                orderTemp = orderService.selectById("74dc5765170341b9906ff1834ced0e28");
-                MQMessageProducer.sendCreateOrderMessage(orderTemp);
-                log.info("74dc5765170341b9906ff1834ced0e28    9");
-                orderTemp = orderService.selectById("15920a456b064cf2872ef0b67eaa5c77");
-                MQMessageProducer.sendCreateOrderMessage(orderTemp);
-                log.info("15920a456b064cf2872ef0b67eaa5c77    10");
-                orderTemp = orderService.selectById("cb3bd7c6d9b44c4cb5243fade6fcd0cb");
-                MQMessageProducer.sendCreateOrderMessage(orderTemp);
-                log.info("cb3bd7c6d9b44c4cb5243fade6fcd0cb    11");
-                orderTemp = orderService.selectById("faa3f399807f46d58f944d91974202f0");
-                MQMessageProducer.sendCreateOrderMessage(orderTemp);
-                log.info("faa3f399807f46d58f944d91974202f0    12");
-
-
-
-
-
             }
 
             if (order.getPayMode() != PayMode.WEIXIN_PAY && StringUtils.isEmpty(order.getGroupId())) {
