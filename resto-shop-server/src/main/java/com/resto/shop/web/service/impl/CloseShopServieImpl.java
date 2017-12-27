@@ -16,7 +16,6 @@ import com.resto.shop.web.dto.UnderLineOrderDto;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +23,6 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
 
-import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.OrderCountUtils.formatDouble;
 import static com.resto.brand.core.util.OrderCountUtils.getOrderMoney;
 @SuppressWarnings("ALL")
@@ -97,8 +95,13 @@ public class CloseShopServieImpl implements CloseShopService{
 		 */
 		Date cleanDate = offLineOrder.getCreateDate();
 
-		//存储线下订单
-		insertOffLineOrder(brand.getId(),shopDetail.getId(),cleanDate,offLineOrder);
+
+
+		//判断是否是当天结店
+		if(DateUtil.isSameDate(cleanDate,new Date())){
+			cleanDate = new Date();
+		}
+
 
 		/**
 		 * 获取天气数据
@@ -173,19 +176,7 @@ public class CloseShopServieImpl implements CloseShopService{
 
 	}
 
-	private void insertOffLineOrder(String brandId, String shopId, Date cleanDate, OffLineOrder offLineOrder) {
-		OffLineOrder offLineOrder1 = offLineOrderService.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopId, DateUtil.getDateBegin(cleanDate), DateUtil.getDateEnd(cleanDate));
-		if (null != offLineOrder1) {
-			offLineOrder1.setState(Common.NO);
-			offLineOrderService.update(offLineOrder1);
-		}
-		offLineOrder.setId(ApplicationUtils.randomUUID());
-		offLineOrder.setState(Common.YES);
-		offLineOrder.setResource(OfflineOrderSource.OFFLINE_POS);
-		offLineOrder.setBrandId(brandId);
-		offLineOrder.setShopDetailId(shopId);
-		offLineOrderService.insert(offLineOrder);
-	}
+
 
 
 
@@ -196,6 +187,8 @@ public class CloseShopServieImpl implements CloseShopService{
 	 * @return
 	 */
 	private Map<String,String> querryDateDataByFirstEdtion(String shopId, String shopName,Date cleanDate) {
+
+		//数据库查询时候需要的时间begin-----------------
 
 		//----1.定义时间(指定日期的开始时间)---
 		final Date todayBegin = DateUtil.getDateBegin(cleanDate);
@@ -210,12 +203,22 @@ public class CloseShopServieImpl implements CloseShopService{
 		Date xunBegin = getXunBegin(cleanDate,monthBegin);
 		Date xunEnd = todayEnd;
 
+		//数据查询时候需要的时间 end-----------------
+
+		//比较某个时间是否在时间范围内所需要的时间类型
+		Date compareToTodayBegin = cleanDate;
+		Date compareToTodayEnd = cleanDate;
+
+		Date compareToMonthBegin = DateUtil.beginOfMonth(cleanDate);
+
+
+
 
 		List<OffLineOrder> monthOffLineOrderList = offLineOrderService.selectlistByTimeSourceAndShopId(shopId, monthBegin, monthEnd, OfflineOrderSource.OFFLINE_POS);
 
 
 		//本日线下订单
-		OffLineOrder todayOffLineOrder = monthOffLineOrderList.stream().filter(order -> order.getCreateTime().getTime()>todayBegin.getTime() && order.getCreateTime().getTime()<todayEnd.getTime()).reduce(OffLineOrder.init(),(s1,s2) ->s1.sumOrder(s2));
+		OffLineOrder todayOffLineOrder = monthOffLineOrderList.stream().filter(order -> DateUtil.belongCalendar(order.getCreateTime(),todayBegin,todayEnd)).reduce(OffLineOrder.init(),(s1,s2) ->s1.sumOrder(s2));
 
 		UnderLineOrderDto dto = new UnderLineOrderDto();
 		dto.initTodayOffLineOrder(todayOffLineOrder);

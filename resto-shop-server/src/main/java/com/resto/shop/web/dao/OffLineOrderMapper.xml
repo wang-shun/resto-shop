@@ -34,6 +34,7 @@
             <if test="deliveryOrders != null">delivery_orders,</if>
             <if test="orderBooks != null">order_books,</if>
             <if test="numGuest != null">num_guest,</if>
+            <if test="createDate != null">create_date,</if>
             <if test="createTime != null">create_time,</if>
             <if test="state != null">state,</if>
         </trim>
@@ -47,6 +48,7 @@
             <if test="deliveryOrders != null">#{deliveryOrders,jdbcType=INTEGER},</if>
             <if test="orderBooks != null">#{orderBooks,jdbcType=DECIMAL},</if>
             <if test="numGuest != null">#{numGuest,jdbcType=INTEGER},</if>
+            <if test="createDate != null">#{createDate},</if>
             <if test="createTime != null">#{createTime,jdbcType=TIMESTAMP},</if>
             <if test="state != null">#{state},</if>
         </trim>
@@ -63,6 +65,7 @@
             <if test="orderBooks != null">order_books = #{orderBooks,jdbcType=DECIMAL},</if>
             <if test="numGuest != null">num_guest = #{numGuest,jdbcType=INTEGER},</if>
             <if test="createTime != null">create_time = #{createTime,jdbcType=TIMESTAMP},</if>
+            <if test="createDate != null">create_date = #{createDate},</if>
             <if test="state != null">state = #{state},</if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -76,7 +79,7 @@
     SELECT id,shop_detail_id,brand_id,resource,enter_total,enter_count,delivery_orders,order_books,delivery_orders, order_books,num_guest,create_time,state FROM tb_off_line_order
     WHERE  shop_detail_id =#{shopId} AND  resource=1 AND  state =1 AND
     <![CDATA[
-     create_time > #{beginDate} AND create_time <= #{endDate}
+     create_time >= #{beginDate} AND create_time <= #{endDate}
 
         ]]>
     </select>
@@ -96,7 +99,7 @@
     state FROM tb_off_line_order
     WHERE  shop_detail_id =#{shopId} AND  resource=1 AND  state =1 AND
     <![CDATA[
-     create_time > #{beginDate} AND create_time <= #{endDate}
+     create_time >= #{beginDate} AND create_time <= #{endDate}
       ]]>
     </select>
 
@@ -106,7 +109,7 @@
         SELECT id,shop_detail_id,brand_id,resource,enter_total,enter_count,delivery_orders, order_books,num_guest,create_time,state FROM tb_off_line_order
         WHERE  shop_detail_id =#{shopId} AND  state =1 AND
         <![CDATA[
-     create_time > #{beginDate} AND create_time <= #{endDate}
+     create_time >= #{beginDate} AND create_time <= #{endDate}
 
         ]]>
     </select>
@@ -120,7 +123,7 @@ and production_status in (2,3)
 and order_state in (2,10,11,12,13)
 and
  <![CDATA[
-     create_time > #{beginDate} AND create_time <= #{endDate}
+     create_time >= #{beginDate} AND create_time <= #{endDate}
         ]]>
     </select>
 
@@ -131,7 +134,7 @@ and order_state in (2,10,11,12,13)
 and shop_detail_id = #{shopId}
 and
  <![CDATA[
-     create_time > #{beginDate} AND create_time <= #{endDate}
+     create_time >= #{beginDate} AND create_time <= #{endDate}
    ]]>
     </select>
 
@@ -145,7 +148,7 @@ and
         AND state = 1
         AND
          <![CDATA[
-           create_time > #{beginDate} AND create_time <= #{endDate}
+           create_time >= #{beginDate} AND create_time <= #{endDate}
          ]]>
         AND resource = #{orderType}
     </select>
@@ -153,7 +156,7 @@ and
     <select id="selectOrderNumByTimeAndBrandId" resultType="com.resto.shop.web.dto.OrderNumDto">
         select shop_detail_id shopId, sum(enter_count)num  from tb_off_line_order
         WHERE  <![CDATA[
-           create_time > #{beginDate} AND create_time <= #{endDate}
+           create_time >= #{beginDate} AND create_time <= #{endDate}
          ]]> and state = 1
         GROUP BY shop_detail_id
 
