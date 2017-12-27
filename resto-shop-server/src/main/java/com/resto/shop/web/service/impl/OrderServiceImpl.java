@@ -457,7 +457,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         if(customer != null) {
-            if (!MemcachedUtils.add(customer.getId() + "createOrder", 1, 15)) {
+            if(customer.getIsBindPhone() && "15618232089".equals(customer.getTelephone())){
+                //  如果是英杰的账号，则不进行 此验证 , 可使用 此手机号 进行并发下单测试   -lmx
+            }else if (!MemcachedUtils.add(customer.getId() + "createOrder", 1, 15)) {
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("下单过于频繁，请稍后再试！");
                 return jsonResult;
