@@ -25,6 +25,7 @@ public class OffLineOrder implements Serializable {
 
     private Integer numGuest;
 
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")

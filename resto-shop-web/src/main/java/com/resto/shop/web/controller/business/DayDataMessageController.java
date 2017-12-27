@@ -41,7 +41,7 @@ public class DayDataMessageController extends GenericController{
 	@RequestMapping("/list")
     public ModelAndView list(){
 	    //判断是否要显示旬 和 月
-       int type= DateUtil.getEarlyMidLate();
+       int type= DateUtil.getEarlyMidLateEnd(new Date());
        ModelAndView mv = new ModelAndView();
        mv.setViewName("daydatamessage/list");
        mv.addObject("type",type);
