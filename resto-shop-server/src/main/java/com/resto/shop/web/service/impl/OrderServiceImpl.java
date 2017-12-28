@@ -9089,7 +9089,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         newOrder.setPrintTimes(1);
         newOrder.setGiveChange(giveChange);
         newOrder.setIsPosPay(Common.YES);
-        newOrder.setPaymentAmount(newOrder.getOrderMoney().subtract(couponValue));
+        newOrder.setPaymentAmount(order.getOrderMoney().subtract(couponValue));
         update(newOrder);
         OrderPaymentItem paymentItem = new OrderPaymentItem();
         if (payValue.compareTo(BigDecimal.ZERO) > 0) {
