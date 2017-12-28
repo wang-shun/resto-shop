@@ -683,7 +683,6 @@ public class CloseShopServieImpl implements CloseShopService{
 			//截取电话号码
 			String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
 
-			telephones = "13317182430";
 			String[] tels = telephones.split(",");
 
 			for (String telephone : tels) {
