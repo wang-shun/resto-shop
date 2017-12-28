@@ -156,7 +156,7 @@
         <if test="IS_EXPIRE != null and IS_EXPIRE != '' ">
             <![CDATA[AND (begin_date>current_date()  OR end_date <current_date() )]]>
         </if>
-        order by VALUE DESC
+        order by `value` DESC
     </select>
 
 
@@ -174,7 +174,7 @@
         <if test="IS_EXPIRE != null and IS_EXPIRE != '' ">
             <![CDATA[AND end_date <current_date()]]>
         </if>
-        order by VALUE DESC
+        order by `value` DESC
     </select>
 
     <select id="getListByCustomerId" resultType="Coupon">
