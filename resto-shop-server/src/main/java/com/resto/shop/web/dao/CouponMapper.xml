@@ -143,7 +143,7 @@
 
 
     <!-- 根据状态查询 客户所有品牌的优惠劵 -->
-    <select id="listCouponByStatusAndBrandId" resultType="Coupon">
+    <select id="listCouponByStatusAndBrandId" resultType="com.resto.shop.web.model.Coupon">
         select * from tb_coupon
         where CUSTOMER_ID = #{customerId}
         AND brand_id = #{brandId} and shop_detail_id is null
@@ -151,17 +151,17 @@
             and is_used= #{status}
         </if>
         <if test="NOT_EXPIRE != null and NOT_EXPIRE != '' ">
-            AND (current_date()>=begin_date  AND end_date >=current_date())
+            <![CDATA[AND (begin_date<=current_date()  AND end_date >=current_date() )]]>
         </if>
         <if test="IS_EXPIRE != null and IS_EXPIRE != '' ">
-            AND (begin_date>current_date()  OR  current_date()>end_date)
+            <![CDATA[AND (begin_date>current_date()  OR end_date <current_date() )]]>
         </if>
         order by VALUE DESC
     </select>
 
 
     <!-- 根据状态查询 客户所有店铺的优惠劵   包含生日优惠券 -->
-    <select id="listCouponByStatusAndShopId" resultType="Coupon">
+    <select id="listCouponByStatusAndShopId" resultType="com.resto.shop.web.model.Coupon">
         select * from tb_coupon
         where CUSTOMER_ID = #{customerId}
         AND shop_detail_id = #{shopId}
