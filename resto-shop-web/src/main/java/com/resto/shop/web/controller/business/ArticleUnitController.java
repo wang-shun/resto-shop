@@ -5,6 +5,8 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import com.resto.shop.web.service.PosService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -20,6 +22,9 @@ public class ArticleUnitController extends GenericController{
 
 	@Resource
 	ArticleUnitService articleunitService;
+
+	@Autowired
+	PosService posService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -42,6 +47,7 @@ public class ArticleUnitController extends GenericController{
 	@ResponseBody
 	public Result create(@Valid ArticleUnit brand){
 		articleunitService.insert(brand);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
@@ -49,6 +55,7 @@ public class ArticleUnitController extends GenericController{
 	@ResponseBody
 	public Result modify(@Valid ArticleUnit brand){
 		articleunitService.update(brand);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 	
@@ -56,6 +63,7 @@ public class ArticleUnitController extends GenericController{
 	@ResponseBody
 	public Result delete(Integer id){
 		articleunitService.delete(id);
+		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 }

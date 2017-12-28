@@ -16,6 +16,9 @@ public class Unit implements Serializable {
 
     private String shopId;
 
+    // 上面那个 shopId 是个假的，但是不敢删
+    private String shopDetailId;
+
     private Integer choiceType;
 
     private Integer isUsed;
@@ -77,5 +80,13 @@ public class Unit implements Serializable {
 
     final public void setDetails(List<UnitDetail> details) {
         this.details = details;
+    }
+
+    public String getShopDetailId() {
+        return shopDetailId;
+    }
+
+    public void setShopDetailId(String shopDetailId) {
+        this.shopDetailId = shopDetailId;
     }
 }

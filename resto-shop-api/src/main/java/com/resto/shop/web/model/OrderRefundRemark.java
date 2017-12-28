@@ -23,6 +23,8 @@ public class OrderRefundRemark {
 
     private String brandId;
 
+    private String dataSyncId;
+
     public Long getId() {
         return id;
     }
@@ -101,5 +103,13 @@ public class OrderRefundRemark {
 
     public void setBrandId(String brandId) {
         this.brandId = brandId == null ? null : brandId.trim();
+    }
+
+    public String getDataSyncId() {
+        return dataSyncId;
+    }
+
+    public void setDataSyncId(String dataSyncId) {
+        this.dataSyncId = dataSyncId;
     }
 }

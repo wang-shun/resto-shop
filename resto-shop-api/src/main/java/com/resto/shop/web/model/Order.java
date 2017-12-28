@@ -1,9 +1,16 @@
 package com.resto.shop.web.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.resto.brand.web.model.RefundRemark;
+import com.resto.shop.web.posDto.OrderDto;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +23,42 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 @JsonInclude(Include.NON_NULL)
-public class Order implements Serializable{
+public class Order implements Serializable {
+
+    public Order(OrderDto orderDto) {
+        this.id = orderDto.getId() == null ? "" : orderDto.getId();
+        this.tableNumber = orderDto.getTableNumber() == null ? "" : orderDto.getTableNumber();
+        this.customerCount = orderDto.getCustomerCount() == null ? 0 : orderDto.getCustomerCount();
+        this.accountingTime = orderDto.getAccountingTime() == null ? new Date() : orderDto.getAccountingTime();
+        this.orderState = orderDto.getOrderState() == null ? 0 : orderDto.getOrderState();
+        this.productionStatus = orderDto.getProductionStatus() == null ? 0 : orderDto.getProductionStatus();
+        this.originalAmount = orderDto.getOriginalAmount() == null ? BigDecimal.valueOf(0) : orderDto.getOriginalAmount();
+        this.orderMoney = orderDto.getOrderMoney() == null ? BigDecimal.valueOf(0) : orderDto.getOrderMoney();
+        this.articleCount = orderDto.getArticleCount() == null ? 0 : orderDto.getArticleCount();
+        this.serialNumber = orderDto.getSerialNumber() == null ? "" : orderDto.getSerialNumber();
+        this.allowCancel = orderDto.getAllowCancel() == null ? false : orderDto.getAllowCancel() > 0;
+        this.closed = orderDto.getClosed() == null ? false : orderDto.getClosed() > 0;
+        this.createTime = orderDto.getCreateTime() == null ? new Date() : new Date(orderDto.getCreateTime());
+        this.pushOrderTime = orderDto.getPushOrderTime() == null ? new Date() : new Date(orderDto.getPushOrderTime());
+        this.printOrderTime = orderDto.getPrintOrderTime() == null ? new Date() : new Date(orderDto.getPrintOrderTime());
+        this.remark = orderDto.getRemark() == null ? "" : orderDto.getRemark();
+        this.distributionModeId = orderDto.getDistributionModeId() == null ? 0 : orderDto.getDistributionModeId();
+        this.amountWithChildren = orderDto.getAmountWithChildren() == null ? BigDecimal.valueOf(0) : orderDto.getAmountWithChildren();
+        this.parentOrderId = StringUtils.isEmpty(orderDto.getParentOrderId())  ? null : orderDto.getParentOrderId();
+        this.servicePrice = orderDto.getServicePrice() == null ? BigDecimal.valueOf(0) : orderDto.getServicePrice();
+        this.shopDetailId = orderDto.getShopDetailId() == null ? "" : orderDto.getShopDetailId();
+        this.payType = orderDto.getPayType() == null ? 0 : orderDto.getPayType();
+        this.countWithChild = orderDto.getCountWithChild() == null ? 0 : orderDto.getCountWithChild();
+        this.allowContinueOrder = orderDto.getAllowContinueOrder() == null ? false : orderDto.getAllowContinueOrder() > 0;
+        this.paymentAmount = orderDto.getPaymentAmount() == null ? BigDecimal.valueOf(0) : orderDto.getPaymentAmount();
+        this.customerId = orderDto.getCustomerId() == null ? "0" : orderDto.getCustomerId();
+        this.customerAddressId = StringUtils.isEmpty(orderDto.getCustomerAddressId()) ? null : orderDto.getCustomerAddressId();
+        this.mealAllNumber = orderDto.getMealAllNumber() == null ? 0 : orderDto.getMealAllNumber();
+        this.mealFeePrice = orderDto.getMealFeePrice() == null ? BigDecimal.valueOf(0) : orderDto.getMealFeePrice();
+        this.verCode = orderDto.getVerCode() == null ? "" : orderDto.getVerCode();
+        this.allowAppraise = orderDto.getAllowAppraise() == null ? false : orderDto.getAllowAppraise();
+    }
+
 
     private Integer tag;//不去重
 
@@ -39,7 +81,7 @@ public class Order implements Serializable{
     private BigDecimal paymentAmount;
 
     private BigDecimal orderMoney;
-    
+
     private BigDecimal aliPayDiscountMoney;
 
     private Integer articleCount;
@@ -58,7 +100,7 @@ public class Order implements Serializable{
 
     private String remark;
 
-    @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     private String operatorId;
@@ -146,7 +188,7 @@ public class Order implements Serializable{
 
     private Integer isShare;
 
-    private  String shareCustomer;
+    private String shareCustomer;
 
     //该订单是否使用优惠券
     private Boolean ifUseCoupon;
@@ -154,7 +196,7 @@ public class Order implements Serializable{
     //该订单的优惠券信息
     private Coupon couponInfo;
 
-    private  List<Order> childList; //子订单
+    private List<Order> childList; //子订单
 
     //新增微信支付单号
     public OrderPaymentItem orderPaymentItem;
@@ -174,7 +216,7 @@ public class Order implements Serializable{
     private Integer isPay;
 
     //子订单的菜品项 ，key为子订单id
-    private Map<String,List<OrderItem>> childItems;
+    private Map<String, List<OrderItem>> childItems;
 
     private BigDecimal refundMoney;
 
@@ -257,6 +299,11 @@ public class Order implements Serializable{
     private Integer orderBefore;
 
     private String beforeId;
+
+    // 订单退款备注
+    private List<OrderRefundRemark> orderRefundRemarks;
+    // Pos 2.0 字段，用于备份原始订单
+    private String posBackUps;
 
     //新版服务费的集合 包括：餐具费、纸巾费、酱料费
     private List<JSONObject> serviceList;
@@ -501,16 +548,16 @@ public class Order implements Serializable{
     public void setNeedScan(Integer needScan) {
         this.needScan = needScan;
     }
-    
+
     public Integer getBaseMealAllCount() {
-		return baseMealAllCount;
-	}
+        return baseMealAllCount;
+    }
 
-	public void setBaseMealAllCount(Integer baseMealAllCount) {
-		this.baseMealAllCount = baseMealAllCount;
-	}
+    public void setBaseMealAllCount(Integer baseMealAllCount) {
+        this.baseMealAllCount = baseMealAllCount;
+    }
 
-	public Integer getBaseCustomerCount() {
+    public Integer getBaseCustomerCount() {
         return baseCustomerCount;
     }
 
@@ -621,6 +668,7 @@ public class Order implements Serializable{
     final public void setServicePrice(BigDecimal servicePrice) {
         this.servicePrice = servicePrice;
     }
+
     final public Long getEmployeeId() {
         return employeeId;
     }
@@ -1055,13 +1103,13 @@ public class Order implements Serializable{
         this.useAccount = useAccount;
     }
 
-	public BigDecimal getAliPayDiscountMoney() {
-		return aliPayDiscountMoney;
-	}
+    public BigDecimal getAliPayDiscountMoney() {
+        return aliPayDiscountMoney;
+    }
 
-	public void setAliPayDiscountMoney(BigDecimal aliPayDiscountMoney) {
-		this.aliPayDiscountMoney = aliPayDiscountMoney;
-	}
+    public void setAliPayDiscountMoney(BigDecimal aliPayDiscountMoney) {
+        this.aliPayDiscountMoney = aliPayDiscountMoney;
+    }
 
     public Boolean getIfUseCoupon() {
         return ifUseCoupon;
@@ -1247,5 +1295,24 @@ public class Order implements Serializable{
 
     public void setDiscountMoney(BigDecimal discountMoney) {
         this.discountMoney = discountMoney;
+    }
+
+    public Order() {
+    }
+
+    public List<OrderRefundRemark> getOrderRefundRemarks() {
+        return orderRefundRemarks;
+    }
+
+    public void setOrderRefundRemarks(List<OrderRefundRemark> orderRefundRemarks) {
+        this.orderRefundRemarks = orderRefundRemarks;
+    }
+
+    public String getPosBackUps() {
+        return posBackUps;
+    }
+
+    public void setPosBackUps(String posBackUps) {
+        this.posBackUps = posBackUps;
     }
 }

@@ -791,4 +791,19 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
 	 */
     List<OrderNumDto> selectOrderNumByTimeAndBrandId(@Param("brandId") String brandId, @Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
+
+	/**
+	 * Pos 2.0 数据同步方法，根据 orderId 查询订单信息
+	 * @param orderId
+	 * @return
+	 */
+	Order posSyncSelectById(@Param("orderId") String orderId);
+
+	/**
+	 *
+	 * @param shopId
+	 * @param customerId
+	 * @return
+	 */
+	Integer selectCompleteOrderCount(@Param("shopId") String shopId, @Param("customerId") String customerId);
 }

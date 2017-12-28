@@ -220,4 +220,9 @@
     <select id="selectByOrderIdCustomerId" resultType="Appraise">
         select <include refid="Base_Column_List"/> from tb_appraise where order_id = #{orderId} and customer_id = #{customerId} limit 1
     </select>
+
+    <select id="selectAllAppraiseByShopIdAndCustomerId" resultType="Appraise">
+        select * from tb_appraise where customer_id = #{customerId} and shop_detail_id = #{shopId}
+          and status = 1 order by create_time desc
+    </select>
 </mapper>

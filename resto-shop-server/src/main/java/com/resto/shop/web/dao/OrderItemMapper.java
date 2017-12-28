@@ -84,6 +84,15 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
 
     List<OrderItem> selectByArticleIds(String[] articleIds);
 
+    /**
+     * 根据 订单ID 删除
+     * Pos 2.0 同步数据使用
+     * @param orderId
+     */
+    void posSyncDeleteByOrderId(String orderId);
+
     List<OrderItem> getOrderBefore(@Param("tableNumber") String tableNumber,
                                    @Param("shopId") String shopId,@Param("customerId") String customerId);
+
+    List<OrderItem> posSyncListByOrderId(@Param("orderId") String orderId);
 }

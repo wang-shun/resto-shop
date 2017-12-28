@@ -26,6 +26,7 @@
         <result column="refund_count" property="refundCount"/>
         <result column="change_count" property="changeCount"/>
         <result column="print_fail_flag" property="printFailFlag"/>
+        <result column="meal_fee_number" property="mealFeeNumber"/>
         <result column="customer_id" property="customerId"/>
         <association property="orderRefundRemark" javaType="com.resto.shop.web.model.OrderRefundRemark">
             <id column="id1" property="id" jdbcType="BIGINT"/>
@@ -399,7 +400,7 @@ order by t.print_sort asc
         select  article_id articleId, article_name articleName,
         SUM(refund_count) refundCount,SUM(count) count,
         SUM(IF(type = 4, count, 0)) packageNumber,
-        type
+        type,meal_fee_number
         from tb_order_item
         where order_id in
         <foreach collection="orderIds" item="orderId" open="(" separator="," close=")">
@@ -471,5 +472,13 @@ order by t.print_sort asc
             and customer_id = #{customerId}
         </if>
         )
+    </select>
+
+    <delete id="posSyncDeleteByOrderId" parameterType="java.lang.String">
+      DELETE FROM tb_order_item where order_id = #{orderId}
+    </delete>
+
+    <select id="posSyncListByOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT * from tb_order_item where order_id = #{orderId}
     </select>
 </mapper>

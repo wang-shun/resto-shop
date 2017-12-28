@@ -176,6 +176,11 @@
         select * from tb_meal_item where meal_attr_id = #{attrId}
     </select>
 
+    <select id="selectMealItemByShopId" resultType="MealItem">
+        SELECT mi.id,mi.`name`,mi.sort,mi.article_name,mi.price_dif,mi.meal_attr_id,mi.article_id,mi.is_default,mi.kitchen_id
+         from tb_meal_item mi LEFT JOIN tb_article a on mi.article_id = a.id where a.shop_detail_id = #{shopId}
+    </select>
+
     <update id="updateArticleNameById" parameterType="com.resto.shop.web.model.MealItem">
         update tb_meal_item
         set article_name = #{articleName,jdbcType=VARCHAR}
