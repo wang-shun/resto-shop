@@ -89,19 +89,13 @@ public class CloseShopServieImpl implements CloseShopService{
 	Logger log = LoggerFactory.getLogger(getClass());
 
 	@Override
-	public void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand) {
+	public Boolean cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand) {
+		Boolean flag = false;
+
 		/**
 		 * 查询结店时选择的日期
 		 */
-		Date cleanDate = offLineOrder.getCreateDate();
-
-
-
-		//判断是否是当天结店
-		if(DateUtil.isSameDate(cleanDate,new Date())){
-			cleanDate = new Date();
-		}
-
+		Date cleanDate = offLineOrder.getCreateTime();
 
 		/**
 		 * 获取天气数据
@@ -114,6 +108,9 @@ public class CloseShopServieImpl implements CloseShopService{
 		//第二版短信内容由于模板原因无法发送短信 将数据存在数据库
 		insertDateData(shopDetail,offLineOrder,wether,brand,cleanDate);
 
+		flag = true;
+
+		return flag;
 
 	}
 
@@ -126,7 +123,7 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		pushMessageByFirstEdtion(dayMapByFirstEdtion, shopDetail, wechatConfig,brand);
 		//3判断是否需要发送旬短信
-		int temp = DateUtil.getEarlyMidLate(cleanDate);
+		int temp = DateUtil.getEarlyMidLateEnd(cleanDate);
 		switch (temp){
 			case  DayMessageType.DAY_TYPE:
 				//第一版旬结短信
@@ -142,7 +139,6 @@ public class CloseShopServieImpl implements CloseShopService{
 			case DayMessageType.MONTH_TYPE:
 				Map<String, String> xunMapByFirstEdtion3 = querryXunDataByFirstEditon(shopDetail,cleanDate);
 				pushMessageByFirstEdtion(xunMapByFirstEdtion3, shopDetail, wechatConfig, brand);
-
 				Map<String, String> monthMapByFirstEdtion = querryMonthDataByFirstEditon(shopDetail, offLineOrder,cleanDate);
 				pushMessageByFirstEdtion(monthMapByFirstEdtion, shopDetail, wechatConfig, brand);
 				break;
@@ -150,7 +146,6 @@ public class CloseShopServieImpl implements CloseShopService{
 				break;
 
 		}
-
 
 	}
 
@@ -188,7 +183,7 @@ public class CloseShopServieImpl implements CloseShopService{
 	 */
 	private Map<String,String> querryDateDataByFirstEdtion(String shopId, String shopName,Date cleanDate) {
 
-		//数据库查询时候需要的时间begin-----------------
+		//数据库查询时候需要的时间begin  注意要与下面时间的比较的日期有区分-----------------
 
 		//----1.定义时间(指定日期的开始时间)---
 		final Date todayBegin = DateUtil.getDateBegin(cleanDate);

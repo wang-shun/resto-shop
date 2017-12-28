@@ -9,5 +9,5 @@ import com.resto.shop.web.model.OffLineOrder;
  */
 public interface CloseShopService {
 
-	public  void cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand);
+	public  Boolean cleanShopOrder(ShopDetail shopDetail, OffLineOrder offLineOrder, Brand brand);
 }
