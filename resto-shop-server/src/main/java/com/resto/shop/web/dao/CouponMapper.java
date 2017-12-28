@@ -32,7 +32,7 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
      * @param customerId
      * @return
      */
-    List<Coupon> listCouponByStatusAndBrandId(@Param("status") String status,@Param("IS_EXPIRE") String IS_EXPIRE,@Param("NOT_EXPIRE") String NOT_EXPIRE,@Param("customerId") String customerId,@Param("brandId")String brandId);
+    List<Coupon> listCouponByStatusAndBrandId(@Param("status") String status,@Param("isexpire") String IS_EXPIRE,@Param("notexpire") String NOT_EXPIRE,@Param("customerId") String customerId,@Param("brandId")String brandId);
 
 
     /**
@@ -43,7 +43,7 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
      * @param customerId
      * @return
      */
-    List<Coupon> listCouponByStatusAndShopId(@Param("status") String status,@Param("IS_EXPIRE") String IS_EXPIRE,@Param("NOT_EXPIRE") String NOT_EXPIRE,@Param("customerId") String customerId,@Param("shopId")String shopId);
+    List<Coupon> listCouponByStatusAndShopId(@Param("status") String status,@Param("isexpire") String IS_EXPIRE,@Param("notexpire") String NOT_EXPIRE,@Param("customerId") String customerId,@Param("shopId")String shopId);
 
     /**
      * 查询品牌优惠券

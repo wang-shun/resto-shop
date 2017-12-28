@@ -150,10 +150,10 @@
         <if test="status != null and status != '' ">
             and is_used= #{status}
         </if>
-        <if test="NOT_EXPIRE != null and NOT_EXPIRE != '' ">
+        <if test="notexpire != null and notexpire != '' ">
             <![CDATA[AND (begin_date<=current_date()  AND end_date >=current_date() )]]>
         </if>
-        <if test="IS_EXPIRE != null and IS_EXPIRE != '' ">
+        <if test="isexpire != null and isexpire != '' ">
             <![CDATA[AND (begin_date>current_date()  OR end_date <current_date() )]]>
         </if>
         order by `value` DESC
@@ -168,10 +168,10 @@
         <if test="status != null and status != '' ">
             and is_used= #{status}
         </if>
-        <if test="NOT_EXPIRE != null and NOT_EXPIRE != '' ">
+        <if test="notexpire != null and notexpire != '' ">
             <![CDATA[AND ((begin_date<=current_date()  AND end_date >=current_date()) OR begin_date > current_date())]]>
         </if>
-        <if test="IS_EXPIRE != null and IS_EXPIRE != '' ">
+        <if test="isexpire != null and isexpire != '' ">
             <![CDATA[AND end_date <current_date()]]>
         </if>
         order by `value` DESC
