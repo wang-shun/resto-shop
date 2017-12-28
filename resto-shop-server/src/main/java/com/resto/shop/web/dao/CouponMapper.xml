@@ -148,7 +148,7 @@
         where customer_id = #{customerId}
         and brand_id = #{brandId} and shop_detail_id is null
         <if test="status != null and status != ''">
-            and is_used= #{status}
+            and is_used= ${status}
         </if>
         <if test="notexpire != null and notexpire != ''">
             and (current_date()>=begin_date and end_date >=current_date())
@@ -166,7 +166,7 @@
         where customer_id = #{customerId}
         AND shop_detail_id = #{shopId}
         <if test="status != null and status != ''">
-            and is_used= #{status}
+            and is_used= ${status}
         </if>
         <if test="notexpire != null and notexpire != ''">
             <![CDATA[AND ((begin_date<=current_date()  AND end_date >=current_date()) OR begin_date > current_date())]]>
