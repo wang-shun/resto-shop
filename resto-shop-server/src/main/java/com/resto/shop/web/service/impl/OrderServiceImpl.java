@@ -5682,7 +5682,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
 //        }
-        if (!kitchenTicket.isEmpty()) {
+        if (kitchenTicket != null && !kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
         }
         Map logMap = new HashMap(4);
