@@ -3604,17 +3604,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         switch (order.getDistributionModeId()) {
             case DistributionType.RESTAURANT_MODE_ID:
-                if(printer.getSupportTangshi().equals(Common.NO)){
+                if(printer.getSupportTangshi() == 0){
                     return null;
                 }
                 break;
             case DistributionType.TAKE_IT_SELF:
-                if(printer.getSupportWaidai().equals(Common.NO)){
+                if(printer.getSupportWaidai() == 0){
                     return null;
                 }
                 break;
             case DistributionType.DELIVERY_MODE_ID:
-                if(printer.getSupportWaimai().equals(Common.NO)){
+                if(printer.getSupportWaimai() == 0){
                     return null;
                 }
                 break;
@@ -4015,17 +4015,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Map<String, Object> printTicketPosNew(Order order, List<OrderItem> orderItems, ShopDetail shopDetail, Printer printer) {
         switch (order.getDistributionModeId()) {
             case DistributionType.RESTAURANT_MODE_ID:
-                if(printer.getSupportTangshi().equals(Common.NO)){
+                if(printer.getSupportTangshi() == 0){
                     return null;
                 }
                 break;
             case DistributionType.TAKE_IT_SELF:
-                if(printer.getSupportWaidai().equals(Common.NO)){
+                if(printer.getSupportWaidai() == 0){
                     return null;
                 }
                 break;
             case DistributionType.DELIVERY_MODE_ID:
-                if(printer.getSupportWaimai().equals(Common.NO)){
+                if(printer.getSupportWaimai() == 0){
                     return null;
                 }
                 break;
