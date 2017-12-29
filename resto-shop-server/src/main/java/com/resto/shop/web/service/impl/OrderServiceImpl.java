@@ -2398,7 +2398,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public List<Map<String, Object>> printKitchen(Order order, List<OrderItem> articleList) {
+    public List<Map<String, Object>> printKitchen(Order order, List<OrderItem> articleList, Integer oldDistributionModeId) {
         //每个厨房 所需制作的   菜品信息
         Map<String, List<OrderItem>> kitchenArticleMap = new HashMap<String, List<OrderItem>>();
         //厨房信息
@@ -2462,7 +2462,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 String kitchenId = kitchen.getId().toString();
                 Printer printer = printerService.selectById(kitchen.getPrinterId());
                 //判断订单出单模式
-                switch (order.getDistributionModeId()) {
+                switch (oldDistributionModeId) {
                     case DistributionType.RESTAURANT_MODE_ID:
                         if(printer.getSupportTangshi() == Common.NO){
                             continue;
@@ -2611,7 +2611,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 continue;
             }
             //判断订单出单模式
-            switch (order.getDistributionModeId()) {
+            switch (oldDistributionModeId) {
                 case DistributionType.RESTAURANT_MODE_ID:
                     if(printer.getSupportTangshi() == Common.NO){
                         continue;
@@ -2675,7 +2675,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 continue;
             }
             //判断订单出单模式
-            switch (order.getDistributionModeId()) {
+            switch (oldDistributionModeId) {
                 case DistributionType.RESTAURANT_MODE_ID:
                     if(printer.getSupportTangshi() == Common.NO){
                         continue;
@@ -4923,7 +4923,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         param.put("typeGroup", "true");
         items = orderItemService.listByOrderId(param);
-        List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
+        List<Map<String, Object>> kitchenTicket = printKitchen(order, items, order.getDistributionModeId());
 
         if (kitchenTicket != null && !kitchenTicket.isEmpty() && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getProductionStatus() == ProductionStatus.HAS_ORDER) {
             printTask.addAll(kitchenTicket);
@@ -5664,7 +5664,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             list.addAll(items);
         }
 
-        List<Map<String, Object>> kitchenTicket = printKitchen(order, list);
+        List<Map<String, Object>> kitchenTicket = printKitchen(order, list, order.getDistributionModeId());
 
         //如果是外带，添加一张外带小票
         if (order.getDistributionModeId().equals(DistributionType.TAKE_IT_SELF)) {
@@ -7499,7 +7499,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 orderItem.setChildren(list);
                 orderItemList.add(orderItem);
-                printTask.addAll(printKitchen(order, orderItemList));
+                printTask.addAll(printKitchen(order, orderItemList, order.getDistributionModeId()));
             }
             pushMessage.append(orderItem.getArticleName() + "  " + message);
 //            UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName(),
@@ -8783,7 +8783,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> printTask = new ArrayList<>();
         //得到打印任务
         order.setIsRefund(Common.YES);
-        List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
+        List<Map<String, Object>> kitchenTicket = printKitchen(order, items, oldDistributionModeId);
         if (kitchenTicket != null && !kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
         }
@@ -9325,7 +9325,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             List<OrderItem> orderItems = orderitemMapper.getListByParentId(itemId);
             orderItems.add(orderItem);
             List<OrderItem> orderItemList = getOrderItemsWithChild(orderItems);
-            printTask.addAll(printKitchen(order, orderItemList));
+            printTask.addAll(printKitchen(order, orderItemList, order.getDistributionModeId()));
         }
         Order newOrder = new Order();
         newOrder.setId(orderId);
