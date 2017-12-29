@@ -8741,7 +8741,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
         for (Printer p : printer) {
-            Map<String, Object> ticket = refundOrderPrintTicket(order, orderItems, shopDetail, p);
+            Map<String, Object> ticket = refundOrderPrintTicket(order, oldDistributionModeId,orderItems, shopDetail, p);
             if (ticket != null) {
                 printTask.add(ticket);
             }
@@ -8820,11 +8820,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
 
-    public Map<String, Object> refundOrderPrintTicket(Order order, List<OrderItem> orderItems, ShopDetail shopDetail, Printer printer) {
+    public Map<String, Object> refundOrderPrintTicket(Order order, Integer oldDistributionModeId, List<OrderItem> orderItems, ShopDetail shopDetail, Printer printer) {
         if (printer == null) {
             return null;
         }
-        switch (order.getDistributionModeId()) {
+        switch (oldDistributionModeId) {
             case DistributionType.RESTAURANT_MODE_ID:
                 if(printer.getSupportTangshi() == Common.NO){
                     return null;
