@@ -2455,7 +2455,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             if (item.getType() == OrderItemType.MEALS_CHILDREN) {  // 套餐子品
-//                continue;
                 Kitchen kitchen = kitchenService.getItemKitchenId(item);
                 if (kitchen == null) {
                     continue;
@@ -2466,17 +2465,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 switch (order.getDistributionModeId()) {
                     case DistributionType.RESTAURANT_MODE_ID:
                         if(printer.getSupportTangshi() == Common.NO){
-                            return null;
+                            continue;
                         }
                         break;
                     case DistributionType.TAKE_IT_SELF:
                         if(printer.getSupportWaidai() == Common.NO){
-                            return null;
+                            continue;
                         }
                         break;
                     case DistributionType.DELIVERY_MODE_ID:
                         if(printer.getSupportWaimai() == Common.NO){
-                            return null;
+                            continue;
                         }
                         break;
                     default:
@@ -2615,17 +2614,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             switch (order.getDistributionModeId()) {
                 case DistributionType.RESTAURANT_MODE_ID:
                     if(printer.getSupportTangshi() == Common.NO){
-                        return null;
+                        continue;
                     }
                     break;
                 case DistributionType.TAKE_IT_SELF:
                     if(printer.getSupportWaidai() == Common.NO){
-                        return null;
+                        continue;
                     }
                     break;
                 case DistributionType.DELIVERY_MODE_ID:
                     if(printer.getSupportWaimai() == Common.NO){
-                        return null;
+                        continue;
                     }
                     break;
                 default:
@@ -2679,17 +2678,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             switch (order.getDistributionModeId()) {
                 case DistributionType.RESTAURANT_MODE_ID:
                     if(printer.getSupportTangshi() == Common.NO){
-                        return null;
+                        continue;
                     }
                     break;
                 case DistributionType.TAKE_IT_SELF:
                     if(printer.getSupportWaidai() == Common.NO){
-                        return null;
+                        continue;
                     }
                     break;
                 case DistributionType.DELIVERY_MODE_ID:
                     if(printer.getSupportWaimai() == Common.NO){
-                        return null;
+                        continue;
                     }
                     break;
                 default:
