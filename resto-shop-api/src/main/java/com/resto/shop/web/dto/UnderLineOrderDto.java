@@ -31,6 +31,19 @@ public class UnderLineOrderDto implements Serializable{
 
 
     /**
+     * 本旬线下订单总数/订单总额
+     */
+    private int xunEnterCount;
+    private BigDecimal xunEnterTotal;
+
+    /**
+     * /本旬外卖订单数/订单总额
+     */
+    private int xunDeliverOrders;
+    private BigDecimal xunOrderBooks;
+
+
+    /**
      *
      本月线下订单总数/总额
      */
@@ -46,17 +59,4 @@ public class UnderLineOrderDto implements Serializable{
 
 
 
-    public void initTodayOffLineOrder(OffLineOrder todayOffLineOrder) {
-        this.setTodayEnterCount(todayOffLineOrder.getEnterCount());
-        this.setTodayEnterTotal(todayOffLineOrder.getEnterTotal());
-        this.setTodayDeliverOrders(todayOffLineOrder.getDeliveryOrders());
-        this.setTodayOrderBooks(todayOffLineOrder.getOrderBooks());
-    }
-
-    public void initMonthOffLineOrder(OffLineOrder monthOffLineOrder) {
-        this.setMonthEnterCount(monthOffLineOrder.getEnterCount());
-        this.setMonthEnterTotal(monthOffLineOrder.getEnterTotal());
-        this.setMonthDeliverOrders(monthOffLineOrder.getDeliveryOrders());
-        this.setMonthOrderBooks(monthOffLineOrder.getOrderBooks());
-    }
 }

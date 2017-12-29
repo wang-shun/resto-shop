@@ -6,6 +6,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.dao.OffLineOrderMapper;
 import com.resto.shop.web.dto.OrderNumDto;
+import com.resto.shop.web.dto.UnderLineOrderDto;
 import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.service.OffLineOrderService;
 import cn.restoplus.rpc.server.RpcService;
@@ -68,6 +69,16 @@ public class OffLineOrderServiceImpl extends GenericServiceImpl<OffLineOrder, St
         Date beginDate = DateUtil.getformatBeginDate(begin);
         Date endDate = DateUtil.getformatEndDate(end);
         return offlineorderMapper.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
+    }
+
+    @Override
+    public UnderLineOrderDto selectDateAndMonthByShopId(Date todayBegin, Date todayEnd, Date monthBegin, Date monthEnd, String shopId) {
+        return offlineorderMapper.selectDateAndMonthByShopId(todayBegin,todayEnd,monthBegin,monthEnd,shopId);
+    }
+
+    @Override
+    public UnderLineOrderDto selectDateAndMonthByShopId(Date xunBegin, Date xunEnd, String id) {
+        return null;
     }
 
 
