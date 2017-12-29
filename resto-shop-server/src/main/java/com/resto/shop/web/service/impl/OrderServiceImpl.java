@@ -8784,7 +8784,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //得到打印任务
         order.setIsRefund(Common.YES);
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
-        if (!kitchenTicket.isEmpty()) {
+        if (kitchenTicket != null && !kitchenTicket.isEmpty()) {
             printTask.addAll(kitchenTicket);
         }
         Order newOrder = new Order();
