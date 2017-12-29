@@ -88,7 +88,7 @@ public interface OrderService extends GenericService<Order, String> {
 	 * @param articleList	订单菜品集合
 	 * @return
 	 */
-	public List<Map<String,Object>> printKitchen(Order order, List<OrderItem> articleList);
+	public List<Map<String,Object>> printKitchen(Order order, List<OrderItem> articleList, Integer distributionModeId);
 
     /**
      * 打印换桌的小票
