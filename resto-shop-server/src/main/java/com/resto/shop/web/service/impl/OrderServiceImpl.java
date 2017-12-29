@@ -4926,10 +4926,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         items = orderItemService.listByOrderId(param);
         List<Map<String, Object>> kitchenTicket = printKitchen(order, items);
 
-        if (!kitchenTicket.isEmpty() && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getProductionStatus() == ProductionStatus.HAS_ORDER) {
+        if (kitchenTicket != null && !kitchenTicket.isEmpty() && order.getOrderMode() == ShopMode.HOUFU_ORDER && order.getProductionStatus() == ProductionStatus.HAS_ORDER) {
             printTask.addAll(kitchenTicket);
         }
-        if (!kitchenTicket.isEmpty() && order.getOrderMode() != ShopMode.HOUFU_ORDER) {
+        if (kitchenTicket != null && !kitchenTicket.isEmpty() && order.getOrderMode() != ShopMode.HOUFU_ORDER) {
             printTask.addAll(kitchenTicket);
         }
         return printTask;
