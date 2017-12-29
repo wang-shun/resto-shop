@@ -8824,6 +8824,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (printer == null) {
             return null;
         }
+        switch (order.getDistributionModeId()) {
+            case DistributionType.RESTAURANT_MODE_ID:
+                if(printer.getSupportTangshi() == Common.NO){
+                    return null;
+                }
+                break;
+            case DistributionType.TAKE_IT_SELF:
+                if(printer.getSupportWaidai() == Common.NO){
+                    return null;
+                }
+                break;
+            case DistributionType.DELIVERY_MODE_ID:
+                if(printer.getSupportWaimai() == Common.NO){
+                    return null;
+                }
+                break;
+            default:
+                break;
+        }
         List<Map<String, Object>> refundItems = new ArrayList<>();
         BigDecimal articleCount = new BigDecimal(0);
         BigDecimal orderMoney = new BigDecimal(0);
