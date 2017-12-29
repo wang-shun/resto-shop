@@ -2462,6 +2462,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 String kitchenId = kitchen.getId().toString();
                 Printer printer = printerService.selectById(kitchen.getPrinterId());
+                //判断订单出单模式
+                switch (order.getDistributionModeId()) {
+                    case DistributionType.RESTAURANT_MODE_ID:
+                        if(printer.getSupportTangshi() == Common.NO){
+                            return null;
+                        }
+                        break;
+                    case DistributionType.TAKE_IT_SELF:
+                        if(printer.getSupportWaidai() == Common.NO){
+                            return null;
+                        }
+                        break;
+                    case DistributionType.DELIVERY_MODE_ID:
+                        if(printer.getSupportWaimai() == Common.NO){
+                            return null;
+                        }
+                        break;
+                    default:
+                        break;
+                }
                 if (printer.getTicketType().equals(TicketType.PRINT_TICKET) && shopDetail.getPrintType().equals(PrinterType.TOTAL)) { //总单出
                     continue;
                 } else {
@@ -2588,11 +2608,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         for (String kitchenId : kitchenArticleMap.keySet()) {
             Kitchen kitchen = kitchenMap.get(kitchenId);//得到厨房 信息
             Printer printer = printerService.selectById(kitchen.getPrinterId());//得到打印机信息
-
             if (printer == null) {
                 continue;
             }
-
+            //判断订单出单模式
+            switch (order.getDistributionModeId()) {
+                case DistributionType.RESTAURANT_MODE_ID:
+                    if(printer.getSupportTangshi() == Common.NO){
+                        return null;
+                    }
+                    break;
+                case DistributionType.TAKE_IT_SELF:
+                    if(printer.getSupportWaidai() == Common.NO){
+                        return null;
+                    }
+                    break;
+                case DistributionType.DELIVERY_MODE_ID:
+                    if(printer.getSupportWaimai() == Common.NO){
+                        return null;
+                    }
+                    break;
+                default:
+                    break;
+            }
             //生成厨房小票
             Map<String, Integer> countMap = new HashMap<>();
             for (OrderItem article : kitchenArticleMap.get(kitchenId)) {
@@ -2637,7 +2675,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (printer == null) {
                 continue;
             }
-
+            //判断订单出单模式
+            switch (order.getDistributionModeId()) {
+                case DistributionType.RESTAURANT_MODE_ID:
+                    if(printer.getSupportTangshi() == Common.NO){
+                        return null;
+                    }
+                    break;
+                case DistributionType.TAKE_IT_SELF:
+                    if(printer.getSupportWaidai() == Common.NO){
+                        return null;
+                    }
+                    break;
+                case DistributionType.DELIVERY_MODE_ID:
+                    if(printer.getSupportWaimai() == Common.NO){
+                        return null;
+                    }
+                    break;
+                default:
+                    break;
+            }
 
             //生成厨房小票
             for (String recommendId : recommendMap.get(kitchenId)) {
