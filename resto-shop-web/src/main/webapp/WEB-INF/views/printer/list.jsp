@@ -68,6 +68,22 @@
 										前台打印机</label>
 								</div>
 							</div>
+
+							<div class="form-group">
+								<div class="col-sm-3 control-label">出单模式：</div>
+								<div class="col-sm-9 radio-list">
+									<label class="radio-inline">
+										<input type="checkbox" name="supportTangshi" v-model="m.supportTangshi" value="1">
+										堂食</label>
+									<label class="radio-inline">
+										<input type="checkbox" name="supportWaidai" v-model="m.supportWaidai" value="1">
+										外带</label>
+									<label class="radio-inline">
+										<input type="checkbox" name="supportWaimai" v-model="m.supportWaimai" value="1">
+										外卖</label>
+								</div>
+							</div>
+
 							<div class="form-group" v-if="m.range == 1 && m.printType == 2">
 								<div class="col-sm-3 control-label">出单类型：</div>
 								<div class="col-sm-9 radio-list">

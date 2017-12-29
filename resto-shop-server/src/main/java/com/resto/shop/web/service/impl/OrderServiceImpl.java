@@ -3602,11 +3602,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (printer == null) {
             return null;
         }
+        switch (order.getDistributionModeId()) {
+            case DistributionType.RESTAURANT_MODE_ID:
+                if(printer.getSupportTangshi() == Common.NO){
+                    return null;
+                }
+                break;
+            case DistributionType.TAKE_IT_SELF:
+                if(printer.getSupportWaidai() == Common.NO){
+                    return null;
+                }
+                break;
+            case DistributionType.DELIVERY_MODE_ID:
+                if(printer.getSupportWaimai() == Common.NO){
+                    return null;
+                }
+                break;
+            default:
+                break;
+        }
         if (shopDetail.getIsPosNew() == Common.POS_NEW) {
             //如果是新版本pos
             return printTicketPosNew(order, orderItems, shopDetail, printer);
         }
-
 
         List<Map<String, Object>> items = new ArrayList<>(); //存储菜品项
         List<Map<String, Object>> refundItems = new ArrayList<>(); //存储退掉的菜品
@@ -3995,6 +4013,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     public Map<String, Object> printTicketPosNew(Order order, List<OrderItem> orderItems, ShopDetail shopDetail, Printer printer) {
+        switch (order.getDistributionModeId()) {
+            case DistributionType.RESTAURANT_MODE_ID:
+                if(printer.getSupportTangshi() == Common.NO){
+                    return null;
+                }
+                break;
+            case DistributionType.TAKE_IT_SELF:
+                if(printer.getSupportWaidai() == Common.NO){
+                    return null;
+                }
+                break;
+            case DistributionType.DELIVERY_MODE_ID:
+                if(printer.getSupportWaimai() == Common.NO){
+                    return null;
+                }
+                break;
+            default:
+                break;
+        }
         List<Map<String, Object>> items = new ArrayList<>();
         List<Map<String, Object>> refundItems = new ArrayList<>();
         List<String> articleIds = new ArrayList<>();
