@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.util.*;
-import com.resto.brand.core.util.StringUtils;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
@@ -15,7 +14,6 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
-import org.apache.commons.lang3.*;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.aspectj.lang.JoinPoint;
@@ -166,6 +164,13 @@ public class OrderAspect {
                 shopCartService.deleteByGroup(order.getGroupId());
             }
 
+
+            ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+            log.info("tttttttttttttt----------");
+            if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+                MQMessageProducer.sendCreateOrderMessage(order);
+            }
+
             if (order.getPayMode() != PayMode.WEIXIN_PAY && StringUtils.isEmpty(order.getGroupId())) {
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
             }
@@ -196,6 +201,7 @@ public class OrderAspect {
             if (!updateStockSuccess) {
                 log.info("库存变更失败:" + order.getId());
             }
+
         }
     }
 
@@ -705,6 +711,9 @@ public class OrderAspect {
             RedisUtil.set(shopId + "shopOrderTotal", orderTotal);
             MQMessageProducer.sendPrintSuccess(shopId);
         }
+        if(order.getPayMode() != OrderPayMode.WX_PAY && order.getPayMode() != OrderPayMode.ALI_PAY){
+            MQMessageProducer.sendOrderPay(order);
+        }
     }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.posPayOrder(..))")
@@ -805,8 +814,19 @@ public class OrderAspect {
             MQMessageProducer.sendPrintSuccess(order.getShopDetailId());
 //            orderService.confirmOrder(order);
         }
-
+        if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+            log.info("\n\n lmx test   orderPayAfter  \n\n\n");
+            MQMessageProducer.sendOrderPay(order);
+        }
     }
+
+//    public static void main(String[] args) {
+//        Order order = new Order();
+//        order.setId("00b8a27437cf460c93910bdc2489d061");
+//        order.setBrandId("31946c940e194311b117e3fff5327215");
+//        order.setShopDetailId("31164cebcc4b422685e8d9a32db12ab8");
+//        MQMessageProducer.sendPlaceOrderMessage(order);
+//    }
 
     @Pointcut("execution(* com.resto.shop.web.service.OrderService.pushOrder(..))")
     public void pushOrder() {

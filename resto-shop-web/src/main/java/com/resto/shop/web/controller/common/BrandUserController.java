@@ -15,6 +15,7 @@ import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.config.SessionKey;
+import com.resto.shop.web.service.PosService;
 import com.resto.shop.web.util.LogTemplateUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
@@ -53,6 +54,9 @@ public class BrandUserController extends GenericController{
 
     @Resource
     private WetherService wetherService;
+
+    @Resource
+    private PosService posService;
 
 
     @Resource
@@ -210,6 +214,7 @@ public class BrandUserController extends GenericController{
     @ResponseBody
     public Result updatePwd(String password){
     	brandUserService.updatePwd(getCurrentUserId(), password);
+        posService.shopMsgChange(getCurrentShopId());
     	return getSuccessResult();
     }
 
@@ -218,6 +223,7 @@ public class BrandUserController extends GenericController{
     @ResponseBody
     public Result updateSuperPwd(String password){
         brandUserService.updateSuperPwd(getCurrentUserId(), password);
+        posService.shopMsgChange(getCurrentShopId());
         return getSuccessResult();
     }
 
@@ -237,6 +243,7 @@ public class BrandUserController extends GenericController{
 	public Result create(@Valid BrandUser brandUser){
 		brandUser.setBrandId(getCurrentBrandId());
 		brandUserService.creatBrandUser(brandUser);
+        posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
 	}
 
@@ -245,6 +252,7 @@ public class BrandUserController extends GenericController{
     @ResponseBody
     public Result modify(@Valid BrandUser brandUser){
         brandUserService.update(brandUser);
+        posService.shopMsgChange(getCurrentShopId());
         return Result.getSuccess();
     }
 	

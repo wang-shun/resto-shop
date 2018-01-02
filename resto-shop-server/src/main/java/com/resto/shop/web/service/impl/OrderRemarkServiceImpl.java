@@ -5,6 +5,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
+import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.dao.OrderRemarkMapper;
 import com.resto.shop.web.model.OrderRemark;
 import com.resto.shop.web.service.OrderRemarkService;
@@ -18,6 +20,8 @@ public class OrderRemarkServiceImpl extends GenericServiceImpl<OrderRemark, Stri
 
 	@Resource
 	private OrderRemarkMapper orderRemarkMapper;
+	@Resource
+	private ShopDetailService shopDetailService;
 
     @Resource
     private com.resto.brand.web.service.OrderRemarkService boOrderRemarkService;
@@ -55,5 +59,16 @@ public class OrderRemarkServiceImpl extends GenericServiceImpl<OrderRemark, Stri
     @Override
     public void deleteByBoOrderRemarkId(String boOrderRemarkId) {
             orderRemarkMapper.deleteByBoOrderRemarkId(boOrderRemarkId);
+    }
+
+    @Override
+    public List<OrderRemark> selectOrderRemarkListByShopId(String shopId) {
+	    // 先判断 当前店铺是否开启 订单备注的功能
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+        if(shopDetail.getOpenOrderRemark() != null && shopDetail.getOpenOrderRemark() == 1){
+            return  orderRemarkMapper.selectOpenOrderRemarkByShopId(shopId);
+        }else{
+            return null;
+        }
     }
 }

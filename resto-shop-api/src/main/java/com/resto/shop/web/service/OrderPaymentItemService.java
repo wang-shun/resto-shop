@@ -82,4 +82,18 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
     List<OrderPaymentItem> selectRefundPayMent(String orderId);
 
     int deleteByOrderId(String orderId);
+
+    /**
+     * 根据 订单ID 删除
+     * Pos 2.0 同步数据使用
+     * @param orderId
+     */
+    void posSyncDeleteByOrderId(String orderId);
+
+    /**
+     * Pos 2.0 数据同步方法，根据 orderId 查询订单支付项
+     * @param orderId
+     * @return
+     */
+    List<OrderPaymentItem> posSyncListByOrderId(String orderId);
 }

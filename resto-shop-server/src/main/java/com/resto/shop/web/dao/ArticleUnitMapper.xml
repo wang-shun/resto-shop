@@ -101,5 +101,22 @@ insert into tb_article_unit (name, sort,
   <select id="selectSame" resultType="ArticleUnit">
     select * from tb_article_unit where name = #{name} and tb_article_attr_id = #{attrId}
   </select>
+
+  <select id="selectByShopId" resultType="ArticleUnit">
+    SELECT au.id,au.`name`,au.sort,au.tb_article_attr_id,au.state from tb_article_unit au LEFT JOIN
+     tb_article_attr aa on au.tb_article_attr_id = aa.id
+where aa.shop_detail_id =  #{shopId}
+  </select>
   
+  <select id="selectArticleUnitDetailByShopId" resultType="ArticleUnitDetail">
+        SELECT aud.id,aud.unit_detail_id,aud.article_unit_id,aud.price,aud.is_used,aud.sort from tb_article_unit_detail aud
+     LEFT JOIN tb_unit_detail ud on aud.unit_detail_id = ud.id LEFT JOIN tb_unit u on ud.unit_id = u.id
+     where u.shop_detail_id = #{shopId}
+  </select>
+
+  <select id="selectArticleUnitNewByShopId" resultType="ArticleUnitNew">
+    SELECT aun.id,aun.article_id,aun.unit_id,aun.choice_type,aun.is_used from tb_article_unit_new aun
+     LEFT JOIN tb_unit u on aun.unit_id = u.id where u.shop_detail_id = #{shopId}
+  </select>
+
 </mapper>

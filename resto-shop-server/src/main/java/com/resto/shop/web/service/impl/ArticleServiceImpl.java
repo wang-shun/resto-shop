@@ -22,6 +22,7 @@ import com.resto.shop.web.dao.FreeDayMapper;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.dto.ArticleSellCountDto;
 import com.resto.shop.web.model.*;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -114,7 +115,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
                 article.setDiscount(discountMap.get(article.getId()).getDiscount());
             }
         }
-        return articleMapper.selectList(currentShopId);
+        return articleList;
     }
 
     @Override
@@ -432,7 +433,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         String emptyRemark = count <= 0 ? "【手动沽清】" : null;
 //        RedisUtil.set(articleId + Common.KUCUN, count);
-        RedisUtil.set(articleId + Common.KUCUN, count);
+            RedisUtil.set(articleId + Common.KUCUN, count);
         if (article.getIsEmpty()) {
             if (moreType && count > 0) {
                 articlePriceServer.setArticlePriceEmptyFail(baseArticleId);
@@ -773,6 +774,11 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     public Boolean setEmptyFail(String articleId) {
         return articleMapper.setEmptyFail(articleId);
     }
+    @Override
+    public List<Article> selectArticleByShopId(String shopId) {
+        return articleMapper.selectArticleByShopId(shopId);
+    }
+
 
     @Override
     public List<ArticleSellCountDto> findArticleByLastCountTime(String shopId,String lastCountTime) {

@@ -97,4 +97,10 @@ public class MealAttrServiceImpl extends GenericServiceImpl<MealAttr, Integer> i
 	public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
 		return mealattrMapper.queryArticleMealAttr(selectMap);
 	}
+    @Override
+    public List<MealAttr> selectMealAttrByShopId(String shopId) {
+        return mealattrMapper.selectMealAttrByShopId(shopId);
+    }
+
+
 }

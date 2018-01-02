@@ -36,7 +36,7 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * @return
 	 */
 	List<Article> selectListByShopIdRecommendCategory(String currentShopId, String recommendCcategoryId, String show);
-	
+
 	/**
 	 * 根据 是否 谷清 查询菜品信息
 	 * @param isEmpty
@@ -170,6 +170,15 @@ public interface ArticleService extends GenericService<Article, String> {
 	 * @return
 	 */
 	Boolean setEmptyFail(String articleId);
+
+	/**
+	 * 根据 店铺ID 查询店铺下的所有菜品数据
+	 * Pos2.0 数据拉取接口			By___lmx
+	 * @param shopId
+	 * @return
+	 */
+	List<Article> selectArticleByShopId(String shopId);
+
 
 
 	List<ArticleSellCountDto> findArticleByLastCountTime(String shopId,String lastCountTime);

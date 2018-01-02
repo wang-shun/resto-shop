@@ -667,6 +667,9 @@
             <if test="isUseNewService != null">
                 is_use_new_service,
             </if>
+            <if test="posBackUps != null">
+                pos_back_ups,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -863,6 +866,9 @@
             </if>
             <if test="isUseNewService != null">
                 #{isUseNewService},
+            </if>
+            <if test="posBackUps != null">
+                #{posBackUps},
             </if>
         </trim>
     </insert>
@@ -2788,7 +2794,7 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and pay_type = 1 and order_state = 1
         and parent_order_id is null
         and pay_type = 1
-        and #{closeContinueTime} >  now() - create_time
+        and #{closeContinueTime} > TIMESTAMPDIFF(SECOND,create_time,now())
         and customer_id != #{customerId}
     </select>
 
@@ -3468,6 +3474,11 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         o.shop_detail_id;
     </select>
 
+    <select id="posSyncSelectById" parameterType="java.lang.String" resultType="Order">
+        SELECT * from tb_order where id = #{orderId}
+    </select>
 
-
+    <select id="selectCompleteOrderCount" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(id) from tb_order where order_state in (2, 10, 11 ,12) and customer_id = #{customerId} and shop_detail_id = #{shopId}
+    </select>
 </mapper>

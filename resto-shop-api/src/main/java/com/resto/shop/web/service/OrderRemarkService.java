@@ -13,4 +13,12 @@ public interface OrderRemarkService extends GenericService<OrderRemark, String>{
     List<JSONObject> getShopOrderRemark(String shopId);
 
     void deleteByBoOrderRemarkId(String boOrderRemarkId);
+
+    /**
+     * 根据 店铺ID 查询店铺下的所有  OrderRemark  数据
+     * Pos2.0 数据拉取接口			By___lmx
+     * @param shopId
+     * @return
+     */
+    List<OrderRemark> selectOrderRemarkListByShopId(String shopId);
 }

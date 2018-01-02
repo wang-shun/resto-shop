@@ -9,6 +9,10 @@ public class OrderRemark {
     private Date createTime;
     private String shopDetailId;
     private String brandId;
+    private String remarkName;
+    private Integer sort;
+    private Integer state;
+
 
     public String getId() {
         return id;
@@ -48,6 +52,30 @@ public class OrderRemark {
 
     public void setBrandId(String brandId) {
         this.brandId = brandId;
+    }
+
+    public String getRemarkName() {
+        return remarkName;
+    }
+
+    public void setRemarkName(String remarkName) {
+        this.remarkName = remarkName;
+    }
+
+    public Integer getSort() {
+        return sort;
+    }
+
+    public void setSort(Integer sort) {
+        this.sort = sort;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 
     public OrderRemark() {

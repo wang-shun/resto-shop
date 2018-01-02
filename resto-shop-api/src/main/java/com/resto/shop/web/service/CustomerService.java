@@ -117,4 +117,12 @@ public interface CustomerService extends GenericService<Customer, String> {
 	 * @return
 	 */
 	Customer selectByAccountId(String accountId);
+
+	/**
+	 * 获取客户消费信息， pos 2.0 小票使用
+	 * @param shopId
+	 * @param customerId
+	 * @return
+	 */
+	Map getCustomerConsumeInfo(String shopId, String customerId);
 }

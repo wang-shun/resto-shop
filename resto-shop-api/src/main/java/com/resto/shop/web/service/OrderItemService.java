@@ -60,5 +60,19 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 
 	List<OrderItem> selectByArticleIds(String[] articleIds);
 
+	/**
+	 * 根据 订单ID 删除
+	 * Pos 2.0 同步数据使用
+	 * @param orderId
+	 */
+	void posSyncDeleteByOrderId(String orderId);
+
 	List<OrderItem> getOrderBefore(String tableNumber, String shopId, String customerId);
+
+	/**
+	 * Pos 2.0 数据同步方法，根据 orderId 查询订单项
+	 * @param orderId
+	 * @return
+	 */
+	List<OrderItem> posSyncListByOrderId(String orderId);
 }

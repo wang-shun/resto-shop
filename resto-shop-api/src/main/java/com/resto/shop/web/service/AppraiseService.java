@@ -88,4 +88,12 @@ public interface AppraiseService extends GenericService<Appraise, String> {
      * @return
      */
 	Appraise selectByOrderIdCustomerId(String orderId, String customerId);
+
+	/**
+	 * 根据 店铺id 和 用户id 查询所有评论，以时间倒序
+	 * @param shopId
+	 * @param customerId
+	 * @return
+	 */
+	List<Appraise> selectAllAppraiseByShopIdAndCustomerId(String shopId, String customerId);
 }

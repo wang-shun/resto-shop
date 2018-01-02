@@ -170,4 +170,12 @@ where t.id = #{articleId} order by t3.sort
         left join tb_unit_detail t5 on t5.id = t3.unit_detail_id
         where t4.name is not null and t.shop_detail_id = #{id} order by t4.sort desc,t5.sort
     </select>
+
+    <select id="selectUnitByShopId" resultType="Unit">
+        SELECT * from tb_unit where shop_detail_id = #{shopId}
+    </select>
+
+    <select id="selectUnitDetailByShopId" resultType="UnitDetail">
+        SELECT ud.* from tb_unit u LEFT JOIN tb_unit_detail ud on u.id = ud.unit_id where u.shop_detail_id = #{shopId}
+    </select>
 </mapper>

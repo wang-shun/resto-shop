@@ -50,4 +50,6 @@ public interface AppraiseMapper  extends GenericDao<Appraise,String> {
 	List<Appraise> selectByTimeAndBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end);
 
     Appraise selectByOrderIdCustomerId(@Param("orderId") String orderId, @Param("customerId") String customerId);
+
+    List<Appraise> selectAllAppraiseByShopIdAndCustomerId(@Param("shopId") String shopId, @Param("customerId") String customerId);
 }

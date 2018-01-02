@@ -123,4 +123,14 @@ public class UnitServiceImpl extends GenericServiceImpl<Unit, String> implements
     public List<UnitArticle> selectUnitDetail(String id) {
         return unitMapper.selectUnitDetail(id);
     }
+
+    @Override
+    public List<Unit> selectUnitByShopId(String shopId) {
+        return unitMapper.selectUnitByShopId(shopId);
+    }
+
+    @Override
+    public List<UnitDetail> selectUnitDetailByShopId(String shopId) {
+        return unitMapper.selectUnitDetailByShopId(shopId);
+    }
 }
