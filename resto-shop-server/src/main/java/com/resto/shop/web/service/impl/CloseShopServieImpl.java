@@ -1058,7 +1058,6 @@ public class CloseShopServieImpl implements CloseShopService{
 			}
 		}
 
-
 		//查询回头用户的
 		List<BackCustomerDto> todayBackCustomerDtos = orderService.selectBackCustomerByShopIdAndTime(shopDetail.getId(), todayBegin, todayEnd);
 		//回头用户
