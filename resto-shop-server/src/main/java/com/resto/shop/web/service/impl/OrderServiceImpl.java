@@ -24,15 +24,12 @@ import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
-import com.resto.shop.web.model.Account;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
-import com.resto.shop.web.service.AccountService;
 import com.resto.shop.web.util.BrandAccountSendUtil;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
-import net.sf.jsqlparser.schema.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
@@ -41,7 +38,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -2405,7 +2401,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Map<String, Kitchen> kitchenMap = new HashMap<String, Kitchen>();
         Map<String, List<String>> recommendMap = new HashMap<>();
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
-        BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
         //遍历 订单集合
         for (OrderItem item : articleList) {
             if(item.getStatus() != 1){
@@ -2461,6 +2456,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 String kitchenId = kitchen.getId().toString();
                 Printer printer = printerService.selectById(kitchen.getPrinterId());
+                log.info("打印机的ip：" + printer.getIp());
                 //判断订单出单模式
                 switch (oldDistributionModeId) {
                     case DistributionType.RESTAURANT_MODE_ID:
