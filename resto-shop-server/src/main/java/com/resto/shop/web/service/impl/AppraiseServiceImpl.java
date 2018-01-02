@@ -120,7 +120,6 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			order.setOrderState(OrderState.HASAPPRAISE);
 			order.setAllowAppraise(false);
 			order.setAllowCancel(false);
-			order.setAllowContinueOrder(false);
 			orderService.update(order);
 		}else if(order.getAllowAppraise() && order.getGroupId() != null && !"".equals(order.getGroupId())){
 			//判断用户是否已经评论
