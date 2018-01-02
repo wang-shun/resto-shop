@@ -1274,7 +1274,6 @@ public class CloseShopServieImpl implements CloseShopService{
 		if (Common.YES.equals(shopDetail.getIsOpenSms())&& null != shopDetail.getnoticeTelephone()) {
 			//截取电话号码
 			String telephones = shopDetail.getnoticeTelephone().replaceAll("，", ",");
-			telephones = "13317182430";
 
 			String[] tels = telephones.split(",");
 
