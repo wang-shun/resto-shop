@@ -2456,7 +2456,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 String kitchenId = kitchen.getId().toString();
                 Printer printer = printerService.selectById(kitchen.getPrinterId());
-                log.info("打印机的ip：" + printer.getIp());
                 //判断订单出单模式
                 switch (oldDistributionModeId) {
                     case DistributionType.RESTAURANT_MODE_ID:
@@ -2481,7 +2480,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     continue;
                 } else {
                     if (kitchen != null) {
-
                         kitchenMap.put(kitchenId, kitchen);
                         if (!kitchenArticleMap.containsKey(kitchenId)) {
                             //如果没有 则新建
@@ -2498,8 +2496,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                        item.setPrintFailFlag(PrintStatus.PRINT_SUCCESS);
 //                        orderItemService.update(item);
                     }
-
-
                 }
             }
 
