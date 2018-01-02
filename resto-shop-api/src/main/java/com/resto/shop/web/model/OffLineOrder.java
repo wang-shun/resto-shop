@@ -1,6 +1,6 @@
 package com.resto.shop.web.model;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -37,6 +37,24 @@ public class OffLineOrder implements Serializable {
 
     private Integer state;
 
+    public OffLineOrder(String id, String shopDetailId, String brandId, Integer resource, BigDecimal enterTotal, Integer enterCount, Integer deliveryOrders, BigDecimal orderBooks, Integer numGuest, Date createTime, Date createDate, Integer state) {
+        this.id = id;
+        this.shopDetailId = shopDetailId;
+        this.brandId = brandId;
+        this.resource = resource;
+        this.enterTotal = enterTotal;
+        this.enterCount = enterCount;
+        this.deliveryOrders = deliveryOrders;
+        this.orderBooks = orderBooks;
+        this.numGuest = numGuest;
+        this.createTime = createTime;
+        this.createDate = createDate;
+        this.state = state;
+    }
+
+    public OffLineOrder() {
+    }
+
 
     public static OffLineOrder init(){
         OffLineOrder offLineOrder = new OffLineOrder();
@@ -52,4 +70,7 @@ public class OffLineOrder implements Serializable {
         offLineOrder.setEnterCount(this.getEnterCount()+offLineOrder.getEnterCount());
         return offLineOrder;
     }
+
+
+
 }
