@@ -334,7 +334,7 @@ public class CloseShopServieImpl implements CloseShopService{
 
 		todayContent.append("{")
 				.append("shopName:").append("'").append(shopName).append("'").append(",")
-				.append("datetime:").append("'").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd HH:mm:ss")).append("'").append(",")
+				.append("datetime:").append("'").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd hh:mm:ss")).append("'").append(",")
 				//到店总笔数(r+线下)-----
 				.append("arriveCount:").append("'").append(dto.getTodayEnterCount() + todayRestoCount).append("'").append(",")
 				//到店消费总额 我们的总额+线下的总额，不包含外卖金额
@@ -395,7 +395,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		StringBuilder sb = new StringBuilder();
 		sb
 				.append("店铺名称:").append(shopName).append("\n")
-				.append("时间:").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd HH:mm:ss")).append("\n")
+				.append("时间:").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd hh:mm:ss")).append("\n")
 				.append("到店总笔数:").append(dto.getTodayEnterCount() + todayRestoCount).append("\n")
 				.append("到店消费总额:").append(dto.getTodayEnterTotal().add(todayRestoTotal)).append("\n")
 				.append("---------------------").append("\n")
@@ -572,7 +572,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		StringBuilder sb = new StringBuilder();
 		sb
 				.append("店铺名称:").append(shopDetail.getName()).append("\n")
-				.append("时间:").append(DateUtil.formatDate(cleanDate,"yyyy-MM-dd HH:mm:ss")).append("\n")
+				.append("时间:").append(DateUtil.formatDate(cleanDate,"yyyy-MM-dd hh:mm:ss")).append("\n")
 				.append("本旬总结").append("\n")
 				.append("到店总笔数:").append(dto.getXunEnterCount() + xunRestoCount).append("\n")
 				.append("到店消费总额:").append(dto.getXunEnterTotal().add(xunRestoTotal)).append("\n")
@@ -776,7 +776,7 @@ public class CloseShopServieImpl implements CloseShopService{
 		StringBuilder sb = new StringBuilder();
 		sb
 				.append("店铺名称:").append(shopDetail.getName()).append("\n")
-				.append("时间:").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd HH:mm:ss")).append("\n")
+				.append("时间:").append(DateUtil.formatDate(cleanDate, "yyyy-MM-dd hh:mm:ss")).append("\n")
 				.append("本月总结").append("\n")
 				.append("到店总笔数:").append(dto.getMonthEnterCount() + monthRestoCount).append("\n")
 				.append("到店消费总额:").append(dto.getMonthEnterTotal().add(monthRestoTotal)).append("\n")
