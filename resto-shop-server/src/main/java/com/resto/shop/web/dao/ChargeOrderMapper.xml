@@ -589,4 +589,19 @@ AND u.id =#{customerId}
             </foreach>
         </if>
     </select>
+
+
+    <select id="selectTotalBalanceByTimeAndShopId" resultType="java.math.BigDecimal">
+
+        select sum(charge_money)
+        from tb_charge_order
+        where order_state = 1
+        <if test="shopId != null">
+            and shop_detail_id = #{shopId}
+        </if>
+        and finish_time &gt;= CONCAT(#{monthBegin},' 00:00:00')
+        and finish_time &lt;= CONCAT(#{monthEnd},' 23:59:59')
+
+    </select>
+
 </mapper>

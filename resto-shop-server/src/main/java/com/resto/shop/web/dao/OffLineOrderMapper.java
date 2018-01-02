@@ -74,4 +74,17 @@ public interface OffLineOrderMapper  extends GenericDao<OffLineOrder,String> {
      * @return
      */
     UnderLineOrderDto selectDateAndMonthByShopId(@Param("todayBegin") Date todayBegin, @Param("todayEnd") Date todayEnd,@Param("monthBegin") Date monthBegin, @Param("monthEnd") Date monthEnd, @Param("shopId") String shopId);
+
+    /**
+     * 结店 时 查询 旬的线下数据
+     * @param xunBegin
+     * @param xunEnd
+     * @param shopId
+     * @return
+     */
+    UnderLineOrderDto selectXunByShopId(@Param("xunBegin") Date xunBegin, @Param("xunEnd") Date xunEnd,@Param("shopId") String shopId);
+
+    UnderLineOrderDto selectMonthByShopId(@Param("monthBegin")Date monthBegin,@Param("monthEnd") Date monthEnd, @Param("shopId")String shopId);
+
+    UnderLineOrderDto selectMonthXunTodayByShopId(@Param("todayBegin") Date todayBegin, @Param("todayEnd") Date todayEnd, @Param("xunBegin") Date xunBegin, @Param("xunEnd") Date xunEnd, @Param("monthBegin") Date monthBegin,@Param("monthEnd") Date monthEnd,@Param("shopId") String shopId);
 }

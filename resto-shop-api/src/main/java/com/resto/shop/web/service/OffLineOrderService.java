@@ -50,5 +50,18 @@ public interface OffLineOrderService extends GenericService<OffLineOrder, String
      */
     UnderLineOrderDto selectDateAndMonthByShopId(Date todayBegin, Date todayEnd, Date monthBegin, Date monthEnd, String shopId);
 
-    UnderLineOrderDto selectDateAndMonthByShopId(Date xunBegin, Date xunEnd, String id);
+    /**
+     * 结店 查询 线下录入的数据 (当旬)
+     * @param xunBegin
+     * @param xunEnd
+     * @param shopId
+     * @return
+     */
+
+    UnderLineOrderDto selectXunByShopId(Date xunBegin, Date xunEnd, String shopId);
+
+    UnderLineOrderDto selectMonthByShopId(Date monthBegin, Date monthEnd, String id);
+
+    UnderLineOrderDto selectMonthXunTodayByShopId(Date todayBegin, Date todayEnd, Date xunBegin, Date xunEnd, Date monthBegin, Date monthEnd, String id);
+
 }

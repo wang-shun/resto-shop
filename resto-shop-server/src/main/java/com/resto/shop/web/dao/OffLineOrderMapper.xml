@@ -191,6 +191,72 @@ and
 
     </select>
 
+    <select id="selectMonthXunTodayByShopId" resultType="com.resto.shop.web.dto.UnderLineOrderDto">
+        SELECT a.todayEnterCount,a.todayEnterTotal,a.todayDeliverOrders,a.todayOrderBooks ,b.xunEnterCount,b.xunEnterTotal,b.xunDeliverOrders,b.xunOrderBooks ,c.monthEnterCount,c.monthEnterTotal,c.monthDeliverOrders,c.monthOrderBooks FROM
+        (SELECT
+        shop_detail_id,
+        enter_total todayEnterTotal,
+        enter_count todayEnterCount,
+        delivery_orders todayDeliverOrders ,
+        order_books todayOrderBooks
+        FROM tb_off_line_order
+        WHERE shop_detail_id = #{shopId} AND  resource=1 AND  state =1 AND
+        <![CDATA[create_time >= #{todayBegin} AND create_time <= #{todayEnd}]]>
+        ) as a INNER JOIN
+        (SELECT
+        shop_detail_id,
+        sum(enter_total) xunEnterTotal,
+        sum(enter_count) xunEnterCount,
+        sum(delivery_orders) xunDeliverOrders,
+        sum(order_books) xunOrderBooks
+        FROM tb_off_line_order
+        WHERE shop_detail_id = #{shopId} AND  resource=1 AND  state =1 AND
+         <![CDATA[create_time >= #{xunBegin} AND create_time <= #{xunEnd}]]>
+        )as b
+        INNER  JOIN
+        (
+          SELECT
+         shop_detail_id,
+        sum(enter_total) monthEnterTotal,
+        sum(enter_count) monthEnterCount,
+        sum(delivery_orders) monthDeliverOrders,
+        sum(order_books) monthOrderBooks
+        FROM tb_off_line_order
+        WHERE shop_detail_id = #{shopId} AND  resource=1 AND  state =1 AND
+         <![CDATA[create_time >= #{monthBegin} AND create_time <= #{monthEnd}]]>
+        )as c
+        on a.shop_detail_id = c.shop_detail_id;
+    </select>
+
+
+
+
+    <select id="selectXunByShopId" resultType="com.resto.shop.web.dto.UnderLineOrderDto">
+        SELECT
+        shop_detail_id,
+        sum(enter_total) xunEnterTotal,
+        sum(enter_count) xunEnterCount,
+        sum(delivery_orders) xunDeliverOrders,
+        sum(order_books) xunOrderBooks
+        FROM tb_off_line_order
+        WHERE shop_detail_id = #{shopId} AND  resource=1 AND  state =1 AND
+         <![CDATA[create_time >= #{xunBegin} AND create_time <= #{xunEnd}]]>
+
+    </select>
+
+
+    <select id="selectMonthByShopId" resultType="com.resto.shop.web.dto.UnderLineOrderDto">
+                SELECT
+        shop_detail_id,
+        sum(enter_total) monthEnterTotal,
+        sum(enter_count) monthEnterCount,
+        sum(delivery_orders) monthDeliverOrders,
+        sum(order_books) monthOrderBooks
+        FROM tb_off_line_order
+        WHERE shop_detail_id = #{shopId} AND  resource=1 AND  state =1 AND
+         <![CDATA[create_time >= #{monthBegin} AND create_time <= #{monthEnd}]]>
+    </select>
+
 
 
 </mapper>

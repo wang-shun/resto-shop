@@ -59,7 +59,7 @@
 
     <select id="selectListByTimeAndGoodType" resultType="com.resto.brand.web.dto.ArticleTopDto">
         SELECT name,type,COUNT(*)num FROM tb_article_top WHERE type=5
-         AND  shop_detail_id=#{shopId} AND
+         AND  shop_detail_id=#{shopId} AND name !='' AND
         <![CDATA[
         create_time>#{beginDate} and create_time<#{endDate}
         ]]>
@@ -68,7 +68,7 @@
 
     <select id="selectListByTimeAndBadType" resultType="com.resto.brand.web.dto.ArticleTopDto">
         SELECT name,type,COUNT(*)num FROM tb_article_top WHERE type in(1,2.3,4)
-        AND  shop_detail_id=#{shopId} AND
+        AND  shop_detail_id=#{shopId} AND name !='' AND
         <![CDATA[
         create_time>#{beginDate} and create_time<#{endDate}
         ]]>

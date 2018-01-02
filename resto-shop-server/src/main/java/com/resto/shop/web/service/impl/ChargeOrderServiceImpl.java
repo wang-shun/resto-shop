@@ -518,4 +518,9 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	public List<String> selectCustomerChargeOrder(List<String> customerIds) {
 		return chargeOrderMapper.selectCustomerChargeOrder(customerIds);
 	}
+
+    @Override
+    public BigDecimal selectTotalBalanceByTimeAndShopId(Date monthBegin, Date monthEnd, String shopId) {
+        return chargeOrderMapper.selectTotalBalanceByTimeAndShopId(monthBegin,monthEnd,shopId);
+    }
 }

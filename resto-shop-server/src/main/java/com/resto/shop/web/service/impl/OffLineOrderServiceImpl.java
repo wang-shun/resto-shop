@@ -77,8 +77,19 @@ public class OffLineOrderServiceImpl extends GenericServiceImpl<OffLineOrder, St
     }
 
     @Override
-    public UnderLineOrderDto selectDateAndMonthByShopId(Date xunBegin, Date xunEnd, String id) {
-        return null;
+    public UnderLineOrderDto selectXunByShopId(Date xunBegin, Date xunEnd, String shopId) {
+        return offlineorderMapper.selectXunByShopId(xunBegin,xunEnd,shopId);
+    }
+
+    @Override
+    public UnderLineOrderDto selectMonthByShopId(Date monthBegin, Date monthEnd, String shopId) {
+        return offlineorderMapper.selectMonthByShopId(monthBegin,monthEnd,shopId);
+
+    }
+
+    @Override
+    public UnderLineOrderDto selectMonthXunTodayByShopId(Date todayBegin, Date todayEnd, Date xunBegin, Date xunEnd, Date monthBegin, Date monthEnd, String shopId) {
+        return offlineorderMapper.selectMonthXunTodayByShopId(todayBegin,todayEnd,xunBegin,xunEnd,monthBegin,monthEnd,shopId);
     }
 
 
