@@ -172,7 +172,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			redPacket.setState(0);
             redPacketService.insert(redPacket);
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
-			MQMessageProducer.sendShareGiveMoneyMsg(redPacket,60000);
+			MQMessageProducer.sendShareGiveMoneyMsg(redPacket,5);
 		}
 		return money;
 	}
