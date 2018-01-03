@@ -30,6 +30,14 @@ public interface MealItemMapper  extends GenericDao<MealItem,Integer> {
 
     List<MealItem> selectByAttrId(Integer attrId);
 
+    /**
+     * 根据 店铺ID 查询店铺下的所有  MealItem  数据
+     * Pos2.0 数据拉取接口			By___lmx
+     * @param shopId
+     * @return
+     */
+    List<MealItem> selectMealItemByShopId(@Param("shopId") String shopId);
+
     List<MealItem> selectByArticleId(String articleId);
 
     int updateArticleNameById(@Param("articleName") String articleName, @Param("id") Integer id);

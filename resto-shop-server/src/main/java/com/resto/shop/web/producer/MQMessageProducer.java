@@ -19,7 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 public class MQMessageProducer {
 	final static Logger log = LoggerFactory.getLogger(MQMessageProducer.class);
-	
+
 	private static final Producer producer;
 	static{
 		Properties pro = MQSetting.getPropertiesWithAccessSecret();
@@ -27,14 +27,14 @@ public class MQMessageProducer {
 		producer = ONSFactory.createProducer(pro);
 		producer.start();
 	}
-	
+
 	public static void sendAutoCloseMsg(final String orderId, final String brandId,final long delay) {
 		JSONObject obj = new JSONObject();
 		obj.put("orderId", orderId);
 		obj.put("brandId", brandId);
 		//是否是自动取消
-        obj.put("auto",true);
-		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_CANCEL_ORDER, obj.toJSONString().getBytes());				
+		obj.put("auto",true);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_CANCEL_ORDER, obj.toJSONString().getBytes());
 		message.setStartDeliverTime(System.currentTimeMillis()+delay);
 		sendMessageASync(message);
 	}
@@ -52,7 +52,7 @@ public class MQMessageProducer {
 		message.setStartDeliverTime(calendar.getTime().getTime());
 		sendMessageASync(message);
 	}
-	
+
 	public static void autoSendRemmend(final String brandId,Calendar calendar, final String customerId,final String pr,final String name,final Integer pushDay, final String shopName){
 		JSONObject obj = new JSONObject();
 		obj.put("brandId", brandId);
@@ -65,7 +65,7 @@ public class MQMessageProducer {
 		message.setStartDeliverTime(calendar.getTime().getTime());
 		sendMessageASync(message);
 	}
-	
+
 
 	public static void sendCallMessage(final String brandId,final String orderId,final String customerId){
 		JSONObject obj = new JSONObject();
@@ -119,7 +119,7 @@ public class MQMessageProducer {
 		obj.put("productionStatus", order.getProductionStatus());
 		obj.put("verCode", order.getVerCode());
 		obj.put("parentOrderId", order.getParentOrderId());
-		
+
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOT_PRINT_ORDER,obj.toJSONString().getBytes());
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
@@ -149,9 +149,9 @@ public class MQMessageProducer {
 		}).start();
 	}
 
-	
+
 	public static void sendPlatformOrderMessage(String id,Integer type,String brandId,String shopId) {
- 		JSONObject obj  = new JSONObject();
+		JSONObject obj  = new JSONObject();
 		obj.put("id", id);
 		obj.put("type", type);
 		obj.put("brandId", brandId);
@@ -246,6 +246,8 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+
+
 	public static void removeTableGroup(TableGroup tableGroup,final long delayTime){
 		JSONObject obj = new JSONObject();
 		obj.put("groupId",tableGroup.getGroupId());
@@ -254,8 +256,8 @@ public class MQMessageProducer {
 		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
 		sendMessageASync(message);
 	}
-	
-	
+
+
 	public static void checkPlaceOrderMessage(Order order,Long delayTime,Long limitTime) {
 		JSONObject obj = new JSONObject();
 		obj.put("brandId", order.getBrandId());
@@ -280,9 +282,20 @@ public class MQMessageProducer {
 		obj.put("verCode", order.getVerCode());
 		obj.put("parentOrderId", order.getParentOrderId());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOTICE_ORDER,obj.toJSONString().getBytes());
-        sendMessageASync(message);
-		
+		sendMessageASync(message);
+
 	}
+
+	public static void sendCreateOrderMessage(Order order){
+		JSONObject obj  = new JSONObject();
+		obj.put("id", order.getId());
+		obj.put("brandId", order.getBrandId());
+		obj.put("shopDetailId", order.getShopDetailId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_ORDER_CREATED,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+
+	}
+
 
 
 	public static void sendNoticeShareMessage(Customer customer){
@@ -296,6 +309,14 @@ public class MQMessageProducer {
 
 	}
 
+	public static void main(String[] args) {
+//		Order order = new Order();
+//		order.setId("00b8a27437cf460c93910bdc2489d061");
+//		order.setBrandId("31946c940e194311b117e3fff5327215");
+//		order.setShopDetailId("31164cebcc4b422685e8d9a32db12ab8");
+		sendPlatformOrderMessage("3010611616147302622",1,"974b0b1e31dc4b3fb0c3d9a0970d22e4","013e35a74b0e43e1bb79c84d5e4d4d95");
+	}
+
 	public static void sendNotAllowContinueMessage(Order order, long delay) {
 		JSONObject object=  new JSONObject();
 		object.put("brandId", order.getBrandId());
@@ -305,23 +326,31 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
-    public static void sendModelFivePaySuccess(Order order) {
-        JSONObject obj=  new JSONObject();
-        obj.put("brandId", order.getBrandId());
-        obj.put("id", order.getId());
-        obj.put("tableNumber", order.getTableNumber());
-        obj.put("shopDetailId", order.getShopDetailId());
-        obj.put("articleCount", order.getArticleCount());
-        obj.put("orderMode",order.getOrderMode());
-        obj.put("productionStatus", order.getProductionStatus());
-        obj.put("verCode", order.getVerCode());
-        obj.put("parentOrderId", order.getParentOrderId());
-        obj.put("originalAmount", order.getOriginalAmount());
-        obj.put("orderMoney", order.getOrderMoney());
-        obj.put("serialNumber",order.getSerialNumber());
-        Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_DELETE_ORDER,obj.toJSONString().getBytes());
-        sendMessageASync(message);
-    }
+
+	public static void sendShopChangeMessage(String shopId) {
+		JSONObject object=  new JSONObject();
+		object.put("shopId", shopId);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SHOP_CHANGE,object.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
+	public static void sendModelFivePaySuccess(Order order) {
+		JSONObject obj=  new JSONObject();
+		obj.put("brandId", order.getBrandId());
+		obj.put("id", order.getId());
+		obj.put("tableNumber", order.getTableNumber());
+		obj.put("shopDetailId", order.getShopDetailId());
+		obj.put("articleCount", order.getArticleCount());
+		obj.put("orderMode",order.getOrderMode());
+		obj.put("productionStatus", order.getProductionStatus());
+		obj.put("verCode", order.getVerCode());
+		obj.put("parentOrderId", order.getParentOrderId());
+		obj.put("originalAmount", order.getOriginalAmount());
+		obj.put("orderMoney", order.getOrderMoney());
+		obj.put("serialNumber",order.getSerialNumber());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_DELETE_ORDER,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
 
 	public static void sendPrintSuccess(String shopId) {
 		JSONObject obj  = new JSONObject();
@@ -367,6 +396,26 @@ public class MQMessageProducer {
 	}
 
 
+
+
+	public static void sendOrderPay(Order order) {
+		JSONObject obj  = new JSONObject();
+		obj.put("id", order.getId());
+		obj.put("brandId", order.getBrandId());
+		obj.put("payMode", order.getPayMode());
+		obj.put("shopDetailId", order.getShopDetailId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_ORDER_PAY,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
+	public static void sendCancelOrder(Order order) {
+		JSONObject obj  = new JSONObject();
+		obj.put("id", order.getId());
+		obj.put("brandId", order.getBrandId());
+		obj.put("shopDetailId", order.getShopDetailId());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_ORDER_CANCEL,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
 
 
 

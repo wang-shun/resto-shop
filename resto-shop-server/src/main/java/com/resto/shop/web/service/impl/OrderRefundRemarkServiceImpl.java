@@ -8,6 +8,8 @@ import com.resto.shop.web.model.OrderRefundRemark;
 import com.resto.shop.web.service.OrderRefundRemarkService;
 import cn.restoplus.rpc.server.RpcService;
 
+import java.util.List;
+
 /**
  *
  */
@@ -20,6 +22,24 @@ public class OrderRefundRemarkServiceImpl extends GenericServiceImpl<OrderRefund
     @Override
     public GenericDao<OrderRefundRemark, Long> getDao() {
         return orderrefundremarkMapper;
-    } 
+    }
 
+    @Override
+    public void posSyncDeleteByOrderId(String orderId) {
+        orderrefundremarkMapper.posSyncDeleteByOrderId(orderId);
+    }
+
+    @Override
+    public void posSyncInsertList(List<OrderRefundRemark> orderRefundRemarks) {
+        if(orderRefundRemarks != null){
+            for(OrderRefundRemark orderRefundRemark : orderRefundRemarks){
+                orderrefundremarkMapper.insertSelective(orderRefundRemark);
+            }
+        }
+    }
+
+    @Override
+    public List<OrderRefundRemark> posSyncListByOrderId(String orderId) {
+        return orderrefundremarkMapper.posSyncListByOrderId(orderId);
+    }
 }

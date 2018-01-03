@@ -81,7 +81,7 @@ public class SendMessageAspect {
 			JSONObject jsonObject = new JSONObject();
 			jsonObject.put("num",remindNum);
 			jsonObject.put("name",brandUser.getBrandName());
-			SMSUtils.sendNoticeToBrand(jsonObject, brandUser.getPhone());
+			SMSUtils.sendNoticeToBrand(jsonObject, smsAcount.getSmsNoticeTelephone());
 		}
 
 	}
@@ -137,7 +137,8 @@ public class SendMessageAspect {
 		Brand brand = brandService.selectByPrimaryKey(brandId);
 		BrandUser brandUser = brandUserService.selectOneByBrandId(brandId);
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(brandId);
-		if (brandSetting != null && brandSetting.getOpenBrandAccount() == 1) {//如果开启了
+		//如果开启了
+		if (brandSetting != null && brandSetting.getOpenBrandAccount() == 1) {
 			//判断type是否等于1 type =0代表是需要发短信（账户小于设置则发短信通知） type=1是不需要发短信
 			log.info("该品牌开启了品牌账户信息--------");
 			//获取品牌账户设置
@@ -159,11 +160,11 @@ public class SendMessageAspect {
 				log.info("发送欠费消息后把账户设置改为已发送状态,并发送消息队列。。。");
 				MQMessageProducer.sendBrandAccountSms(brandId, MQSetting.DELAY_TIME);
 
-			} else { //未开启品牌账户
-				log.info("该品牌未开启品牌账户 -- ");
-				//判断是否要提醒商家充值短信账户
-				sendNotice(brandUser);
 			}
+		}else { //未开启品牌账户
+			log.info("该品牌未开启品牌账户 -- ");
+			//判断是否要提醒商家充值短信账户
+			sendNotice(brandUser);
 		}
 	}
 
@@ -194,12 +195,14 @@ public class SendMessageAspect {
 		log.info("短信发送结果:"+ JSONObject.toJSONString(aliResult));
 
 		//后置通知
-		if(aliResult.getBoolean("success")){//如果发短发送成功
+		if(aliResult.getBoolean("success")){
+			//如果发短发送成功
 			smsLog.setIsSuccess(true);
 			//成功时记录一条记录
 			smsLogService.insert(smsLog);
 			BrandSetting brandSetting = brandSettingService.selectByBrandId(brandId);
-			if (brandSetting != null && brandSetting.getOpenBrandAccount() == 1) {//如果开启了
+			//如果开启了
+			if (brandSetting != null && brandSetting.getOpenBrandAccount() == 1) {
 				//获取品牌账户设置
 				AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
 				//品牌账户
@@ -217,10 +220,12 @@ public class SendMessageAspect {
 				blog.setCreateTime(new Date());
 				blog.setGroupName(brand.getBrandName());
 				blog.setBehavior(BehaviorType.SMS);
-				blog.setFoundChange(sms_unit.negate());//负数
+				//负数
+				blog.setFoundChange(sms_unit.negate());
 				//blog.setRemain(remain);//剩余账户余额
 				int detailType = 0;
-				if(smsType== SmsLogType.AUTO_CODE){//如果是验证码
+				//如果是验证码
+				if(smsType== SmsLogType.AUTO_CODE){
 					detailType = DetailType.SMS_CODE;
 				}else if(smsType==SmsLogType.DAYMESSGAGE){
 					detailType = DetailType.SMS_DAY_MESSAGE;
@@ -229,7 +234,8 @@ public class SendMessageAspect {
 				blog.setAccountId(brandAccount.getId());
 				blog.setBrandId(brandId);
 				blog.setShopId(shopId);
-				blog.setSerialNumber(DateUtil.getRandomSerialNumber());//这个流水号目前使用当前时间搓+4位随机字符串
+				//这个流水号目前使用当前时间搓+4位随机字符串
+				blog.setSerialNumber(DateUtil.getRandomSerialNumber());
 //				Integer accountId = brandAccount.getId();
 //				brandAccount = new BrandAccount();
 //				brandAccount.setId(accountId);

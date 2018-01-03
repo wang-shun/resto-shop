@@ -96,4 +96,8 @@
     <select id="getItemKitchenId" resultType="Kitchen">
       select * from tb_kitchen where id = (select kitchen_id from tb_meal_item where id = #{mealItemId})
     </select>
+  
+  <select id="selectArticleKitchenByShopId" resultType="ArticleKitchen">
+    SELECT * from tb_article_kitchen ak where ak.article_id in (SELECT id from tb_article a where a.shop_detail_id =  #{shopId} );
+  </select>
 </mapper>

@@ -3,8 +3,6 @@
  import com.google.zxing.WriterException;
  import com.resto.brand.core.entity.Result;
  import com.resto.brand.core.util.FileToZip;
- import com.resto.brand.core.util.MemcachedUtils;
- import com.resto.brand.core.util.QRCodeUtil;
  import com.resto.brand.core.util.WeChatUtils;
  import com.resto.brand.web.model.Brand;
  import com.resto.brand.web.model.ShopDetail;
@@ -29,7 +27,6 @@
  import java.text.SimpleDateFormat;
  import java.util.Date;
  import java.util.List;
- import java.util.UUID;
 
  @Controller
  @RequestMapping("shopDetailManage")
@@ -39,7 +36,6 @@
 
      @Resource
      ShopDetailService shopDetailService;
-
      @Resource
      BrandService brandService;
 

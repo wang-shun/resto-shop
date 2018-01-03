@@ -11,6 +11,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.shop.web.dao.MealAttrMapper;
+import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.MealAttr;
 import com.resto.shop.web.model.MealItem;
 import com.resto.shop.web.service.MealAttrService;
@@ -71,7 +72,7 @@ public class MealAttrServiceImpl extends GenericServiceImpl<MealAttr, Integer> i
 	}
 
 	@Override
-	public List<MealAttr> selectFullByArticleId(String articleId,String show) {
+	public List<MealAttr> selectFullByArticleId(String articleId,String show,Map<String, Article> articleMap) {
 		List<MealAttr> list = selectList(articleId);
 		if(list.size()>0){
 			Map<Integer,MealAttr> attrMap = ApplicationUtils.convertCollectionToMap(Integer.class, list);
@@ -82,7 +83,11 @@ public class MealAttrServiceImpl extends GenericServiceImpl<MealAttr, Integer> i
 				if(attr.getMealItems()==null){
 					attr.setMealItems(new ArrayList<MealItem>());
 				}
-				attr.getMealItems().add(mealItem);
+				if (articleMap == null) {
+					attr.getMealItems().add(mealItem);
+				}else if(articleMap != null && articleMap.containsKey(mealItem.getArticleId())){
+					attr.getMealItems().add(mealItem);
+				}
 			}
 		}
 		return list;
@@ -92,4 +97,10 @@ public class MealAttrServiceImpl extends GenericServiceImpl<MealAttr, Integer> i
 	public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
 		return mealattrMapper.queryArticleMealAttr(selectMap);
 	}
+    @Override
+    public List<MealAttr> selectMealAttrByShopId(String shopId) {
+        return mealattrMapper.selectMealAttrByShopId(shopId);
+    }
+
+
 }

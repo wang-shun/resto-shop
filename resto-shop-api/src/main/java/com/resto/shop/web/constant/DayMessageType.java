@@ -5,9 +5,12 @@ package com.resto.shop.web.constant;
  */
 public class DayMessageType {
 
-    public final static int DAY_TYPE = 1;  //日结短信
-    public final static int XUN_TYPE = 2;    //旬结短信
-    public static final int MONTH_TYPE = 3;//月结短信
+    //日结短信
+    public final static int DAY_TYPE = 1;
+    //旬结短信
+    public final static int XUN_TYPE = 2;
+    //月结短信
+    public static final int MONTH_TYPE = 3;
 
 }
 

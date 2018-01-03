@@ -50,4 +50,11 @@ public interface AccountService extends GenericService<Account, String> {
 	 * @return
 	 */
 	List<Account> selectRebate();
+
+	/**
+	 * 根据 用户ID 查询 用户余额
+	 * @param customerId
+	 * @return
+	 */
+	Account selectAccountByCustomerId(String customerId);
 }

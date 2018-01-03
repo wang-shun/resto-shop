@@ -9,6 +9,7 @@
  import com.resto.scm.web.service.SupplierMaterialPriceService;
  import com.resto.shop.web.constant.Common;
  import com.resto.shop.web.controller.GenericController;
+ import org.apache.commons.lang3.StringUtils;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,6 +38,10 @@ public class SupplierPriceController extends GenericController{
 			return "notopen";
 		}
 	}
+
+	/***
+	 *@return
+	 */
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public Result listData(){
@@ -91,4 +96,6 @@ public class SupplierPriceController extends GenericController{
 		supplierpriceService.updateMdSupplierPriceStatus(id,supStatus);
 		return Result.getSuccess();
 	}
+
+
 }

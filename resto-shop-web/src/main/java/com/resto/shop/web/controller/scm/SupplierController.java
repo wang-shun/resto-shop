@@ -10,6 +10,7 @@
  import com.resto.shop.web.config.SessionKey;
  import com.resto.shop.web.constant.Common;
  import com.resto.shop.web.controller.GenericController;
+ import org.apache.commons.lang3.StringUtils;
  import org.apache.shiro.session.Session;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestBody;
@@ -32,16 +33,18 @@ public class SupplierController extends GenericController{
 
 	@RequestMapping("/list")
 	public String list(){
-
 		BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
 		if (brandSetting.getIsOpenScm().equals(Common.YES)){
 			return "scmSupplier/list";
 		}else {
 			return "notopen";
 		}
-
 	}
-
+	/**
+	 * @param request
+	 * @param state
+	 * @return
+	 */
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public Result listData(HttpServletRequest request,Integer state){
@@ -64,7 +67,6 @@ public class SupplierController extends GenericController{
 		supplierService.addMdSupplier(supplier);
 		return Result.getSuccess();
 	}
-
 	@RequestMapping("modify")
 	@ResponseBody
 	public Result modify(@Valid @RequestBody MdSupplierDo supplier){
@@ -81,4 +83,16 @@ public class SupplierController extends GenericController{
 		supplierService.delete(id,getCurrentShopId());
 		return Result.getSuccess();
 	}
+	/***
+	 * pos2.0供应商和报价单接口查询
+	 * @param
+	 * @return
+	 */
+
+	@RequestMapping("supplierAndSupPrice")
+	@ResponseBody
+	public Result querySupplierAndSupPrice(String shopId){
+		return getSuccessResult(supplierService.querySupplierAndSupPrice(shopId));
+	}
+
 }

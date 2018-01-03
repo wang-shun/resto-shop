@@ -58,6 +58,11 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
         return orderitemMapper.listByParentId(orderId);
     }
 
+    @Override
+    public void updateOrderIdByBeforeId(String orderId, String beforeId) {
+        orderitemMapper.updateOrderIdByBeforeId(orderId, beforeId);
+    }
+
     List<OrderItem> getOrderItemsWithChild(List<OrderItem> orderItems) {
         log.debug("这里查看套餐子项: ");
         Map<String, OrderItem> idItems = ApplicationUtils.convertCollectionToMap(String.class, orderItems);
@@ -95,7 +100,7 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
         for(int i = 0; i < orderItems.size(); i++){
             if(orderItems.get(i).getType() == OrderItemType.UNIT_NEW){
                 for(int j = 0; j < orderItems.size(); j++){
-                    if(orderItems.get(i).getName().equals(orderItems.get(j).getName()) && !orderItems.get(i).getId().equals(orderItems.get(j).getId())){
+                    if(orderItems.get(i).getArticleName().equals(orderItems.get(j).getArticleName()) && !orderItems.get(i).getId().equals(orderItems.get(j).getId())){
                         orderItems.get(i).setCount(orderItems.get(i).getCount() + orderItems.get(j).getCount());
                         orderItems.get(i).setFinalPrice(orderItems.get(i).getFinalPrice().add(orderItems.get(j).getFinalPrice()));
                         orderItems.remove(orderItems.get(j));
@@ -181,7 +186,17 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
     }
 
     @Override
+    public void posSyncDeleteByOrderId(String orderId) {
+        orderitemMapper.posSyncDeleteByOrderId(orderId);
+    }
+
+    @Override
     public List<OrderItem> getOrderBefore(String tableNumber, String shopId, String customerId) {
         return orderitemMapper.getOrderBefore(tableNumber, shopId, customerId);
+    }
+
+    @Override
+    public List<OrderItem> posSyncListByOrderId(String orderId) {
+        return orderitemMapper.posSyncListByOrderId(orderId);
     }
 }

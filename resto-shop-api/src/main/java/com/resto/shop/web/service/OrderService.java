@@ -754,6 +754,14 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	 */
 	List<Order> selectCompleteByShopIdAndTime(String shopId, Date todayBegin, Date todayEnd);
 
+    /**
+     * 	【Pos 2.0】
+     * 	本地 Pos 订单上传接口
+     * 	lmx			2017年6月20日 19:56:21
+     * @param orderList
+     */
+    void uploadLocalPosOrderList(List<Map<String, Object>> orderList);
+
 	/**
 	 * 用户最近一把有效订单
 	 * @param customerId
@@ -775,4 +783,19 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	List<Map<String,Object>> callBossAppOrdrReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate);
 
+	/**
+	 * Pos 2.0 数据同步方法，根据 orderId 查询订单信息
+	 * @param orderId
+	 * @return
+	 */
+	Order posSyncSelectById(String orderId);
+
+	/**
+	 * 根据 店铺ID 和 用户ID 查询此用户在该店消费订单数量
+	 * pos2.0 使用
+	 * @param shopId
+	 * @param customerId
+	 * @return
+	 */
+	Integer selectCompleteOrderCount(String shopId, String customerId);
 }

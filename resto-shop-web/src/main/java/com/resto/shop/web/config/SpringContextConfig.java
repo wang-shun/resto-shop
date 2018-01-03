@@ -604,6 +604,10 @@ public class SpringContextConfig {
     public DocPmsPoHeaderService docPmsPoHeaderService(){
         return proxy.create(DocPmsPoHeaderService.class);
     }
+    @Bean
+    public DocReturnHeaderService docDocReturnHeaderService(){
+        return proxy.create(DocReturnHeaderService.class);
+    }
 
 
     //------------scm server config end-----------
@@ -615,6 +619,9 @@ public class SpringContextConfig {
 	    return proxy.create(GoodTopService.class);
     }
 
+
+    @Bean
+    public PosService posService() {return  proxy.create(PosService.class);}
 
     public <T> T getProxy(Class<T> clazz) {
         return proxy.create(clazz);
