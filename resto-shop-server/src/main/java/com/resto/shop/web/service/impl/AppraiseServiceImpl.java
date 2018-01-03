@@ -157,10 +157,11 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	private BigDecimal rewardRed(Order order) {
 		BigDecimal money = redConfigService.nextRedAmount(order);
 		Customer cus = customerService.selectById(order.getCustomerId());
+		String uuid = ApplicationUtils.randomUUID();
 		if(money.compareTo(BigDecimal.ZERO)>0){
 //			accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.APPRAISE_RED_PACKAGE,order.getShopDetailId());
             RedPacket redPacket = new RedPacket();
-            redPacket.setId(ApplicationUtils.randomUUID());
+            redPacket.setId(uuid);
             redPacket.setRedMoney(money);
             redPacket.setCreateTime(new Date());
             redPacket.setCustomerId(cus.getId());
@@ -172,7 +173,8 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			redPacket.setState(0);
             redPacketService.insert(redPacket);
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
-			MQMessageProducer.sendShareGiveMoneyMsg(redPacket,5);
+			RedPacket rp = redPacketService.selectById(uuid);
+			MQMessageProducer.sendShareGiveMoneyMsg(rp,5);
 		}
 		return money;
 	}
