@@ -105,4 +105,13 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	List<Map<String, Object>> getChargeSumInfo(Map<String, Object> selectMap);
 
 	List<String> selectCustomerChargeOrder(List<String> customerIds);
+
+	/**
+	 * 查询时间 充值金额
+	 * @param monthBegin
+	 * @param monthEnd
+	 * @param shopId
+	 * @return
+	 */
+    BigDecimal selectTotalBalanceByTimeAndShopId(Date monthBegin, Date monthEnd, String shopId);
 }
