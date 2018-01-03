@@ -137,7 +137,7 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
-	public static void sendShareGiveMoneyMsg(final RedPacket redPacket,final long delayTime){
+	public static void sendShareGiveMoneyMsg(RedPacket redPacket,long delayTime){
 		JSONObject obj = new JSONObject();
 		obj.put("id", redPacket.getId());
 		obj.put("brandId", redPacket.getBrandId());
