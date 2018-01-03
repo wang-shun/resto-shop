@@ -10,6 +10,7 @@ import javax.annotation.Resource;
 import com.resto.brand.web.dto.AppraiseShopDto;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.model.*;
+import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -145,7 +146,6 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 				order.setAllowAppraise(false);
 			}
 			order.setAllowCancel(false);
-			order.setAllowContinueOrder(false);
 			orderService.update(order);
 		}else{
 			log.error("订单不允许评论:	"+order.getId());
@@ -158,7 +158,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		BigDecimal money = redConfigService.nextRedAmount(order);
 		Customer cus = customerService.selectById(order.getCustomerId());
 		if(money.compareTo(BigDecimal.ZERO)>0){
-			accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.APPRAISE_RED_PACKAGE,order.getShopDetailId());
+//			accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.APPRAISE_RED_PACKAGE,order.getShopDetailId());
             RedPacket redPacket = new RedPacket();
             redPacket.setId(ApplicationUtils.randomUUID());
             redPacket.setRedMoney(money);
@@ -169,8 +169,10 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
             redPacket.setRedRemainderMoney(money);
             redPacket.setRedType(RedType.APPRAISE_RED);
 			redPacket.setOrderId(order.getId());
+			redPacket.setState(0);
             redPacketService.insert(redPacket);
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
+			MQMessageProducer.sendShareGiveMoneyMsg(redPacket,60000);
 		}
 		return money;
 	}

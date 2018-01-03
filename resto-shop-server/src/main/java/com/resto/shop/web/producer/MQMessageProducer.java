@@ -137,6 +137,17 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+	public static void sendShareGiveMoneyMsg(final RedPacket redPacket,final long delayTime){
+		JSONObject obj = new JSONObject();
+		obj.put("id", redPacket.getId());
+		obj.put("brandId", redPacket.getBrandId());
+		obj.put("customerId", redPacket.getCustomerId());
+		obj.put("shopDetailId", redPacket.getShopDetailId());
+		obj.put("redMoney", redPacket.getRedMoney());
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SHARE_GIVE_MONEY,obj.toJSONString().getBytes());
+		message.setStartDeliverTime(System.currentTimeMillis()+delayTime);
+		sendMessageASync(message);
+	}
 
 	public static void sendMessageASync(final Message message) {
 
