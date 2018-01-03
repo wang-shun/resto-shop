@@ -620,7 +620,7 @@ public class OrderMessageListener implements MessageListener {
             Customer customer = customerService.selectById(redPacket.getCustomerId());
             accountService.addAccount(redPacket.getRedMoney(),customer.getAccountId(), " 评论奖励红包:"+redPacket.getRedMoney(),AccountLog.APPRAISE_RED_PACKAGE,redPacket.getShopDetailId());
             RedPacket newRedPacket = new RedPacket();
-            newRedPacket.setId(newRedPacket.getId());
+            newRedPacket.setId(redPacket.getId());
             newRedPacket.setState(1);
             redPacketService.update(newRedPacket);
             sendShareGiveMoneyDelayMsg(redPacket, customer);
