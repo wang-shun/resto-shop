@@ -138,6 +138,7 @@ public class MQMessageProducer {
 	}
 
 	public static void sendShareGiveMoneyMsg(RedPacket redPacket,long delayTime){
+		log.info("我正在进来。。。。。。。" + redPacket.getId());
 		JSONObject obj = new JSONObject();
 		obj.put("id", redPacket.getId());
 		obj.put("brandId", redPacket.getBrandId());
