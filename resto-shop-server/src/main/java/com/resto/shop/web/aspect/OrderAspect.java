@@ -996,7 +996,7 @@ public class OrderAspect {
                     if (setting.getAutoConfirmTime() <= setting.getCloseContinueTime()) {    //加菜时间跟领取红包时间对比
                         if (order.getOrderState() == OrderState.PAYMENT) {
                             MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
-                            MQMessageProducer.sendBossOrder(order, setting.getCloseContinueTime() * 1000);
+                            MQMessageProducer.sendBossOrder(order, setting.getAutoConfirmTime() * 1000);
                         }
                     } else {
                         MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
