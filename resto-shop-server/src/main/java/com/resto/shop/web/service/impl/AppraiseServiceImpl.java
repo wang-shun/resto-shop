@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import com.resto.brand.web.dto.AppraiseShopDto;
+import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
@@ -59,6 +61,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	@Resource
 	ParticipantService participantService;
 
+	@Resource
+	BrandSettingService brandSettingService;
+
     @Override
     public GenericDao<Appraise, String> getDao() {
         return appraiseMapper;
@@ -107,6 +112,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 	@Override
 	public Appraise saveAppraise(Appraise appraise) throws AppException {
 		Order order= orderService.selectById(appraise.getOrderId());
+		BrandSetting brandSetting =  brandSettingService.selectByBrandId(order.getBrandId());
 		if(order.getAllowAppraise() && (order.getGroupId() == null || "".equals(order.getGroupId()))){
 //			String pic = getPicture(appraise);
 //			appraise.setPictureUrl(pic);
@@ -114,7 +120,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			appraise.setCreateTime(new Date());
 			appraise.setStatus((byte)1);
 			appraise.setShopDetailId(order.getShopDetailId());
-			BigDecimal redMoney= rewardRed(order);
+			BigDecimal redMoney= rewardRed(order, brandSetting);
 			appraise.setRedMoney(redMoney);
 			appraise.setBrandId(order.getBrandId());
 			insert(appraise);
@@ -133,7 +139,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			appraise.setCreateTime(new Date());
 			appraise.setStatus((byte)1);
 			appraise.setShopDetailId(order.getShopDetailId());
-			BigDecimal redMoney= rewardRed(order);
+			BigDecimal redMoney= rewardRed(order, brandSetting);
 			appraise.setRedMoney(redMoney);
 			appraise.setBrandId(order.getBrandId());
 			insert(appraise);
@@ -154,12 +160,14 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		return appraise;
 	}
 
-	private BigDecimal rewardRed(Order order) {
+	private BigDecimal rewardRed(Order order, BrandSetting brandSetting) {
 		BigDecimal money = redConfigService.nextRedAmount(order);
 		Customer cus = customerService.selectById(order.getCustomerId());
 		String uuid = ApplicationUtils.randomUUID();
 		if(money.compareTo(BigDecimal.ZERO)>0){
-//			accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.APPRAISE_RED_PACKAGE,order.getShopDetailId());
+			if(brandSetting.getDelayAppraiseMoneyTime() != 0){
+				accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.APPRAISE_RED_PACKAGE,order.getShopDetailId());
+			}
             RedPacket redPacket = new RedPacket();
             redPacket.setId(uuid);
             redPacket.setRedMoney(money);
@@ -170,11 +178,16 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
             redPacket.setRedRemainderMoney(money);
             redPacket.setRedType(RedType.APPRAISE_RED);
 			redPacket.setOrderId(order.getId());
-			redPacket.setState(0);
+			if(brandSetting.getDelayAppraiseMoneyTime() != 0){
+				redPacket.setState(0);
+			}
             redPacketService.insert(redPacket);
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
-			RedPacket rp = redPacketService.selectById(uuid);
-			MQMessageProducer.sendShareGiveMoneyMsg(rp,5);
+			if(brandSetting.getDelayAppraiseMoneyTime() != 0){
+				RedPacket rp = redPacketService.selectById(uuid);
+				MQMessageProducer.sendShareGiveMoneyMsg(rp, brandSetting.getDelayAppraiseMoneyTime());
+			}
+
 		}
 		return money;
 	}
