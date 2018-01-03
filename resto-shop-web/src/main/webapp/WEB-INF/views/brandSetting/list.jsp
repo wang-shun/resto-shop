@@ -103,7 +103,7 @@
                             <label>最迟加菜时间(秒)</label>
                             <input type="number" class="form-control" name="closeContinueTime"
                                    v-model="m.closeContinueTime" required="required">
-                            <div style="color: red" id="timeTips"></div>
+                            <%--<div style="color: red" id="timeTips"></div>--%>
                         </div>
                         <div class="form-group">
                             <label>评论订单红包延迟到账时间(秒)</label>
