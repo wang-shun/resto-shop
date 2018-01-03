@@ -569,6 +569,43 @@ public class PosServiceImpl implements PosService {
         SMSUtils.sendMessage("17671111590",param ,SMSUtils.SIGN, SMSUtils.SMS_SERVER_ERROR);
     }
 
+    @Override
+    public void sendMockMQMessage(String shopId, String type, String orderId, Integer platformType) {
+        Order order = new Order();
+        if(StringUtils.isNotEmpty(orderId)){
+            order = orderService.selectById(orderId);
+        }
+        switch (type){
+            case "createOrder":
+                MQMessageProducer.sendCreateOrderMessage(order);
+                break;
+            case "platform":
+                platformType = platformType != null ? platformType : 1;
+                ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+                if(shopDetail != null){
+                    MQMessageProducer.sendPlatformOrderMessage(orderId, platformType, shopDetail.getBrandId(), shopId);
+                }
+                break;
+            case "orderPay":
+                MQMessageProducer.sendOrderPay(order);
+                break;
+            case "cancelOrder":
+                MQMessageProducer.sendCancelOrder(order);
+                break;
+            case "change":
+                MQMessageProducer.sendShopChangeMessage(shopId);
+                break;
+//            case "serverCommand":
+//                com.alibaba.fastjson.JSONObject obj  = new com.alibaba.fastjson.JSONObject();
+//                MQMessageProducer.sendServerCommandToNewPos(obj);
+//                break;
+            default:
+                log.info("【sendMockMQMessage】未匹配~");
+                break;
+        }
+        log.info("\n\n  shopId：" + shopId + "\n   type：" + type + "\n   orderId：" + orderId + "\n   platformType" + platformType);
+    }
+
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
         String orderId = orderDto.getId();
         StringBuffer backUps = new StringBuffer();

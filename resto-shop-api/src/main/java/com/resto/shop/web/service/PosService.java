@@ -148,5 +148,14 @@ public interface PosService {
      */
     void serverError(String brandId,String shopId);
 
+    /**
+     * 发送虚拟消息队列数据
+     * @param shopId  店铺ID
+     * @param type  消息类型
+     * @param orderId   订单ID
+     * @param platformType   外卖平台类型
+     */
+    void sendMockMQMessage(String shopId, String type, String orderId, Integer platformType);
+
     void test();
 }
