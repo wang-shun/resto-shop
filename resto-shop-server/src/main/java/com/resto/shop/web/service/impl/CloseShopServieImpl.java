@@ -121,6 +121,30 @@ public class CloseShopServieImpl implements CloseShopService{
 
 	}
 
+	@Override
+	public Boolean insertOffLineOrder(String brandId, String shopId, OffLineOrder offLineOrder) {
+		Boolean flag = false;
+		Date cleanDate = offLineOrder.getCreateTime();
+		OffLineOrder offLineOrder1 = offLineOrderService.selectByTimeSourceAndShopId(OfflineOrderSource.OFFLINE_POS, shopId, DateUtil.getDateBegin(cleanDate), DateUtil.getDateEnd(cleanDate));
+		if (null != offLineOrder1) {
+			offLineOrder1.setState(Common.NO);
+			offLineOrderService.update(offLineOrder1);
+		}
+
+		offLineOrder.setCreateTime(cleanDate);
+		offLineOrder.setCreateDate(cleanDate);
+		offLineOrder.setId(ApplicationUtils.randomUUID());
+		offLineOrder.setState(Common.YES);
+		offLineOrder.setResource(OfflineOrderSource.OFFLINE_POS);
+		offLineOrder.setBrandId(brandId);
+		offLineOrder.setShopDetailId(shopId);
+		int temp = offLineOrderService.insert(offLineOrder);
+		if(temp > 0){
+			flag = true;
+		}
+		return flag;
+	}
+
 	private void sendMessageByFirst(Brand brand,ShopDetail shopDetail,Date cleanDate,OffLineOrder offLineOrder) {
 
 		WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());

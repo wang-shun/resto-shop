@@ -536,7 +536,7 @@ public class PosServiceImpl implements PosService {
 
     @Override
     public void posCheckOut(String brandId,String shopId, OffLineOrder offLineOrder) {
-        offLineOrder = new OffLineOrder(ApplicationUtils.randomUUID(), shopId, brandId , 1, BigDecimal.ZERO, 0, 0, BigDecimal.ZERO, 0, new Date(), new Date(), 1);
+//        offLineOrder = new OffLineOrder(ApplicationUtils.randomUUID(), shopId, brandId , 1, BigDecimal.ZERO, 0, 0, BigDecimal.ZERO, 0, new Date(), new Date(), 1);
         Brand brand = brandService.selectByPrimaryKey(brandId);
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         closeShopService.cleanShopOrder(shopDetail, offLineOrder, brand);
