@@ -815,7 +815,6 @@ public class OrderAspect {
 //            orderService.confirmOrder(order);
         }
         if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
-            log.info("\n\n lmx test   orderPayAfter  \n\n\n");
             MQMessageProducer.sendOrderPay(order);
         }
     }

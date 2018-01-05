@@ -417,6 +417,15 @@ public class MQMessageProducer {
 		sendMessageASync(message);
 	}
 
+	/**
+	 * 给 Pos2.0 客户端发送指定命令
+	 * @param obj
+	 */
+	public static void sendServerCommandToNewPos(JSONObject obj) {
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SERVER_COMMAND,obj.toJSONString().getBytes());
+		sendMessageASync(message);
+	}
+
 
 
 }

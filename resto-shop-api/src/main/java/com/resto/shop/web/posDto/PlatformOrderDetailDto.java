@@ -16,6 +16,7 @@ public class PlatformOrderDetailDto implements Serializable {
     public PlatformOrderDetailDto(PlatformOrderDetail platformOrderDetail){
         this.id = platformOrderDetail.getId() == null ? "" : platformOrderDetail.getId();
         this.name = platformOrderDetail.getName() == null ? "" : platformOrderDetail.getName();
+        this.platformOrderId = platformOrderDetail.getPlatformOrderId() == null ? "" : platformOrderDetail.getPlatformOrderId();
         this.price = platformOrderDetail.getPrice() == null ? BigDecimal.valueOf(0) : platformOrderDetail.getPrice();
         this.quantity = platformOrderDetail.getQuantity() == null ? 0 : platformOrderDetail.getQuantity();
         this.showName = platformOrderDetail.getShowName() == null ? "" : platformOrderDetail.getShowName();
@@ -31,6 +32,8 @@ public class PlatformOrderDetailDto implements Serializable {
     private Integer quantity;
 
     private String showName;
+
+    private String platformOrderId;
 
     public String getId() {
         return id;
@@ -70,5 +73,13 @@ public class PlatformOrderDetailDto implements Serializable {
 
     public void setShowName(String showName) {
         this.showName = showName;
+    }
+
+    public String getPlatformOrderId() {
+        return platformOrderId;
+    }
+
+    public void setPlatformOrderId(String platformOrderId) {
+        this.platformOrderId = platformOrderId;
     }
 }
