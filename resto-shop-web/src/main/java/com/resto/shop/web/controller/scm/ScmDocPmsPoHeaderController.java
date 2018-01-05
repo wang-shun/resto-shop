@@ -1,6 +1,7 @@
  package com.resto.shop.web.controller.scm;
 
  import com.resto.brand.core.entity.Result;
+ import com.resto.scm.web.dto.DocPmsPoHeaderDetailDo;
  import com.resto.scm.web.model.DocPmsPoHeader;
  import com.resto.scm.web.service.DocPmsPoHeaderService;
  import com.resto.shop.web.controller.GenericController;
@@ -37,8 +38,8 @@ public class ScmDocPmsPoHeaderController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid DocPmsPoHeader docPmsPoHeader){
-		docPmsPoHeaderService.insert(docPmsPoHeader);
+	public Result create(@Valid DocPmsPoHeaderDetailDo docPmsPoHeaderDetailDo){
+		docPmsPoHeaderService.createPmsPoHeaderDetailDo(docPmsPoHeaderDetailDo);
 		return Result.getSuccess();
 	}
 	

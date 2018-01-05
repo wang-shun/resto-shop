@@ -9,6 +9,7 @@ import com.resto.scm.web.service.CategoryService;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.util.Assertion;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +30,7 @@ public class ScmCategoryController extends GenericController {
     @Resource
     BrandSettingService brandSettingService;
 
+
     @RequestMapping("/list")
     public String list(){
         BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
@@ -39,12 +41,18 @@ public class ScmCategoryController extends GenericController {
         }
     }
 
+    /***
+     * @return
+     */
     @RequestMapping("/query")
     @ResponseBody
-    public Result queryAll() {
-        List<CategoryOne> list = categoryService.queryAll(this.getCurrentShopId());
+    public Result queryAll(String shopId,Long supPriceId) {
+        String shopDetailId = StringUtils.isEmpty(shopId)?getCurrentShopId():shopId;
+        List<CategoryOne> list = categoryService.queryAll(shopDetailId,supPriceId);
         return getSuccessResult(list);
     }
+
+
 
     @RequestMapping("/list_categoryHierarchy")
     @ResponseBody
@@ -60,6 +68,7 @@ public class ScmCategoryController extends GenericController {
         return getSuccessResult(list);
     }
 
+
     @RequestMapping("/list_all")
     @ResponseBody
     public Result listData() {
@@ -67,12 +76,14 @@ public class ScmCategoryController extends GenericController {
         return getSuccessResult(list);
     }
 
+
     @RequestMapping("/list_one")
     @ResponseBody
     public Result list_one(Long id) {
         MdCategory mdCategory = categoryService.queryById(id);
         return getSuccessResult(mdCategory);
     }
+
 
     @RequestMapping("look_down")
     @ResponseBody
