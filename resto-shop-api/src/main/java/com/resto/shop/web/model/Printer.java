@@ -35,6 +35,12 @@ public class Printer implements Serializable {
 
     private Integer billOfConsumption;
 
+    private Integer supportTangshi;
+
+    private Integer supportWaidai;
+
+    private Integer supportWaimai;
+
     public Integer getBillOfAccount() {
         return billOfAccount;
     }
@@ -131,5 +137,29 @@ public class Printer implements Serializable {
 
     public void setShopDetailId(String shopDetailId) {
         this.shopDetailId = shopDetailId == null ? null : shopDetailId.trim();
+    }
+
+    public Integer getSupportTangshi() {
+        return supportTangshi;
+    }
+
+    public void setSupportTangshi(Integer supportTangshi) {
+        this.supportTangshi = supportTangshi;
+    }
+
+    public Integer getSupportWaidai() {
+        return supportWaidai;
+    }
+
+    public void setSupportWaidai(Integer supportWaidai) {
+        this.supportWaidai = supportWaidai;
+    }
+
+    public Integer getSupportWaimai() {
+        return supportWaimai;
+    }
+
+    public void setSupportWaimai(Integer supportWaimai) {
+        this.supportWaimai = supportWaimai;
     }
 }

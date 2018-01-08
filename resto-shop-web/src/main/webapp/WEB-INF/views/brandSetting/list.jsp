@@ -103,7 +103,12 @@
                             <label>最迟加菜时间(秒)</label>
                             <input type="number" class="form-control" name="closeContinueTime"
                                    v-model="m.closeContinueTime" required="required">
-                            <div style="color: red" id="timeTips"></div>
+                            <%--<div style="color: red" id="timeTips"></div>--%>
+                        </div>
+                        <div class="form-group">
+                            <label>评论订单红包延迟到账时间(秒)</label>
+                            <input type="number" class="form-control" name="delayAppraiseMoneyTime"
+                                   v-model="m.delayAppraiseMoneyTime" required="required">
                         </div>
                         <!--		以后	配送模式，都以店铺设置为准，品牌设置不再生效	2017年4月19日 17:51:05		—lmx		-->
                         <%--<div class="form-group">--%>

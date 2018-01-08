@@ -41,50 +41,42 @@ public class OrderMessageListener implements MessageListener {
 
     @Resource
     OrderService orderService;
-
     @Resource
     WechatConfigService wechatConfigService;
     @Resource
     BrandSettingService brandSettingService;
-    
     @Resource
     BrandService brandService;
-    
     @Resource
     CustomerService customerService;
-
     @Resource
     CouponService couponService;
-
     @Resource
     ShareSettingService shareSettingService;
-
     @Resource
     OrderItemService orderItemService;
     @Resource
     ShopDetailService shopDetailService;
-
     @Resource
     NewCustomCouponService newcustomcouponService;
-
     @Resource
 	BrandAccountService brandAccountService;
-
     @Resource
 	AccountSettingService accountSettingService;
-
-
     @Resource
 	AccountNoticeService accountNoticeService;
-
     @Resource
     TemplateService templateService;
     @Autowired
     TableGroupService tableGroupService;
-
-
+    @Resource
+    AccountService accountService;
     @Resource
     LogBaseService logBaseService;
+    @Resource
+    RedPacketService redPacketService;
+
+
     @Value("#{propertyConfigurer['orderMsg']}")
     public static String orderMsg;
     @Override
@@ -113,6 +105,8 @@ public class OrderMessageListener implements MessageListener {
             return executeNotAllowContinue(message);
         } else if (tag.equals(MQSetting.TAG_SHOW_ORDER)) {
             return executeShowComment(message);
+        } else if (tag.equals(MQSetting.TAG_SHARE_GIVE_MONEY)){
+            return executeShareGiveMoneyDelay(message);
         } else if (tag.equals(MQSetting.TAG_AUTO_REFUND_ORDER)) {
             return executeAutoRefundOrder(message);
         } else if (tag.equals(MQSetting.TAG_NOTICE_SHARE_CUSTOMER)) {
@@ -523,7 +517,6 @@ public class OrderMessageListener implements MessageListener {
             DataSourceContextHolder.setDataSourceName(appraise.getBrandId());
             log.info("开始发送分享通知:");
             sendShareMsg(appraise);
-
         }catch (Exception e){
             e.printStackTrace();
             return Action.ReconsumeLater;
@@ -616,6 +609,36 @@ public class OrderMessageListener implements MessageListener {
                 doPostAnsc(LogUtils.url, map);
             }
         }
+    }
+
+    private Action executeShareGiveMoneyDelay(Message message) {
+        try {
+            String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
+            RedPacket redPacket = JSON.parseObject(msg, RedPacket.class);
+            DataSourceContextHolder.setDataSourceName(redPacket.getBrandId());
+            log.info("开始发送分享红包到账通知:");
+            Customer customer = customerService.selectById(redPacket.getCustomerId());
+            accountService.addAccount(redPacket.getRedMoney(),customer.getAccountId(), " 评论奖励红包:"+redPacket.getRedMoney(),AccountLog.APPRAISE_RED_PACKAGE,redPacket.getShopDetailId());
+            RedPacket newRedPacket = new RedPacket();
+            newRedPacket.setId(redPacket.getId());
+            newRedPacket.setState(1);
+            redPacketService.update(newRedPacket);
+            sendShareGiveMoneyDelayMsg(redPacket, customer);
+        }catch (Exception e){
+            e.printStackTrace();
+            return Action.ReconsumeLater;
+        }
+        return Action.CommitMessage;
+    }
+
+    private void sendShareGiveMoneyDelayMsg(RedPacket redPacket , Customer customer) {
+        StringBuffer msg = new StringBuffer();
+        Brand brand = brandService.selectById(redPacket.getBrandId());
+        WechatConfig config = wechatConfigService.selectByBrandId(redPacket.getBrandId());
+        msg.append("太好了！评论红包已经送达您的账户！");
+        String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
+        msg.append("<a href='" + jumpurl + "'>前往查看</a>");
+        WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
 
     private Action executeChangeProductionState(Message message) throws UnsupportedEncodingException {

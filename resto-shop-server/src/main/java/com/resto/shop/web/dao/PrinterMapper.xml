@@ -14,8 +14,11 @@
     <result column="receive_money" property="receiveMoney"/>
     <result column="bill_of_account" property="billOfAccount"/>
     <result column="bill_of_consumption" property="billOfConsumption"/>
+    <result column="support_tangshi" property="supportTangshi"/>
+    <result column="support_waidai" property="supportWaidai"/>
+    <result column="support_waimai" property="supportWaimai"/>
   </resultMap>
-  <sql id="Base_Column_List">id, name, ip, port, shop_detail_id,print_type,ticket_type,`range`,receive_money,bill_of_account,bill_of_consumption</sql>
+  <sql id="Base_Column_List">id, name, ip, port, shop_detail_id,print_type,ticket_type,`range`,receive_money,bill_of_account,bill_of_consumption,support_tangshi,support_waidai,support_waimai</sql>
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">select 
     <include refid="Base_Column_List"/> from tb_printer where id = #{id,jdbcType=INTEGER}
   </select>
@@ -34,6 +37,9 @@
       <if test="receiveMoney != null">receive_money,</if>
       <if test="billOfAccount != null">bill_of_account,</if>
       <if test="billOfConsumption != null">bill_of_consumption,</if>
+      <if test="supportTangshi != null">support_tangshi,</if>
+      <if test="supportWaidai != null">support_waidai,</if>
+      <if test="supportWaimai != null">support_waimai,</if>
     </trim>  
     <trim prefix="values (" suffix=")" suffixOverrides=","> 
       <if test="id != null">#{id,jdbcType=INTEGER},</if>  
@@ -47,6 +53,9 @@
       <if test="receiveMoney != null">#{receiveMoney},</if>
       <if test="billOfAccount != null">#{billOfAccount},</if>
       <if test="billOfConsumption != null">#{billOfConsumption},</if>
+      <if test="supportTangshi != null">#{supportTangshi},</if>
+      <if test="supportWaidai != null">#{supportWaidai},</if>
+      <if test="supportWaimai != null">#{supportWaimai},</if>
     </trim> 
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Printer">update tb_printer 
@@ -61,6 +70,9 @@
       <if test="receiveMoney != null">receive_money = #{receiveMoney},</if>
       <if test="billOfAccount != null">bill_of_account = #{billOfAccount},</if>
       <if test="billOfConsumption != null">bill_of_consumption = #{billOfConsumption},</if>
+      <if test="supportTangshi != null">support_tangshi = #{supportTangshi},</if>
+      <if test="supportWaidai != null">support_waidai = #{supportWaidai},</if>
+      <if test="supportWaimai != null">support_waimai = #{supportWaimai},</if>
     </set> where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.Printer">

@@ -16,6 +16,7 @@ public class RedPacket implements Serializable {
     private BigDecimal redRemainderMoney;
     private Integer redType;
     private String orderId;
+    private Integer state;
 
     public String getId() {
         return id;
@@ -95,5 +96,13 @@ public class RedPacket implements Serializable {
 
     public void setOrderId(String orderId) {
         this.orderId = orderId;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 }
