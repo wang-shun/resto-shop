@@ -84,7 +84,7 @@
                 <span style="text-indent:15%;display: block;">为保证高峰期间稳定性，管理后台使用时间临时调整为：</span>
                 <span class="rightText">上午 0:00 - 11:00</span>
                 <span class="rightText">下午 13:00 - 17:00</span>
-                <span class="rightText">晚上 19:00 - 0:00</span>
+                <span class="rightText">晚上 20:00 - 0:00</span>
                 <span class="leftText">在此期间带来的不便请您谅解！感谢您的配合！</span>
                 <span class="rightText">客服热线:400-805-1711</span>
             </p>

@@ -70,6 +70,15 @@ public class PrinterController extends GenericController{
 		if (printer.getBillOfConsumption() == null){
 			printer.setBillOfConsumption(0);
 		}
+		if (printer.getSupportTangshi() == null){
+			printer.setSupportTangshi(0);
+		}
+		if (printer.getSupportWaidai() == null){
+			printer.setSupportWaidai(0);
+		}
+		if (printer.getSupportWaimai() == null){
+			printer.setSupportWaimai(0);
+		}
 		printerService.update(printer);
 		posService.shopMsgChange(getCurrentShopId());
 		return Result.getSuccess();
