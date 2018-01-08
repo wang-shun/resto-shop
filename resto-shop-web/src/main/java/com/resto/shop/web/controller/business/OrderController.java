@@ -452,7 +452,7 @@ public class OrderController extends GenericController{
             String[][] items = new String[orderDetailDto.getShopOrderList().size()][];
             int i = 0;
             for (Map map : orderDetailDto.getShopOrderList()){
-                items[i] = new String[19];
+                items[i] = new String[18];
                 items[i][0] = map.get("shopName").toString();
                 items[i][1] = map.get("createTime").toString();
                 items[i][2] = map.get("telephone").toString();
@@ -470,8 +470,7 @@ public class OrderController extends GenericController{
                 items[i][14] = map.get("shanhuiPay").toString();
                 items[i][15] = map.get("integralPay").toString();
                 items[i][16] = map.get("articleBackPay").toString();
-                items[i][17] = map.get("incomePrize").toString();
-				items[i][18] = map.get("refundCrashPayment").toString();
+				items[i][17] = map.get("refundCrashPayment").toString();
                 i++;
             }
             AppendToExcelUtil.insertRows(path,startPosition,items);
