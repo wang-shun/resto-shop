@@ -552,10 +552,21 @@ public class PosServiceImpl implements PosService {
                 updateOrder.setOrderState(OrderState.CANCEL);
                 orderService.update(updateOrder);
             }
-            //  如果绑定的有桌位，则释放桌位
-            if(StringUtils.isNotEmpty(order.getTableNumber())){
-                RedisUtil.set(shopId+order.getTableNumber()+"status", true);
+            if(StringUtils.isEmpty(order.getParentOrderId())){
+                //  如果绑定的有桌位，则释放桌位
+                if(StringUtils.isNotEmpty(order.getTableNumber())){
+                    RedisUtil.set(shopId+order.getTableNumber()+"status", true);
+                }
+            }else{
+                //  如果父订单的状态 不是 未支付，并且绑定了桌位，则释放主订单的桌位
+                Order parentOrder = orderService.selectById(order.getParentOrderId());
+                if(parentOrder.getOrderState() != OrderState.SUBMIT){
+                    if(StringUtils.isNotEmpty(parentOrder.getTableNumber())){
+                        RedisUtil.set(shopId+order.getTableNumber()+"status", true);
+                    }
+                }
             }
+
         }
     }
 
