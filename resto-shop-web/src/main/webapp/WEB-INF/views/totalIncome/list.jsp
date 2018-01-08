@@ -245,6 +245,10 @@
             {
                 title : "其他方式支付(元)",
                 data : "otherPayment"
+            },
+            {
+                title : "现金退款(元)",
+                data : "refundCrashPayment"
             }
 
         ]
@@ -322,6 +326,10 @@
             {
                 title : "其他方式支付(元)",
                 data : "otherPayment"
+            },
+            {
+                title : "现金退款(元)",
+                data : "refundCrashPayment"
             },
             {
                 title : "连接率",
