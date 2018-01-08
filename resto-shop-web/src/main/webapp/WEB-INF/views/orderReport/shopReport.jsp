@@ -276,6 +276,10 @@
                             title : "退菜返还红包",
                             data : "articleBackPay"
                         },
+                        {
+                            title : "现金退款",
+                            data : "refundCrashPayment"
+                        },
 //                        {
 //                            title : "找零",
 //                            data : "giveChangePayment"
