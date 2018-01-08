@@ -165,7 +165,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		Customer cus = customerService.selectById(order.getCustomerId());
 		String uuid = ApplicationUtils.randomUUID();
 		if(money.compareTo(BigDecimal.ZERO)>0){
-			if(brandSetting.getDelayAppraiseMoneyTime() != 0){
+			if(brandSetting.getDelayAppraiseMoneyTime() == 0){
 				accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.APPRAISE_RED_PACKAGE,order.getShopDetailId());
 			}
             RedPacket redPacket = new RedPacket();
