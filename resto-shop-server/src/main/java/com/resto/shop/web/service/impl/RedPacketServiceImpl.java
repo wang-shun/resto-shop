@@ -5,17 +5,20 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.UserActionUtils;
+import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.dto.LogType;
 import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.model.WechatConfig;
+import com.resto.brand.web.service.BrandService;
+import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.dao.RedPacketMapper;
 import com.resto.shop.web.dto.ShareMoneyDto;
-import com.resto.shop.web.model.Order;
-import com.resto.shop.web.model.OrderPaymentItem;
-import com.resto.shop.web.model.RedPacket;
+import com.resto.shop.web.model.*;
+import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.RedPacketService;
 
@@ -34,6 +37,18 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
 
     @Resource
     private OrderPaymentItemService orderPaymentItemService;
+
+    @Resource
+    private AccountServiceImpl accountService;
+
+    @Resource
+    private CustomerService customerService;
+
+    @Resource
+    private BrandService brandService;
+
+    @Resource
+    private WechatConfigService wechatConfigService;
 
     @Override
     public GenericDao<RedPacket, String> getDao() {
@@ -156,5 +171,29 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
     @Override
     public List<ShareMoneyDto> selectShareMoneyList(String customerId, Integer currentPage, Integer showCount) {
         return redPacketMapper.selectShareMoneyList(customerId, currentPage, showCount);
+    }
+
+    @Override
+    public void fixErrorAppraiseRedMoney() {
+        List<RedPacket> redPackets = redPacketMapper.selectByStateZero();
+        for(RedPacket redPacket : redPackets){
+            Customer customer = customerService.selectById(redPacket.getCustomerId());
+            accountService.addAccount(redPacket.getRedMoney(),customer.getAccountId(), " 评论奖励红包:"+redPacket.getRedMoney(), AccountLog.APPRAISE_RED_PACKAGE,redPacket.getShopDetailId());
+            RedPacket newRedPacket = new RedPacket();
+            newRedPacket.setId(redPacket.getId());
+            newRedPacket.setState(1);
+            redPacketMapper.updateByPrimaryKeySelective(newRedPacket);
+            sendShareGiveMoneyDelayMsg(redPacket, customer);
+        }
+    }
+
+    private void sendShareGiveMoneyDelayMsg(RedPacket redPacket , Customer customer) {
+        StringBuffer msg = new StringBuffer();
+        Brand brand = brandService.selectById(redPacket.getBrandId());
+        WechatConfig config = wechatConfigService.selectByBrandId(redPacket.getBrandId());
+        msg.append("太好了！评论红包已经送达您的账户！");
+        String jumpurl = "http://" + brand.getBrandSign() + ".restoplus.cn/wechat/index?dialog=myYue&subpage=my";
+        msg.append("<a href='" + jumpurl + "'>前往查看</a>");
+        WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
     }
 }
