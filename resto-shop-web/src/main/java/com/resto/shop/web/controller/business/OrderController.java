@@ -283,6 +283,7 @@ public class OrderController extends GenericController{
                                     break;
 								case PayMode.REFUND_CRASH:
 									ot.setRefundCrashPayment(ot.getRefundCrashPayment().add(oi.getPayValue().abs()));
+									break;
 								default:
 									break;
 							}
