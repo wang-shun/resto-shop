@@ -568,6 +568,40 @@ public class PosServiceImpl implements PosService {
             }
 
         }
+
+//        try {
+//            Order order = orderService.selectById(orderId);
+//            if(order != null){
+//                //查询是否存在子订单
+//                List<Order> childrenOrders = orderService.selectByParentId(orderId, order.getPayType());
+//                for (Order childrenOrder : childrenOrders) {
+//                    if (!childrenOrder.getClosed()) {
+//                        orderService.cancelOrderPos(childrenOrder.getId());//取消子订单
+//                    }
+//                }
+//                orderService.cancelOrderPos(orderId);//取消父订单
+//
+//                //  释放桌位
+//                if(StringUtils.isEmpty(order.getParentOrderId())){
+//                    //  如果绑定的有桌位，则释放桌位
+//                    if(StringUtils.isNotEmpty(order.getTableNumber())){
+//                        RedisUtil.set(shopId+order.getTableNumber()+"status", true);
+//                    }
+//                }else{
+//                    //  如果父订单的状态 不是 未支付，并且绑定了桌位，则释放主订单的桌位
+//                    Order parentOrder = orderService.selectById(order.getParentOrderId());
+//                    if(parentOrder.getOrderState() != OrderState.SUBMIT){
+//                        if(StringUtils.isNotEmpty(parentOrder.getTableNumber())){
+//                            RedisUtil.set(shopId+order.getTableNumber()+"status", true);
+//                        }
+//                    }
+//                }
+//            }
+//
+//        } catch (Exception e) {
+//            log.error("pos端拒绝订单失败！");
+//            e.printStackTrace();
+//        }
     }
 
     @Override

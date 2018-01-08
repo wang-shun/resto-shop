@@ -35,14 +35,12 @@ public class ScmStockController extends GenericController{
 
     @RequestMapping("/list")
     public String list(){
-
         BrandSetting brandSetting = brandSettingService.selectByBrandId(getCurrentBrandId());
         if (brandSetting.getIsOpenScm().equals(Common.YES)){
             return "scmStockCount/list";
         }else {
             return "notopen";
         }
-
     }
 
     @RequestMapping("/list_default")
@@ -66,6 +64,21 @@ public class ScmStockController extends GenericController{
         docStockInput.setCreateId(getCurrentUserId());
         try {
             stockCountCheckService.saveStock(docStockInput);
+            return Result.getSuccess();
+        }catch (Exception e){
+            return new Result("保存失败", 5000,false);
+        }
+    }
+
+    /***
+     *审核
+     * @return
+     */
+    @RequestMapping("approveStockStatusById")
+    @ResponseBody
+    public Result create(Long id,String status){
+        try {
+            stockCountCheckService.approveStockStatusById(id,status);
             return Result.getSuccess();
         }catch (Exception e){
             return new Result("保存失败", 5000,false);
