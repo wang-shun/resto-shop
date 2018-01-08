@@ -977,26 +977,14 @@ public class OrderAspect {
 //                    sendPaySuccessMsg(order);
 //                }
                 log.info("检查打印异常");
-//                int times = setting.getReconnectTimes();
-//                int seconds = setting.getReconnectSecond();
-//                for (int i = 0; i < times; i++) {
-//                    MQMessageProducer.checkPlaceOrderMessage(order, (i + 1) * seconds * 1000L, seconds * times * 1000L);
-//                }
             } else if (ProductionStatus.PRINTED == order.getProductionStatus()) {
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
                 if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.PAY) {
-//                    MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
-//                    if(order.getOrderState() == OrderState.SUBMIT){
-//                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000*2);
-//                    }else{
-//                        MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
-//                    }
                     if (setting.getAutoConfirmTime() <= setting.getCloseContinueTime()) {    //加菜时间跟领取红包时间对比
-                        if (order.getOrderState() == OrderState.SUBMIT) {   //是否买单
+                        if (order.getOrderState() == OrderState.PAYMENT) {
                             MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
-                        } else if (order.getOrderState() == OrderState.PAYMENT) {
-                            MQMessageProducer.sendBossOrder(order, setting.getCloseContinueTime() * 1000 - 10000);
+                            MQMessageProducer.sendBossOrder(order, setting.getAutoConfirmTime() * 1000);
                         }
                     } else {
                         MQMessageProducer.sendNotAllowContinueMessage(order, 1000 * setting.getCloseContinueTime()); //延迟禁止继续加菜
