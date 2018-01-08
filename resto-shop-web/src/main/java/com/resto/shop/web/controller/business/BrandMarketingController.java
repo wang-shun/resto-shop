@@ -33,10 +33,7 @@ import javax.swing.*;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/brandMarketing")
@@ -58,7 +55,15 @@ public class BrandMarketingController extends GenericController{
     private CouponService couponService;
 
     @RequestMapping("/redList")
-    public void redList(){}
+    public String redList(){
+        Date date = new Date();
+        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+            getRequest().setAttribute("netOpen", true);
+            return "notopen";
+        }else{
+            return "brandMarketing/redList";
+        }
+    }
 
     /**
      * 查询红包报表
@@ -378,7 +383,15 @@ public class BrandMarketingController extends GenericController{
     }
 
     @RequestMapping("/couponList")
-    public void couponList(){}
+    public String couponList(){
+        Date date = new Date();
+        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+            getRequest().setAttribute("netOpen", true);
+            return "notopen";
+        }else{
+            return "brandMarketing/couponList";
+        }
+    }
 
     /**
      * 查看优惠券报表

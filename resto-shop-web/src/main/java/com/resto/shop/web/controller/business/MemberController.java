@@ -40,12 +40,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
  import java.io.FileOutputStream;
  import java.io.OutputStream;
  import java.math.BigDecimal;
- import java.util.ArrayList;
-import java.util.HashMap;
- import java.util.List;
- import java.util.Map;
+import java.util.*;
 
-@Controller
+ @Controller
 @RequestMapping("member")
 public class MemberController extends GenericController{
 	
@@ -60,7 +57,14 @@ public class MemberController extends GenericController{
 
 	
 	@RequestMapping("/myList")
-	public void list(){
+	public String list(){
+        Date date = new Date();
+        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+            getRequest().setAttribute("netOpen", true);
+            return "notopen";
+        }else{
+            return "member/myList";
+        }
 	}
 	
 	//查询当前店铺的所有用户

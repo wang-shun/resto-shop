@@ -31,10 +31,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("refundArticle")
@@ -53,7 +50,15 @@ public class RefundArticleController extends GenericController{
     ShopDetailService shopDetailService;
 
     @RequestMapping("/list")
-    public void list(){}
+    public String list(){
+        Date date = new Date();
+        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+            getRequest().setAttribute("netOpen", true);
+            return "notopen";
+        }else{
+            return "refundArticle/list";
+        }
+    }
 
     /**
      * 查询退菜报表list
