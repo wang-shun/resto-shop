@@ -1,5 +1,6 @@
  package com.resto.shop.web.controller.business;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -32,7 +33,14 @@ public class WechatChargeContoller extends GenericController{
 	
 	
 	@RequestMapping("/list")
-    public void list(){
+    public String list(){
+		Date date = new Date();
+		if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+			getRequest().setAttribute("netOpen", true);
+			return "notopen";
+		}else{
+			return "wechatCharge/list";
+		}
     }
 
 //	@RequestMapping("/list_all")
