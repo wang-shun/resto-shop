@@ -167,6 +167,14 @@
                             C.findBtn(rowData),
                             </s:hasPermission>
                         ];
+
+                        if(rowData.orderStatus==12||rowData.orderStatus==13||rowData.orderStatus==15){
+                            operator=[
+                                <s:hasPermission name="scmStockPlan/showDetails">
+                                C.findBtn(rowData),
+                                </s:hasPermission>
+                            ];
+                        }
                         $(td).html(operator);
                     }
                 },
