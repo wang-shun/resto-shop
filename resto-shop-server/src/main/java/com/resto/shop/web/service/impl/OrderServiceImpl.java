@@ -7677,7 +7677,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectById(o.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         Customer customer = customerService.selectById(o.getCustomerId());
-        if (customer == null || o.getIsPosPay() == Common.YES) {
+        if (customer == null) {
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
             item.setPayValue(new BigDecimal(-1).multiply(order.getRefundMoney()));
