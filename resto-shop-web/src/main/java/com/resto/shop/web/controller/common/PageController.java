@@ -20,13 +20,13 @@ public class PageController {
      */
     @RequestMapping("/login")
     public String login() {
-       Date date = new Date();
-       if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
-            return "login_error";
-       }else{
-            return "login";
-       }
-       //return "login";
+//       Date date = new Date();
+//       if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+//            return "login_error";
+//       }else{
+//            return "login";
+//       }
+       return "login";
     }
 
     /**
