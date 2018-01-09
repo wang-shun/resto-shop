@@ -30,4 +30,6 @@ public interface RedPacketService extends GenericService<RedPacket, String> {
     void refundRedPacket(BigDecimal payValue, String Id);
 
     List<ShareMoneyDto> selectShareMoneyList(String customerId, Integer currentPage, Integer showCount);
+
+    void fixErrorAppraiseRedMoney();
 }

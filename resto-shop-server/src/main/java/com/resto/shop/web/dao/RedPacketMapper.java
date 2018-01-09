@@ -29,4 +29,6 @@ public interface RedPacketMapper extends GenericDao<RedPacket,String> {
     void refundRedPacket(@Param("payValue")BigDecimal payValue, @Param("Id") String Id);
 
     List<ShareMoneyDto> selectShareMoneyList(@Param(value = "customerId")String customerId,@Param(value = "currentPage") Integer currentPage,@Param(value = "showCount") Integer showCount);
+
+    List<RedPacket> selectByStateZero();
 }

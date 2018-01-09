@@ -4605,15 +4605,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             update(order);
             LogTemplateUtils.getConfirmByOrderType(brand.getBrandName(), order, orginState, "confirmBossOrder");
-            if(!StringUtils.isEmpty(order.getGroupId())){
-                //如果订单是在组里的
-                //禁止加菜后，组释放，并且删除所有 人与组的关系，并且删除该组的购物车
-                TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
-                tableGroup.setState(TableGroup.FINISH);
-                tableGroupService.update(tableGroup);
-//                customerGroupService.removeByGroupId(order.getGroupId());
-                shopCartService.resetGroupId(order.getGroupId());
-            }
             return order;
         }
         return null;
@@ -7677,7 +7668,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectById(o.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(o.getShopDetailId());
         Customer customer = customerService.selectById(o.getCustomerId());
-        if (customer == null || o.getIsPosPay() == Common.YES) {
+        if (customer == null) {
             OrderPaymentItem item = new OrderPaymentItem();
             item.setId(ApplicationUtils.randomUUID());
             item.setPayValue(new BigDecimal(-1).multiply(order.getRefundMoney()));

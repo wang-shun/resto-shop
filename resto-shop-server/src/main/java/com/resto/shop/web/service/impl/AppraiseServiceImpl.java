@@ -120,7 +120,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			appraise.setCreateTime(new Date());
 			appraise.setStatus((byte)1);
 			appraise.setShopDetailId(order.getShopDetailId());
-			BigDecimal redMoney= rewardRed(order, brandSetting);
+			BigDecimal redMoney= rewardRed(appraise.getCustomerId(), order, brandSetting);
 			appraise.setRedMoney(redMoney);
 			appraise.setBrandId(order.getBrandId());
 			insert(appraise);
@@ -139,7 +139,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			appraise.setCreateTime(new Date());
 			appraise.setStatus((byte)1);
 			appraise.setShopDetailId(order.getShopDetailId());
-			BigDecimal redMoney= rewardRed(order, brandSetting);
+			BigDecimal redMoney= rewardRed(appraise.getCustomerId(), order, brandSetting);
 			appraise.setRedMoney(redMoney);
 			appraise.setBrandId(order.getBrandId());
 			insert(appraise);
@@ -160,12 +160,12 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		return appraise;
 	}
 
-	private BigDecimal rewardRed(Order order, BrandSetting brandSetting) {
+	private BigDecimal rewardRed(String customerId, Order order, BrandSetting brandSetting) {
 		BigDecimal money = redConfigService.nextRedAmount(order);
-		Customer cus = customerService.selectById(order.getCustomerId());
+		Customer cus = customerService.selectById(customerId);
 		String uuid = ApplicationUtils.randomUUID();
 		if(money.compareTo(BigDecimal.ZERO)>0){
-			if(brandSetting.getDelayAppraiseMoneyTime() != 0){
+			if(brandSetting.getDelayAppraiseMoneyTime() == 0){
 				accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.APPRAISE_RED_PACKAGE,order.getShopDetailId());
 			}
             RedPacket redPacket = new RedPacket();
@@ -185,9 +185,8 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
 			if(brandSetting.getDelayAppraiseMoneyTime() != 0){
 				RedPacket rp = redPacketService.selectById(uuid);
-				MQMessageProducer.sendShareGiveMoneyMsg(rp, brandSetting.getDelayAppraiseMoneyTime());
+				MQMessageProducer.sendShareGiveMoneyMsg(rp, brandSetting.getDelayAppraiseMoneyTime() * 1000);
 			}
-
 		}
 		return money;
 	}

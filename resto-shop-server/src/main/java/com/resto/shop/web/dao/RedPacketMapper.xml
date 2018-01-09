@@ -231,4 +231,8 @@
         and trp.order_id is not null and trp.red_type = 1
         order by trp.create_time desc  LIMIT #{currentPage},#{showCount}
     </select>
+
+    <select id="selectByStateZero" resultMap="BaseResultMap">
+        select * from tb_red_packet where state = 0
+    </select>
 </mapper>
