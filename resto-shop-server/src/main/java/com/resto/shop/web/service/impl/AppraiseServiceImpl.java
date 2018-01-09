@@ -120,7 +120,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			appraise.setCreateTime(new Date());
 			appraise.setStatus((byte)1);
 			appraise.setShopDetailId(order.getShopDetailId());
-			BigDecimal redMoney= rewardRed(order, brandSetting);
+			BigDecimal redMoney= rewardRed(appraise.getCustomerId(), order, brandSetting);
 			appraise.setRedMoney(redMoney);
 			appraise.setBrandId(order.getBrandId());
 			insert(appraise);
@@ -139,7 +139,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 			appraise.setCreateTime(new Date());
 			appraise.setStatus((byte)1);
 			appraise.setShopDetailId(order.getShopDetailId());
-			BigDecimal redMoney= rewardRed(order, brandSetting);
+			BigDecimal redMoney= rewardRed(appraise.getCustomerId(), order, brandSetting);
 			appraise.setRedMoney(redMoney);
 			appraise.setBrandId(order.getBrandId());
 			insert(appraise);
@@ -160,9 +160,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		return appraise;
 	}
 
-	private BigDecimal rewardRed(Order order, BrandSetting brandSetting) {
+	private BigDecimal rewardRed(String customerId, Order order, BrandSetting brandSetting) {
 		BigDecimal money = redConfigService.nextRedAmount(order);
-		Customer cus = customerService.selectById(order.getCustomerId());
+		Customer cus = customerService.selectById(customerId);
 		String uuid = ApplicationUtils.randomUUID();
 		if(money.compareTo(BigDecimal.ZERO)>0){
 			if(brandSetting.getDelayAppraiseMoneyTime() == 0){
