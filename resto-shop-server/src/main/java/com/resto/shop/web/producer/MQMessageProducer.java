@@ -433,8 +433,8 @@ public class MQMessageProducer {
 	 * @param obj
 	 */
 	public static void sendServerCommandToNewPos(JSONObject obj) {
-//		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SERVER_COMMAND,obj.toJSONString().getBytes());
-//		sendMessageASync(message);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SERVER_COMMAND,obj.toJSONString().getBytes());
+		sendMessageASync(message);
 	}
 
 

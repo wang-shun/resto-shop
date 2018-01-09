@@ -615,15 +615,21 @@ public class PosServiceImpl implements PosService {
             case "change":
                 MQMessageProducer.sendShopChangeMessage(shopId);
                 break;
-//            case "serverCommand":
-//                com.alibaba.fastjson.JSONObject obj  = new com.alibaba.fastjson.JSONObject();
-//                MQMessageProducer.sendServerCommandToNewPos(obj);
-//                break;
             default:
                 log.info("【sendMockMQMessage】未匹配~");
                 break;
         }
         log.info("\n\n  shopId：" + shopId + "\n   type：" + type + "\n   orderId：" + orderId + "\n   platformType" + platformType);
+    }
+
+    @Override
+    public void sendServerCommand(String shopId, String type, String sql) {
+        com.alibaba.fastjson.JSONObject obj  = new com.alibaba.fastjson.JSONObject();
+        obj.put("shopId", shopId);
+        obj.put("dataType", type);
+        obj.put("data", sql);
+        MQMessageProducer.sendServerCommandToNewPos(obj);
+        log.info("\n\n  shopId：" + shopId + "\n   type：" + type + "\n   sql：" + sql);
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
