@@ -165,7 +165,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 		Customer cus = customerService.selectById(order.getCustomerId());
 		String uuid = ApplicationUtils.randomUUID();
 		if(money.compareTo(BigDecimal.ZERO)>0){
-			//accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.APPRAISE_RED_PACKAGE,order.getShopDetailId());
+			if(brandSetting.getDelayAppraiseMoneyTime() == 0){
+				accountService.addAccount(money,cus.getAccountId(), " 评论奖励红包:"+money,AccountLog.APPRAISE_RED_PACKAGE,order.getShopDetailId());
+			}
             RedPacket redPacket = new RedPacket();
             redPacket.setId(uuid);
             redPacket.setRedMoney(money);
@@ -176,12 +178,15 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
             redPacket.setRedRemainderMoney(money);
             redPacket.setRedType(RedType.APPRAISE_RED);
 			redPacket.setOrderId(order.getId());
-			redPacket.setState(0);
+			if(brandSetting.getDelayAppraiseMoneyTime() != 0){
+				redPacket.setState(0);
+			}
             redPacketService.insert(redPacket);
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
-			RedPacket rp = redPacketService.selectById(uuid);
-			MQMessageProducer.sendShareGiveMoneyMsg(rp, brandSetting.getDelayAppraiseMoneyTime() * 1000);
-
+			if(brandSetting.getDelayAppraiseMoneyTime() != 0){
+				RedPacket rp = redPacketService.selectById(uuid);
+				MQMessageProducer.sendShareGiveMoneyMsg(rp, brandSetting.getDelayAppraiseMoneyTime() * 1000);
+			}
 		}
 		return money;
 	}

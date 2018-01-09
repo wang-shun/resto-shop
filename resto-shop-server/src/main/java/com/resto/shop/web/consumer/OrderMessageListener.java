@@ -616,14 +616,17 @@ public class OrderMessageListener implements MessageListener {
             String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
             RedPacket redPacket = JSON.parseObject(msg, RedPacket.class);
             DataSourceContextHolder.setDataSourceName(redPacket.getBrandId());
-            log.info("开始发送分享红包到账通知:");
-            Customer customer = customerService.selectById(redPacket.getCustomerId());
-            accountService.addAccount(redPacket.getRedMoney(),customer.getAccountId(), " 评论奖励红包:"+redPacket.getRedMoney(),AccountLog.APPRAISE_RED_PACKAGE,redPacket.getShopDetailId());
-            RedPacket newRedPacket = new RedPacket();
-            newRedPacket.setId(redPacket.getId());
-            newRedPacket.setState(1);
-            redPacketService.update(newRedPacket);
-            sendShareGiveMoneyDelayMsg(redPacket, customer);
+            redPacket = redPacketService.selectById(redPacket.getId());
+            if(redPacket.getState() == 0){
+                log.info("开始发送分享红包到账通知:");
+                Customer customer = customerService.selectById(redPacket.getCustomerId());
+                accountService.addAccount(redPacket.getRedMoney(),customer.getAccountId(), " 评论奖励红包:"+redPacket.getRedMoney(),AccountLog.APPRAISE_RED_PACKAGE,redPacket.getShopDetailId());
+                RedPacket newRedPacket = new RedPacket();
+                newRedPacket.setId(redPacket.getId());
+                newRedPacket.setState(1);
+                redPacketService.update(newRedPacket);
+                sendShareGiveMoneyDelayMsg(redPacket, customer);
+            }
         }catch (Exception e){
             e.printStackTrace();
             return Action.ReconsumeLater;
