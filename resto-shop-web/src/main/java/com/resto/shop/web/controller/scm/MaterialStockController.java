@@ -6,6 +6,7 @@ import com.resto.scm.web.dto.MaterialStockDo;
 import com.resto.scm.web.service.MaterialStockService;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.controller.GenericController;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -38,8 +39,9 @@ public class MaterialStockController extends GenericController {
 
     @RequestMapping("/list_all")
     @ResponseBody
-    public Result listData() {
-        List<MaterialStockDo> list = materialstockService.queryJoin4Page(this.getCurrentShopId());
+    public Result listData(String shopId) {
+        String shopDetailId =StringUtils.isEmpty(shopId)?this.getCurrentShopId():shopId;
+        List<MaterialStockDo> list = materialstockService.queryJoin4Page(shopDetailId);
         return getSuccessResult(list);
 
     }
