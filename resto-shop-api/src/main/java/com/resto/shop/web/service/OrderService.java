@@ -798,4 +798,13 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	 * @return
 	 */
 	Integer selectCompleteOrderCount(String shopId, String customerId);
+
+	/**
+	 * 根据 订单创建时间 获取店铺未取消的订单
+	 * @param shopId
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	List<String> posSelectNotCancelledOrdersIdByDate(String shopId, String beginDate, String endDate);
 }

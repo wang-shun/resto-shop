@@ -3482,4 +3482,9 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <select id="selectCompleteOrderCount" parameterType="java.lang.String" resultType="java.lang.Integer">
         SELECT COUNT(id) from tb_order where order_state in (2, 10, 11 ,12) and customer_id = #{customerId} and shop_detail_id = #{shopId}
     </select>
+
+    <select id="posSelectNotCancelledOrdersIdByDate" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT id from tb_order where shop_detail_id = ${shopId} and parent_order_id is null and order_state != 9
+        and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time
+    </select>
 </mapper>
