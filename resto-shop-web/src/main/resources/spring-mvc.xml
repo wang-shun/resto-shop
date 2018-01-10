@@ -80,10 +80,10 @@
 
 		</mvc:interceptor>
 
-        <!--<mvc:interceptor>-->
-            <!--<mvc:mapping path="/**/*"/>-->
-            <!--<bean class="com.resto.shop.web.interceptor.AccessControlAllowInterceptor"></bean>-->
-        <!--</mvc:interceptor>-->
+        <mvc:interceptor>
+            <mvc:mapping path="/**"/>
+            <bean class="com.resto.shop.web.interceptor.AccessControlAllowInterceptor"></bean>
+        </mvc:interceptor>
 
 		<mvc:interceptor>
 			<mvc:mapping path="/**/*list"/>

@@ -1,10 +1,13 @@
  package com.resto.shop.web.controller.scm;
 
  import com.resto.brand.core.entity.Result;
+ import com.resto.brand.web.model.ShopDetail;
+ import com.resto.brand.web.service.ShopDetailService;
  import com.resto.scm.web.dto.DocPmsPoHeaderDetailDo;
  import com.resto.scm.web.model.DocPmsPoHeader;
  import com.resto.scm.web.service.DocPmsPoHeaderService;
  import com.resto.shop.web.controller.GenericController;
+ import org.apache.commons.lang3.StringUtils;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,6 +21,9 @@ public class ScmDocPmsPoHeaderController extends GenericController{
 
 	@Resource
 	DocPmsPoHeaderService docPmsPoHeaderService;
+
+	@Resource
+	private ShopDetailService shopDetailService;
 	
 	@RequestMapping("/list")
     public void list(){
@@ -25,8 +31,18 @@ public class ScmDocPmsPoHeaderController extends GenericController{
 
 	@RequestMapping("/list_all")
 	@ResponseBody
-	public Result listData(){
-		return getSuccessResult(docPmsPoHeaderService.queryJoin4Page(getCurrentShopId(),getCurrentShopName()));
+	public Result listData(String shopId){
+    	String shopDetailId =StringUtils.isEmpty(shopId)?getCurrentShopId():shopId;
+		String currentShopName = null;
+		if(StringUtils.isEmpty(shopId)){
+			ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopDetailId);
+			currentShopName = shopDetail.getName();
+
+		}else{
+			currentShopName =getCurrentShopName();
+		}
+
+		return getSuccessResult(docPmsPoHeaderService.queryJoin4Page(shopDetailId,currentShopName));
 	}
 	
 	@RequestMapping("list_one")

@@ -9,6 +9,7 @@ import com.resto.scm.web.dto.MaterialStockDo;
 import com.resto.scm.web.service.StockCountCheckService;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.controller.GenericController;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +30,6 @@ public class ScmStockController extends GenericController{
 
     @Autowired
     private StockCountCheckService stockCountCheckService;
-
     @Resource
     BrandSettingService brandSettingService;
 
@@ -52,8 +52,9 @@ public class ScmStockController extends GenericController{
 
     @RequestMapping("/list_all")
     @ResponseBody
-    public Result listData(){
-        List<DocStockCountHeaderDo> list = stockCountCheckService.findStockList(getCurrentShopId());
+    public Result listData(String shopId){
+        String shopDetailId = StringUtils.isEmpty(shopId)?getCurrentShopId():shopId;
+        List<DocStockCountHeaderDo> list = stockCountCheckService.findStockList(shopDetailId);
         return getSuccessResult(list);
     }
 
