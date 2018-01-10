@@ -17,6 +17,7 @@ import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,6 +76,8 @@ public class OrderMessageListener implements MessageListener {
     LogBaseService logBaseService;
     @Resource
     RedPacketService redPacketService;
+    @Resource
+    ShopCartService shopCartService;
 
 
     @Value("#{propertyConfigurer['orderMsg']}")
@@ -500,6 +503,15 @@ public class OrderMessageListener implements MessageListener {
 //            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             DataSourceContextHolder.setDataSourceName(order.getBrandId());
             orderService.updateAllowContinue(order.getId(), false);
+            if(!StringUtils.isEmpty(order.getGroupId())){
+                //如果订单是在组里的
+                //禁止加菜后，组释放，并且删除所有 人与组的关系，并且删除该组的购物车
+                TableGroup tableGroup = tableGroupService.selectByGroupId(order.getGroupId());
+                tableGroup.setState(TableGroup.FINISH);
+                tableGroupService.update(tableGroup);
+//                customerGroupService.removeByGroupId(order.getGroupId());
+                shopCartService.resetGroupId(order.getGroupId());
+            }
 //            UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                    "订单加菜时间已过期，不允许继续加菜！");
         }catch (Exception e){
@@ -616,14 +628,17 @@ public class OrderMessageListener implements MessageListener {
             String msg = new String(message.getBody(), MQSetting.DEFAULT_CHAT_SET);
             RedPacket redPacket = JSON.parseObject(msg, RedPacket.class);
             DataSourceContextHolder.setDataSourceName(redPacket.getBrandId());
-            log.info("开始发送分享红包到账通知:");
-            Customer customer = customerService.selectById(redPacket.getCustomerId());
-            accountService.addAccount(redPacket.getRedMoney(),customer.getAccountId(), " 评论奖励红包:"+redPacket.getRedMoney(),AccountLog.APPRAISE_RED_PACKAGE,redPacket.getShopDetailId());
-            RedPacket newRedPacket = new RedPacket();
-            newRedPacket.setId(redPacket.getId());
-            newRedPacket.setState(1);
-            redPacketService.update(newRedPacket);
-            sendShareGiveMoneyDelayMsg(redPacket, customer);
+            redPacket = redPacketService.selectById(redPacket.getId());
+            if(redPacket.getState() == 0){
+                log.info("开始发送分享红包到账通知:");
+                Customer customer = customerService.selectById(redPacket.getCustomerId());
+                accountService.addAccount(redPacket.getRedMoney(),customer.getAccountId(), " 评论奖励红包:"+redPacket.getRedMoney(),AccountLog.APPRAISE_RED_PACKAGE,redPacket.getShopDetailId());
+                RedPacket newRedPacket = new RedPacket();
+                newRedPacket.setId(redPacket.getId());
+                newRedPacket.setState(1);
+                redPacketService.update(newRedPacket);
+                sendShareGiveMoneyDelayMsg(redPacket, customer);
+            }
         }catch (Exception e){
             e.printStackTrace();
             return Action.ReconsumeLater;

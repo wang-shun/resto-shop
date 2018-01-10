@@ -157,5 +157,13 @@ public interface PosService {
      */
     void sendMockMQMessage(String shopId, String type, String orderId, Integer platformType);
 
+    /**
+     * 发送指定命令至Pos端
+     * @param shopId
+     * @param type
+     * @param sql
+     */
+    void sendServerCommand(String shopId, String type, String sql);
+
     void test();
 }

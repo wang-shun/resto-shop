@@ -332,6 +332,7 @@ public class MQMessageProducer {
 		JSONObject object=  new JSONObject();
 		object.put("brandId", order.getBrandId());
 		object.put("id", order.getId());
+		object.put("groupId", order.getGroupId());
 		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_NOT_ALLOW_CONTINUE,object.toJSONString().getBytes());
 		message.setStartDeliverTime(System.currentTimeMillis()+delay);
 		sendMessageASync(message);
@@ -433,8 +434,8 @@ public class MQMessageProducer {
 	 * @param obj
 	 */
 	public static void sendServerCommandToNewPos(JSONObject obj) {
-//		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SERVER_COMMAND,obj.toJSONString().getBytes());
-//		sendMessageASync(message);
+		Message message = new Message(MQSetting.TOPIC_RESTO_SHOP,MQSetting.TAG_SERVER_COMMAND,obj.toJSONString().getBytes());
+		sendMessageASync(message);
 	}
 
 

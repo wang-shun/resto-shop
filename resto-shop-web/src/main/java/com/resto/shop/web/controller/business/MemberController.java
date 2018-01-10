@@ -59,7 +59,9 @@ public class MemberController extends GenericController{
 	@RequestMapping("/myList")
 	public String list(){
         Date date = new Date();
-        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+        //吼爽在高峰也能查询会员信息报表
+        if(((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20))
+                && !"fe3c670dbd81433c97217daeeb2084ec".equalsIgnoreCase(getCurrentBrandId())){
             getRequest().setAttribute("netOpen", true);
             return "notopen";
         }else{
