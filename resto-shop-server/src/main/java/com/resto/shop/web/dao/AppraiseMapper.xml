@@ -186,8 +186,8 @@
         on ta.order_id = td.id
         inner join tb_customer tc
         on ta.customer_id = tc.id
-        where td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-        and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+        where ta.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+        and ta.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
         and td.shop_detail_id = #{shopId}
     </select>
 
