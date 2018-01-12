@@ -116,7 +116,7 @@
     <select id="selectCount" resultType="GetNumber">
         select id from tb_get_number where table_type = #{tableType}
         and DATE_FORMAT(create_time,'%Y-%m-%d') = DATE_FORMAT(NOW(),'%Y-%m-%d')
-        and #{date} >= create_time
+        and #{date} >= create_time and shop_detail_id = #{shopId}
     </select>
 
     <select id="getWaitInfoByCustomerId" resultType="GetNumber">
