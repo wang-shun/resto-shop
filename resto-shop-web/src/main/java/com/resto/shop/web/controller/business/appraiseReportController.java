@@ -11,6 +11,8 @@
  import com.resto.brand.core.util.StringUtils;
  import com.resto.brand.web.dto.AppraiseDto;
  import com.resto.brand.web.dto.AppraiseShopDto;
+ import com.resto.brand.web.dto.BrandOrderReportDto;
+ import com.resto.brand.web.dto.ShopOrderReportDto;
  import com.resto.brand.web.model.Brand;
  import com.resto.brand.web.model.ShopDetail;
  import com.resto.brand.web.model.TableQrcode;
@@ -87,8 +89,11 @@ public class appraiseReportController extends GenericController{
 
 	private Map<String,Object> getSuccess(String beginDate,String endDate){
 		List<Order> olist =  orderService.selectListBybrandId(beginDate,endDate,getCurrentBrandId());
+		Map<String, Object> orderCountMap = orderService.callMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
 		int appraiseNum=0;//评价单数
-		int totalNum = 0;//已消费订单数
+		BrandOrderReportDto brandOrderReportDto = (BrandOrderReportDto)orderCountMap.get("brandId");
+		List<ShopOrderReportDto> shopOrderReportDtos = (List<ShopOrderReportDto>)orderCountMap.get("shopId");
+		int totalNum = brandOrderReportDto.getOrderCount();//已消费订单数
 		BigDecimal orderMoney = BigDecimal.ZERO;//订单总额
 		BigDecimal redMoney = BigDecimal.ZERO;//评论红包总额
 		int oneStart=0;
@@ -119,10 +124,6 @@ public class appraiseReportController extends GenericController{
 				if(o.getAppraise().getLevel()==5){
 					fiveStart++;
 				}
-			}
-			//消费的总订单(只计算父订单)
-			if (o.getParentOrderId() == null){
-				totalNum++;
 			}
 			//消费的总金额
 			orderMoney = add(orderMoney,o.getOrderMoney());
@@ -155,6 +156,11 @@ public class appraiseReportController extends GenericController{
             //每个店铺设置默认值
 			int appraiseNum2=0;//评价单数
 			int totalNum2 = 0;//已消费订单数
+			for (ShopOrderReportDto orderReportDto : shopOrderReportDtos){
+				if (orderReportDto.getShopDetailId().equalsIgnoreCase(s.getId())){
+					totalNum2 = orderReportDto.getShop_orderCount();
+				}
+			}
 			BigDecimal orderMoney2 = BigDecimal.ZERO;//订单总额
 			BigDecimal redMoney2 = BigDecimal.ZERO;//评论红包总额
 			//设置红包撬动率
@@ -188,10 +194,6 @@ public class appraiseReportController extends GenericController{
 					}
 					//消费的总金额
 					orderMoney2 = add(orderMoney2,o.getOrderMoney());
-					//消费的总订单(只计算父订单)
-					if (o.getParentOrderId() == null){
-						totalNum2++;
-					}
 				}
 			}
 			//设置评价单数

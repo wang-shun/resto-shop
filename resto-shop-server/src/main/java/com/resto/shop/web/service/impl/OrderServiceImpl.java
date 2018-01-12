@@ -10010,6 +10010,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectCompleteOrderCount(shopId, customerId);
     }
 
+    @Override
+    public List<String> posSelectNotCancelledOrdersIdByDate(String shopId, String beginDate, String endDate) {
+        return orderMapper.posSelectNotCancelledOrdersIdByDate(shopId,beginDate,endDate);
+    }
+
     private List<ShopOrderReportDto> getBossAppOrderReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate) {
         List<ShopOrderReportDto> shopOrderReportDtoLists = new ArrayList<>();
         for(int i = 0; i < shopDetailList.size(); i++){
