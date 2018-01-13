@@ -7948,6 +7948,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void refundItem(Order refundOrder) {
+        log.debug("----进入退菜方法----");
         //修改菜品数量
         Order order = getOrderInfo(refundOrder.getId());
         int customerCount = 0;
@@ -8135,8 +8136,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             if (refundOrder.getPosRefundArticleType() != null){
                 //pos2.0退菜
-                List<OrderPaymentItem> refundPaymentList = posTwoRefundArticle(o);
+                List<OrderPaymentItem> refundPaymentList = refundPosTwoArticle(o);
                 refundOrder.setRefundPaymentList(refundPaymentList);
+                log.debug("----newPos退菜执行完毕----");
             }else{
                 //老版pos退菜
                 refundArticle(o); //去退款
@@ -8151,7 +8153,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
      * @param refundOrder
      * @return
      */
-    private final List<OrderPaymentItem> posTwoRefundArticle(Order refundOrder){
+    private final List<OrderPaymentItem> refundPosTwoArticle(Order refundOrder){
+        log.debug("----进入newPos退菜方法----");
         //查找到主订单的订单信息
         Order order = selectById(StringUtils.isNotBlank(refundOrder.getParentOrderId()) ? refundOrder.getParentOrderId() : refundOrder.getId());
         //存储当前还需要退多少金额
