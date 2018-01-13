@@ -264,8 +264,8 @@
             keyProperty="id">insert into tb_order_payment_item
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="payTime != null">pay_time,</if>
-            pay_value,
+            pay_time
+            <if test="payValue != null">pay_value,</if>
             <if test="remark != null">remark,</if>
             <if test="paymentModeId != null">payment_mode_id,</if>
             <if test="orderId != null">order_id,</if>

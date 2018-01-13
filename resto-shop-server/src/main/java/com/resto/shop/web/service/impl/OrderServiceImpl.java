@@ -8168,17 +8168,54 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         surplusRefundMoney = surplusRefundMoney.subtract(wxRefundValue);
         //此次支付宝退款金额
         BigDecimal aliRefundValue = aliPayTotal.compareTo(surplusRefundMoney) >= 0 ? surplusRefundMoney : aliPayTotal;
-        surplusRefundMoney = surplusRefundMoney.subtract(aliPayTotal);
+        surplusRefundMoney = surplusRefundMoney.subtract(aliRefundValue);
         //此次现金退款的金额
         BigDecimal cashRefundValue = otherPayTotal.compareTo(surplusRefundMoney) >= 0 ? surplusRefundMoney : otherPayTotal;
         //如果剩余还有可退金额已退菜红包的形式返还
         surplusRefundMoney = surplusRefundMoney.subtract(cashRefundValue);
         //有微信可退的
-        if (wxPayTotal.compareTo(BigDecimal.ZERO) > 0){
+        if (wxRefundValue.compareTo(BigDecimal.ZERO) > 0){
             refundActualByMode(order, wxRefundValue, PayMode.WEIXIN_PAY, refundPaymentList);
         }
         //有支付宝可退的
-
+        if (aliRefundValue.compareTo(BigDecimal.ZERO) > 0){
+            refundActualByMode(order, aliRefundValue, PayMode.ALI_PAY, refundPaymentList);
+        }
+        //线下退还现金
+        if (cashRefundValue.compareTo(BigDecimal.ZERO) > 0){
+            OrderPaymentItem refundPaymentItem = new OrderPaymentItem();
+            refundPaymentItem.setId(ApplicationUtils.randomUUID());
+            refundPaymentItem.setPayValue(cashRefundValue.multiply(new BigDecimal(-100)));
+            refundPaymentItem.setRemark("线下退还现金：" + refundPaymentItem.getPayValue());
+            refundPaymentItem.setPaymentModeId(PayMode.REFUND_CRASH);
+            refundPaymentItem.setOrderId(order.getId());
+            orderPaymentItemService.insertByBeforePay(refundPaymentItem);
+            refundPaymentList.add(refundPaymentItem);
+        }
+        //退菜红包返还
+        if (surplusRefundMoney.compareTo(BigDecimal.ZERO) > 0){
+            OrderPaymentItem refundPaymentItem = new OrderPaymentItem();
+            refundPaymentItem.setId(ApplicationUtils.randomUUID());
+            refundPaymentItem.setPayValue(surplusRefundMoney.multiply(new BigDecimal(-100)));
+            refundPaymentItem.setRemark("退菜红包返还：" + refundPaymentItem.getPayValue());
+            refundPaymentItem.setPaymentModeId(PayMode.ARTICLE_BACK_PAY);
+            refundPaymentItem.setOrderId(order.getId());
+            orderPaymentItemService.insertByBeforePay(refundPaymentItem);
+            refundPaymentList.add(refundPaymentItem);
+            Customer customer = customerService.selectById(order.getCustomerId());
+            accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE, order.getShopDetailId());
+            RedPacket redPacket = new RedPacket();
+            redPacket.setId(ApplicationUtils.randomUUID());
+            redPacket.setRedMoney(order.getRefundMoney());
+            redPacket.setCreateTime(new Date());
+            redPacket.setCustomerId(customer.getId());
+            redPacket.setBrandId(order.getBrandId());
+            redPacket.setShopDetailId(order.getShopDetailId());
+            redPacket.setRedRemainderMoney(order.getRefundMoney());
+            redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+            redPacket.setOrderId(order.getId());
+            redPacketService.insert(redPacket);
+        }
         return refundPaymentList;
     }
 
