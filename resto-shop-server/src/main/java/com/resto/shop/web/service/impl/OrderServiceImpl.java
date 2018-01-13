@@ -8129,11 +8129,153 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             o.setRefundMoney(orders.get(id)); //退掉的金额
             o.setOrderItems(refundOrder.getOrderItems()); //退菜明细
             o.setRefundType(refundOrder.getRefundType()); //退款方式
-            refundArticle(o); //去退款
+            if (!refundOrder.getId().equalsIgnoreCase(id)){
+                //退的是子订单的菜
+                o.setParentOrderId(refundOrder.getId());
+            }
+            if (refundOrder.getPosRefundArticleType() != null){
+                //pos2.0退菜
+                posTwoRefundArticle(o);
+            }else{
+                //老版pos退菜
+                refundArticle(o); //去退款
+            }
             updateArticle(o); //去修改订单项
         }
 
     }
+
+    /**
+     *
+     * @param refundOrder
+     * @return
+     */
+    private final List<OrderPaymentItem> posTwoRefundArticle(Order refundOrder){
+        //查找到主订单的订单信息
+        Order order = selectById(StringUtils.isNotBlank(refundOrder.getParentOrderId()) ? refundOrder.getParentOrderId() : refundOrder.getId());
+        //存储当前还需要退多少金额
+        BigDecimal surplusRefundMoney = refundOrder.getRefundMoney();
+        //存放退菜是的退款记录
+        List<OrderPaymentItem> refundPaymentList = new ArrayList<>();
+        //得到实际支付已到账的父子订单的微信支付金额总和
+        BigDecimal wxPayTotal = orderMapper.selectSurplusAmountByPayMode(order.getId(), PayMode.WEIXIN_PAY);
+        //得到实际支付已到账的父子订单的支付宝支付金额总和
+        BigDecimal aliPayTotal = orderMapper.selectSurplusAmountByPayMode(order.getId(), PayMode.ALI_PAY);
+        //得到实际支付未到账的父子订单的金额总和
+        BigDecimal otherPayTotal = orderMapper.selectSurplusAmountByPayMode(order.getId(), 3);
+        //此次微信退款金额
+        BigDecimal wxRefundValue = wxPayTotal.compareTo(surplusRefundMoney) >= 0 ? surplusRefundMoney : wxPayTotal;
+        surplusRefundMoney = surplusRefundMoney.subtract(wxRefundValue);
+        //此次支付宝退款金额
+        BigDecimal aliRefundValue = aliPayTotal.compareTo(surplusRefundMoney) >= 0 ? surplusRefundMoney : aliPayTotal;
+        surplusRefundMoney = surplusRefundMoney.subtract(aliPayTotal);
+        //此次现金退款的金额
+        BigDecimal cashRefundValue = otherPayTotal.compareTo(surplusRefundMoney) >= 0 ? surplusRefundMoney : otherPayTotal;
+        //如果剩余还有可退金额已退菜红包的形式返还
+        surplusRefundMoney = surplusRefundMoney.subtract(cashRefundValue);
+        //有微信可退的
+        if (wxPayTotal.compareTo(BigDecimal.ZERO) > 0){
+            refundActualByMode(order, wxRefundValue, PayMode.WEIXIN_PAY, refundPaymentList);
+        }
+        //有支付宝可退的
+
+        return refundPaymentList;
+    }
+
+    private final void refundActualByMode(Order order, BigDecimal refundValue, Integer payMode, List<OrderPaymentItem> refundPaymentList){
+        //得到所有父子订单实际支付的记录
+        List<OrderPaymentItem> payList = orderPaymentItemService.selectPayMentByPayMode(order.getId(), payMode, Common.YES);
+        //得到所有父子订单实际支付的退款记录
+        List<OrderPaymentItem> refundList  = orderPaymentItemService.selectPayMentByPayMode(order.getId(), payMode, Common.NO);
+        //退款的实体
+        OrderPaymentItem refundPayment;
+        //循环支付记录
+        for (OrderPaymentItem paymentItem : payList) {
+            //还有未退款金额，继续退款
+            if (refundValue.compareTo(BigDecimal.ZERO) > 0) {
+                JSONObject payInfo = new JSONObject(paymentItem.getResultData());
+                //记录当前支付记录可退款金额
+                BigDecimal remainPayMent = paymentItem.getPayValue();
+                //循环退款记录
+                for (OrderPaymentItem refundPayMentItem : refundList) {
+                    //得到当前退款的回调信息
+                    JSONObject refundInfo = new JSONObject(refundPayMentItem.getResultData());
+                    if (payMode.equals(PayMode.WEIXIN_PAY)) {
+                        //微信支付
+                        if (paymentItem.getId().equalsIgnoreCase(refundInfo.getString("transaction_id"))) {
+                            //减去此次退款的金额
+                            remainPayMent = remainPayMent.add(refundPayMentItem.getPayValue());
+                        }
+                    } else {
+                        //支付宝支付
+                        JSONObject aliPayRefundInfo = refundInfo.getJSONObject("alipay_trade_refund_response");
+                        if (paymentItem.getId().equalsIgnoreCase(aliPayRefundInfo.getString("trade_no"))) {
+                            //减去此次退款的金额
+                            remainPayMent = remainPayMent.add(refundPayMentItem.getPayValue());
+                        }
+                    }
+                }
+                //发现该笔支付还有可退金额
+                if (remainPayMent.compareTo(BigDecimal.ZERO) > 0) {
+                    //当前可退款金额
+                    BigDecimal refund = refundValue.compareTo(remainPayMent) >= 0 ? remainPayMent : refundValue;
+                    ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+                    refundPayment = new OrderPaymentItem();
+                    refundPayment.setId(ApplicationUtils.randomUUID());
+                    refundPayment.setPayValue(refund.multiply(new BigDecimal(-1)));
+                    refundPayment.setPaymentModeId(payMode);
+                    refundPayment.setOrderId(order.getId());
+                    if (payMode.equals(PayMode.WEIXIN_PAY)) {
+                        WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
+                        Map<String, String> result;
+                        //微信支付
+                        if (shopDetail.getWxServerId() == null) {
+                            //独立商户模式
+                            result = WeChatPayUtils.refund(refundPayment.getId(), payInfo.getString("transaction_id"), payInfo.getInt("total_fee")
+                                    , Integer.valueOf(refund.multiply(new BigDecimal(100)).toString()), StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
+                                    StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(),
+                                    StringUtils.isEmpty(shopDetail.getMchkey()) ? config.getMchkey() : shopDetail.getMchkey(),
+                                    StringUtils.isEmpty(shopDetail.getPayCertPath()) ? config.getPayCertPath() : shopDetail.getPayCertPath());
+                        } else {
+                            //服务商模式
+                            WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+                            result = WeChatPayUtils.refundNew(refundPayment.getId(), payInfo.getString("transaction_id"),
+                                    payInfo.getInt("total_fee"), Integer.valueOf(refund.multiply(new BigDecimal(100)).toString()), wxServerConfig.getAppid(), wxServerConfig.getMchid(),
+                                    StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
+                        }
+                        if (result.containsKey("ERROR")) {
+                            log.error("微信退款失败！失败信息：" + new JSONObject(result).toString());
+                            throw new RuntimeException(new JSONObject(result).toString());
+                        }
+                        refundPayment.setResultData(result.toString());
+                        refundPayment.setRemark("微信退款：" + refundPayment.getPayValue());
+                    } else {
+                        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                        //支付宝支付
+                        AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ? brandSetting.getAliAppId() : shopDetail.getAliAppId().trim(),
+                                StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ? brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
+                                StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
+                        Map map = new HashMap();
+                        map.put("out_trade_no", paymentItem.getOrderId());
+                        map.put("refund_amount", refund);
+                        map.put("out_request_no", refundPayment.getId());
+                        String resultJson = AliPayUtils.refundPay(map);
+                        if (resultJson.indexOf("ERROR") != -1) {
+                            log.error("支付宝退款失败！失败信息：" + resultJson);
+                            throw new RuntimeException(resultJson);
+                        }
+                        refundPayment.setResultData(resultJson);
+                        refundPayment.setRemark("支付宝退款：" + refundPayment.getPayValue());
+                    }
+                    orderPaymentItemService.insertByBeforePay(refundPayment);
+                    refundPaymentList.add(refundPayment);
+                    refundValue = refundValue.subtract(refund);
+                }
+            }
+        }
+    }
+
+
 
     @Override
     public Order afterPay(String orderId, String couponId, BigDecimal price, BigDecimal pay, BigDecimal waitMoney, Integer payMode) {
@@ -8370,9 +8512,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
         o.setArticleCount(o.getArticleCount() - Integer.parseInt(RedisUtil.get(o.getId() + "ItemCount").toString()));
-//        o.setPaymentAmount(total.add(o.getServicePrice()));
-        //这里不知道为什么会怎么写， 正常情况下 o.getServicePrice() = shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount()))
-//        o.setOriginalAmount(origin.add(shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount() != null ? o.getCustomerCount() : 0))));
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {

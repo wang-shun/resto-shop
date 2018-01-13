@@ -3487,4 +3487,24 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         SELECT id from tb_order where shop_detail_id = ${shopId} and parent_order_id is null and order_state != 9
         and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time
     </select>
+
+
+    <select id="selectSurplusAmountByPayMode" resultType="java.math.BigDecimal">
+        SELECT
+            IFNULL(SUM(top.pay_value),0) payValue
+        FROM
+            tb_order td
+        INNER JOIN tb_order_payment_item top ON td.id = top.order_id
+        WHERE
+            td.id = #{orderId}
+        OR td.parent_order_id = #{orderId}
+        <if test="payMode != 3">
+            AND top.payment_mode_id = ${payMode}
+            AND top.result_data IS NOT NULL
+        </if>
+        <if test="payMode == 3">
+            AND top.payment_mode_id not in (2,3,4,6,7,8,11,13,14,15,20,21)
+            AND top.result_data IS NULL
+        </if>
+    </select>
 </mapper>

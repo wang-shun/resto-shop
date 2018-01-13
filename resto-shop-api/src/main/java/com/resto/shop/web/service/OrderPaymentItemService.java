@@ -96,4 +96,6 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
      * @return
      */
     List<OrderPaymentItem> posSyncListByOrderId(String orderId);
+
+    List<OrderPaymentItem> selectPayMentByPayMode(String orderId, Integer payMode, Integer type);
 }

@@ -413,6 +413,8 @@ public class PosServiceImpl implements PosService {
     public String syncPosRefundOrder(String data) {
         JSONObject json = new JSONObject(data);
         Order order = JSON.parseObject(json.get("refund").toString(), Order.class);
+        //标识为pos2.0退菜
+        order.setPosRefundArticleType(Common.YES);
         Order refundOrder = orderService.getOrderInfo(order.getId());
         if(refundOrder.getOrderState() == OrderState.SUBMIT){
             for(OrderItem orderItem : order.getOrderItems()){
@@ -423,30 +425,25 @@ public class PosServiceImpl implements PosService {
             orderService.refundItem(order);
             orderService.refundArticleMsg(order);
         }
-
+        //退菜后再重新更新一下主订单信息， 用来判断是否一退光
+        refundOrder = orderService.getOrderInfo(order.getId());
         //判断是否清空
         boolean flag = true;
-        for (OrderItem item : refundOrder.getOrderItems()) {
-            if (item.getCount() > 0) {
-                flag = false;
-            }
+        //原逻辑为articleCount为0则改成退菜取消，现改成如果orderMoney为0则改为退菜取消(注：其实orderMoney为0就是菜品及服务费退完了)
+        if (refundOrder.getOrderMoney().compareTo(BigDecimal.ZERO) == 0) {
+            flag = false;
         }
         if (flag) {
+            //如果当前订单为主订单
             if (refundOrder.getParentOrderId() == null) {
                 List<Order> orders = orderService.selectByParentId(refundOrder.getId(), 1); //得到子订单
-                if (orders.size() > 0) {
-                    for (Order child : orders) { //遍历子订单
-                        child = orderService.getOrderInfo(child.getId());
-                        for (OrderItem item : child.getOrderItems()) {
-                            if (item.getCount() > 0) {
-                                flag = false;
-                            }
-                        }
+                for (Order child : orders) { //遍历子订单
+                    child = orderService.getOrderInfo(child.getId());
+                    if (child.getOrderMoney().compareTo(BigDecimal.ZERO) == 0) {
+                        flag = false;
                     }
-                    if (flag) {
-                        refundOrderArticleNull(refundOrder);
-                    }
-                } else {
+                }
+                if (flag) {
                     refundOrderArticleNull(refundOrder);
                 }
             } else {

@@ -1315,4 +1315,15 @@ public class Order implements Serializable {
     public void setPosBackUps(String posBackUps) {
         this.posBackUps = posBackUps;
     }
+
+    //pos退菜类型  有值则为pos2.0退菜
+    private Integer posRefundArticleType;
+
+    public Integer getPosRefundArticleType() {
+        return posRefundArticleType;
+    }
+
+    public void setPosRefundArticleType(Integer posRefundArticleType) {
+        this.posRefundArticleType = posRefundArticleType;
+    }
 }

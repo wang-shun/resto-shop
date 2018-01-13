@@ -177,4 +177,9 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     public List<OrderPaymentItem> posSyncListByOrderId(String orderId) {
         return orderpaymentitemMapper.posSyncListByOrderId(orderId);
     }
+
+    @Override
+    public List<OrderPaymentItem> selectPayMentByPayMode(String orderId, Integer payMode, Integer type) {
+        return orderpaymentitemMapper.selectPayMentByPayMode(orderId, payMode, type);
+    }
 }
