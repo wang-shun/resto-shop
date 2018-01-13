@@ -808,4 +808,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	Integer selectCompleteOrderCount(@Param("shopId") String shopId, @Param("customerId") String customerId);
 
 	List<String> posSelectNotCancelledOrdersIdByDate(@Param("shopId") String shopId, @Param("beginDate") String beginDate, @Param("endDate") String endDate);
+
+	Order selectBySerialNumber(String serialNumber);
 }
