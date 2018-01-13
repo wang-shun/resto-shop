@@ -134,6 +134,16 @@ public class OrderItem implements Serializable {
 
     private Integer peference;
 
+    private String verCode;
+
+    public String getVerCode() {
+        return verCode;
+    }
+
+    public void setVerCode(String verCode) {
+        this.verCode = verCode;
+    }
+
     public Integer getPrintFailFlag() {
         return printFailFlag;
     }
