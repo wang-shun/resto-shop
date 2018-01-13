@@ -134,6 +134,8 @@ public class OrderItem implements Serializable {
 
     private Integer peference;
 
+    private String verCode;
+
     public String getVerCode() {
         return verCode;
     }
@@ -141,8 +143,6 @@ public class OrderItem implements Serializable {
     public void setVerCode(String verCode) {
         this.verCode = verCode;
     }
-
-    private String verCode;
 
     public Integer getPrintFailFlag() {
         return printFailFlag;
