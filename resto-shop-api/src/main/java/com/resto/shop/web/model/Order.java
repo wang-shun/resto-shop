@@ -1326,4 +1326,14 @@ public class Order implements Serializable {
     public void setPosRefundArticleType(Integer posRefundArticleType) {
         this.posRefundArticleType = posRefundArticleType;
     }
+
+    private List<OrderPaymentItem> refundPaymentList;
+
+    public List<OrderPaymentItem> getRefundPaymentList() {
+        return refundPaymentList;
+    }
+
+    public void setRefundPaymentList(List<OrderPaymentItem> refundPaymentList) {
+        this.refundPaymentList = refundPaymentList;
+    }
 }

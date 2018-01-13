@@ -8135,7 +8135,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             if (refundOrder.getPosRefundArticleType() != null){
                 //pos2.0退菜
-                posTwoRefundArticle(o);
+                List<OrderPaymentItem> refundPaymentList = posTwoRefundArticle(o);
+                refundOrder.setRefundPaymentList(refundPaymentList);
             }else{
                 //老版pos退菜
                 refundArticle(o); //去退款
