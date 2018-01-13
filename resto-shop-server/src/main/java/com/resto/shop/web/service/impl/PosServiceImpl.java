@@ -411,65 +411,83 @@ public class PosServiceImpl implements PosService {
 
     @Override
     public String syncPosRefundOrder(String data) {
-        JSONObject json = new JSONObject(data);
-        Order order = JSON.parseObject(json.get("refund").toString(), Order.class);
-        //标识为pos2.0退菜
-        order.setPosRefundArticleType(Common.YES);
-        Order refundOrder = orderService.getOrderInfo(order.getId());
-        if(refundOrder.getOrderState() == OrderState.SUBMIT){
-            for(OrderItem orderItem : order.getOrderItems()){
-                OrderItem item = orderItemService.selectById(orderItem.getId());
-                orderService.updateOrderItem(item.getOrderId(),item.getCount() - orderItem.getCount(),orderItem.getId(), 1);
-            }
-        }else{
-            orderService.refundItem(order);
-            orderService.refundArticleMsg(order);
-        }
-        //退菜后再重新更新一下主订单信息， 用来判断是否一退光
-        refundOrder = orderService.getOrderInfo(order.getId());
-        //判断是否清空
-        boolean flag = true;
-        //原逻辑为articleCount为0则改成退菜取消，现改成如果orderMoney为0则改为退菜取消(注：其实orderMoney为0就是菜品及服务费退完了)
-        if (refundOrder.getOrderMoney().compareTo(BigDecimal.ZERO) == 0) {
-            flag = false;
-        }
-        if (flag) {
-            //如果当前订单为主订单
-            if (refundOrder.getParentOrderId() == null) {
-                List<Order> orders = orderService.selectByParentId(refundOrder.getId(), 1); //得到子订单
-                for (Order child : orders) { //遍历子订单
-                    child = orderService.getOrderInfo(child.getId());
-                    if (child.getOrderMoney().compareTo(BigDecimal.ZERO) == 0) {
-                        flag = false;
-                    }
-                }
-                if (flag) {
-                    refundOrderArticleNull(refundOrder);
+        JSONObject result = new JSONObject();
+        result.put("success", true);
+        try {
+            JSONObject json = new JSONObject(data);
+            Order order = JSON.parseObject(json.get("refund").toString(), Order.class);
+            //标识为pos2.0退菜
+            order.setPosRefundArticleType(Common.YES);
+            Order refundOrder = orderService.getOrderInfo(order.getId());
+            if (refundOrder.getOrderState() == OrderState.SUBMIT) {
+                for (OrderItem orderItem : order.getOrderItems()) {
+                    OrderItem item = orderItemService.selectById(orderItem.getId());
+                    orderService.updateOrderItem(item.getOrderId(), item.getCount() - orderItem.getCount(), orderItem.getId(), 1);
                 }
             } else {
-                refundOrderArticleNull(refundOrder);
+                orderService.refundItem(order);
+                result.put("data", com.alibaba.fastjson.JSONObject.toJSONString(order.getRefundPaymentList()));
+                orderService.refundArticleMsg(order);
             }
-            //存在退菜之后订单菜品是为负的情况  所以这边添加此校验  若为负则为零
-            if(refundOrder.getArticleCount() != null && refundOrder.getArticleCount() < 0){
-                refundOrder.setArticleCount(0);
-            }else if(refundOrder.getCountWithChild() != null && refundOrder.getCountWithChild() < 0){
-                refundOrder.setCountWithChild(0);
+            //退菜后再重新更新一下主订单信息， 用来判断是否一退光
+            refundOrder = orderService.getOrderInfo(order.getId());
+            //判断是否清空
+            boolean flag = true;
+            //原逻辑为articleCount为0则改成退菜取消，现改成如果orderMoney为0则改为退菜取消(注：其实orderMoney为0就是菜品及服务费退完了)
+            if (refundOrder.getOrderMoney().compareTo(BigDecimal.ZERO) == 0) {
+                flag = false;
             }
-            orderService.update(refundOrder);
+            if (flag) {
+                //如果当前订单为主订单
+                if (refundOrder.getParentOrderId() == null) {
+                    List<Order> orders = orderService.selectByParentId(refundOrder.getId(), 1); //得到子订单
+                    for (Order child : orders) { //遍历子订单
+                        child = orderService.getOrderInfo(child.getId());
+                        if (child.getOrderMoney().compareTo(BigDecimal.ZERO) == 0) {
+                            flag = false;
+                        }
+                    }
+                    if (flag) {
+                        refundOrderArticleNull(refundOrder);
+                    }
+                } else {
+                    refundOrderArticleNull(refundOrder);
+                }
+                //存在退菜之后订单菜品是为负的情况  所以这边添加此校验  若为负则为零
+                if (refundOrder.getArticleCount() != null && refundOrder.getArticleCount() < 0) {
+                    refundOrder.setArticleCount(0);
+                } else if (refundOrder.getCountWithChild() != null && refundOrder.getCountWithChild() < 0) {
+                    refundOrder.setCountWithChild(0);
+                }
+                orderService.update(refundOrder);
+            }
+            // 插入退款备注
+            orderRefundRemarkService.posSyncInsertList(order.getOrderRefundRemarks());
+            // 还原库存
+            Boolean addStockSuccess = false;
+            try {
+                addStockSuccess = orderService.addStock(order);
+            } catch (AppException e) {
+                e.printStackTrace();
+            }
+            if (!addStockSuccess) {
+                log.info("库存还原失败:" + order.getId());
+            }
+        }catch (Exception e) {
+            String errorMsg = "退菜失败";
+            //如果报错信息不为空
+            if (com.resto.brand.core.util.StringUtils.isNotBlank(e.getMessage())){
+                com.alibaba.fastjson.JSONObject object = JSON.parseObject(e.getMessage());
+                if (object != null){
+                    if (com.resto.brand.core.util.StringUtils.isNotBlank(object.getString("err_code_des"))) { //微信退款失败
+                        errorMsg = object.getString("err_code_des");
+                    }
+                }
+            }
+            result.put("success", false);
+            result.put("message", errorMsg);
         }
-        // 插入退款备注
-        orderRefundRemarkService.posSyncInsertList(order.getOrderRefundRemarks());
-        // 还原库存
-        Boolean addStockSuccess = false;
-        try {
-            addStockSuccess = orderService.addStock(order);
-        } catch (AppException e) {
-            e.printStackTrace();
-        }
-        if (!addStockSuccess) {
-            log.info("库存还原失败:" + order.getId());
-        }
-        return com.alibaba.fastjson.JSONObject.toJSONString(order.getRefundPaymentList());
+        return result.toString();
     }
 
     private void refundOrderArticleNull(Order refundOrder) {
