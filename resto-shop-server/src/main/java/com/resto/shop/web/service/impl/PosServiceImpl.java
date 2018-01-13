@@ -469,7 +469,7 @@ public class PosServiceImpl implements PosService {
         if (!addStockSuccess) {
             log.info("库存还原失败:" + order.getId());
         }
-        return null;
+        return com.alibaba.fastjson.JSONObject.toJSONString(order.getRefundPaymentList());
     }
 
     private void refundOrderArticleNull(Order refundOrder) {
