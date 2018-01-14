@@ -8151,7 +8151,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
      * @param refundOrder
      * @return
      */
-    private final List<OrderPaymentItem> refundPosTwoArticle(Order refundOrder){
+    @Override
+    public List<OrderPaymentItem> refundPosTwoArticle(Order refundOrder){
         log.debug("----进入newPos退菜方法----");
         //查找到主订单的订单信息
         Order order = selectById(StringUtils.isNotBlank(refundOrder.getParentOrderId()) ? refundOrder.getParentOrderId() : refundOrder.getId());
@@ -8221,7 +8222,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return refundPaymentList;
     }
 
-    private final void refundActualByMode(Order order, BigDecimal refundValue, Integer payMode, List<OrderPaymentItem> refundPaymentList){
+    public void refundActualByMode(Order order, BigDecimal refundValue, Integer payMode, List<OrderPaymentItem> refundPaymentList){
         //得到所有父子订单实际支付的记录
         List<OrderPaymentItem> payList = orderPaymentItemService.selectPayMentByPayMode(order.getId(), payMode, Common.YES);
         //得到所有父子订单实际支付的退款记录

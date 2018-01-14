@@ -434,7 +434,7 @@ public class PosServiceImpl implements PosService {
             //判断是否清空
             boolean flag = true;
             //原逻辑为articleCount为0则改成退菜取消，现改成如果orderMoney为0则改为退菜取消(注：其实orderMoney为0就是菜品及服务费退完了)
-            if (refundOrder.getOrderMoney().compareTo(BigDecimal.ZERO) == 0) {
+            if (refundOrder.getOrderMoney().compareTo(BigDecimal.ZERO) > 0) {
                 flag = false;
             }
             if (flag) {
@@ -443,7 +443,7 @@ public class PosServiceImpl implements PosService {
                     List<Order> orders = orderService.selectByParentId(refundOrder.getId(), 1); //得到子订单
                     for (Order child : orders) { //遍历子订单
                         child = orderService.getOrderInfo(child.getId());
-                        if (child.getOrderMoney().compareTo(BigDecimal.ZERO) == 0) {
+                        if (child.getOrderMoney().compareTo(BigDecimal.ZERO) > 0) {
                             flag = false;
                         }
                     }

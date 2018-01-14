@@ -807,4 +807,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	 * @return
 	 */
 	List<String> posSelectNotCancelledOrdersIdByDate(String shopId, String beginDate, String endDate);
+
+
+	List<OrderPaymentItem> refundPosTwoArticle(Order refundOrder);
 }
