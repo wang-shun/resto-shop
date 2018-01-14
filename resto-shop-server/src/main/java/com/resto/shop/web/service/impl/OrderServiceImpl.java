@@ -8300,7 +8300,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             log.error("支付宝退款失败！失败信息：" + resultJson);
                             throw new RuntimeException(resultJson);
                         }
-                        refundPayment.setResultData(JSON.toJSONString(resultJson));
+                        refundPayment.setResultData(new JSONObject(resultJson).toString());
                         refundPayment.setRemark("支付宝退款：" + refundPayment.getPayValue());
                     }
                     orderPaymentItemService.insert(refundPayment);
