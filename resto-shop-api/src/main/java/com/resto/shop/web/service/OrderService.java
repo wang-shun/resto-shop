@@ -813,4 +813,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 
 	BigDecimal selectSurplusAmountByPayMode(String orderId, Integer payMode);
+
+
+	void refundActualByMode(Order order, BigDecimal refundValue, Integer payMode, List<OrderPaymentItem> refundPaymentList);
 }

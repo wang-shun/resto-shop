@@ -314,8 +314,8 @@
             tb_order td
         INNER JOIN tb_order_payment_item top ON td.id = top.order_id
         WHERE
-            td.id = #{orderId}
-        OR td.parent_order_id = #{orderId}
+        (td.id = #{orderId}
+        OR td.parent_order_id = #{orderId})
         AND top.payment_mode_id = ${payMode}
         <if test="type == 1">
           AND top.pay_value > 0

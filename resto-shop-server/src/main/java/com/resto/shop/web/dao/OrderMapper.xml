@@ -3496,8 +3496,8 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
             tb_order td
         INNER JOIN tb_order_payment_item top ON td.id = top.order_id
         WHERE
-            td.id = #{orderId}
-        OR td.parent_order_id = #{orderId}
+        (td.id = #{orderId}
+        OR td.parent_order_id = #{orderId})
         <if test="payMode != 3">
             AND top.payment_mode_id = ${payMode}
             AND top.result_data IS NOT NULL
