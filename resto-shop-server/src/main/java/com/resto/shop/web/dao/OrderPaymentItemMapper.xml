@@ -324,5 +324,6 @@
             AND top.pay_value &lt; 0
         </if>
         AND top.result_data IS NOT NULL
+        AND top.result_data != ''
     </select>
 </mapper>
