@@ -809,5 +809,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<String> posSelectNotCancelledOrdersIdByDate(@Param("shopId") String shopId, @Param("beginDate") String beginDate, @Param("endDate") String endDate);
 
+	Order selectBySerialNumber(String serialNumber);
+
 	BigDecimal selectSurplusAmountByPayMode(@Param("orderId") String orderId,@Param("payMode") Integer payMode);
 }

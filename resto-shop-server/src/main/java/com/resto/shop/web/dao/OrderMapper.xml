@@ -3488,6 +3488,10 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time
     </select>
 
+    <select id="selectBySerialNumber" parameterType="java.lang.String" resultType="Order">
+        SELECT * from tb_order where serial_number = #{serialNumber}
+    </select>
+
 
     <select id="selectSurplusAmountByPayMode" resultType="java.math.BigDecimal">
         SELECT
