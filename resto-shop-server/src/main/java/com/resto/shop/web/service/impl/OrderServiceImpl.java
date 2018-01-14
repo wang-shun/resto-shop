@@ -8283,7 +8283,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             log.error("微信退款失败！失败信息：" + new JSONObject(result).toString());
                             throw new RuntimeException(new JSONObject(result).toString());
                         }
-                        refundPayment.setResultData(result.toString());
+                        refundPayment.setResultData(JSON.toJSONString(result));
                         refundPayment.setRemark("微信退款：" + refundPayment.getPayValue());
                     } else {
                         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -8300,7 +8300,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             log.error("支付宝退款失败！失败信息：" + resultJson);
                             throw new RuntimeException(resultJson);
                         }
-                        refundPayment.setResultData(resultJson);
+                        refundPayment.setResultData(JSON.toJSONString(resultJson));
                         refundPayment.setRemark("支付宝退款：" + refundPayment.getPayValue());
                     }
                     orderPaymentItemService.insert(refundPayment);
