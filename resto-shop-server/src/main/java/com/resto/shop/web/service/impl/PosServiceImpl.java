@@ -417,7 +417,7 @@ public class PosServiceImpl implements PosService {
             JSONObject json = new JSONObject(data);
             Order order = JSON.parseObject(json.get("refund").toString(), Order.class);
             //标识为pos2.0退菜
-//            order.setPosRefundArticleType(Common.YES);
+            order.setPosRefundArticleType(Common.YES);
             Order refundOrder = orderService.getOrderInfo(order.getId());
             if (refundOrder.getOrderState() == OrderState.SUBMIT) {
                 for (OrderItem orderItem : order.getOrderItems()) {
