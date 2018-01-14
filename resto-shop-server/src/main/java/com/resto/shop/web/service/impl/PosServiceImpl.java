@@ -477,14 +477,14 @@ public class PosServiceImpl implements PosService {
             e.printStackTrace();
             String errorMsg = "退菜失败";
             //如果报错信息不为空
-            if (com.resto.brand.core.util.StringUtils.isNotBlank(e.getMessage())){
-                com.alibaba.fastjson.JSONObject object = JSON.parseObject(e.getMessage());
-                if (object != null){
-                    if (com.resto.brand.core.util.StringUtils.isNotBlank(object.getString("err_code_des"))) { //微信退款失败
-                        errorMsg = object.getString("err_code_des");
-                    }
-                }
-            }
+//            if (com.resto.brand.core.util.StringUtils.isNotBlank(e.getMessage())){
+//                com.alibaba.fastjson.JSONObject object = JSON.parseObject(e.getMessage());
+//                if (object != null){
+//                    if (com.resto.brand.core.util.StringUtils.isNotBlank(object.getString("err_code_des"))) { //微信退款失败
+//                        errorMsg = object.getString("err_code_des");
+//                    }
+//                }
+//            }
             result.put("success", false);
             result.put("message", errorMsg);
         }
