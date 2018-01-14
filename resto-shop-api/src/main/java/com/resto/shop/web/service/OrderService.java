@@ -809,13 +809,4 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	List<String> posSelectNotCancelledOrdersIdByDate(String shopId, String beginDate, String endDate);
 
 	Order selectBySerialNumber(String serialNumber);
-
-
-	List<OrderPaymentItem> refundPosTwoArticle(Order refundOrder);
-
-
-	BigDecimal selectSurplusAmountByPayMode(String orderId, Integer payMode);
-
-
-	void refundActualByMode(Order order, BigDecimal refundValue, Integer payMode, List<OrderPaymentItem> refundPaymentList);
 }

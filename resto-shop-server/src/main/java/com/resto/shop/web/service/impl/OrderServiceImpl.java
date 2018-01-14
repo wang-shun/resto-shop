@@ -8141,17 +8141,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     }
 
-    @Override
-    public BigDecimal selectSurplusAmountByPayMode(String orderId, Integer payMode) {
-        return orderMapper.selectSurplusAmountByPayMode(orderId, payMode);
-    }
-
     /**
      *
      * @param refundOrder
      * @return
      */
-    @Override
     public List<OrderPaymentItem> refundPosTwoArticle(Order refundOrder){
         //查找到主订单的订单信息
         Order order = selectById(StringUtils.isNotBlank(refundOrder.getParentOrderId()) ? refundOrder.getParentOrderId() : refundOrder.getId());
@@ -8160,11 +8154,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //存放退菜是的退款记录
         List<OrderPaymentItem> refundPaymentList = new ArrayList<>();
         //得到实际支付已到账的父子订单的微信支付金额总和
-        BigDecimal wxPayTotal = selectSurplusAmountByPayMode(order.getId(), PayMode.WEIXIN_PAY);
+        BigDecimal wxPayTotal = orderMapper.selectSurplusAmountByPayMode(order.getId(), PayMode.WEIXIN_PAY);
         //得到实际支付已到账的父子订单的支付宝支付金额总和
-        BigDecimal aliPayTotal = selectSurplusAmountByPayMode(order.getId(), PayMode.ALI_PAY);
+        BigDecimal aliPayTotal = orderMapper.selectSurplusAmountByPayMode(order.getId(), PayMode.ALI_PAY);
         //得到实际支付未到账的父子订单的金额总和
-        BigDecimal otherPayTotal = selectSurplusAmountByPayMode(order.getId(), 3);
+        BigDecimal otherPayTotal = orderMapper.selectSurplusAmountByPayMode(order.getId(), 3);
         //此次微信退款金额
         BigDecimal wxRefundValue = wxPayTotal.compareTo(surplusRefundMoney) >= 0 ? surplusRefundMoney : wxPayTotal;
         surplusRefundMoney = surplusRefundMoney.subtract(wxRefundValue);
@@ -8177,11 +8171,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         surplusRefundMoney = surplusRefundMoney.subtract(cashRefundValue);
         //有微信可退的
         if (wxRefundValue.compareTo(BigDecimal.ZERO) > 0){
-//            refundActualByMode(order, wxRefundValue, PayMode.WEIXIN_PAY, refundPaymentList);
+            refundActualByMode(order, wxRefundValue, PayMode.WEIXIN_PAY, refundPaymentList);
         }
         //有支付宝可退的
         if (aliRefundValue.compareTo(BigDecimal.ZERO) > 0){
-//            refundActualByMode(order, aliRefundValue, PayMode.ALI_PAY, refundPaymentList);
+            refundActualByMode(order, aliRefundValue, PayMode.ALI_PAY, refundPaymentList);
         }
         //线下退还现金
         if (cashRefundValue.compareTo(BigDecimal.ZERO) > 0){
@@ -8223,7 +8217,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return refundPaymentList;
     }
 
-    @Override
     public void refundActualByMode(Order order, BigDecimal refundValue, Integer payMode, List<OrderPaymentItem> refundPaymentList){
         //得到所有父子订单实际支付的记录
         List<OrderPaymentItem> payList = orderPaymentItemService.selectPayMentByPayMode(order.getId(), payMode, Common.YES);
