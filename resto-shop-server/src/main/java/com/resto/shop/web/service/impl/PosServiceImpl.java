@@ -474,6 +474,7 @@ public class PosServiceImpl implements PosService {
                 log.info("库存还原失败:" + order.getId());
             }
         }catch (Exception e) {
+            e.printStackTrace();
             String errorMsg = "退菜失败";
             //如果报错信息不为空
             if (com.resto.brand.core.util.StringUtils.isNotBlank(e.getMessage())){
