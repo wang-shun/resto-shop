@@ -8177,11 +8177,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         surplusRefundMoney = surplusRefundMoney.subtract(cashRefundValue);
         //有微信可退的
         if (wxRefundValue.compareTo(BigDecimal.ZERO) > 0){
-            refundActualByMode(order, wxRefundValue, PayMode.WEIXIN_PAY, refundPaymentList);
+//            refundActualByMode(order, wxRefundValue, PayMode.WEIXIN_PAY, refundPaymentList);
         }
         //有支付宝可退的
         if (aliRefundValue.compareTo(BigDecimal.ZERO) > 0){
-            refundActualByMode(order, aliRefundValue, PayMode.ALI_PAY, refundPaymentList);
+//            refundActualByMode(order, aliRefundValue, PayMode.ALI_PAY, refundPaymentList);
         }
         //线下退还现金
         if (cashRefundValue.compareTo(BigDecimal.ZERO) > 0){
