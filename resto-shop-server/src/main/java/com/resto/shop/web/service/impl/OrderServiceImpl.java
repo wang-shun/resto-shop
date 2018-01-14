@@ -8201,7 +8201,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderPaymentItemService.insert(refundPaymentItem);
             refundPaymentList.add(refundPaymentItem);
             Customer customer = customerService.selectById(order.getCustomerId());
-            accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE, order.getShopDetailId());
+            accountService.addAccount(surplusRefundMoney, customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE, order.getShopDetailId());
             RedPacket redPacket = new RedPacket();
             redPacket.setId(ApplicationUtils.randomUUID());
             redPacket.setRedMoney(order.getRefundMoney());
