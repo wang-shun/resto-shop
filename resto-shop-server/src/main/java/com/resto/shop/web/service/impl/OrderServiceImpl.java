@@ -8181,7 +8181,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (cashRefundValue.compareTo(BigDecimal.ZERO) > 0){
             OrderPaymentItem refundPaymentItem = new OrderPaymentItem();
             refundPaymentItem.setId(ApplicationUtils.randomUUID());
-            refundPaymentItem.setPayValue(cashRefundValue.multiply(new BigDecimal(-100)));
+            refundPaymentItem.setPayValue(cashRefundValue.multiply(new BigDecimal(-1)));
             refundPaymentItem.setRemark("线下退还现金：" + refundPaymentItem.getPayValue());
             refundPaymentItem.setPaymentModeId(PayMode.REFUND_CRASH);
             refundPaymentItem.setOrderId(order.getId());
@@ -8193,7 +8193,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (surplusRefundMoney.compareTo(BigDecimal.ZERO) > 0){
             OrderPaymentItem refundPaymentItem = new OrderPaymentItem();
             refundPaymentItem.setId(ApplicationUtils.randomUUID());
-            refundPaymentItem.setPayValue(surplusRefundMoney.multiply(new BigDecimal(-100)));
+            refundPaymentItem.setPayValue(surplusRefundMoney.multiply(new BigDecimal(-1)));
             refundPaymentItem.setRemark("退菜红包返还：" + refundPaymentItem.getPayValue());
             refundPaymentItem.setPaymentModeId(PayMode.ARTICLE_BACK_PAY);
             refundPaymentItem.setPayTime(new Date());
