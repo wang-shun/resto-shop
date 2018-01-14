@@ -8196,7 +8196,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             refundPaymentItem.setRemark("线下退还现金：" + refundPaymentItem.getPayValue());
             refundPaymentItem.setPaymentModeId(PayMode.REFUND_CRASH);
             refundPaymentItem.setOrderId(order.getId());
-            orderPaymentItemService.insertByBeforePay(refundPaymentItem);
+            refundPaymentItem.setPayTime(new Date());
+            orderPaymentItemService.insert(refundPaymentItem);
             refundPaymentList.add(refundPaymentItem);
         }
         //退菜红包返还
@@ -8206,8 +8207,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             refundPaymentItem.setPayValue(surplusRefundMoney.multiply(new BigDecimal(-100)));
             refundPaymentItem.setRemark("退菜红包返还：" + refundPaymentItem.getPayValue());
             refundPaymentItem.setPaymentModeId(PayMode.ARTICLE_BACK_PAY);
+            refundPaymentItem.setPayTime(new Date());
             refundPaymentItem.setOrderId(order.getId());
-            orderPaymentItemService.insertByBeforePay(refundPaymentItem);
+            orderPaymentItemService.insert(refundPaymentItem);
             refundPaymentList.add(refundPaymentItem);
             Customer customer = customerService.selectById(order.getCustomerId());
             accountService.addAccount(order.getRefundMoney(), customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE, order.getShopDetailId());
@@ -8269,6 +8271,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     refundPayment.setPayValue(refund.multiply(new BigDecimal(-1)));
                     refundPayment.setPaymentModeId(payMode);
                     refundPayment.setOrderId(order.getId());
+                    refundPayment.setPayTime(new Date());
                     if (payMode.equals(PayMode.WEIXIN_PAY)) {
                         WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
                         Map<String, String> result;
@@ -8311,7 +8314,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         refundPayment.setResultData(resultJson);
                         refundPayment.setRemark("支付宝退款：" + refundPayment.getPayValue());
                     }
-                    orderPaymentItemService.insertByBeforePay(refundPayment);
+                    orderPaymentItemService.insert(refundPayment);
                     refundPaymentList.add(refundPayment);
                     refundValue = refundValue.subtract(refund);
                 }
