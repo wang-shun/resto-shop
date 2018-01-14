@@ -8268,7 +8268,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         if (shopDetail.getWxServerId() == null) {
                             //独立商户模式
                             result = WeChatPayUtils.refund(refundPayment.getId(), payInfo.getString("transaction_id"), payInfo.getInt("total_fee")
-                                    , Integer.valueOf(refund.multiply(new BigDecimal(100)).toString()), StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
+                                    , Integer.parseInt(refund.multiply(new BigDecimal(100)).toString()), StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
                                     StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(),
                                     StringUtils.isEmpty(shopDetail.getMchkey()) ? config.getMchkey() : shopDetail.getMchkey(),
                                     StringUtils.isEmpty(shopDetail.getPayCertPath()) ? config.getPayCertPath() : shopDetail.getPayCertPath());
