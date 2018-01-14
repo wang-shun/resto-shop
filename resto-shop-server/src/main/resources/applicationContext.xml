@@ -113,7 +113,6 @@
 			<tx:method name="delete*" propagation="REQUIRED"	rollback-for="java.lang.Throwable" />
 			<tx:method name="create*" propagation="REQUIRED"	rollback-for="java.lang.Throwable" />
 			<tx:method name="add*"    propagation="REQUIRED"	rollback-for="java.lang.Throwable" />
-			<tx:method name="refund*"    propagation="REQUIRED"	rollback-for="java.lang.Throwable" />
 			<!-- 07-28新增  wtl 用于报表存储过程的调用 -->
 			<tx:method name="call*"    propagation="REQUIRED"	rollback-for="java.lang.Throwable" />
 			<!-- select,count开头的方法,开启只读,提高数据库访问性能 -->
