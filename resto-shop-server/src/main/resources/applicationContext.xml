@@ -102,7 +102,7 @@
 	<!-- 对dataSource 数据源进行事务管理 -->
 	<bean id="transactionManager"
 		class="org.springframework.jdbc.datasource.DataSourceTransactionManager"
-		p:dataSource-ref="dataSource" />
+		p:dataSource-ref="dataSource" p:globalRollbackOnParticipationFailure="false"/>
 
 	<!-- 事务管理 通知 -->
 	<tx:advice id="txAdvice" transaction-manager="transactionManager">
