@@ -7948,7 +7948,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public void refundItem(Order refundOrder) {
-        log.debug("----进入退菜方法----");
         //修改菜品数量
         Order order = getOrderInfo(refundOrder.getId());
         int customerCount = 0;
@@ -8138,7 +8137,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //pos2.0退菜
                 List<OrderPaymentItem> refundPaymentList = refundPosTwoArticle(o);
                 refundOrder.setRefundPaymentList(refundPaymentList);
-                log.debug("----newPos退菜执行完毕----");
             }else{
                 //老版pos退菜
                 refundArticle(o); //去退款
