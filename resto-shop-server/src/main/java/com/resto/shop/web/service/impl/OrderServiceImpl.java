@@ -8268,7 +8268,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         if (shopDetail.getWxServerId() == null) {
                             //独立商户模式
                             result = WeChatPayUtils.refund(refundPayment.getId(), payInfo.getString("transaction_id"), payInfo.getInt("total_fee")
-                                    , Integer.parseInt(refund.multiply(new BigDecimal(100)).toString()), StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
+                                    , refund.multiply(new BigDecimal(100)).intValue(), StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
                                     StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(),
                                     StringUtils.isEmpty(shopDetail.getMchkey()) ? config.getMchkey() : shopDetail.getMchkey(),
                                     StringUtils.isEmpty(shopDetail.getPayCertPath()) ? config.getPayCertPath() : shopDetail.getPayCertPath());
@@ -8276,7 +8276,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             //服务商模式
                             WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
                             result = WeChatPayUtils.refundNew(refundPayment.getId(), payInfo.getString("transaction_id"),
-                                    payInfo.getInt("total_fee"), Integer.valueOf(refund.multiply(new BigDecimal(100)).toString()), wxServerConfig.getAppid(), wxServerConfig.getMchid(),
+                                    payInfo.getInt("total_fee"), refund.multiply(new BigDecimal(100)).intValue(), wxServerConfig.getAppid(), wxServerConfig.getMchid(),
                                     StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
                         }
                         if (result.containsKey("ERROR")) {
