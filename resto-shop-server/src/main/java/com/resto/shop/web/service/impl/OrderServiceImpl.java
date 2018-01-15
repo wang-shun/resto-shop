@@ -1880,30 +1880,25 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order orderWxPaySuccess(OrderPaymentItem item) {
         Order order = selectById(item.getOrderId());
-        OrderPaymentItem historyItem = orderPaymentItemService.selectById(item.getId());
-        if (historyItem == null) {
-            orderPaymentItemService.insert(item);
-            if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
-                order.setPaymentAmount(item.getPayValue());
-                update(order);
-            }
-            if (order.getPayMode() == OrderPayMode.ALI_PAY && order.getIsPay().equals(OrderPayState.ALIPAYING)) {
-                order.setIsPay(OrderPayState.ALIPAYED);
-                update(order);
-            } else if (order.getPayMode() != OrderPayMode.WX_PAY && order.getIsPay().equals(OrderPayState.ALIPAYING)) {
-                order.setIsPay(OrderPayState.PAYED);
-                update(order);
-            } else if (order.getPayMode() != OrderPayMode.ALI_PAY && order.getIsPay().equals(OrderPayState.ALIPAYING)) {
-                order.setIsPay(OrderPayState.NOT_PAY);
-                update(order);
-            }
-            payOrderSuccess(order);
-            if(!StringUtils.isEmpty(order.getGroupId())){
-                //如果多人点餐支付成功
-                MemcachedUtils.delete(order.getShopDetailId()+order.getGroupId());
-            }
-        } else {
-            log.warn("该笔支付记录已经处理过:" + item.getId());
+        orderPaymentItemService.insert(item);
+        if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
+            order.setPaymentAmount(item.getPayValue());
+            update(order);
+        }
+        if (order.getPayMode() == OrderPayMode.ALI_PAY && order.getIsPay().equals(OrderPayState.ALIPAYING)) {
+            order.setIsPay(OrderPayState.ALIPAYED);
+            update(order);
+        } else if (order.getPayMode() != OrderPayMode.WX_PAY && order.getIsPay().equals(OrderPayState.ALIPAYING)) {
+            order.setIsPay(OrderPayState.PAYED);
+            update(order);
+        } else if (order.getPayMode() != OrderPayMode.ALI_PAY && order.getIsPay().equals(OrderPayState.ALIPAYING)) {
+            order.setIsPay(OrderPayState.NOT_PAY);
+            update(order);
+        }
+        payOrderSuccess(order);
+        if(!StringUtils.isEmpty(order.getGroupId())){
+            //如果多人点餐支付成功
+            MemcachedUtils.delete(order.getShopDetailId()+order.getGroupId());
         }
         return order;
     }
