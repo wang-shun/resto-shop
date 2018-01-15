@@ -27,6 +27,7 @@ import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
+import com.resto.shop.web.report.OrderMapperReport;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.BrandAccountSendUtil;
 import com.resto.shop.web.util.LogTemplateUtils;
@@ -75,6 +76,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private OrderMapper orderMapper;
+
+    @Resource
+    private OrderMapperReport orderMapperReport;
 
     @Resource
     private OrderItemMapper orderitemMapper;
@@ -5353,7 +5357,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         selectBrandMap.put("beginDate", beginDate);
         selectBrandMap.put("endDate", endDate);
         selectBrandMap.put("brandId", brandId);
-        brandOrderReportDto=orderMapper.procDayAllOrderItemBrand(selectBrandMap);
+        brandOrderReportDto=orderMapperReport.procDayAllOrderItemBrand(selectBrandMap);
         brandOrderReportDto.setBrandName(brandName);
         if(brandOrderReportDto.getOrderCount()!=0&&brandOrderReportDto.getOrderPrice()!=null){
             BigDecimal singlePrice = new BigDecimal(brandOrderReportDto.getOrderPrice().doubleValue()/brandOrderReportDto.getOrderCount());
@@ -10024,7 +10028,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             ShopOrderReportDto shopOrderReportDto= new ShopOrderReportDto();
             Date begin = DateUtil.getformatBeginDate(beginDate);
             Date end = DateUtil.getformatEndDate(endDate);
-            shopOrderReportDto=orderMapper.procDayAllOrderItemShop(begin,end,shopDetail.getId());
+            shopOrderReportDto=orderMapperReport.procDayAllOrderItemShop(begin,end,shopDetail.getId());
             BigDecimal initial_=new BigDecimal("0.00");
             if(shopOrderReportDto.getShop_orderCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
                 BigDecimal ssinglePrice= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_orderCount());
