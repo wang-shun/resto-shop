@@ -102,7 +102,7 @@
 	<!-- mybatis文件配置，扫描所有mapper文件 -->
 	<bean id="sqlSessionFactoryReport" class="org.mybatis.spring.SqlSessionFactoryBean"
 		  p:dataSource-ref="dynamicDataSourceReport" p:configLocation="classpath:mybatis-config.xml"
-		  p:mapperLocations="classpath:com/resto/shop/web/dao/*.xml"/>
+		  p:mapperLocations="classpath:com/resto/shop/web/report/*.xml"/>
 
 	<!-- spring与mybatis整合配置，扫描所有dao -->
 	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer"
