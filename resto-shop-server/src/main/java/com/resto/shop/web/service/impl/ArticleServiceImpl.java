@@ -177,6 +177,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             }
             if("".equals(article.getRecommendId())){
                 article.setRecommendId(null);
+                article.setRecommendCount(0);
             }
         }
         getArticleDiscount(currentShopId, articleList, show);
@@ -199,6 +200,7 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             article.setRecommendCategoryId(recommendCcategoryId);
             if("".equals(article.getRecommendId())){
                 article.setRecommendId(null);
+                article.setRecommendCount(0);
             }
         }
         getArticleDiscount(currentShopId, articleList, show);
