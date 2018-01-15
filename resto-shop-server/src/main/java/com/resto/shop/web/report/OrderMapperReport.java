@@ -14,7 +14,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public interface OrderMapper  extends GenericDao<Order,String> {
+public interface OrderMapperReport  extends GenericDao<Order,String> {
     int deleteByPrimaryKey(String id);
 
     int insert(Order record);
