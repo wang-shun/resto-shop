@@ -27,7 +27,6 @@ public class DynamicDataSourceReport extends AbstractRoutingDataSource implement
 		if(!dataSourceMap.containsKey(dataconfigId)){
 			DatabaseConfig config = databaseConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
 			DruidDataSource druidDataSource = new DruidDataSource();
-			druidDataSource.setUrl("jdbc:mysql://139.196.222.42:3306/shop_manager?useUnicode=true&characterEncoding=utf8");
 			druidDataSource.setUrl(config.getUrl().replace("rds64fw2qrd8q0eg95nmo.mysql.rds.aliyuncs.com","rr-uf68ruwd0571iwmf4o.mysql.rds.aliyuncs.com"));
 			druidDataSource.setUsername("viewer");
 			druidDataSource.setPassword("Vino2016");
