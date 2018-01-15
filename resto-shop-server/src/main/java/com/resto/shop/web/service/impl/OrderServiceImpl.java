@@ -20,6 +20,7 @@ import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
+import com.resto.shop.web.datasource.DataSourceContextHolderReport;
 import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
@@ -5346,6 +5347,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Map<String, Object> callMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
         //封装品牌的数据
+        DataSourceContextHolderReport.setDataSourceName(brandId);
         BrandOrderReportDto brandOrderReportDto;
         Map<String, Object> selectBrandMap = new HashMap<>();
         selectBrandMap.put("beginDate", beginDate);
