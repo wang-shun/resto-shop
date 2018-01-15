@@ -197,6 +197,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             }
             article.setMonthlySales(articleMapper.selectSumByMonthlySales(article.getId(), dateNowStr));
             article.setRecommendCategoryId(recommendCcategoryId);
+            if("".equals(article.getRecommendId())){
+                article.setRecommendId(null);
+            }
         }
         getArticleDiscount(currentShopId, articleList, show);
         RecommendCategory recommendCategory=recommendCategoryService.selectById(recommendCcategoryId);
