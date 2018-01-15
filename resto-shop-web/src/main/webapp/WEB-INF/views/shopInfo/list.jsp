@@ -95,7 +95,9 @@
 									   v-model="m.mealFeePrice" required="required" min="0">
 							</div>
 						</div>
-                        <!--    仅   混合支付模式（大Boos模式）  显示         begin-->
+
+
+						<!--    仅   混合支付模式（大Boos模式）  显示         begin-->
 						<div class="form-group"  v-show="m.shopMode == 6">
 							<label class="col-md-4 control-label">允许先付：</label>
 							<div  class="col-md-6 radio-list">
@@ -118,6 +120,8 @@
 								</label>
 							</div>
 						</div>
+
+
                         <!--    仅   混合支付模式（大Boos模式）  显示         end-->
 						<div class="form-group">
 							<label class="col-md-4 control-label">点餐页面滑动效果：</label>
