@@ -1,0 +1,607 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.resto.shop.web.dao.ChargeOrderMapper">
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.ChargeOrder" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="charge_money" property="chargeMoney" jdbcType="DECIMAL" />
+    <result column="reward_money" property="rewardMoney" jdbcType="DECIMAL" />
+    <result column="order_state" property="orderState" jdbcType="TINYINT" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP" />
+    <result column="customer_id" property="customerId" jdbcType="VARCHAR" />
+    <result column="brand_id" property="brandId" jdbcType="VARCHAR" />
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
+    <result column="charge_balance" property="chargeBalance" jdbcType="DECIMAL" />
+    <result column="reward_balance" property="rewardBalance" jdbcType="DECIMAL" />
+    <result column="total_balance" property="totalBalance" jdbcType="DECIMAL" />
+    <result column="number_day_now" property="numberDayNow"/>
+    <result column="arrival_amount" property="arrivalAmount"/>
+    <result column="end_amount" property="endAmount"/>
+    <result column="type" property="type"/>
+    <result column="charge_setting_id" property="chargeSettingId"/>
+  </resultMap>
+
+  <!--店铺详细-->
+  <resultMap id="ShopchargecordMap" type="com.resto.shop.web.model.ChargeOrder">
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="charge_money" property="chargeMoney" jdbcType="DECIMAL" />
+    <result column="reward_money" property="rewardMoney" jdbcType="DECIMAL" />
+    <result column="finish_time" property="finishTime" jdbcType="TIMESTAMP" />
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR" />
+    <result column="type" property="type"/>
+    <!--充值详细-->
+    <association property="chargelog" javaType="com.resto.shop.web.model.ChargeLog">
+      <id column="cid" property="id" jdbcType="VARCHAR" />
+      <result column="operation_phone" property="operationPhone" jdbcType="VARCHAR" />
+      <result column="customer_phone"  property="customerPhone" jdbcType="VARCHAR" />
+    </association>
+  </resultMap>
+
+
+  <sql id="Base_Column_List" >
+    id, charge_money, reward_money, order_state, create_time, finish_time, customer_id,
+    brand_id, shop_detail_id, charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount, type, charge_setting_id
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select
+    <include refid="Base_Column_List" />
+    from tb_charge_order
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from tb_charge_order
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.resto.shop.web.model.ChargeOrder" >
+    insert into tb_charge_order (id, charge_money, reward_money, order_state, create_time, finish_time, customer_id, brand_id, shop_detail_id,
+    charge_balance, reward_balance, total_balance, number_day_now, arrival_amount, end_amount, type, charge_setting_id
+    )
+    values (#{id,jdbcType=VARCHAR}, #{chargeMoney,jdbcType=DECIMAL}, #{rewardMoney,jdbcType=DECIMAL},
+      #{orderState,jdbcType=TINYINT}, #{createTime,jdbcType=TIMESTAMP}, #{finishTime,jdbcType=TIMESTAMP},
+      #{customerId,jdbcType=VARCHAR}, #{brandId,jdbcType=VARCHAR}, #{shopDetailId,jdbcType=VARCHAR},
+      #{chargeBalance,jdbcType=DECIMAL}, #{rewardBalance,jdbcType=DECIMAL}, #{totalBalance,jdbcType=DECIMAL},
+      #{numberDayNow}, #{arrivalAmount}, #{endAmount}, #{type}, #{chargeSettingId}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.resto.shop.web.model.ChargeOrder" >
+    insert into tb_charge_order
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="chargeMoney != null" >
+        charge_money,
+      </if>
+      <if test="rewardMoney != null" >
+        reward_money,
+      </if>
+      <if test="orderState != null" >
+        order_state,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="finishTime != null" >
+        finish_time,
+      </if>
+      <if test="customerId != null" >
+        customer_id,
+      </if>
+      <if test="brandId != null" >
+        brand_id,
+      </if>
+      <if test="shopDetailId != null" >
+        shop_detail_id,
+      </if>
+      <if test="chargeBalance != null" >
+        charge_balance,
+      </if>
+      <if test="rewardBalance != null" >
+        reward_balance,
+      </if>
+      <if test="totalBalance != null" >
+        total_balance,
+      </if>
+      <if test="numberDayNow != null" >
+        number_day_now,
+      </if>
+      <if test="arrivalAmount != null" >
+        arrival_amount,
+      </if>
+      <if test="endAmount != null" >
+        end_amount,
+      </if>
+      <if test="type != null" >
+        `type`,
+      </if>
+      <if test="chargeSettingId != null" >
+        charge_setting_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeMoney != null" >
+        #{chargeMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="rewardMoney != null" >
+        #{rewardMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="orderState != null" >
+        #{orderState,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null" >
+        #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="customerId != null" >
+        #{customerId,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null" >
+        #{brandId,jdbcType=VARCHAR},
+      </if>
+      <if test="shopDetailId != null" >
+        #{shopDetailId,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeBalance != null" >
+        #{chargeBalance,jdbcType=DECIMAL},
+      </if>
+      <if test="rewardBalance != null" >
+        #{rewardBalance,jdbcType=DECIMAL},
+      </if>
+      <if test="totalBalance != null" >
+        #{totalBalance,jdbcType=DECIMAL},
+      </if>
+      <if test="numberDayNow != null" >
+        #{numberDayNow},
+      </if>
+      <if test="arrivalAmount != null" >
+        #{arrivalAmount},
+      </if>
+      <if test="endAmount != null" >
+        #{endAmount},
+      </if>
+      <if test="type != null" >
+        #{type},
+      </if>
+      <if test="chargeSettingId != null" >
+        #{chargeSettingId},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.ChargeOrder" >
+    update tb_charge_order
+    <set >
+      <if test="chargeMoney != null" >
+        charge_money = #{chargeMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="rewardMoney != null" >
+        reward_money = #{rewardMoney,jdbcType=DECIMAL},
+      </if>
+      <if test="orderState != null" >
+        order_state = #{orderState,jdbcType=TINYINT},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="finishTime != null" >
+        finish_time = #{finishTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="customerId != null" >
+        customer_id = #{customerId,jdbcType=VARCHAR},
+      </if>
+      <if test="brandId != null" >
+        brand_id = #{brandId,jdbcType=VARCHAR},
+      </if>
+      <if test="shopDetailId != null" >
+        shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},
+      </if>
+      <if test="chargeBalance != null" >
+        charge_balance = #{chargeBalance,jdbcType=DECIMAL},
+      </if>
+      <if test="rewardBalance != null" >
+        reward_balance = #{rewardBalance,jdbcType=DECIMAL},
+      </if>
+      <if test="totalBalance != null" >
+        total_balance = #{totalBalance,jdbcType=DECIMAL},
+      </if>
+      <if test="numberDayNow != null" >
+        number_day_now = #{numberDayNow},
+      </if>
+      <if test="arrivalAmount != null" >
+        arrival_amount = #{arrivalAmount},
+      </if>
+      <if test="endAmount != null" >
+        end_amount = #{endAmount},
+      </if>
+      <if test="type != null" >
+        `type` = #{type},
+      </if>
+      <if test="chargeSettingId != null" >
+          charge_setting_id = #{chargeSettingId},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ChargeOrder" >
+    update tb_charge_order
+    set charge_money = #{chargeMoney,jdbcType=DECIMAL},
+      reward_money = #{rewardMoney,jdbcType=DECIMAL},
+      order_state = #{orderState,jdbcType=TINYINT},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      finish_time = #{finishTime,jdbcType=TIMESTAMP},
+      customer_id = #{customerId,jdbcType=VARCHAR},
+      brand_id = #{brandId,jdbcType=VARCHAR},
+      shop_detail_id = #{shopDetailId,jdbcType=VARCHAR},
+      charge_balance = #{chargeBalance,jdbcType=DECIMAL},
+      reward_balance = #{rewardBalance,jdbcType=DECIMAL},
+      total_balance = #{totalBalance,jdbcType=DECIMAL},
+      number_day_now = #{numberDayNow},
+      arrival_amount = #{arrivalAmount},
+      end_amount = #{endAmount},`type` = #{type},
+      charge_setting_id = #{chargeSettingId}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <select id="selectList" resultType="ChargeOrder">select * from tb_charge_order</select>
+  <select id="selectTotalBalance" resultType="DECIMAL">
+  	SELECT SUM(total_balance) FROM tb_charge_order
+	WHERE order_state=1
+	AND total_balance>0
+	AND customer_id=#{0}
+  </select>
+  <select id="selectFirstBalanceOrder" resultType="ChargeOrder">
+  	SELECT * FROM tb_charge_order
+	WHERE order_state=1
+	AND total_balance>0
+	AND customer_id=#{0}
+	ORDER BY finish_time
+	LIMIT 0,1
+  </select>
+  <!--店铺充值详细-->
+  <select id="shopChargeCodes" resultMap="ShopchargecordMap" >
+    SELECT
+    o.id,
+    o.charge_money,
+    o.reward_money,
+    o.finish_time,
+    o.shop_detail_id,
+    o.customer_id,
+    IF (o.type IS NULL, 1, o.type) type,
+
+    IF (
+    c.id IS NULL,
+    '没有填写',
+    c.id
+    ) cid,
+
+    IF (
+    c.operation_phone IS NULL,
+    '没有填写',
+    c.operation_phone
+    ) operation_phone,
+
+    IF (
+    o.type = 0,if(c.customer_phone IS NULL,'没有填写',c.customer_phone),(select telephone from tb_customer r where r.id = o.customer_id)
+    ) customer_phone
+    FROM
+    tb_charge_order o
+    LEFT JOIN tb_charge_log c ON c.charge_order_id = o.id
+    WHERE o.shop_detail_id=#{shopDetailId}
+       AND o.order_state = 1
+         AND o.finish_time is not null
+    <if test="beginDate != null and beginDate != ''">
+      AND  <![CDATA[  o.finish_time>=#{beginDate} ]]>
+    </if>
+    <if test="endDate != null and endDate != ''">
+      AND  <![CDATA[ o.finish_time <= #{endDate } ]]>
+    </if>
+
+</select>
+
+
+  <update id="updateBalance">
+  	update tb_charge_order
+  	set charge_balance = charge_balance-#{useCharge},
+  	reward_balance = reward_balance-#{useReward},
+  	total_balance = charge_balance+reward_balance
+  	where id = #{id}
+  </update>
+  <update id="refundCharge">
+  	update tb_charge_order
+  	set charge_balance = charge_balance+#{0},
+  	total_balance = charge_balance+reward_balance
+  	where id=#{1}
+  </update>
+
+    <update id="refundMoney">
+        update tb_charge_order
+        set charge_balance = charge_balance+#{0},
+        reward_balance = reward_balance+#{1},
+        total_balance = charge_balance+reward_balance
+        where id=#{2}
+    </update>
+
+  <update id="refundReward">
+  	update tb_charge_order
+  	set reward_balance = reward_balance+#{0},
+  	total_balance = charge_balance+reward_balance
+  	where id=#{1}
+  </update>
+
+
+    <select id="selectByDateAndShopId" resultType="com.resto.shop.web.model.ChargeOrder">
+        SELECT
+        id,
+        create_time,
+        order_state,
+        charge_money,
+        shop_detail_id,
+        brand_id
+        FROM
+        tb_charge_order
+        WHERE
+        shop_detail_id = #{shopId} and
+        <![CDATA[
+        create_time>#{beginDate} and create_time<#{endDate}
+        ]]>
+        AND order_state = 1
+    </select>
+
+    <select id="selectByDateAndBrandId" resultType="com.resto.shop.web.model.ChargeOrder">
+        SELECT
+        id,
+        order_state,
+        charge_money,
+        shop_detail_id,
+        brand_id
+        FROM
+        tb_charge_order
+        WHERE
+        brand_id = #{brandId} and
+        <![CDATA[
+        create_time>#{beginDate} and create_time<#{endDate}
+        ]]>
+        AND order_state = 1
+    </select>
+
+	<select id="selectByShopToDay" parameterType="java.util.Map" resultType="java.util.Map">
+		select tco.charge_money chargeMoney,tc.telephone from tb_charge_order tco
+		inner join tb_customer tc on  tco.customer_id = tc.id
+		where tco.shop_detail_id = #{shopId}
+		and tco.order_state = 1
+		and tco.finish_time &gt;= CONCAT(#{beginDate}, ' 00:00:00')
+		and tco.finish_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
+	</select>
+
+    <select id="selectChargeRedPacket" resultType="com.resto.brand.web.dto.RedPacketDto">
+        select
+        tco.shop_detail_id shopDetailId, IFNULL(COUNT(1),0) redCount, IFNULL(SUM(tco.reward_money),0) redMoney,
+        IFNULL((SUM((select COUNT(1) from (
+        select top.result_data from tb_order td
+        inner join tb_order_payment_item top
+        on td.id = top.order_id
+        where td.order_state in (2,10,11,12)
+        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3))
+        and top.payment_mode_id = 7
+        and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
+        and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
+        GROUP BY top.result_data
+        ) r where r.result_data = tco.id))),0) useRedCount,
+        IFNULL((SUM((select SUM(r.payValue) from (
+        select top.result_data, SUM(top.pay_value) payValue from tb_order td
+        inner join tb_order_payment_item top
+        on td.id = top.order_id
+        where td.order_state in (2,10,11,12)
+        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3))
+        and top.payment_mode_id = 7
+        and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
+        and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
+        GROUP BY top.result_data
+        ) r where r.result_data = tco.id))),0) useRedMoney
+        from tb_charge_order tco
+        where tco.order_state = 1
+        and tco.reward_money > 0
+        and tco.create_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
+        and tco.create_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
+        GROUP BY tco.shop_detail_id
+    </select>
+
+    <select id="selectListByDateAndShopId" resultType="ChargeOrder">
+ SELECT
+	c.id,
+	c.charge_money,
+	c.create_time,
+	c.brand_id,
+	c.shop_detail_id,
+	c.type,
+	u.telephone
+FROM
+	tb_charge_order c
+LEFT JOIN tb_customer u ON c.customer_id = u.id
+WHERE
+	c.order_state = 1
+	AND c.shop_detail_id=#{shopId}
+	AND
+   <![CDATA[
+        c.create_time>#{beginDate} and c.create_time<#{endDate}
+       ]]>
+
+    </select>
+
+    <select id="selectByCustomerIdAndBrandId" resultType="ChargeOrder">
+        SELECT
+	c.id,
+	c.charge_money,
+	c.create_time,
+	c.brand_id,
+	c.shop_detail_id,
+	c.type,
+	u.telephone
+FROM
+	tb_charge_order c
+INNER JOIN tb_customer u ON c.customer_id = u.id
+WHERE
+	c.order_state = 1
+AND c.brand_id =#{brandId}
+AND u.id =#{customerId}
+    </select>
+
+    <select id="selectMonthDto" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select id, charge_money, reward_money, charge_balance, reward_balance, type, finish_time, customer_id
+        from tb_charge_order
+        where order_state = 1
+        <if test="shopId != null">
+          and shop_detail_id = #{shopId}
+        </if>
+        and finish_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+        and finish_time &lt;= CONCAT(#{endDate},' 23:59:59')
+    </select>
+
+
+    <!-- 所有品牌充值记录 -->
+    <select id="selectRechargeLog" resultType="com.resto.brand.web.dto.RechargeLogDto">
+        SELECT
+        COUNT(id) AS rechargeCount,
+        SUM(charge_money) AS rechargeNum,
+        SUM(reward_money) AS rechargeGaNum,
+        (
+        SELECT
+        SUM(charge_money)
+        FROM
+        tb_charge_order
+        WHERE
+        order_state = 1
+        AND type = 1
+        AND
+        <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+        AND brand_id = #{brandId}
+        ) AS rechargeWeChat,
+        (
+        SELECT
+        SUM(charge_money)
+        FROM
+        tb_charge_order
+        WHERE
+        order_state = 1
+        AND type = 0
+        AND
+        <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+        AND brand_id = #{brandId}
+        ) AS rechargePos,
+        SUM(charge_money) - SUM(charge_balance) AS rechargeCsNum,
+
+        IF (
+        number_day_now > 0,
+        SUM(
+        reward_money - (number_day_now - 1) * arrival_amount + end_amount
+        ),
+        SUM(
+        reward_money - reward_balance
+        )
+        ) AS rechargeGaCsNum,
+        SUM(charge_balance) AS rechargeSpNum,
+        SUM(reward_balance) AS rechargeGaSpNum
+        FROM
+        tb_charge_order
+        WHERE
+        order_state = 1
+        AND
+        <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+        AND brand_id = #{brandId}
+        GROUP BY
+        brand_id = #{brandId}
+    </select>
+
+    <!-- 得到品牌下所有店铺的充值记录 -->
+    <select id="selectShopRechargeLog" resultType="com.resto.brand.web.dto.RechargeLogDto">
+        SELECT COUNT(1) AS shopCount,
+        SUM(charge_money) AS shopNum,
+        SUM(reward_money) AS shopGaNum,
+        (
+        SELECT
+        SUM(charge_money)
+        FROM
+        tb_charge_order
+        WHERE
+        order_state = 1
+        AND type = 1
+        AND
+        <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+        AND shop_detail_id = #{shopId}
+        ) AS shopWeChat,
+        (
+        SELECT
+        SUM(charge_money)
+        FROM
+        tb_charge_order
+        WHERE
+        order_state = 1
+        AND type = 0
+        AND
+        <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+        AND shop_detail_id = #{shopId}
+        ) AS shopPos,
+        SUM(charge_money)-SUM(charge_balance) AS shopCsNum,
+        IF (
+        number_day_now > 0,
+        SUM(
+        reward_money - (((number_day_now - 1) * arrival_amount) + end_amount + reward_balance)
+        ),
+        SUM(
+        reward_money - reward_balance
+        )
+        ) AS shopGaCsNum
+        FROM
+        tb_charge_order
+        WHERE
+        order_state = 1
+        AND
+        <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+        AND shop_detail_id = #{shopId}
+        GROUP BY
+        shop_detail_id = #{shopId}
+    </select>
+
+
+  <select id="getChargeSumInfo" parameterType="java.util.Map" resultType="java.util.Map">
+    select shop_detail_id shopId, COUNT(1) chargeCount, SUM(charge_money) chargeMoney from tb_charge_order where order_state = 1 and finish_time &gt;= CONCAT(#{beginDate}, ' 00:00:00') and finish_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
+    <if test="shopId != null">
+      and shop_detail_id = #{shopId}
+    </if>
+    <if test="chart != null">
+      GROUP BY shop_detail_id,customer_id
+    </if>
+    <if test="chart == null">
+      GROUP BY customer_id
+    </if>
+  </select>
+
+    <select id="selectCustomerChargeOrder" resultType="java.lang.String">
+        select customer_id from tb_charge_order where order_state = 1
+        <if test="list != null and list.size() > 0">
+            and customer_id in
+            <foreach collection="list" item="customerId" open="(" separator="," close=")">
+                #{customerId}
+            </foreach>
+        </if>
+    </select>
+
+
+    <select id="selectTotalBalanceByTimeAndShopId" resultType="java.math.BigDecimal">
+
+        select sum(charge_money)
+        from tb_charge_order
+        where order_state = 1
+        <if test="shopId != null">
+            and shop_detail_id = #{shopId}
+        </if>
+        and finish_time &gt;= CONCAT(#{monthBegin},' 00:00:00')
+        and finish_time &lt;= CONCAT(#{monthEnd},' 23:59:59')
+
+    </select>
+
+</mapper>
