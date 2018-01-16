@@ -8281,10 +8281,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         }
                         if (result.containsKey("ERROR")) {
                             log.error("微信退款失败！失败信息：" + new JSONObject(result).toString());
-                            throw new RuntimeException(new JSONObject(result).toString());
+                            refundPayment.setRemark("微信退还金额：" + refund + "失败，以线下退还现金的形式返还");
+                            refundPayment.setPaymentModeId(PayMode.REFUND_CRASH);
+                        }else{
+                            refundPayment.setResultData(JSON.toJSONString(result));
+                            refundPayment.setRemark("微信退款：" + refundPayment.getPayValue());
                         }
-                        refundPayment.setResultData(JSON.toJSONString(result));
-                        refundPayment.setRemark("微信退款：" + refundPayment.getPayValue());
                     } else {
                         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
                         //支付宝支付
@@ -8298,10 +8300,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         String resultJson = AliPayUtils.refundPay(map);
                         if (resultJson.indexOf("ERROR") != -1) {
                             log.error("支付宝退款失败！失败信息：" + resultJson);
-                            throw new RuntimeException(resultJson);
+                            refundPayment.setPaymentModeId(PayMode.REFUND_CRASH);
+                            refundPayment.setRemark("支付宝退还金额：" + refund + "失败，以线下退还现金的形式返还");
+                        }else {
+                            refundPayment.setResultData(new JSONObject(resultJson).toString());
+                            refundPayment.setRemark("支付宝退款：" + refundPayment.getPayValue());
                         }
-                        refundPayment.setResultData(new JSONObject(resultJson).toString());
-                        refundPayment.setRemark("支付宝退款：" + refundPayment.getPayValue());
                     }
                     orderPaymentItemService.insert(refundPayment);
                     refundPaymentList.add(refundPayment);
