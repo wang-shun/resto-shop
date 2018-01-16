@@ -1700,7 +1700,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
                     AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ? brandSetting.getAliAppId() : shopDetail.getAliAppId().trim(),
                             StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ? brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
-                            StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
+                            StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim(),
+                            shopDetail.getAliEncrypt());
                     Map map = new HashMap();
                     map.put("out_trade_no", order.getId());
                     map.put("refund_amount", aliPay.add(aliRefund));
@@ -1796,7 +1797,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ? brandSetting.getAliAppId() : shopDetail.getAliAppId().trim(),
                 StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ? brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
-                StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
+                StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim(),
+                shopDetail.getAliEncrypt());
         Map map = new HashMap();
         map.put("out_trade_no", order.getId());
         map.put("refund_amount", refundTotal);
@@ -7820,7 +7822,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
                             AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ? brandSetting.getAliAppId() : shopDetail.getAliAppId().trim(),
                                     StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ? brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
-                                    StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
+                                    StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim(),
+                                    shopDetail.getAliEncrypt());
                             Map map = new HashMap();
                             map.put("out_trade_no", o.getId());
                             map.put("refund_amount", refundTotal);
