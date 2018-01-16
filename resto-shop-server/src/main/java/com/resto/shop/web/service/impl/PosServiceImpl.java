@@ -662,6 +662,11 @@ public class PosServiceImpl implements PosService {
         return orderService.posSelectNotCancelledOrdersIdByDate(shopId, beginDate, endDate);
     }
 
+    @Override
+    public void posCallNumber(String orderId) {
+        orderService.callNumber(orderId);
+    }
+
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
         String orderId = orderDto.getId();
         StringBuffer backUps = new StringBuffer();
