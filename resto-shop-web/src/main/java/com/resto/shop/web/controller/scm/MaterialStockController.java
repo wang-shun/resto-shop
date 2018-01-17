@@ -3,6 +3,7 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.scm.web.dto.MaterialStockDo;
+import com.resto.scm.web.model.MdMaterialConsumeDetail;
 import com.resto.scm.web.service.MaterialStockService;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.controller.GenericController;
@@ -10,6 +11,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import javax.annotation.Resource;
 import java.util.List;
 
@@ -39,9 +42,18 @@ public class MaterialStockController extends GenericController {
 
     @RequestMapping("/list_all")
     @ResponseBody
-    public Result listData(String shopId) {
+    public Result listData(String shopId,String startTime,String endTime) {
         String shopDetailId =StringUtils.isEmpty(shopId)?this.getCurrentShopId():shopId;
-        List<MaterialStockDo> list = materialstockService.queryJoin4Page(shopDetailId);
+        List<MaterialStockDo> list = materialstockService.queryJoin4Page(shopDetailId,startTime,endTime);
+        return getSuccessResult(list);
+
+    }
+
+    @RequestMapping("/findMaterialStockConsumeDetail")
+    @ResponseBody
+    public Result findMaterialStockConsumeDetail(String shopId,Long materialId) {
+        String shopDetailId =StringUtils.isEmpty(shopId)?this.getCurrentShopId():shopId;
+        List<MdMaterialConsumeDetail> list = materialstockService.findMaterialStockConsumeDetailByMaterialId(shopDetailId,materialId);
         return getSuccessResult(list);
 
     }
