@@ -62,8 +62,6 @@ public interface OffLineOrderMapper  extends GenericDao<OffLineOrder,String> {
 
     OffLineOrder selectSumByTimeSourceAndShopId(@Param("orderType") int offlinePos, @Param("shopId") String id,@Param("beginDate") Date begin,@Param("endDate") Date end);
 
-    List<OrderNumDto> selectOrderNumByTimeAndBrandId(@Param("brandId") String brandId, @Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
-
     /**
      * 结店 时 查询线下 日 和月的线下数据
      * @param todayBegin

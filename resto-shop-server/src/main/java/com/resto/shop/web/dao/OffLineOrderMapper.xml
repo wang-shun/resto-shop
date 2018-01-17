@@ -154,16 +154,6 @@ and
         AND resource = #{orderType}
     </select>
 
-    <select id="selectOrderNumByTimeAndBrandId" resultType="com.resto.shop.web.dto.OrderNumDto">
-        select shop_detail_id shopId, sum(enter_count)num  from tb_off_line_order
-        WHERE  <![CDATA[
-           create_time >= #{beginDate} AND create_time <= #{endDate}
-         ]]> and state = 1
-        GROUP BY shop_detail_id
-
-    </select>
-
-
     <select id="selectDateAndMonthByShopId" resultType="com.resto.shop.web.dto.UnderLineOrderDto">
 
         SELECT a.todayEnterCount,a.todayEnterTotal,a.todayDeliverOrders,a.todayOrderBooks ,b.monthEnterCount,b.monthEnterTotal,b.monthDeliverOrders,b.monthOrderBooks FROM
