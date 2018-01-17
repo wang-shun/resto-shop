@@ -65,14 +65,13 @@ public class TotalIncomeController extends GenericController {
 
     @RequestMapping("/list")
     public String list() {
-//        Date date = new Date();
-//        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
-//            getRequest().setAttribute("netOpen", true);
-//            return "notopen";
-//        }else{
-//            return "totalIncome/list";
-//        }
-        return "totalIncome/list";
+        Date date = new Date();
+        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+            getRequest().setAttribute("netOpen", true);
+            return "notopen";
+        }else{
+            return "totalIncome/list";
+        }
     }
 
 

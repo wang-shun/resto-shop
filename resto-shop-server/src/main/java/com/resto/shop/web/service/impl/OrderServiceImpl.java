@@ -9370,12 +9370,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap) {
-        return orderMapper.callProcDayAllOrderItem(selectMap);
+        return orderMapperReport.callProcDayAllOrderItem(selectMap);
     }
 
     @Override
     public List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap) {
-        return orderMapper.callProcDayAllOrderPayMent(selectMap);
+        return orderMapperReport.callProcDayAllOrderPayMent(selectMap);
     }
 
     @Override
@@ -10072,7 +10072,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<OrderNumDto> selectOrderNumByTimeAndBrandId(String brandId, String begin, String end) {
         Date beginDate = DateUtil.getformatBeginDate(begin);
         Date endDate = DateUtil.getformatEndDate(end);
-        return orderMapper.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
+        return orderMapperReport.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
     }
 
     public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, BigDecimal posDiscount, Order order, BigDecimal eraseMoney,
