@@ -379,6 +379,7 @@ public class PosServiceImpl implements PosService {
             order.setPaymentAmount(BigDecimal.valueOf(0));
             order.setAllowCancel(false);
             order.setAllowContinueOrder(false);
+            order.setPayMode(json.getInt("payMode"));
             orderService.update(order);
             if(!StringUtils.isEmpty(order.getParentOrderId())){
                 updateParent(order);
