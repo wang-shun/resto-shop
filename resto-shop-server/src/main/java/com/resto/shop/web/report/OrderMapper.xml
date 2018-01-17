@@ -185,6 +185,19 @@
         <result column="waimaiPrice" property="waimaiPrice" jdbcType="DECIMAL"/>
     </resultMap>
 
+    <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id"/>
+        <result column="order_money" property="orderMoney"/>
+        <result column="order_mode" property="orderMode"/>
+        <result column="pay_type" property="payType"/>
+        <result column="amount_with_children" property="amountWithChildren"/>
+        <result column="create_time" property="createTime"/>
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItemId" property="id"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+            <result column="pay_value" property="payValue"/>
+        </collection>
+    </resultMap>
 
     <sql id="Base_Column_List">
         id, table_number, customer_count, accounting_time,
@@ -450,5 +463,19 @@
         AND o.shop_detail_id=#{2}
         GROUP BY o.id) t2;
         --      AND o.brand_id=brandId) t2;
+    </select>
+
+
+
+    <select id="selectListByShopId" resultMap="consumedOrderByshopId">
+        SELECT
+        o.id,o.order_money,oi.payment_mode_id ,oi.pay_value,o.create_time
+        FROM
+        tb_order o
+        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (2, 10, 11, 12)
+        and o.production_status in (2,3) AND
+        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
     </select>
 </mapper>

@@ -33,4 +33,14 @@ public interface OrderMapperReport{
 
 	ShopOrderReportDto procDayAllOrderItemShop(Date beginDate, Date endDate, String shopId);
 
+	/**
+	 * 查询店铺下所有的已消费的订单
+	 * @param begin
+	 * @param end
+	 * @param shopId
+	 * @return
+	 */
+
+	List<Order> selectListByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String shopId);
+
 }

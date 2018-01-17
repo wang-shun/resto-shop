@@ -271,20 +271,6 @@
         </collection>
     </resultMap>
 
-    <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
-        <id column="id" property="id"/>
-        <result column="order_money" property="orderMoney"/>
-        <result column="order_mode" property="orderMode"/>
-        <result column="pay_type" property="payType"/>
-        <result column="amount_with_children" property="amountWithChildren"/>
-        <result column="create_time" property="createTime"/>
-        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
-            <id column="orderPaymentItemId" property="id"/>
-            <result column="payment_mode_id" property="paymentModeId"/>
-            <result column="pay_value" property="payValue"/>
-        </collection>
-    </resultMap>
-
     <resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
         <id property="tag" column="tag"/>
         <id column="id" property="id" jdbcType="VARCHAR"/>
@@ -2425,23 +2411,6 @@ GROUP BY r.table_number
         and t.employee_id = #{employeeId} and t.shop_detail_id = #{shopId}
 
     </select>
-
-
-
-    <select id="selectListByShopId" resultMap="consumedOrderByshopId">
-        SELECT
-        o.id,o.order_money,oi.payment_mode_id ,oi.pay_value,o.create_time
-        FROM
-        tb_order o
-        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
-        WHERE
-        o.order_state IN (2, 10, 11, 12)
-        and o.production_status in (2,3) AND
-        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
-    </select>
-
-
-
 
     <!-- 根据订单状态和生产状态查询指定店铺的订单   不包含包含外卖订单-->
     <select id="selectByOrderSatesAndProductionStates" resultType="Order">
