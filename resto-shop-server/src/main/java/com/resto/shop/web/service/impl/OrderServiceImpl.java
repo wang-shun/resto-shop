@@ -20,12 +20,14 @@ import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
+import com.resto.shop.web.datasource.DataSourceContextHolderReport;
 import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
+import com.resto.shop.web.report.OrderMapperReport;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.BrandAccountSendUtil;
 import com.resto.shop.web.util.LogTemplateUtils;
@@ -74,6 +76,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private OrderMapper orderMapper;
+
+    @Resource
+    private OrderMapperReport orderMapperReport;
 
     @Resource
     private OrderItemMapper orderitemMapper;
@@ -1695,7 +1700,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
                     AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ? brandSetting.getAliAppId() : shopDetail.getAliAppId().trim(),
                             StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ? brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
-                            StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
+                            StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim(),
+                            shopDetail.getAliEncrypt());
                     Map map = new HashMap();
                     map.put("out_trade_no", order.getId());
                     map.put("refund_amount", aliPay.add(aliRefund));
@@ -1791,7 +1797,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ? brandSetting.getAliAppId() : shopDetail.getAliAppId().trim(),
                 StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ? brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
-                StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
+                StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim(),
+                shopDetail.getAliEncrypt());
         Map map = new HashMap();
         map.put("out_trade_no", order.getId());
         map.put("refund_amount", refundTotal);
@@ -5346,12 +5353,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Map<String, Object> callMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
         //封装品牌的数据
+        DataSourceContextHolderReport.setDataSourceName(brandId);
         BrandOrderReportDto brandOrderReportDto;
         Map<String, Object> selectBrandMap = new HashMap<>();
         selectBrandMap.put("beginDate", beginDate);
         selectBrandMap.put("endDate", endDate);
         selectBrandMap.put("brandId", brandId);
-        brandOrderReportDto=orderMapper.procDayAllOrderItemBrand(selectBrandMap);
+        brandOrderReportDto=orderMapperReport.procDayAllOrderItemBrand(selectBrandMap);
         brandOrderReportDto.setBrandName(brandName);
         if(brandOrderReportDto.getOrderCount()!=0&&brandOrderReportDto.getOrderPrice()!=null){
             BigDecimal singlePrice = new BigDecimal(brandOrderReportDto.getOrderPrice().doubleValue()/brandOrderReportDto.getOrderCount());
@@ -7814,7 +7822,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                             BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());
                             AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ? brandSetting.getAliAppId() : shopDetail.getAliAppId().trim(),
                                     StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ? brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
-                                    StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim());
+                                    StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim(),
+                                    shopDetail.getAliEncrypt());
                             Map map = new HashMap();
                             map.put("out_trade_no", o.getId());
                             map.put("refund_amount", refundTotal);
@@ -10206,7 +10215,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             ShopOrderReportDto shopOrderReportDto= new ShopOrderReportDto();
             Date begin = DateUtil.getformatBeginDate(beginDate);
             Date end = DateUtil.getformatEndDate(endDate);
-            shopOrderReportDto=orderMapper.procDayAllOrderItemShop(begin,end,shopDetail.getId());
+            shopOrderReportDto=orderMapperReport.procDayAllOrderItemShop(begin,end,shopDetail.getId());
             BigDecimal initial_=new BigDecimal("0.00");
             if(shopOrderReportDto.getShop_orderCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
                 BigDecimal ssinglePrice= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_orderCount());

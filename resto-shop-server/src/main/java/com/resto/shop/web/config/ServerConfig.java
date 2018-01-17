@@ -5,6 +5,7 @@ import javax.annotation.Resource;
 import com.resto.brand.web.service.*;
 import com.resto.brand.web.service.OrderRemarkService;
 import com.resto.brand.web.service.TableQrcodeService;
+import com.resto.shop.web.datasource.DynamicDataSourceReport;
 import com.resto.shop.web.service.*;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.context.annotation.Bean;
@@ -91,6 +92,11 @@ public class ServerConfig {
     @Bean
     public DynamicDataSource dataSource(){
         return new DynamicDataSource();
+    }
+
+    @Bean
+    public DynamicDataSourceReport dynamicDataSourceReport(){
+        return new DynamicDataSourceReport();
     }
 
     @Bean
