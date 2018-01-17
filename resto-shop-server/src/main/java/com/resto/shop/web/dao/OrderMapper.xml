@@ -2014,17 +2014,6 @@
 
     </select>
 
-    <select id="selectListByTime" resultMap="selectOrdersMap">
-        CALL
-        <if test="shopId != null and shopId != ''">
-            proc_order_list_by_shop(#{beginDate},#{endDate},#{shopId})
-        </if>
-        <if test="customerId != null and customerId != ''">
-            proc_order_list_by_customer(#{beginDate},#{endDate},#{customerId})
-        </if>
-    </select>
-
-
     <select id="selectOrderDetails" resultMap="selectOrderDetailsMap">
         SELECT
         o.shop_detail_id,
@@ -3213,10 +3202,6 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         and create_time >= '2017-06-29'
     </select>
 
-    <select id="callProcDayAllOrderItem" resultType="com.resto.brand.web.dto.ShopIncomeDto">
-        CALL <if test="shopId == null">proc_day_all_order_item(#{beginDate},#{endDate},#{pageNo})</if>
-        <if test="shopId != null">proc_day_all_order_item_by_shop(#{beginDate},#{endDate},#{shopId},#{pageNo})</if>
-    </select>
     <resultMap id="shopMap" type="com.resto.brand.web.dto.ShopOrderReportDto">
         <result column="orderCount" property="shop_orderCount" jdbcType="INTEGER"/>
         <result column="orderPrice" property="shop_orderPrice" jdbcType="DECIMAL"/>
@@ -3228,9 +3213,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         <result column="waimaiCount" property="shop_waimaiCount" jdbcType="INTEGER"/>
         <result column="waimaiPrice" property="shop_waimaiPrice" jdbcType="DECIMAL"/>
     </resultMap>
-    <select id="procDayAllOrderItemShop" resultMap="shopMap">
-       call proc_day_all_order_item_shop(#{0},#{1},#{2})
-    </select>
+
     <resultMap id="brandMap" type="com.resto.brand.web.dto.BrandOrderReportDto">
         <result column="orderCount" property="orderCount" jdbcType="INTEGER"/>
         <result column="orderPrice" property="orderPrice" jdbcType="DECIMAL"/>
@@ -3242,14 +3225,6 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         <result column="waimaiCount" property="waimaiCount" jdbcType="INTEGER"/>
         <result column="waimaiPrice" property="waimaiPrice" jdbcType="DECIMAL"/>
     </resultMap>
-    <select id="procDayAllOrderItemBrand" resultMap="brandMap">
-        call proc_day_all_order_item_brand(#{beginDate},#{endDate},#{brandId})
-    </select>
-
-    <select id="callProcDayAllOrderPayMent" resultType="com.resto.brand.web.dto.ShopIncomeDto">
-        CALL <if test="shopId == null">proc_day_all_order_payment(#{beginDate},#{endDate},#{pageNo})</if>
-        <if test="shopId != null">proc_day_all_order_payment_by_shop(#{beginDate},#{endDate},#{shopId},#{pageNo})</if>
-    </select>
 
     <select id="addRefundArticleDto" resultType="com.resto.brand.web.dto.RefundArticleOrder">
         call proc_refund_article_report(#{beginDate},#{endDate})
@@ -3456,23 +3431,6 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 
     <select id="selectAfterValidOrderByCustomerId" resultType="Order">
         select * from tb_order where customer_id = #{customerId} and order_state in (2,10,11,12) and production_status != 6 order by create_time desc limit 1
-    </select>
-
-    <select id="selectOrderNumByTimeAndBrandId" resultType="com.resto.shop.web.dto.OrderNumDto">
-
-        SELECT
-        COUNT(DISTINCT o.id) num,
-        o.shop_detail_id shopId
-        FROM
-        tb_order o
-        INNER JOIN tb_order_payment_item opi ON o.id = opi.order_id
-        WHERE
-        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-        AND o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3)
-        AND o.brand_id = #{brandId}
-        GROUP BY
-        o.shop_detail_id;
     </select>
 
     <select id="posSyncSelectById" parameterType="java.lang.String" resultType="Order">

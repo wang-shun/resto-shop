@@ -273,8 +273,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<ArticleSellDto> selectShopArticleSellByDateAndId(@Param("shopId")String shopId,@Param("beginDate") Date begin, @Param("endDate")Date end,@Param("sort") String sort);
 
-	List<Order> selectListByTime(@Param("beginDate")Date begin, @Param("endDate")Date end,@Param("shopId") String shopId,@Param("customerId") String customerId);
-
 	Order selectOrderDetails(String orderId);
 
 
@@ -702,15 +700,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 
-
-	List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap);
-
-	ShopOrderReportDto procDayAllOrderItemShop(Date beginDate, Date endDate, String shopId);
-
-	BrandOrderReportDto procDayAllOrderItemBrand(Map<String, Object> selectMap);
-
-	List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap);
-
 	void fixAllowContinueOrder(@Param("beginDate") Date begin);
 
 	List<Order> getAllowAppraise();
@@ -782,15 +771,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
      */
 	Order selectAfterValidOrderByCustomerId(String customerId);
-
-	/**
-	 * 每个店铺的交易笔数
-	 * @param brandId
-	 * @param beginDate
-	 * @param endDate
-	 * @return
-	 */
-    List<OrderNumDto> selectOrderNumByTimeAndBrandId(@Param("brandId") String brandId, @Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
 
 	/**
 	 * Pos 2.0 数据同步方法，根据 orderId 查询订单信息
