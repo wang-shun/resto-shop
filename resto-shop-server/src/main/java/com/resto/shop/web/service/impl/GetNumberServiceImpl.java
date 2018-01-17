@@ -56,8 +56,8 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
     }
 
     @Override
-    public Integer selectCount(String tableType,Date date) {
-        return getNumberMapper.selectCount(tableType,date).size();
+    public Integer selectCount(String tableType,Date date,String shopId) {
+        return getNumberMapper.selectCount(tableType,date,shopId).size();
     }
 
     @Override

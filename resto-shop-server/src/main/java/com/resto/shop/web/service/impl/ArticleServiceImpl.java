@@ -175,6 +175,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             if (count != null) {
                 article.setCurrentWorkingStock(count);
             }
+            if("".equals(article.getRecommendId())){
+                article.setRecommendId(null);
+                article.setRecommendCount(0);
+            }
         }
         getArticleDiscount(currentShopId, articleList, show);
         return articleList;
@@ -194,6 +198,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             }
             article.setMonthlySales(articleMapper.selectSumByMonthlySales(article.getId(), dateNowStr));
             article.setRecommendCategoryId(recommendCcategoryId);
+            if("".equals(article.getRecommendId())){
+                article.setRecommendId(null);
+                article.setRecommendCount(0);
+            }
         }
         getArticleDiscount(currentShopId, articleList, show);
         RecommendCategory recommendCategory=recommendCategoryService.selectById(recommendCcategoryId);

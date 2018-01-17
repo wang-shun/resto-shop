@@ -2,7 +2,6 @@ package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
-import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.web.model.AccountSetting;
@@ -30,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.resto.shop.web.service.impl.OrderServiceImpl.generateString;
@@ -151,6 +151,9 @@ public class PosServiceImpl implements PosService {
                     if(orderPaymentDto.getPaymentModeId() == PayMode.COUPON_PAY){
                         orderPaymentDto.setResultData("手机端完成的优惠券支付");
                     }
+                    if(orderPaymentDto.getPaymentModeId() == PayMode.REWARD_PAY){
+                        orderPaymentDto.setResultData("手机端完成的充值赠送金额支付");
+                    }
                     orderPaymentDtos.add(orderPaymentDto);
                 }
                 jsonObject.put("orderPayment", orderPaymentDtos);
@@ -187,6 +190,9 @@ public class PosServiceImpl implements PosService {
             }
             if(orderPaymentDto.getPaymentModeId() == PayMode.COUPON_PAY){
                 orderPaymentDto.setResultData("手机端完成的优惠券支付");
+            }
+            if(orderPaymentDto.getPaymentModeId() == PayMode.REWARD_PAY){
+                orderPaymentDto.setResultData("手机端完成的充值赠送金额支付");
             }
             orderPaymentDtos.add(orderPaymentDto);
         }
@@ -630,6 +636,15 @@ public class PosServiceImpl implements PosService {
         obj.put("data", sql);
         MQMessageProducer.sendServerCommandToNewPos(obj);
         log.info("\n\n  shopId：" + shopId + "\n   type：" + type + "\n   sql：" + sql);
+    }
+
+    @Override
+    public List<String> getServerOrderIds(String shopId) {
+        Date today = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String beginDate = format.format(DateUtil.getDateBegin(today));
+        String endDate = format.format(DateUtil.getDateEnd(today));
+        return orderService.posSelectNotCancelledOrdersIdByDate(shopId, beginDate, endDate);
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){

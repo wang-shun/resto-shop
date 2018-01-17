@@ -21,7 +21,7 @@ public interface GetNumberService extends GenericService<GetNumber, String> {
 
     int getWaitNumber(GetNumber getNumber);
 
-    Integer selectCount(String tableType, Date date);
+    Integer selectCount(String tableType, Date date, String shopId);
 
     GetNumber updateGetNumber(GetNumber getNumber, Integer state);
 
