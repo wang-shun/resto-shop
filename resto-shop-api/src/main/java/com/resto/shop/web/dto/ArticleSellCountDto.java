@@ -10,6 +10,8 @@ public class ArticleSellCountDto {
     private int totalCount;
     private int mealFeeNumber;
 
+    private String createTime;
+
 
     public String getArticleId() {
         return articleId;
@@ -44,6 +46,14 @@ public class ArticleSellCountDto {
         this.totalCount = totalCount;
     }
 
+    public String getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(String createTime) {
+        this.createTime = createTime;
+    }
+
     @Override
     public String toString() {
         return "ArticleSellCountDto{" +
@@ -51,6 +61,7 @@ public class ArticleSellCountDto {
                 ", articleName='" + articleName + '\'' +
                 ", totalCount=" + totalCount +
                 ", mealFeeNumber=" + mealFeeNumber +
+                ", createTime='" + createTime + '\'' +
                 '}';
     }
 }
