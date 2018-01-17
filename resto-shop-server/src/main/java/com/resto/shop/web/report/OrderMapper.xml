@@ -127,40 +127,6 @@
         </collection>
     </resultMap>
 
-    <resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
-        <id property="tag" column="tag"/>
-        <id column="id" property="id" jdbcType="VARCHAR"/>
-        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
-        <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
-        <result column="order_state" property="orderState" jdbcType="INTEGER"/>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="ver_code" property="verCode" jdbcType="VARCHAR"/>
-        <result column="order_state" property="orderState" jdbcType="VARCHAR"/>
-        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
-        <result column="production_status" property="productionStatus"/>
-        <result column="parent_order_id" property="parentOrderId"/>
-        <result column="service_price" property="servicePrice"/>
-        <result column="order_mode" property="orderMode"/>
-        <result column="distribution_mode_id" property="distributionModeId"/>
-        <result column="table_number" property="tableNumber"/>
-
-        <association property="customer" javaType="com.resto.shop.web.model.Customer">
-            <id column="customer_id" property="id"/>
-            <result column="telephone" property="telephone"/>
-        </association>
-
-        <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
-            <id column="appraise_id" property="id"/>
-            <result column="level" property="level"/>
-        </association>
-
-        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
-            <id column="orderPaymentItem_id" property="id"/>
-            <result column="pay_value" property="payValue"/>
-            <result column="payment_mode_id" property="paymentModeId"/>
-        </collection>
-    </resultMap>
-
     <resultMap id="shopMap" type="com.resto.brand.web.dto.ShopOrderReportDto">
         <result column="orderCount" property="shop_orderCount" jdbcType="INTEGER"/>
         <result column="orderPrice" property="shop_orderPrice" jdbcType="DECIMAL"/>
