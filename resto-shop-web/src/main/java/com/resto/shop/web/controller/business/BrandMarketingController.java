@@ -196,14 +196,13 @@ public class BrandMarketingController extends GenericController{
         selectMap.put("redPacket","redPacket");
         for(RedPacketDto redPacketDto : redPacketDtos){
             selectMap.put("shopDetailId",redPacketDto.getShopDetailId());
-            Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
+            Map<String, BigDecimal> useOrder = redPacketService.selectUseRedOrder(selectMap);
             if(useOrder == null){
                 redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
                 redPacketDto.setUseRedOrderMoney(BigDecimal.ZERO);
             }else{
-                String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
-                redPacketDto.setUseRedOrderCount(new BigDecimal(useRedOrder[0]));
-                redPacketDto.setUseRedOrderMoney(new BigDecimal(useRedOrder[1]));
+                redPacketDto.setUseRedOrderCount(useOrder.get("useRedOrderCount"));
+                redPacketDto.setUseRedOrderMoney(useOrder.get("useRedOrderMoney"));
             }
         }
         return redPacketDtos;
@@ -228,14 +227,13 @@ public class BrandMarketingController extends GenericController{
         selectMap.put("chargeOrder","chargeOrder");
         for(RedPacketDto redPacketDto : redPacketDtos){
             selectMap.put("shopDetailId",redPacketDto.getShopDetailId());
-            Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
+            Map<String, BigDecimal> useOrder = redPacketService.selectUseRedOrder(selectMap);
             if(useOrder == null){
                 redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
                 redPacketDto.setUseRedOrderMoney(BigDecimal.ZERO);
             }else{
-                String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
-                redPacketDto.setUseRedOrderCount(new BigDecimal(useRedOrder[0]));
-                redPacketDto.setUseRedOrderMoney(new BigDecimal(useRedOrder[1]));
+                redPacketDto.setUseRedOrderCount(useOrder.get("useRedOrderCount"));
+                redPacketDto.setUseRedOrderMoney(useOrder.get("useRedOrderMoney"));
             }
         }
         return redPacketDtos;
@@ -260,14 +258,13 @@ public class BrandMarketingController extends GenericController{
         selectMap.put("getNumber","getNumber");
         for(RedPacketDto redPacketDto : redPacketDtos){
             selectMap.put("shopDetailId",redPacketDto.getShopDetailId());
-            Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
+            Map<String, BigDecimal> useOrder = redPacketService.selectUseRedOrder(selectMap);
             if(useOrder == null){
                 redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
                 redPacketDto.setUseRedOrderMoney(BigDecimal.ZERO);
             }else{
-                String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
-                redPacketDto.setUseRedOrderCount(new BigDecimal(useRedOrder[0]));
-                redPacketDto.setUseRedOrderMoney(new BigDecimal(useRedOrder[1]));
+                redPacketDto.setUseRedOrderCount(useOrder.get("useRedOrderCount"));
+                redPacketDto.setUseRedOrderMoney(useOrder.get("useRedOrderMoney"));
             }
         }
         return redPacketDtos;

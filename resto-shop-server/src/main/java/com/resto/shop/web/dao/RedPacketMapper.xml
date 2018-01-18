@@ -99,125 +99,85 @@
     </update>
 
     <select id="selectRedPacketLog" resultType="com.resto.brand.web.dto.RedPacketDto">
-        select
-        trp.shop_detail_id shopDetailId,IFNULL(COUNT(1),0) redCount,IFNULL(SUM(red_money),0) redMoney,
-        IFNULL((SUM((select COUNT(1) from (
-        select top.result_data
-        from tb_order td
-        inner join tb_order_payment_item top
-        on td.id = top.order_id
-        where td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3))
-        and top.payment_mode_id in (${payMode})
-        and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
-        and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-        GROUP BY top.result_data
-        ) r where r.result_data = trp.id))),0) useRedCount,
-        IFNULL((SUM((select SUM(r.payValue) from (
-        select top.result_data, SUM(top.pay_value) payValue from tb_order td
-        inner join tb_order_payment_item top
-        on td.id = top.order_id
-        where td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3))
-        and top.payment_mode_id in (${payMode})
-        and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
-        and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-        GROUP BY top.result_data
-        ) r where r.result_data = trp.id))),0) useRedMoney
-        from tb_red_packet trp
-		where trp.red_type in (${redType})
-        and trp.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
-        and trp.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
-        GROUP BY trp.shop_detail_id
+        SELECT
+        r.shop_detail_id shopDetailId,
+        COUNT(1) redCount,
+        SUM(r.red_money) redMoney,
+        IFNULL(SUM(r.useCount),0) useRedCount,
+        IFNULL(SUM(r.useMoney),0) useRedMoney
+        FROM
+        (
+        SELECT
+        trp.shop_detail_id,
+        trp.red_money,
+        IF(COUNT(1) = 1 and top.id is null,0,COUNT(1)) useCount,
+        SUM(top.pay_value) useMoney
+        FROM
+        tb_red_packet trp
+        LEFT JOIN tb_order_payment_item top ON top.to_pay_id = trp.id
+        AND top.pay_time &gt;= CONCAT(#{useBeginDate}, ' 00:00:00')
+        AND top.pay_time &lt;= CONCAT(#{useEndDate}, ' 23:59:59')
+        WHERE
+        trp.red_type IN (${redType})
+        AND trp.create_time &gt;= CONCAT(#{grantBeginDate}, ' 00:00:00')
+        AND trp.create_time &lt;= CONCAT(#{grantEndDate}, ' 23:59:59')
+        GROUP BY trp.id
+        ) r
+        GROUP BY
+        r.shop_detail_id
     </select>
 
     <select id="selectUseRedOrder" resultType="java.util.Map">
-        select CONCAT_WS(',',(
-        IFNULL((select COUNT(1) from (
-        select COUNT(1) count from tb_order td
-        inner join tb_order_payment_item top
-        on td.id = top.order_id
-        where td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3))
-        and top.payment_mode_id in (${payMode})
-        and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
-        and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-        and top.result_data in (
-        <if test="chargeOrder != null">
-            select tco.id from tb_charge_order tco
-            where tco.order_state = 1
-            and tco.reward_money > 0
-            and tco.create_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
-            and tco.create_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
-            and tco.shop_detail_id = #{shopDetailId}
-        </if>
-        <if test="redPacket != null">
-            select trp.id from tb_red_packet trp
-            where trp.red_type in (${redType})
-            and trp.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
-            and trp.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
-            and trp.shop_detail_id = #{shopDetailId}
-        </if>
-        <if test="getNumber != null">
-            select tgn.id from tb_get_number tgn
-            where tgn.state in (3)
-            and tgn.final_money > 0
-            and tgn.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
-            and tgn.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
-            and tgn.shop_detail_id = #{shopDetailId}
-        </if>
-        <if test="coupon != null">
-            select id from tb_coupon
-            where using_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
-            and using_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-            and is_used = 1
-            and coupon_type = ${couponTypeInt}
-        </if>
-        )
-        and td.parent_order_id is null
-        GROUP BY td.id) r),0)),(
-        IFNULL((select SUM(r.orderMoney) from (
-        select td.order_money orderMoney from tb_order td
-        inner join tb_order_payment_item top
-        on td.id = top.order_id
-        where td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3))
-        and top.payment_mode_id in (${payMode})
-        and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
-        and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-        and top.result_data in (
-          <if test="chargeOrder != null">
-              select tco.id from tb_charge_order tco
-              where tco.order_state = 1
-              and tco.reward_money > 0
-              and tco.create_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
-              and tco.create_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
-              and tco.shop_detail_id = #{shopDetailId}
-          </if>
-          <if test="redPacket != null">
-              select trp.id from tb_red_packet trp
-              where trp.red_type in (${redType})
-              and trp.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
-              and trp.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
-              and trp.shop_detail_id = #{shopDetailId}
-          </if>
-          <if test="getNumber != null">
-              select tgn.id from tb_get_number tgn
-              where tgn.state in (3)
-              and tgn.final_money > 0
-              and tgn.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
-              and tgn.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
-              and tgn.shop_detail_id = #{shopDetailId}
-          </if>
-          <if test="coupon != null">
-              select id from tb_coupon
-              where using_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
-              and using_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-              and is_used = 1
-              and coupon_type = ${couponTypeInt}
-          </if>
-        )
-        GROUP BY td.id) r),0))) useOrder;
+        SELECT
+            IFNULL(SUM(r.orderCount),0) useRedOrderCount,
+            IFNULL(SUM(r.orderCount), 0) useRedOrderMoney
+        FROM
+        (
+            SELECT
+                SUM(IF(td.parent_order_id IS NULL,1,0)) orderCount,
+                td.order_money
+            FROM
+            tb_order td
+            INNER JOIN tb_order_payment_item top ON td.id = top.order_id
+            WHERE
+                td.order_state IN (2, 10, 11, 12)
+                AND td.production_status IN (2, 3)
+                AND top.pay_time &gt;= CONCAT(#{useBeginDate},' 00:00:00')
+                AND top.pay_time &lt;= CONCAT(#{useEndDate},' 23:59:59')
+                AND top.to_pay_id in (
+                    <if test="chargeOrder != null">
+                        select tco.id from tb_charge_order tco
+                        where tco.order_state = 1
+                        and tco.reward_money > 0
+                        and tco.create_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
+                        and tco.create_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
+                        and tco.shop_detail_id = #{shopDetailId}
+                    </if>
+                    <if test="redPacket != null">
+                        select trp.id from tb_red_packet trp
+                        where trp.red_type in (${redType})
+                        and trp.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
+                        and trp.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
+                        and trp.shop_detail_id = #{shopDetailId}
+                    </if>
+                    <if test="getNumber != null">
+                        select tgn.id from tb_get_number tgn
+                        where tgn.state in (3)
+                        and tgn.final_money > 0
+                        and tgn.create_time &gt;=  CONCAT(#{grantBeginDate},' 00:00:00')
+                        and tgn.create_time &lt;=  CONCAT(#{grantEndDate},' 23:59:59')
+                        and tgn.shop_detail_id = #{shopDetailId}
+                    </if>
+                    <if test="coupon != null">
+                        select id from tb_coupon
+                        where using_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
+                        and using_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
+                        and is_used = 1
+                        and coupon_type = ${couponTypeInt}
+                    </if>
+                )
+            GROUP BY td.id
+        ) r
     </select>
 
     <select id="selectShareMoneyList" resultType="com.resto.shop.web.dto.ShareMoneyDto">

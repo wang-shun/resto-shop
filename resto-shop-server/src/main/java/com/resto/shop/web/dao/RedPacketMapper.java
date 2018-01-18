@@ -19,7 +19,7 @@ public interface RedPacketMapper extends GenericDao<RedPacket,String> {
 
     List<RedPacketDto> selectRedPacketLog(Map<String, Object> selectMap);
 
-    Map<String, Object> selectUseRedOrder(Map<String, Object> selectMap);
+    Map<String, BigDecimal> selectUseRedOrder(Map<String, Object> selectMap);
 
     /**
      * 取消订单返还红包
