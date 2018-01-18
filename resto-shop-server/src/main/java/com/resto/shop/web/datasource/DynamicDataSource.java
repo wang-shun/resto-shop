@@ -26,7 +26,6 @@ public class DynamicDataSource extends AbstractRoutingDataSource implements Init
 	@Override
 	protected Object determineCurrentLookupKey() {
 		String dataconfigId = DataSourceContextHolder.getDataSourceName();
-		System.out.println("当前数据源：" + DataSourceContextHolder.getDataSourceName());
 		if(!dataSourceMap.containsKey(dataconfigId)){
 			DatabaseConfig config = databaseConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
 			DruidDataSource druidDataSource = new DruidDataSource();
