@@ -26,6 +26,7 @@ import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.ChargeSettingMapper;
 import com.resto.shop.web.model.*;
+import com.resto.shop.web.report.ChargeOrderMapperReport;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
 import org.json.JSONObject;
@@ -51,14 +52,20 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     private ChargeOrderMapper chargeorderMapper;
 
     @Resource
+	private ChargeOrderMapperReport chargeOrderMapperReport;
+
+    @Resource
     private ChargePaymentService chargePaymentService;
 
     @Resource
     private AccountService accountService;
+
     @Resource
     CustomerService customerService;
+
     @Resource
     OrderPaymentItemService orderPaymentItemService;
+
     @Resource
     BrandService brandService;
 
@@ -284,7 +291,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	 */
 	@Override
 	public List<ChargeOrder> shopChargeCodes(String shopDetailId, Date beginDate, Date endDate) {
-		return chargeorderMapper.shopChargeCodes(shopDetailId,beginDate,endDate);
+		return chargeOrderMapperReport.shopChargeCodes(shopDetailId,beginDate,endDate);
 	}
 
 	/**
@@ -301,7 +308,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	public Map<String, Object> shopChargeCodesSetDto(String shopDetailId, String beginDate, String endDate, String shopname) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
-		List<ChargeOrder>  chargeList=chargeOrderMapper.shopChargeCodes(shopDetailId,begin,end);
+		List<ChargeOrder>  chargeList=chargeOrderMapperReport.shopChargeCodes(shopDetailId,begin,end);
 		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
 		if(chargeList!=null&&chargeList.size()>0){
 	    for (ChargeOrder charge:chargeList) {
@@ -496,7 +503,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
         // TODO Auto-generated method stub
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return chargeOrderMapper.selectRechargeLog(begin,end,brandId);
+        return chargeOrderMapperReport.selectRechargeLog(begin,end,brandId);
     }
 
     @Override
