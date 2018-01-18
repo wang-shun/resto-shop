@@ -17,4 +17,8 @@ public interface ChargeOrderMapperReport{
 
     RechargeLogDto selectRechargeLog(@Param("begin")Date begin, @Param("end")Date end, @Param("brandId")String brandId);
 
+    RechargeLogDto selectShopRechargeLog(@Param("begin")Date begin,@Param("end")Date end,@Param("shopId")String shopId);
+
+    List<ChargeOrder> selectMonthDto(Map<String, Object> selectMap);
+
 }

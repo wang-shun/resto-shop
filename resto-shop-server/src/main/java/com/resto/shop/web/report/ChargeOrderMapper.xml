@@ -138,4 +138,64 @@
         brand_id = #{brandId}
     </select>
 
+    <!-- 得到品牌下所有店铺的充值记录 -->
+    <select id="selectShopRechargeLog" resultType="com.resto.brand.web.dto.RechargeLogDto">
+        SELECT COUNT(1) AS shopCount,
+        SUM(charge_money) AS shopNum,
+        SUM(reward_money) AS shopGaNum,
+        (
+        SELECT
+        SUM(charge_money)
+        FROM
+        tb_charge_order
+        WHERE
+        order_state = 1
+        AND type = 1
+        AND
+        <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+        AND shop_detail_id = #{shopId}
+        ) AS shopWeChat,
+        (
+        SELECT
+        SUM(charge_money)
+        FROM
+        tb_charge_order
+        WHERE
+        order_state = 1
+        AND type = 0
+        AND
+        <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+        AND shop_detail_id = #{shopId}
+        ) AS shopPos,
+        SUM(charge_money)-SUM(charge_balance) AS shopCsNum,
+        IF (
+        number_day_now > 0,
+        SUM(
+        reward_money - (((number_day_now - 1) * arrival_amount) + end_amount + reward_balance)
+        ),
+        SUM(
+        reward_money - reward_balance
+        )
+        ) AS shopGaCsNum
+        FROM
+        tb_charge_order
+        WHERE
+        order_state = 1
+        AND
+        <![CDATA[ create_time>#{begin} AND create_time<#{end}]]>
+        AND shop_detail_id = #{shopId}
+        GROUP BY
+        shop_detail_id = #{shopId}
+    </select>
+
+    <select id="selectMonthDto" parameterType="java.util.Map" resultMap="BaseResultMap">
+        select id, charge_money, reward_money, charge_balance, reward_balance, type, finish_time, customer_id
+        from tb_charge_order
+        where order_state = 1
+        <if test="shopId != null">
+            and shop_detail_id = #{shopId}
+        </if>
+        and finish_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+        and finish_time &lt;= CONCAT(#{endDate},' 23:59:59')
+    </select>
 </mapper>
