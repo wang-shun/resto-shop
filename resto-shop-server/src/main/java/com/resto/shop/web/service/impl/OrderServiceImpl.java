@@ -5353,7 +5353,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Map<String, Object> callMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
         //封装品牌的数据
-        DataSourceContextHolderReport.setDataSourceName(brandId);
         BrandOrderReportDto brandOrderReportDto;
         Map<String, Object> selectBrandMap = new HashMap<>();
         selectBrandMap.put("beginDate", beginDate);
@@ -5486,7 +5485,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> callListByTime(String beginDate, String endDate, String shopId, String customerId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListByTime(begin, end, shopId, customerId);
+        return orderMapperReport.selectListByTime(begin, end, shopId, customerId);
 
     }
 
@@ -5523,7 +5522,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectListByShopId(String beginDate, String endDate, String shopId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListByShopId(begin, end, shopId);
+        return orderMapperReport.selectListByShopId(begin, end, shopId);
     }
 
 
@@ -9556,12 +9555,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap) {
-        return orderMapper.callProcDayAllOrderItem(selectMap);
+        return orderMapperReport.callProcDayAllOrderItem(selectMap);
     }
 
     @Override
     public List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap) {
-        return orderMapper.callProcDayAllOrderPayMent(selectMap);
+        return orderMapperReport.callProcDayAllOrderPayMent(selectMap);
     }
 
     @Override
@@ -10258,7 +10257,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<OrderNumDto> selectOrderNumByTimeAndBrandId(String brandId, String begin, String end) {
         Date beginDate = DateUtil.getformatBeginDate(begin);
         Date endDate = DateUtil.getformatEndDate(end);
-        return orderMapper.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
+        return orderMapperReport.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
     }
 
     public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, BigDecimal posDiscount, Order order, BigDecimal eraseMoney,

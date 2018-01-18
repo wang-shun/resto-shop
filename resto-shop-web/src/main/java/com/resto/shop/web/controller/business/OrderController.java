@@ -54,14 +54,8 @@ public class OrderController extends GenericController{
 
 	@RequestMapping("/list")
 	public String list(){
-		Date date = new Date();
-//		if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
-//			getRequest().setAttribute("netOpen", true);
-//			return "notopen";
-//		}else{
-//			return "orderReport/list";
-//		}
 		return "orderReport/list";
+
 	}
 
 	//查询已消费订单的订单份数和订单金额
