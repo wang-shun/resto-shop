@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.resto.shop.web.report.CustomerMapperReport">
+    <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Customer">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="wechat_id" property="wechatId" jdbcType="VARCHAR"/>
+        <result column="nickname" property="nickname" jdbcType="VARCHAR"/>
+        <result column="telephone" property="telephone" jdbcType="VARCHAR"/>
+        <result column="head_photo" property="headPhoto" jdbcType="VARCHAR"/>
+        <result column="birthday" property="birthday"/>
+        <result column="default_delivery_point" property="defaultDeliveryPoint" jdbcType="INTEGER"/>
+        <result column="is_bind_phone" property="isBindPhone" jdbcType="BIT"/>
+        <result column="regiest_time" property="regiestTime" jdbcType="TIMESTAMP"/>
+        <result column="first_order_time" property="firstOrderTime" jdbcType="TIMESTAMP"/>
+        <result column="last_login_time" property="lastLoginTime" jdbcType="TIMESTAMP"/>
+        <result column="account_id" property="accountId" jdbcType="VARCHAR"/>
+        <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
+        <result column="sex" property="sex" jdbcType="INTEGER"/>
+        <result column="province" property="province" jdbcType="VARCHAR"/>
+        <result column="city" property="city" jdbcType="VARCHAR"/>
+        <result column="country" property="country" jdbcType="VARCHAR"/>
+        <result column="last_order_shop" property="lastOrderShop" jdbcType="VARCHAR"/>
+        <result column="new_notice_time" property="newNoticeTime" jdbcType="TIMESTAMP"/>
+        <result column="share_customer" property="shareCustomer" jdbcType="VARCHAR"/>
+        <result column="register_shop_id" property="registerShopId" jdbcType="VARCHAR"/>
+        <result column="is_now_register" property="isNowRegister"/>
+        <result column="customer_detail_id" property="customerDetailId"/>
+        <result column="bind_phone_time" property="bindPhoneTime"/>
+        <result column="bind_phone_shop" property="bindPhoneShop"/>
+        <result column="real_time_coupon_ids" property="realTimeCouponIds"/>
+        <result column="subscribe" property="subscribe"/>
+        <result column="last_table_number" property="lastTableNumber"/>
+        <result column="birthday_coupon_ids" property="birthdayCouponIds"/>
+        <result column="share_coupon_ids" property="shareCouponIds"/>
+        <result column="serial_number" property="serialNumber"/>
+        <result column="share_link" property="shareLink"/>
+        <result column="useOrder" property="useOrder"/>
+        <result column="chargeOrder" property="chargeOrder"/>
+        <result column="card_id" property="cardId" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <association property="customerDetail" javaType="com.resto.shop.web.model.CustomerDetail">
+            <id column="id" property="id"/>
+            <result column="birth_date" property="birthDate"/>
+            <result column="age" property="age"/>
+            <result column="constellation" property="constellation"/>
+            <result column="vocation" property="vocation"/>
+            <result column="company" property="company"/>
+            <result column="school" property="school"/>
+            <result column="personal_note" property="personalNote"/>
+            <result column="shop_detail_id" property="shopDetailId"/>
+        </association>
+    </resultMap>
+    <sql id="Base_Column_List">
+    id, wechat_id, nickname, telephone, head_photo, birthday, default_delivery_point, is_bind_phone,
+    regiest_time, first_order_time, last_login_time, account_id, brand_id, sex, province,
+    city, country, last_order_shop, new_notice_time, share_customer, is_now_register, customer_detail_id,
+    bind_phone_time, bind_phone_shop, real_time_coupon_ids, subscribe, last_table_number, birthday_coupon_ids,
+    share_coupon_ids,serial_number,share_link,card_id,code
+  </sql>
+
+
+    <select id="selectBrandUser" resultType="java.lang.String">
+        select CONCAT_WS(',',(select count(1) from tb_customer),(select IFNULL(count(1),0) from tb_customer where is_bind_phone=1)
+        ,(select IFNULL(count(1),0) from tb_customer where is_bind_phone=0),(select IFNULL(count(1),0) from tb_customer where sex=1)
+        ,(select IFNULL(count(1),0) from tb_customer where sex=2),(select IFNULL(count(1),0) from tb_customer where sex=0)) count
+    </select>
+
+    <!-- 得到品牌下的所有用户信息，得到用户已消费的订单 -->
+    <select id="selectListMemberUser" resultType="com.resto.brand.web.dto.MemberUserDto">
+        CALL proc_list_member_user(#{beginDate},#{endDate})
+    </select>
+
+</mapper>

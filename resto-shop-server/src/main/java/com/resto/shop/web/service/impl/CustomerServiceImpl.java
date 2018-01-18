@@ -12,6 +12,7 @@ import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.dao.CustomerMapper;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
+import com.resto.shop.web.report.CustomerMapperReport;
 import com.resto.shop.web.service.*;
 
 import javax.annotation.Resource;
@@ -30,6 +31,8 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 
     @Resource
     private CustomerMapper customerMapper;
+    @Resource
+	private CustomerMapperReport customerMapperReport;
     @Resource
     private AccountService accountService;
 	@Resource
@@ -315,12 +318,12 @@ public class CustomerServiceImpl extends GenericServiceImpl<Customer, String> im
 	public List<MemberUserDto> callListMemberUser(String beginDate,String endDate) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-		return customerMapper.selectListMemberUser(begin,end);
+		return customerMapperReport.selectListMemberUser(begin,end);
 	}
 	
 	@Override
 	public String selectBrandUser() {
-		return customerMapper.selectBrandUser();
+		return customerMapperReport.selectBrandUser();
 	}
 
 	@Override
