@@ -43,4 +43,13 @@ public interface OrderMapperReport{
 
 	List<Order> selectListByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String shopId);
 
+	/**
+	 * 查询已消费的订单
+	 * @param begin
+	 * @param end
+	 * @param brandId
+	 * @return
+	 */
+	List<Order> selectListBybrandId(@Param("beginDate")Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
 }
