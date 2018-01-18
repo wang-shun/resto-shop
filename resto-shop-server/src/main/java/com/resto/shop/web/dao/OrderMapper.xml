@@ -3153,10 +3153,6 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         and create_time >= '2017-06-29'
     </select>
 
-    <select id="addRefundArticleDto" resultType="com.resto.brand.web.dto.RefundArticleOrder">
-        call proc_refund_article_report(#{beginDate},#{endDate})
-    </select>
-
     <select id="selectMealServiceSales" resultType="java.util.Map">
         SELECT
         td.shop_detail_id shopId,

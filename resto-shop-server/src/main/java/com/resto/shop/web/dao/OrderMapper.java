@@ -688,14 +688,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
     void colseOrder(String orderId);
 
-	/**
-	 * 查询退菜报表list
-	 * @param beginDate
-	 * @param endDate
-	 * @return
-	 */
-	List<RefundArticleOrder> addRefundArticleDto(@Param("beginDate") String beginDate,@Param("endDate") String endDate);
-
 	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
 
 	/**

@@ -473,4 +473,20 @@
         and o.brand_id = #{brandId}
         GROUP BY o.id
     </select>
+
+    <select id="addRefundArticleDto" resultType="com.resto.brand.web.dto.RefundArticleOrder">
+        select td.id orderId, td.shop_detail_id shopId, td.table_number, IFNULL(tc.telephone,'--') telephone
+        ,tc.nickname nickName, IFNULL(SUM(toi.refund_count),0) refund_count, IFNULL(SUM(toi.refund_count * toi.unit_price),0) refundMoney
+        ,DATE_FORMAT(td.create_time,'%Y-%m-%d %H:%I:%s') pushOrderTime
+        from tb_order td
+        left join tb_order_item toi
+        on td.id = toi.order_id
+        left join tb_customer tc
+        on td.customer_id = tc.id
+        where td.order_state in (2,10,11,12)
+        and IF(td.production_status = 6, td.production_status = 6, td.production_status in (2,3))
+        and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
+        and CONCAT(#{endDate},' 23:59:59') >= td.create_time
+        and toi.refund_count != 0 GROUP BY td.id;
+    </select>
 </mapper>

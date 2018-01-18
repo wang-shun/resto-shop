@@ -2,6 +2,7 @@ package com.resto.shop.web.report;
 
 
 import com.resto.brand.web.dto.BrandOrderReportDto;
+import com.resto.brand.web.dto.RefundArticleOrder;
 import com.resto.brand.web.dto.ShopIncomeDto;
 import com.resto.brand.web.dto.ShopOrderReportDto;
 import com.resto.shop.web.dto.OrderNumDto;
@@ -51,5 +52,13 @@ public interface OrderMapperReport{
 	 * @return
 	 */
 	List<Order> selectListBybrandId(@Param("beginDate")Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+
+	/**
+	 * 查询退菜报表list
+	 * @param beginDate
+	 * @param endDate
+	 * @return
+	 */
+	List<RefundArticleOrder> addRefundArticleDto(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
 
 }
