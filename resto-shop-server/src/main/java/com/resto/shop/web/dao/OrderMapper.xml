@@ -28,6 +28,19 @@
         </collection>
     </resultMap>
 
+    <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id"/>
+        <result column="order_money" property="orderMoney"/>
+        <result column="order_mode" property="orderMode"/>
+        <result column="pay_type" property="payType"/>
+        <result column="amount_with_children" property="amountWithChildren"/>
+        <result column="create_time" property="createTime"/>
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItemId" property="id"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+            <result column="pay_value" property="payValue"/>
+        </collection>
+    </resultMap>
 
     <!-- 每日短信报表数据 -->
     <resultMap id="everdayReport" type="com.resto.shop.web.model.Order">
