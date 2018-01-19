@@ -418,15 +418,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<ShopArticleReportDto> selectShopArticleSum(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
 
     /**
-     * 查询品牌下每个店铺的菜品销售和
-     * @param begin
-     * @param end
-     * @param brandId
-     * @return
-     */
-    List<ShopArticleReportDto> selectShopArticleSell(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
-
-    /**
      * 根据订单状态和生产状态查询指定店铺的订单
      * @param shopId
      * @param orderStates
@@ -463,11 +454,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectHasPayListOrderByBrandId(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
 
     List<Order> selectHasPayOrderPayMentItemListBybrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
-
-
-    Integer selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
-
-    List<brandArticleReportDto> selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
     /**
      * 手动取消订单
@@ -685,10 +671,10 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	void fixAllowContinueOrder(@Param("beginDate") Date begin);
 
 	List<Order> getAllowAppraise();
-	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
-    void colseOrder(String orderId);
 
-	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
+	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
+
+    void colseOrder(String orderId);
 
 	/**
 	 * yz 2017/07/28

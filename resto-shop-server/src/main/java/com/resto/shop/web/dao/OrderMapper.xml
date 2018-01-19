@@ -1519,11 +1519,6 @@
     <!--)-->
     <!--</select>-->
 
-    <!--查询品牌菜品的总数 -->
-    <select id="selectBrandArticleNum" resultType="java.lang.Integer">
-        CALL proc_brand_article_num(#{beginDate},#{endDate})
-    </select>
-
     <!--查询品牌菜品销售的总价-->
     <select id="selectBrandArticleSell" resultType="BigDecimal">
         SELECT sum(t.final_price)sellIncome FROM
@@ -1553,17 +1548,6 @@
         WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND oi.type != 4 AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
         GROUP BY o.id
-    </select>
-
-
-    <!--查询品牌下每个店铺所有菜品卖的钱的和-->
-    <select id="selectShopArticleSell" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
-        CALL proc_shop_article_sell(#{beginDate},#{endDate})
-    </select>
-
-
-    <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
-        CALL proc_confirm_money(#{beginDate},#{endDate})
     </select>
 
     <!-- 品牌菜品销售 -->
@@ -3151,31 +3135,6 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <select id="getAllowAppraise" resultType="Order">
         select * from tb_order where order_state = 2  and production_status in (2,3)
         and create_time >= '2017-06-29'
-    </select>
-
-    <select id="selectMealServiceSales" resultType="java.util.Map">
-        SELECT
-        td.shop_detail_id shopId,
-        IFNULL(SUM(td.meal_all_number),0) mealSellNum,
-        IFNULL(SUM(td.meal_fee_price),0) mealSalles,
-        IFNULL(SUM(td.customer_count),0) serviceSellNum,
-        IFNULL(SUM(td.service_price),0) serviceSalles,
-        IFNULL(SUM(td.base_meal_all_count-td.meal_all_number),0) refundMealNum,
-        IFNULL(SUM(td.base_meal_all_count-td.meal_all_number) * (SUM(td.meal_fee_price)/SUM(td.meal_all_number)),0) refundMealSalles,
-        IFNULL(SUM(td.base_customer_count-td.customer_count),0) refundServiceCount,
-        IFNULL(IF(SUM(td.service_price) = 0 or SUM(td.customer_count) = 0,0,SUM(td.base_customer_count-td.customer_count) * (SUM(td.service_price)/SUM(td.customer_count))),0) refundServiceSalles
-        FROM
-        tb_order td
-        WHERE
-        td.order_state IN (2, 10, 11, 12)
-        AND td.production_status IN (2, 3)
-        AND td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-        AND td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-        <if test="shopDetailId != null">
-            AND td.shop_detail_id = #{shopDetailId}
-        </if>
-        AND td.parent_order_id is null
-        GROUP BY td.shop_detail_id
     </select>
 
 	<!-- yz 2017/07/28 -->

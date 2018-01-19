@@ -1,10 +1,7 @@
 package com.resto.shop.web.report;
 
 
-import com.resto.brand.web.dto.BrandOrderReportDto;
-import com.resto.brand.web.dto.RefundArticleOrder;
-import com.resto.brand.web.dto.ShopIncomeDto;
-import com.resto.brand.web.dto.ShopOrderReportDto;
+import com.resto.brand.web.dto.*;
 import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.model.Order;
 import org.apache.ibatis.annotations.Param;
@@ -60,5 +57,20 @@ public interface OrderMapperReport{
 	 * @return
 	 */
 	List<RefundArticleOrder> addRefundArticleDto(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
+
+	Integer selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+
+	List<brandArticleReportDto> selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
+
+	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
+
+	/**
+	 * 查询品牌下每个店铺的菜品销售和
+	 * @param begin
+	 * @param end
+	 * @param brandId
+	 * @return
+	 */
+	List<ShopArticleReportDto> selectShopArticleSell(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
 
 }

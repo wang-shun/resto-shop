@@ -489,4 +489,94 @@
         and CONCAT(#{endDate},' 23:59:59') >= td.create_time
         and toi.refund_count != 0 GROUP BY td.id;
     </select>
+
+    <!--查询品牌菜品的总数 -->
+    <select id="selectBrandArticleNum" resultType="java.lang.Integer">
+        SELECT
+        IFNULL(
+        SUM(IF(oi.type != 4, oi.count, 0)) + IFNULL(o.meal_all_number, 0),
+        0
+        ) totalNum
+        FROM
+        tb_order o
+        INNER JOIN tb_order_item oi ON o.id = oi.order_id
+        WHERE
+        o.order_state IN (10, 2, 11, 12)
+        AND
+        IF (
+        o.is_pos_pay = 1,
+        o.is_pos_pay = 1,
+        o.production_status IN (2, 3)
+        )
+        and o.create_time >= CONCAT(#{beginDate},' 00:00:00')
+        and CONCAT(#{endDate},' 23:59:59') = o.create_time;
+    </select>
+
+    <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
+        SELECT
+        IFNULL(sum(oi.final_price) + IFNULL(o.meal_fee_price,0),0.00) sellIncome,
+        IFNULL(SUM(IF(oi.type != 4, oi.refund_count, 0)) + IFNULL(SUM(o.base_customer_count-o.customer_count),0)
+        + IFNULL(SUM(o.base_meal_all_count - o.meal_all_number),0),0)refundCount,
+        IFNULL(SUM(oi.refund_count*oi.unit_price) +
+        IFNULL(IF(SUM(o.service_price) = 0 or SUM(o.customer_count) = 0,0,(SUM(o.service_price)/SUM(o.customer_count)) * SUM(o.base_customer_count-o.customer_count)
+        ),0) + IFNULL(IF(SUM(o.meal_fee_price) = 0 or SUM(o.meal_all_number) = 0,0,(SUM(o.meal_fee_price)/SUM(o.meal_all_number)) * SUM(o.base_meal_all_count-o.meal_all_number)
+        ),0),0.00)refundTotal,
+        IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
+        FROM tb_order_item oi
+        INNER JOIN tb_order o on o.id = oi.order_id
+        WHERE
+        o.order_state IN (10, 2, 11, 12)
+        AND IF(o.production_status = 6,o.production_status = 6,o.production_status IN (2, 3))
+        AND o.create_time >= CONCAT(#{beginDate},' 00:00:00') AND CONCAT(#{endDate},' 23:59:59') >= o.create_time
+        GROUP BY o.id;
+    </select>
+
+    <select id="selectMealServiceSales" resultType="java.util.Map">
+        SELECT
+        td.shop_detail_id shopId,
+        IFNULL(SUM(td.meal_all_number),0) mealSellNum,
+        IFNULL(SUM(td.meal_fee_price),0) mealSalles,
+        IFNULL(SUM(td.customer_count),0) serviceSellNum,
+        IFNULL(SUM(td.service_price),0) serviceSalles,
+        IFNULL(SUM(td.base_meal_all_count-td.meal_all_number),0) refundMealNum,
+        IFNULL(SUM(td.base_meal_all_count-td.meal_all_number) * (SUM(td.meal_fee_price)/SUM(td.meal_all_number)),0) refundMealSalles,
+        IFNULL(SUM(td.base_customer_count-td.customer_count),0) refundServiceCount,
+        IFNULL(IF(SUM(td.service_price) = 0 or SUM(td.customer_count) = 0,0,SUM(td.base_customer_count-td.customer_count) * (SUM(td.service_price)/SUM(td.customer_count))),0) refundServiceSalles
+        FROM
+        tb_order td
+        WHERE
+        td.order_state IN (2, 10, 11, 12)
+        AND td.production_status IN (2, 3)
+        AND td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+        AND td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+        <if test="shopDetailId != null">
+            AND td.shop_detail_id = #{shopDetailId}
+        </if>
+        AND td.parent_order_id is null
+        GROUP BY td.shop_detail_id
+    </select>
+
+    <!--查询品牌下每个店铺所有菜品卖的钱的和-->
+    <select id="selectShopArticleSell" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
+        SELECT
+        IFNULL(SUM(IF(oi.type != 4, oi.count, 0)) + IFNULL(o.meal_all_number,0),0) totalNum,
+        IFNULL(SUM(oi.final_price) + IFNULL(o.meal_fee_price,0),0.00) sellIncome,
+        o.shop_detail_id shop_id,
+        IFNULL(SUM(IF(oi.type != 4, oi.refund_count, 0)) + IFNULL(SUM(o.base_customer_count-o.customer_count),0)
+        + IFNULL(SUM(o.base_meal_all_count - o.meal_all_number),0),0)refundCount,
+        IFNULL(SUM(oi.refund_count*oi.unit_price) +
+        IFNULL(IF(SUM(o.service_price) = 0 or SUM(o.customer_count) = 0,0,(SUM(o.service_price)/SUM(o.customer_count)) * SUM(o.base_customer_count-o.customer_count)
+        ),0) + IFNULL(IF(SUM(o.meal_fee_price) = 0 or SUM(o.meal_all_number) = 0,0,(SUM(o.meal_fee_price)/SUM(o.meal_all_number)) * SUM(o.base_meal_all_count-o.meal_all_number)
+        ),0),0.00)refundTotal,
+        IFNULL(SUM((oi.count * oi.original_price) - oi.final_price),0.00) discountTotal
+        from tb_article ta
+        LEFT JOIN tb_article_price tap on ta.id = tap.article_id
+        INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
+        INNER JOIN  tb_order o ON o.id=oi.order_id
+        WHERE
+        o.order_state IN (10,2, 11, 12) AND  IF(o.production_status = 6,o.production_status = 6,o.production_status in (2,3))
+        AND
+        o.create_time >= #{beginDate} and  #{endDate} >= o.create_time
+        GROUP BY o.id;
+    </select>
 </mapper>
