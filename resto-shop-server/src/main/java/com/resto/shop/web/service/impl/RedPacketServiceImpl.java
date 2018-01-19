@@ -163,7 +163,7 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
     }
 
     @Override
-    public Map<String, Object> selectUseRedOrder(Map<String, Object> selectMap) {
+    public Map<String, BigDecimal> selectUseRedOrder(Map<String, Object> selectMap) {
         return redPacketMapperReport.selectUseRedOrder(selectMap);
     }
 
