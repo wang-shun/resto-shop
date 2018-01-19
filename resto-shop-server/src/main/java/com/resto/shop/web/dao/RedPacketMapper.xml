@@ -130,11 +130,11 @@
     <select id="selectUseRedOrder" resultType="java.util.Map">
         SELECT
             IFNULL(SUM(r.orderCount),0) useRedOrderCount,
-            IFNULL(SUM(r.orderCount), 0) useRedOrderMoney
+            IFNULL(SUM(r.order_money), 0) useRedOrderMoney
         FROM
         (
             SELECT
-                SUM(IF(td.parent_order_id IS NULL,1,0)) orderCount,
+                IF(td.parent_order_id IS NULL,1,0) orderCount,
                 td.order_money
             FROM
             tb_order td
