@@ -12,6 +12,7 @@
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -61,7 +62,7 @@
 
 	 @RequestMapping(value = "create")
 	 @ResponseBody
-	 public Result create(@Valid  MdMaterial mdMaterial){
+	 public Result create(@Valid @RequestBody MdMaterial mdMaterial){
 		 mdMaterial.setShopDetailId(getCurrentShopId());
 		 mdMaterial.setCreaterId(mdMaterial.getCreaterId());
 		 mdMaterial.setCreaterName(mdMaterial.getCreaterName());
@@ -74,7 +75,7 @@
 
 	 @RequestMapping("modify")
 	 @ResponseBody
-	 public Result modify(@Valid MdMaterial mdMaterial){
+	 public Result modify(@Valid @RequestBody MdMaterial mdMaterial){
 		 Integer row = materialService.updateMaterial(mdMaterial);
 		 return Result.getSuccess();
 	 }

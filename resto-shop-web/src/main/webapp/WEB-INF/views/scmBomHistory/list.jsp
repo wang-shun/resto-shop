@@ -224,7 +224,7 @@
 
                 {
                     title : "菜品类别",
-                    data : "familyName",
+                    data : "productCategory",
                     orderable:false,
                 },
                 {

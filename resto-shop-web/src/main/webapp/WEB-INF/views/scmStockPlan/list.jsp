@@ -128,7 +128,7 @@
                 },
                 {
                     title : "入库人",
-                    data : "createrName",
+                    data : "publishedName",
                 },
                 {
                     title : "审核人",
@@ -153,6 +153,16 @@
                 {
                     title : "状态",
                     data : "orderStatus",
+                    createdCell:function(td,tdData,rowData){
+                        switch(tdData){
+                            case '11':tdData='待审核';break;
+                            case '12':tdData='审核通过';break;
+                            case '13':tdData='已驳回';break;
+                            case '14':tdData='审核失败';break;
+                            case '15':tdData='已失效';break;
+                        }
+                        $(td).html(tdData);
+                    }
                 },
                 {
                     title : "操作",

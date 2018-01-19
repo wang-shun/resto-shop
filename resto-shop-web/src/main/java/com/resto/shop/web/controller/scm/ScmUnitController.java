@@ -11,6 +11,7 @@
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -40,7 +41,7 @@
 	 }
 	 @RequestMapping("/list_all")
 	 @ResponseBody
-	 public Result listData(MdUnit mdUnit){
+	 public Result listData(@RequestBody MdUnit mdUnit){
 		 PageResult<MdUnit> list = unitService.query4Page(mdUnit);
 
 		return getSuccessResult(list);
@@ -62,7 +63,7 @@
 
 	 @RequestMapping("create")
 	 @ResponseBody
-	 public Result create(@Valid MdUnit brand){
+	 public Result create(@Valid @RequestBody MdUnit brand){
 		 int i = unitService.addScmUnit(brand);
 		 if(i>0){
 			 return Result.getSuccess();
@@ -72,7 +73,7 @@
 
 	 @RequestMapping("modify")
 	 @ResponseBody
-	 public Result modify(@Valid MdUnit unit){
+	 public Result modify(@Valid @RequestBody MdUnit unit){
 		 Integer row = unitService.update(unit);
 		 return Result.getSuccess();
 	 }

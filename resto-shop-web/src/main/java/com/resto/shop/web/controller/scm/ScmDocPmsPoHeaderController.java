@@ -9,6 +9,7 @@
  import com.resto.shop.web.controller.GenericController;
  import org.apache.commons.lang3.StringUtils;
  import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -54,14 +55,14 @@ public class ScmDocPmsPoHeaderController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid DocPmsPoHeaderDetailDo docPmsPoHeaderDetailDo){
+	public Result create(@Valid @RequestBody DocPmsPoHeaderDetailDo docPmsPoHeaderDetailDo){
 		docPmsPoHeaderService.createPmsPoHeaderDetailDo(docPmsPoHeaderDetailDo);
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid DocPmsPoHeader docPmsPoHeader){
+	public Result modify(@Valid @RequestBody DocPmsPoHeader docPmsPoHeader){
 		docPmsPoHeaderService.update(docPmsPoHeader);
 		return Result.getSuccess();
 	}

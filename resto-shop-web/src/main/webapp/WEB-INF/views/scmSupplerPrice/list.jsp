@@ -35,7 +35,7 @@
                                     <select name="supplierId" v-model="parameter.supplierId" class="bs-select form-control">
                                         <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="supName in supNames" value="{{supName.id}}">
-                                            {{supName.supAliasName}}
+                                            {{supName.supName}}
                                         </option>
                                     </select>
                                 </div>

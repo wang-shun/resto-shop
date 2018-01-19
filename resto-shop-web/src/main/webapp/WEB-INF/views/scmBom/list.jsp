@@ -22,7 +22,7 @@
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">菜品类别<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <select name="articleFamilyId" v-model="parameter.articleFamilyId"  class="bs-select form-control" @change='changeType1' >
+                                    <select id="articleFamilyId" name="articleFamilyId" v-model="parameter.articleFamilyId"  class="bs-select form-control" @change='changeType1' >
                                         <option disabled selected value>请选择</option>
                                         <option  v-for="articleFamily in articleFamilyIdArr" value="{{articleFamily.articleFamilyId}}">
                                             {{articleFamily.name}}
@@ -30,9 +30,11 @@
                                     </select>
                                 </div>
 
+
+
                                 <label class="col-md-2 control-label">菜品名称<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                <select name="articleId"  v-model="parameter.articleId"  class="bs-select form-control" @change='changeType2'>
+                                <select id="articleId" name="articleId"  v-model="parameter.articleId"  class="bs-select form-control" @change='changeType2'>
                                     <option disabled selected value>请选择</option>
                                     <option  v-for="productName in productNameArr" value="{{productName.articleId}}" v-if="parameter.articleFamilyId == productName.articleFamilyId">
                                         {{productName.name}}
@@ -114,7 +116,6 @@
                                 </tr></thead>
                                 <tbody>
                                 <tr v-for="(index,item) in parameter.bomDetailDoList">
-
                                     <td>{{index+1}}</td>
                                     <td>{{item.materialCode}}</td>
                                     <td>{{item.materialTypeShow?item.materialTypeShow:item.materialType}}</td>
@@ -383,12 +384,23 @@
             },
             methods:{
                 changeType1: function (ele) {
+                    debugger
                     this.parameter.productCategory = $(ele.target).find("option:selected").text();
                     this.parameter.articleFamilyId = ele.target.value;
 
+                    for(var i=0;i<this.productNameArr.length;i++){
+                       if(this.parameter.articleId = this.productNameArr[i].articleId){
+                           this.parameter.articleId =this.productNameArr[i].articleId;
+                           this.parameter.productName = this.productNameArr[i].name;
+                           break;
+                       }
+                    }
+
                 },
+
+
                 changeType2: function (ele) {
-                    console.log(this.productNameArr);
+                    debugger
                     this.parameter.productName = $(ele.target).find("option:selected").text();
                     this.parameter.articleId = ele.target.value;
                     for(var i=0;i<this.productNameArr.length;i++){
@@ -396,6 +408,15 @@
                             this.parameter.measurementUnit=this.productNameArr[i].unit;
                             break;
                         }
+                    }
+
+                    for(var i=0;i<this.articleFamilyIdArr.length;i++){
+                        if(this.productNameArr[i].articleFamilyId==this.articleFamilyIdArr[i].id){
+                            this.parameter.productCategory = this.articleFamilyIdArr[i].name;
+                            this.parameter.articleFamilyId =this.articleFamilyIdArr[i].id;
+                            break;
+                        }
+
                     }
                 },
                 create:function(){ //打开新增弹窗
@@ -489,7 +510,6 @@
                             message='请填写原料数量';
                         }
                     }
-
                     if(url =="scmBom/modify"){
                         $.get("scmBom/effectiveBomHead"+'?articleId='+_this.parameter.articleId,function (result) {
                             C.confirmDialog((result.message != null && _this.parameter.state=='1') ? result.message:+ "你确定要启用改bom吗?" + ",你确定要启用改bom吗?", "提醒", function () {
@@ -633,6 +653,7 @@
                 $.get('article/list_all',function (data) { //菜品名称选项
                     console.log(data);
                     for(var i=0;i<data.length;i++){
+                        debugger
                         that.productNameArr.push({articleId:data[i].id, name:data[i].name,articleFamilyId:data[i].articleFamilyId,unit:data[i].unit});
                     }
                 })

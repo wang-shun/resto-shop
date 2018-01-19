@@ -8,6 +8,7 @@
  import com.resto.shop.web.constant.Common;
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -51,14 +52,14 @@ public class ScmMdBillController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid MdBill mdBill){
+	public Result create(@Valid @RequestBody MdBill mdBill){
 		mdBillService.insert(mdBill);
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid MdBill mdBill){
+	public Result modify(@Valid @RequestBody MdBill mdBill){
 		mdBillService.update(mdBill);
 		return Result.getSuccess();
 	}

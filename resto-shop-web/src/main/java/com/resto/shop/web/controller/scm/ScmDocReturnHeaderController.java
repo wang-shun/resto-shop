@@ -8,6 +8,7 @@
  import com.resto.shop.web.constant.Common;
  import com.resto.shop.web.controller.GenericController;
  import org.springframework.stereotype.Controller;
+ import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
  import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -48,14 +49,14 @@ public class ScmDocReturnHeaderController extends GenericController{
 	
 	@RequestMapping("create")
 	@ResponseBody
-	public Result create(@Valid DocReturnHeader docReturnHeader){
+	public Result create(@Valid @RequestBody DocReturnHeader docReturnHeader){
 		docReturnHeaderService.insert(docReturnHeader);
 		return Result.getSuccess();
 	}
 	
 	@RequestMapping("modify")
 	@ResponseBody
-	public Result modify(@Valid DocReturnHeader docReturnHeader){
+	public Result modify(@Valid @RequestBody DocReturnHeader docReturnHeader){
 		docReturnHeaderService.update(docReturnHeader);
 		return Result.getSuccess();
 	}

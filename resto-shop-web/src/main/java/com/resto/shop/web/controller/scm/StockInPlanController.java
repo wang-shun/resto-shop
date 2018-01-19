@@ -2,6 +2,7 @@ package com.resto.shop.web.controller.scm;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.BrandUser;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.scm.web.dto.DocStkInPlanHeaderDo;
 import com.resto.scm.web.service.StockInPlanService;
@@ -45,7 +46,7 @@ public class StockInPlanController extends GenericController {
     @RequestMapping("/list_all")
     @ResponseBody
     public Result listData(String shopId) {
-        String shopDetailId = StringUtils.isEmpty(shopId) ? getCurrentShopId() : getCurrentShopId();
+        String shopDetailId = StringUtils.isEmpty(shopId) ? getCurrentShopId() : shopId;
         return getSuccessResult(stockinplanService.queryJoin4Page(shopDetailId));
     }
 
@@ -78,7 +79,8 @@ public class StockInPlanController extends GenericController {
     @RequestMapping("approve")
     @ResponseBody
     public Result approve(Long id, String orderStatus) {
-        stockinplanService.updateDocStkStatusById(id, orderStatus);
+        BrandUser currentBrandUser = getCurrentBrandUser();
+        stockinplanService.updateDocStkStatusById(id, orderStatus,currentBrandUser.getUsername());
         return Result.getSuccess();
     }
 
