@@ -1040,6 +1040,9 @@ public class OrderAspect {
                 log.info("发送叫号信息");
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
+
+
+            log.info("\n\n\n    【printSuccess】 切面  打印成功：" + order.getProductionStatus() + "\n\n\n\n");
         }
     }
 

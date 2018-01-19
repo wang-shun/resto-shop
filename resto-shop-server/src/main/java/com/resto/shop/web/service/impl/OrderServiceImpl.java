@@ -2051,6 +2051,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 		update(order);
+
+
+        log.info("\n\n\n    【printSuccess】打印成功：" + orderId + "\n\n\n\n");
+
+
         //判断是否已经记录过该订单
 		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
 		if(brandAccountLog!=null){
