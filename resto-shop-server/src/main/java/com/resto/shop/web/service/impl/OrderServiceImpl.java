@@ -26,6 +26,7 @@ import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
+import com.resto.shop.web.report.MealAttrMapperReport;
 import com.resto.shop.web.report.OrderMapperReport;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.BrandAccountSendUtil;
@@ -78,6 +79,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private OrderMapperReport orderMapperReport;
+
+    @Resource
+    private MealAttrMapperReport mealAttrMapperReport;
 
     @Resource
     private OrderItemMapper orderitemMapper;
@@ -6085,7 +6089,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                     selectMap.put("articleId", orderItem.getArticleId());
                                     selectMap.put("beginDate", beginDate);
                                     selectMap.put("endDate", endDate);
-                                    List<ArticleSellDto> articleSellDtos = mealAttrMapper.queryArticleMealAttr(selectMap);
+                                    List<ArticleSellDto> articleSellDtos = mealAttrMapperReport.queryArticleMealAttr(selectMap);
                                     for (ArticleSellDto articleSellDto : articleSellDtos) {
                                         if (orderItem.getArticleId().equalsIgnoreCase(articleSellDto.getArticleId()) && articleSellDto.getBrandSellNum() != 0) {
                                             itemMap = new HashMap<>();
