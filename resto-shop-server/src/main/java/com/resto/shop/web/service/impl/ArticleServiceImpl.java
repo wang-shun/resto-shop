@@ -23,6 +23,7 @@ import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.dto.ArticleSellCountDto;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
+import com.resto.shop.web.report.ArticleMapperReport;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -46,6 +47,9 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Resource
     private ArticleMapper articleMapper;
+
+    @Resource
+    private ArticleMapperReport articleMapperReport;
 
     @Resource
     private OrderMapper orderMapper;
@@ -175,6 +179,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             if (count != null) {
                 article.setCurrentWorkingStock(count);
             }
+            if("".equals(article.getRecommendId())){
+                article.setRecommendId(null);
+                article.setRecommendCount(0);
+            }
         }
         getArticleDiscount(currentShopId, articleList, show);
         return articleList;
@@ -194,6 +202,10 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
             }
             article.setMonthlySales(articleMapper.selectSumByMonthlySales(article.getId(), dateNowStr));
             article.setRecommendCategoryId(recommendCcategoryId);
+            if("".equals(article.getRecommendId())){
+                article.setRecommendId(null);
+                article.setRecommendCount(0);
+            }
         }
         getArticleDiscount(currentShopId, articleList, show);
         RecommendCategory recommendCategory=recommendCategoryService.selectById(recommendCcategoryId);
@@ -727,18 +739,18 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Override
     public List<ArticleSellDto> callOrderArtcile(Map<String, Object> selectMap) {
-        return articleMapper.queryOrderArtcile(selectMap);
+        return articleMapperReport.queryOrderArtcile(selectMap);
     }
 
 
     @Override
     public List<ArticleSellDto> selectArticleByType(Map<String, Object> selectMap) {
-        return articleMapper.selectArticleByType(selectMap);
+        return articleMapperReport.selectArticleByType(selectMap);
     }
 
     @Override
     public Map<String, Object> callArticleOrderCount(Map<String, Object> selectMap) {
-        return articleMapper.selectArticleOrderCount(selectMap);
+        return articleMapperReport.selectArticleOrderCount(selectMap);
     }
 
     @Override

@@ -28,6 +28,19 @@
         </collection>
     </resultMap>
 
+    <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
+        <id column="id" property="id"/>
+        <result column="order_money" property="orderMoney"/>
+        <result column="order_mode" property="orderMode"/>
+        <result column="pay_type" property="payType"/>
+        <result column="amount_with_children" property="amountWithChildren"/>
+        <result column="create_time" property="createTime"/>
+        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
+            <id column="orderPaymentItemId" property="id"/>
+            <result column="payment_mode_id" property="paymentModeId"/>
+            <result column="pay_value" property="payValue"/>
+        </collection>
+    </resultMap>
 
     <!-- 每日短信报表数据 -->
     <resultMap id="everdayReport" type="com.resto.shop.web.model.Order">
@@ -271,20 +284,6 @@
         </collection>
     </resultMap>
 
-    <resultMap id="consumedOrderByshopId" type="com.resto.shop.web.model.Order">
-        <id column="id" property="id"/>
-        <result column="order_money" property="orderMoney"/>
-        <result column="order_mode" property="orderMode"/>
-        <result column="pay_type" property="payType"/>
-        <result column="amount_with_children" property="amountWithChildren"/>
-        <result column="create_time" property="createTime"/>
-        <collection property="orderPaymentItems" javaType="List" ofType="orderPaymentItem">
-            <id column="orderPaymentItemId" property="id"/>
-            <result column="payment_mode_id" property="paymentModeId"/>
-            <result column="pay_value" property="payValue"/>
-        </collection>
-    </resultMap>
-
     <resultMap id="selectOrdersMap" type="com.resto.shop.web.model.Order">
         <id property="tag" column="tag"/>
         <id column="id" property="id" jdbcType="VARCHAR"/>
@@ -334,24 +333,6 @@
             <result column="payment_mode_id" property="paymentModeId"/>
         </collection>
     </resultMap>
-
-
-    <resultMap id="selectListBybrandIdmap" type="com.resto.shop.web.model.Order">
-        <id column="id" property="id" jdbcType="VARCHAR"/>
-        <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="order_money" property="orderMoney" jdbcType="DECIMAL"/>
-        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
-        <result column="customer_count" property="customerCount"/>
-        <result column="distribution_mode_id" property="distributionModeId"/>
-        <result column="parent_order_id" property="parentOrderId"/>
-        <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
-            <id column="appraise_id" property="id"/>
-            <result column="level" property="level"/>
-            <result column="red_money" property="redMoney"/>
-        </association>
-    </resultMap>
-
 
     <resultMap id="selectListByshopIdmap" type="com.resto.shop.web.model.Order">
         <id column="id" property="id" jdbcType="VARCHAR"/>
@@ -1538,11 +1519,6 @@
     <!--)-->
     <!--</select>-->
 
-    <!--查询品牌菜品的总数 -->
-    <select id="selectBrandArticleNum" resultType="java.lang.Integer">
-        CALL proc_brand_article_num(#{beginDate},#{endDate})
-    </select>
-
     <!--查询品牌菜品销售的总价-->
     <select id="selectBrandArticleSell" resultType="BigDecimal">
         SELECT sum(t.final_price)sellIncome FROM
@@ -1572,17 +1548,6 @@
         WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND oi.type != 4 AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
         GROUP BY o.id
-    </select>
-
-
-    <!--查询品牌下每个店铺所有菜品卖的钱的和-->
-    <select id="selectShopArticleSell" resultType="com.resto.brand.web.dto.ShopArticleReportDto">
-        CALL proc_shop_article_sell(#{beginDate},#{endDate})
-    </select>
-
-
-    <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
-        CALL proc_confirm_money(#{beginDate},#{endDate})
     </select>
 
     <!-- 品牌菜品销售 -->
@@ -2014,17 +1979,6 @@
 
     </select>
 
-    <select id="selectListByTime" resultMap="selectOrdersMap">
-        CALL
-        <if test="shopId != null and shopId != ''">
-            proc_order_list_by_shop(#{beginDate},#{endDate},#{shopId})
-        </if>
-        <if test="customerId != null and customerId != ''">
-            proc_order_list_by_customer(#{beginDate},#{endDate},#{customerId})
-        </if>
-    </select>
-
-
     <select id="selectOrderDetails" resultMap="selectOrderDetailsMap">
         SELECT
         o.shop_detail_id,
@@ -2144,20 +2098,7 @@
         GROUP BY t.id
     </select>
 
-    <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
-        SELECT
-        o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.create_time,o.customer_count,
-        o.distribution_mode_id,o.parent_order_id
-        from tb_order o
-        LEFT JOIN tb_order_payment_item oi
-        on o.id = oi.order_id
-        LEFT JOIN  tb_appraise a
-        on o.id = a.order_id
-        WHERE o.order_state in (10,11,12,2) and o.production_status in (2,3,4)
-        and <![CDATA[ a.create_time >= #{beginDate} and a.create_time <= #{endDate}]]>
-        and o.brand_id = #{brandId}
-        GROUP BY o.id
-    </select>
+
 
 
     <select id="selectAppraiseByShopId" resultMap="selectListByshopIdmap">
@@ -2436,23 +2377,6 @@ GROUP BY r.table_number
         and t.employee_id = #{employeeId} and t.shop_detail_id = #{shopId}
 
     </select>
-
-
-
-    <select id="selectListByShopId" resultMap="consumedOrderByshopId">
-        SELECT
-        o.id,o.order_money,oi.payment_mode_id ,oi.pay_value,o.create_time
-        FROM
-        tb_order o
-        INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
-        WHERE
-        o.order_state IN (2, 10, 11, 12)
-        and o.production_status in (2,3) AND
-        <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
-    </select>
-
-
-
 
     <!-- 根据订单状态和生产状态查询指定店铺的订单   不包含包含外卖订单-->
     <select id="selectByOrderSatesAndProductionStates" resultType="Order">
@@ -3213,73 +3137,6 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         and create_time >= '2017-06-29'
     </select>
 
-    <select id="callProcDayAllOrderItem" resultType="com.resto.brand.web.dto.ShopIncomeDto">
-        CALL <if test="shopId == null">proc_day_all_order_item(#{beginDate},#{endDate},#{pageNo})</if>
-        <if test="shopId != null">proc_day_all_order_item_by_shop(#{beginDate},#{endDate},#{shopId},#{pageNo})</if>
-    </select>
-    <resultMap id="shopMap" type="com.resto.brand.web.dto.ShopOrderReportDto">
-        <result column="orderCount" property="shop_orderCount" jdbcType="INTEGER"/>
-        <result column="orderPrice" property="shop_orderPrice" jdbcType="DECIMAL"/>
-        <result column="peopleCount" property="shop_peopleCount" jdbcType="INTEGER"/>
-        <result column="tangshiCount" property="shop_tangshiCount" jdbcType="INTEGER"/>
-        <result column="tangshiPrice" property="shop_tangshiPrice" jdbcType="DECIMAL"/>
-        <result column="waidaiCount" property="shop_waidaiCount" jdbcType="INTEGER"/>
-        <result column="waidaiPrice" property="shop_waidaiPrice" jdbcType="DECIMAL"/>
-        <result column="waimaiCount" property="shop_waimaiCount" jdbcType="INTEGER"/>
-        <result column="waimaiPrice" property="shop_waimaiPrice" jdbcType="DECIMAL"/>
-    </resultMap>
-    <select id="procDayAllOrderItemShop" resultMap="shopMap">
-       call proc_day_all_order_item_shop(#{0},#{1},#{2})
-    </select>
-    <resultMap id="brandMap" type="com.resto.brand.web.dto.BrandOrderReportDto">
-        <result column="orderCount" property="orderCount" jdbcType="INTEGER"/>
-        <result column="orderPrice" property="orderPrice" jdbcType="DECIMAL"/>
-        <result column="peopleCount" property="peopleCount" jdbcType="INTEGER"/>
-        <result column="tangshiCount" property="tangshiCount" jdbcType="INTEGER"/>
-        <result column="tangshiPrice" property="tangshiPrice" jdbcType="DECIMAL"/>
-        <result column="waidaiCount" property="waidaiCount" jdbcType="INTEGER"/>
-        <result column="waidaiPrice" property="waidaiPrice" jdbcType="DECIMAL"/>
-        <result column="waimaiCount" property="waimaiCount" jdbcType="INTEGER"/>
-        <result column="waimaiPrice" property="waimaiPrice" jdbcType="DECIMAL"/>
-    </resultMap>
-    <select id="procDayAllOrderItemBrand" resultMap="brandMap">
-        call proc_day_all_order_item_brand(#{beginDate},#{endDate},#{brandId})
-    </select>
-
-    <select id="callProcDayAllOrderPayMent" resultType="com.resto.brand.web.dto.ShopIncomeDto">
-        CALL <if test="shopId == null">proc_day_all_order_payment(#{beginDate},#{endDate},#{pageNo})</if>
-        <if test="shopId != null">proc_day_all_order_payment_by_shop(#{beginDate},#{endDate},#{shopId},#{pageNo})</if>
-    </select>
-
-    <select id="addRefundArticleDto" resultType="com.resto.brand.web.dto.RefundArticleOrder">
-        call proc_refund_article_report(#{beginDate},#{endDate})
-    </select>
-
-    <select id="selectMealServiceSales" resultType="java.util.Map">
-        SELECT
-        td.shop_detail_id shopId,
-        IFNULL(SUM(td.meal_all_number),0) mealSellNum,
-        IFNULL(SUM(td.meal_fee_price),0) mealSalles,
-        IFNULL(SUM(td.customer_count),0) serviceSellNum,
-        IFNULL(SUM(td.service_price),0) serviceSalles,
-        IFNULL(SUM(td.base_meal_all_count-td.meal_all_number),0) refundMealNum,
-        IFNULL(SUM(td.base_meal_all_count-td.meal_all_number) * (SUM(td.meal_fee_price)/SUM(td.meal_all_number)),0) refundMealSalles,
-        IFNULL(SUM(td.base_customer_count-td.customer_count),0) refundServiceCount,
-        IFNULL(IF(SUM(td.service_price) = 0 or SUM(td.customer_count) = 0,0,SUM(td.base_customer_count-td.customer_count) * (SUM(td.service_price)/SUM(td.customer_count))),0) refundServiceSalles
-        FROM
-        tb_order td
-        WHERE
-        td.order_state IN (2, 10, 11, 12)
-        AND td.production_status IN (2, 3)
-        AND td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-        AND td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-        <if test="shopDetailId != null">
-            AND td.shop_detail_id = #{shopDetailId}
-        </if>
-        AND td.parent_order_id is null
-        GROUP BY td.shop_detail_id
-    </select>
-
 	<!-- yz 2017/07/28 -->
 	<select id="selectNewCustomerOrderByBrandIdAndTime" resultMap="NewCustomerOrderByShopIdAndTimeMap">
 		 SELECT
@@ -3458,23 +3315,6 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         select * from tb_order where customer_id = #{customerId} and order_state in (2,10,11,12) and production_status != 6 order by create_time desc limit 1
     </select>
 
-    <select id="selectOrderNumByTimeAndBrandId" resultType="com.resto.shop.web.dto.OrderNumDto">
-
-        SELECT
-        COUNT(DISTINCT o.id) num,
-        o.shop_detail_id shopId
-        FROM
-        tb_order o
-        INNER JOIN tb_order_payment_item opi ON o.id = opi.order_id
-        WHERE
-        <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-        AND o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3)
-        AND o.brand_id = #{brandId}
-        GROUP BY
-        o.shop_detail_id;
-    </select>
-
     <select id="posSyncSelectById" parameterType="java.lang.String" resultType="Order">
         SELECT * from tb_order where id = #{orderId}
     </select>
@@ -3486,5 +3326,9 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     <select id="posSelectNotCancelledOrdersIdByDate" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT id from tb_order where shop_detail_id = ${shopId} and parent_order_id is null and order_state != 9
         and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time
+    </select>
+
+    <select id="selectBySerialNumber" parameterType="java.lang.String" resultType="Order">
+        SELECT * from tb_order where serial_number = #{serialNumber}
     </select>
 </mapper>

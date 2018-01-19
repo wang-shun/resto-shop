@@ -8,6 +8,7 @@ import com.resto.shop.web.dao.OffLineOrderMapper;
 import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.UnderLineOrderDto;
 import com.resto.shop.web.model.OffLineOrder;
+import com.resto.shop.web.report.OffLineOrderMapperReport;
 import com.resto.shop.web.service.OffLineOrderService;
 import cn.restoplus.rpc.server.RpcService;
 
@@ -22,6 +23,9 @@ public class OffLineOrderServiceImpl extends GenericServiceImpl<OffLineOrder, St
 
     @Resource
     private OffLineOrderMapper offlineorderMapper;
+
+    @Resource
+    private OffLineOrderMapperReport offLineOrderMapperReport;
 
     @Override
     public GenericDao<OffLineOrder, String> getDao() {
@@ -44,14 +48,14 @@ public class OffLineOrderServiceImpl extends GenericServiceImpl<OffLineOrder, St
 
     @Override
     public List<OffLineOrder> selectlistByTimeSourceAndShopId(String id, Date begin, Date end, int offlinePos) {
-        return offlineorderMapper.selectlistByTimeSourceAndShopId(id,begin,end,offlinePos);
+        return offLineOrderMapperReport.selectlistByTimeSourceAndShopId(id,begin,end,offlinePos);
     }
 
     @Override
     public List<OffLineOrder> selectlistByTimeSourceAndShopId(String id, String beginTime, String endTime, int offlinePos) {
         Date beginDate = DateUtil.getformatBeginDate(beginTime);
         Date endDate = DateUtil.getformatEndDate(endTime);
-        return offlineorderMapper.selectlistByTimeSourceAndShopId(id,beginDate,endDate,offlinePos);
+        return offLineOrderMapperReport.selectlistByTimeSourceAndShopId(id,beginDate,endDate,offlinePos);
     }
 
     @Override
@@ -68,7 +72,7 @@ public class OffLineOrderServiceImpl extends GenericServiceImpl<OffLineOrder, St
     public List<OrderNumDto> selectOrderNumByTimeAndBrandId(String brandId, String begin, String end) {
         Date beginDate = DateUtil.getformatBeginDate(begin);
         Date endDate = DateUtil.getformatEndDate(end);
-        return offlineorderMapper.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
+        return offLineOrderMapperReport.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
     }
 
     @Override

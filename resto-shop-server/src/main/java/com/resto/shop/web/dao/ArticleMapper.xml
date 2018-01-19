@@ -952,16 +952,6 @@ GROUP BY article_id
 		and ar.shop_detail_id = #{shopId}
     </select>
 
-    <select id="queryOrderArtcile" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
-        CALL
-        <if test="shopDetailId != null">
-            proc_order_artcile_shop(#{beginDate},#{endDate},#{shopDetailId},${type})
-        </if>
-        <if test="shopDetailId == null">
-            proc_order_artcile(#{beginDate},#{endDate},${type})
-        </if>
-    </select>
-
     <select id="getArticleListByFamily" resultType="Article">
         SELECT * from tb_article a
         LEFT JOIN tb_article_support_time ast on a.id = ast.article_id  and ast.support_time_id in
@@ -981,32 +971,6 @@ GROUP BY article_id
     <update id="updateInitialsById">
         update tb_article set initials = #{initials} where id = #{articleId}
     </update>
-
-    <select id="selectArticleByType" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
-        select
-        ta.id articleId,
-        if(ta.article_type = 1,'单品','套餐') typeName,
-        IFNULL(taf.`name`,'其他')articleFamilyName,
-        ta.`name` articleName,
-        ta.likes likes
-        from tb_article ta
-        left join tb_article_family taf
-        on ta.article_family_id = taf.id
-        where ta.article_type = ${type}
-        <if test="shopDetailId != null and shopDetailId !=''">
-            and ta.shop_detail_id = #{shopDetailId}
-        </if>
-    </select>
-
-    <select id="selectArticleOrderCount" parameterType="java.util.Map" resultType="java.util.Map">
-        CALL
-        <if test="shopDetailId != null">
-            proc_article_order_count_shop(#{beginDate},#{endDate},#{type},#{shopDetailId})
-        </if>
-        <if test="shopDetailId == null">
-            proc_article_order_count(#{beginDate},#{endDate},#{type})
-        </if>
-    </select>
 
     <select id="selectArticleSort" parameterType="java.util.Map" resultType="java.lang.String">
         select ta.id articleId

@@ -63,28 +63,6 @@
   	<foreach collection="ids" open="(" separator="," close=")" item="id">#{id}</foreach>
 </delete>
 
-  <select id="queryArticleMealAttr" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
-        select tma.`name` articleFamilyName, tmi.article_name articleName,
-        IFNULL(
-        (select SUM(ti.count) from tb_order_item ti
-        where ti.parent_id in
-        (select toi.id from tb_order_item toi
-        inner join tb_order tr
-        on toi.order_id = tr.id
-        where tr.order_state in (2,10,11,12) and IF(tr.is_pos_pay = 1,tr.is_pos_pay = 1,tr.production_status in (2,3))
-        and toi.type = 3
-        and toi.article_id = #{articleId}
-        and toi.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
-        and toi.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
-        ) and ti.article_id = tmi.article_id),0) brandSellNum,
-        tma.article_id articleId
-        from tb_meal_attr tma
-        inner join tb_meal_item tmi
-        on tma.id = tmi.meal_attr_id
-        where tma.article_id = #{articleId}
-        GROUP BY tmi.article_id
-        order by tma.sort asc
-    </select>
   <select id="selectMealAttrByShopId" resultType="MealAttr">
       SELECT ma.id,ma.`name`,ma.sort,ma.article_id,ma.print_sort,ma.choice_type,ma.choice_count
        from tb_meal_attr ma LEFT JOIN tb_article a on ma.article_id = a.id where a.shop_detail_id = #{shopId} and a.state = 1;

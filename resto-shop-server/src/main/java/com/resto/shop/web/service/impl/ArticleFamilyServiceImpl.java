@@ -11,6 +11,7 @@ import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.web.dto.ArticleSellDto;
 import com.resto.shop.web.dao.ArticleFamilyMapper;
 import com.resto.shop.web.model.ArticleFamily;
+import com.resto.shop.web.report.ArticleFamilyMapperReport;
 import com.resto.shop.web.service.ArticleFamilyService;
 
 import cn.restoplus.rpc.server.RpcService;
@@ -23,6 +24,9 @@ public class ArticleFamilyServiceImpl extends GenericServiceImpl<ArticleFamily, 
 
     @Resource
     private ArticleFamilyMapper articlefamilyMapper;
+
+    @Resource
+	private ArticleFamilyMapperReport articleFamilyMapperReport;
 
     @Override
     public GenericDao<ArticleFamily, String> getDao() {
@@ -61,7 +65,7 @@ public class ArticleFamilyServiceImpl extends GenericServiceImpl<ArticleFamily, 
 
     @Override
     public List<ArticleSellDto> selectByShopId(String shopId) {
-        return articlefamilyMapper.selectByShopId(shopId);
+        return articleFamilyMapperReport.selectByShopId(shopId);
     }
 
     @Override

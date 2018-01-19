@@ -56,12 +56,7 @@ public interface CustomerMapper extends GenericDao<Customer, String>{
 
     Customer selectCustomerAccount(@Param("telephone") String telephone);
 
-    List<MemberUserDto> selectListMemberUser(@Param("beginDate") Date begin, @Param("endDate") Date end);
-
     Map<String,Object> selectListMember(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
-
-   //得到品牌用户信息
-   String selectBrandUser();
 
 	Integer selectByShareCustomer(String customerId);
 
