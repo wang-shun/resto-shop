@@ -1901,13 +1901,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
-//        }
         } else if (validOrderCanPush(order)) {
             log.info("pushOrder时候支付宝支付修改状态：" + ProductionStatus.HAS_ORDER + "订单id为：" + orderId + "当前时间为：" + time);
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
-            return order;
         }
         return order;
     }
