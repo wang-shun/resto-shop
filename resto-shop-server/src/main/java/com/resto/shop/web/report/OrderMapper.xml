@@ -509,7 +509,7 @@
         o.production_status IN (2, 3)
         )
         and o.create_time >= CONCAT(#{beginDate},' 00:00:00')
-        and CONCAT(#{endDate},' 23:59:59') = o.create_time;
+        and CONCAT(#{endDate},' 23:59:59') >= o.create_time;
     </select>
 
     <select id="selectConfirmMoney" resultType="com.resto.brand.web.dto.brandArticleReportDto">
