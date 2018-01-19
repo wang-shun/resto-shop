@@ -108,20 +108,20 @@
         FROM
         (
         SELECT
-        trp.shop_detail_id,
-        trp.red_money,
-        IF(COUNT(1) = 1 and top.id is null,0,COUNT(1)) useCount,
-        SUM(top.pay_value) useMoney
+            trp.shop_detail_id,
+            trp.red_money,
+            IF(COUNT(1) = 1 and top.id is null,0,COUNT(1)) useCount,
+            SUM(top.pay_value) useMoney
         FROM
-        tb_red_packet trp
+            tb_red_packet trp
         LEFT JOIN tb_order_payment_item top ON top.to_pay_id = trp.id
         AND top.pay_time &gt;= CONCAT(#{useBeginDate}, ' 00:00:00')
         AND top.pay_time &lt;= CONCAT(#{useEndDate}, ' 23:59:59')
         WHERE
-        trp.red_type IN (${redType})
-        AND trp.create_time &gt;= CONCAT(#{grantBeginDate}, ' 00:00:00')
-        AND trp.create_time &lt;= CONCAT(#{grantEndDate}, ' 23:59:59')
-        GROUP BY trp.id
+            trp.red_type IN (${redType})
+            AND trp.create_time &gt;= CONCAT(#{grantBeginDate}, ' 00:00:00')
+            AND trp.create_time &lt;= CONCAT(#{grantEndDate}, ' 23:59:59')
+            GROUP BY trp.id
         ) r
         GROUP BY
         r.shop_detail_id
