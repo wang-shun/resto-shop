@@ -45,8 +45,6 @@ public interface ChargeOrderMapper  extends GenericDao<ChargeOrder,String> {
 
     List<Map<String, Object>> selectByShopToDay(Map<String, Object> selectMap);
 
-    List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap);
-
     List<ChargeOrder> selectListByDateAndShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String id);
 
     List<ChargeOrder> selectByCustomerIdAndBrandId(@Param("customerId") String customerId, @Param("brandId") String brandId);

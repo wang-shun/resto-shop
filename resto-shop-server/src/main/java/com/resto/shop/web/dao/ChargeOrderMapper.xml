@@ -321,39 +321,6 @@
 		and tco.finish_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
 	</select>
 
-    <select id="selectChargeRedPacket" resultType="com.resto.brand.web.dto.RedPacketDto">
-        select
-        tco.shop_detail_id shopDetailId, IFNULL(COUNT(1),0) redCount, IFNULL(SUM(tco.reward_money),0) redMoney,
-        IFNULL((SUM((select COUNT(1) from (
-        select top.result_data from tb_order td
-        inner join tb_order_payment_item top
-        on td.id = top.order_id
-        where td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3))
-        and top.payment_mode_id = 7
-        and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
-        and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-        GROUP BY top.result_data
-        ) r where r.result_data = tco.id))),0) useRedCount,
-        IFNULL((SUM((select SUM(r.payValue) from (
-        select top.result_data, SUM(top.pay_value) payValue from tb_order td
-        inner join tb_order_payment_item top
-        on td.id = top.order_id
-        where td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3))
-        and top.payment_mode_id = 7
-        and top.pay_time &gt;=  CONCAT(#{useBeginDate},' 00:00:00')
-        and top.pay_time &lt;=  CONCAT(#{useEndDate},' 23:59:59')
-        GROUP BY top.result_data
-        ) r where r.result_data = tco.id))),0) useRedMoney
-        from tb_charge_order tco
-        where tco.order_state = 1
-        and tco.reward_money > 0
-        and tco.create_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')
-        and tco.create_time &lt;= CONCAT(#{grantEndDate},' 23:59:59')
-        GROUP BY tco.shop_detail_id
-    </select>
-
     <select id="selectListByDateAndShopId" resultType="ChargeOrder">
  SELECT
 	c.id,

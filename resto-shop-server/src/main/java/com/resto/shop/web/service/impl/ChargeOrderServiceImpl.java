@@ -490,7 +490,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
     @Override
     public List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap) {
-        return chargeorderMapper.selectChargeRedPacket(selectMap);
+        return chargeOrderMapperReport.selectChargeRedPacket(selectMap);
     }
 
     @Override

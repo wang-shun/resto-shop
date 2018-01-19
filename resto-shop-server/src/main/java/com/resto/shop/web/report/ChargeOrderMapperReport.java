@@ -21,4 +21,6 @@ public interface ChargeOrderMapperReport{
 
     List<ChargeOrder> selectMonthDto(Map<String, Object> selectMap);
 
+    List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap);
+
 }
