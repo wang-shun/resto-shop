@@ -1042,7 +1042,7 @@ public class OrderAspect {
             }
 
 
-            log.info("\n\n\n    【printSuccess】 切面  打印成功：" + order.getProductionStatus() + "\n\n\n\n");
+            log.info("\n\n\n    【printSuccess】 切面  打印成功：" + order.getId() + "  打印状态：" + order.getProductionStatus() + "\n\n\n\n");
         }
     }
 
