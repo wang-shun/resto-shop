@@ -172,5 +172,12 @@ public interface PosService {
      */
     List<String> getServerOrderIds(String shopId);
 
+
+    /**
+     * Pos 叫号
+     * @param orderId
+     */
+    void posCallNumber(String orderId);
+
     void test();
 }
