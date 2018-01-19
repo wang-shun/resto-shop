@@ -20,13 +20,13 @@ import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
-import com.resto.shop.web.datasource.DataSourceContextHolderReport;
 import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
+import com.resto.shop.web.report.MealAttrMapperReport;
 import com.resto.shop.web.report.OrderMapperReport;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.BrandAccountSendUtil;
@@ -79,6 +79,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private OrderMapperReport orderMapperReport;
+
+    @Resource
+    private MealAttrMapperReport mealAttrMapperReport;
 
     @Resource
     private OrderItemMapper orderitemMapper;
@@ -160,23 +163,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ArticleFamilyMapper articleFamilyMapper;
 
-    @Resource
-    private LogBaseService logBaseService;
-
     @Autowired
     private GetNumberService getNumberService;
-
-    @Resource
-    private  WetherService wetherService;
 
     @Autowired
     private CustomerDetailMapper customerDetailMapper;
 
     @Resource
     private OrderRefundRemarkMapper orderRefundRemarkMapper;
-
-    @Autowired
-    private DayDataMessageService dayDataMessageService;
 
     @Resource
 	private BrandAccountLogService brandAccountLogService;
@@ -201,20 +195,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     VirtualProductsService virtualProductsService;
 
-    @Resource
-    ArticleTopService articleTopService;
-
     @Autowired
     private TableQrcodeService tableQrcodeService;
 
     @Autowired
     private AreaService areaService;
-
-    @Autowired
-    private SmsLogService smsLogService;
-
-    @Autowired
-    private DayAppraiseMessageService dayAppraiseMessageService;
 
     @Resource
 	private  AccountSettingService accountSettingService;
@@ -1920,13 +1905,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
-//        }
         } else if (validOrderCanPush(order)) {
             log.info("pushOrder时候支付宝支付修改状态：" + ProductionStatus.HAS_ORDER + "订单id为：" + orderId + "当前时间为：" + time);
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
-            return order;
         }
         return order;
     }
@@ -5184,10 +5167,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         //菜品总数单独算是因为 要出去套餐的数量
-        Integer totalNums = orderMapper.selectBrandArticleNum(begin, end, brandId);
+        Integer totalNums = orderMapperReport.selectBrandArticleNum(begin, end, brandId);
         //查询菜品总额，退菜总数，退菜金额
         brandArticleReportDto bo = new brandArticleReportDto(brandName, 0, BigDecimal.ZERO, 0, BigDecimal.ZERO, BigDecimal.ZERO);
-        List<brandArticleReportDto> articleReportDto = orderMapper.selectConfirmMoney(begin, end, brandId);
+        List<brandArticleReportDto> articleReportDto = orderMapperReport.selectConfirmMoney(begin, end, brandId);
         if (articleReportDto != null && !articleReportDto.isEmpty()) {
             for (brandArticleReportDto reportDto : articleReportDto) {
                 bo.setSellIncome(bo.getSellIncome().add(reportDto.getSellIncome()));
@@ -5209,7 +5192,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             shopDetails = shopDetailService.selectByBrandId(brandId);
         }
         //查询每个店铺的菜品销售的和
-        List<ShopArticleReportDto> list = orderMapper.selectShopArticleSell(begin, end, brandId);
+        List<ShopArticleReportDto> list = orderMapperReport.selectShopArticleSell(begin, end, brandId);
         List<ShopArticleReportDto> listArticles = new ArrayList<>();
         for (ShopDetail shop : shopDetails) {
             ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%", 0, BigDecimal.ZERO, BigDecimal.ZERO);
@@ -5515,7 +5498,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectListBybrandId(String beginDate, String endDate, String brandId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListBybrandId(begin, end, brandId);
+        return orderMapperReport.selectListBybrandId(begin, end, brandId);
     }
 
     @Override
@@ -6106,7 +6089,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                     selectMap.put("articleId", orderItem.getArticleId());
                                     selectMap.put("beginDate", beginDate);
                                     selectMap.put("endDate", endDate);
-                                    List<ArticleSellDto> articleSellDtos = mealAttrMapper.queryArticleMealAttr(selectMap);
+                                    List<ArticleSellDto> articleSellDtos = mealAttrMapperReport.queryArticleMealAttr(selectMap);
                                     for (ArticleSellDto articleSellDto : articleSellDtos) {
                                         if (orderItem.getArticleId().equalsIgnoreCase(articleSellDto.getArticleId()) && articleSellDto.getBrandSellNum() != 0) {
                                             itemMap = new HashMap<>();
@@ -9386,7 +9369,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate) {
-        return orderMapper.addRefundArticleDto(beginDate, endDate);
+        return orderMapperReport.addRefundArticleDto(beginDate, endDate);
     }
 
 	@Override
@@ -9572,7 +9555,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap) {
-        return orderMapper.selectMealServiceSales(selectMap);
+        return orderMapperReport.selectMealServiceSales(selectMap);
     }
 
     @Override

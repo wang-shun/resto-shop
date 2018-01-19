@@ -56,13 +56,7 @@ public class BrandMarketingController extends GenericController{
 
     @RequestMapping("/redList")
     public String redList(){
-        Date date = new Date();
-        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
-            getRequest().setAttribute("netOpen", true);
-            return "notopen";
-        }else{
-            return "brandMarketing/redList";
-        }
+        return "brandMarketing/redList";
     }
 
     /**
@@ -384,13 +378,7 @@ public class BrandMarketingController extends GenericController{
 
     @RequestMapping("/couponList")
     public String couponList(){
-        Date date = new Date();
-        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
-            getRequest().setAttribute("netOpen", true);
-            return "notopen";
-        }else{
-            return "brandMarketing/couponList";
-        }
+        return "brandMarketing/couponList";
     }
 
     /**
