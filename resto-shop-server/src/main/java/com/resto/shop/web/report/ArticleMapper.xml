@@ -71,7 +71,13 @@
         if(ta.article_type = 1,'单品','套餐') typeName,
         ta.article_family_id articleFamilyId,
         ta.`name` articleName,
-        IFNULL(SUM(IF(toi.type != 4, toi.count, 0)),0) shopSellNum,
+        IFNULL(SUM(IF(toi.type != 4, toi.count, 0)),0)
+        <if test="shopDetailId != null">
+            shopSellNum
+        </if>
+        <if test="shopDetailId == null">
+            brandSellNum
+        </if>,
         IFNULL(IF(ta.article_type = 2, SUM(IF(toi.type != 4,toi.final_price,0)) + IFNULL(SUM((select SUM(trd.unit_price * trd.count) from tb_order_item trd where trd.parent_id = toi.id)),0)
         ,SUM(IF(toi.type != 4,toi.final_price,0)))
         ,0) salles,
@@ -102,7 +108,13 @@
         if(ta.article_type = 1,'单品','套餐') typeName,
         ta.article_family_id articleFamilyId,
         ta.`name` articleName,
-        IFNULL(SUM(IF(toi.type != 4, toi.count, 0)),0) shopSellNum,
+        IFNULL(SUM(IF(toi.type != 4, toi.count, 0)),0)
+        <if test="shopDetailId != null">
+            shopSellNum
+        </if>
+        <if test="shopDetailId == null">
+            brandSellNum
+        </if>,
         IFNULL(IF(ta.article_type = 2, SUM(IF(toi.type != 4,toi.final_price,0)) + IFNULL(SUM((select SUM(trd.unit_price * trd.count) from tb_order_item trd where trd.parent_id = toi.id)),0)
         ,SUM(IF(toi.type != 4,toi.final_price,0)))
         ,0) salles,
