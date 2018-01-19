@@ -2,6 +2,7 @@ package com.resto.shop.web.rpcinterceptor;
 
 import javax.annotation.Resource;
 
+import com.resto.shop.web.datasource.DataSourceContextHolderReport;
 import org.springframework.stereotype.Component;
 
 import com.resto.brand.web.service.DatabaseConfigService;
@@ -20,6 +21,7 @@ public class RpcReceiverInterceptor implements ReceiverInterceptor{
 	public void receiver(RpcRequest request) {
 		if(request.getRequestHead()!=null){
 			DataSourceContextHolder.setDataSourceName(request.getRequestHead());
+			DataSourceContextHolderReport.setDataSourceName(request.getRequestHead());
 		}
 	}
 

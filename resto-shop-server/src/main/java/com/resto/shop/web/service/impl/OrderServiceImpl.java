@@ -5353,7 +5353,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Map<String, Object> callMoneyAndNumByDate(String beginDate, String endDate, String brandId, String brandName, List<ShopDetail> shopDetailList) {
         //封装品牌的数据
-        DataSourceContextHolderReport.setDataSourceName(brandId);
         BrandOrderReportDto brandOrderReportDto;
         Map<String, Object> selectBrandMap = new HashMap<>();
         selectBrandMap.put("beginDate", beginDate);
@@ -5486,7 +5485,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> callListByTime(String beginDate, String endDate, String shopId, String customerId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListByTime(begin, end, shopId, customerId);
+        return orderMapperReport.selectListByTime(begin, end, shopId, customerId);
 
     }
 
