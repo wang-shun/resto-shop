@@ -9558,8 +9558,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate) {
-        return orderMapperReport.addRefundArticleDto(beginDate, endDate);
+    public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate, String shopId) {
+        return orderMapperReport.addRefundArticleDto(beginDate, endDate, shopId);
     }
 
 	@Override
@@ -10196,7 +10196,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return orderMapper.selectBySerialNumber(serialNumber);
     }
 
-    private List<ShopOrderReportDto> getBossAppOrderReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate) {
+    @Override
+    public List<ShopOrderReportDto> getBossAppOrderReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate) {
         List<ShopOrderReportDto> shopOrderReportDtoLists = new ArrayList<>();
         for(int i = 0; i < shopDetailList.size(); i++){
             ShopDetail shopDetail=shopDetailList.get(i);

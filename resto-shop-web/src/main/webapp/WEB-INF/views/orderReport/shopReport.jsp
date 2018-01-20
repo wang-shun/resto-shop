@@ -2,7 +2,13 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
 <div id="control">
-    <c:if test="${!empty shopId}">
+    <c:if test="${!empty shopId and !empty type}">
+        <a class="btn btn-info ajaxify" href="orderReport/shop/list">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
+    <c:if test="${!empty shopId and empty type}">
         <a class="btn btn-info ajaxify" href="orderReport/list">
             <span class="glyphicon glyphicon-circle-arrow-left"></span>
             返回

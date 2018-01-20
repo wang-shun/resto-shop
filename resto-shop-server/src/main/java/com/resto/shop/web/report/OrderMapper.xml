@@ -73,6 +73,7 @@
         <result column="tableware_fee_count" property="tablewareFeeCount"/>
         <result column="tableware_fee_price" property="tablewareFeePrice"/>
         <result column="is_use_new_service" property="isUseNewService"/>
+        <result column="data_origin" property="dataOrigin"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -202,7 +203,7 @@
         last_order_time,customer_count,service_price,pay_mode,base_money,base_order_money,base_customer_count,meal_fee_price,meal_all_number
         ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
         print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, is_consumption_rebate, group_id, before_id, order_before
-        ,sauce_fee_count,sauce_fee_price,towel_fee_count,towel_fee_price,tableware_fee_count,tableware_fee_price,is_use_new_service
+        ,sauce_fee_count,sauce_fee_price,towel_fee_count,towel_fee_price,tableware_fee_count,tableware_fee_price,is_use_new_service,data_origin
     </sql>
 
 
@@ -412,7 +413,11 @@
         and IF(td.production_status = 6, td.production_status = 6, td.production_status in (2,3))
         and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
         and CONCAT(#{endDate},' 23:59:59') >= td.create_time
-        and toi.refund_count != 0 GROUP BY td.id
+        and toi.refund_count != 0
+        <if test="shopId != null">
+          and td.shop_detail_id = #{shopId}
+        </if>
+        GROUP BY td.id
     </select>
 
     <!--查询品牌菜品的总数 -->

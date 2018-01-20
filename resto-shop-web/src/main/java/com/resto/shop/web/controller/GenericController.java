@@ -3,9 +3,13 @@ package com.resto.shop.web.controller;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.enums.RoleSign;
 import com.resto.brand.core.feature.orm.mybatis.Page;
 import com.resto.brand.web.model.BrandUser;
+import com.resto.brand.web.model.Role;
 import com.resto.brand.web.model.ShopDetail;
+import com.resto.brand.web.service.RoleService;
+import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.SysErrorService;
 import com.resto.shop.web.config.SessionKey;
 import org.slf4j.Logger;
@@ -19,6 +23,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.context.request.ServletWebRequest;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -34,6 +39,12 @@ public abstract class GenericController{
 
 	@Autowired
 	private SysErrorService sysErrorService;
+
+	@Resource
+	private RoleService roleService;
+
+	@Resource
+	private ShopDetailService shopDetailService;
 
 	public Result getSuccessResult() {
 		return getSuccessResult(null);
@@ -173,6 +184,13 @@ public abstract class GenericController{
 	}
 
     public List<ShopDetail> getCurrentShopDetails(){
+		Role role = roleService.selectById(getCurrentBrandUser().getRoleId());
+		if (RoleSign.SHOP_MANAGER.equalsIgnoreCase(role.getRoleSign())){
+			List<ShopDetail> shopDetails = new ArrayList<>();
+			ShopDetail shopDetail = shopDetailService.selectById(getCurrentShopId());
+			shopDetails.add(shopDetail);
+			return shopDetails;
+		}
         return (List<ShopDetail>) getRequest().getSession().getAttribute(SessionKey.CURRENT_SHOP_NAMES);
     }
 	

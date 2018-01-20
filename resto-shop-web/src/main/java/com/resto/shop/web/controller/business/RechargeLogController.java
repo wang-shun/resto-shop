@@ -61,6 +61,11 @@ public class RechargeLogController extends GenericController{
 		return "recharge/list";
 	}
 
+	@RequestMapping("/shop/list")
+	public String  shopList(){
+		return "recharge/shopList";
+	}
+
 	/**
 	 * name:yjuany
 	 * @param shopDetailId
@@ -331,6 +336,9 @@ public class RechargeLogController extends GenericController{
                 shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
             }
             List<RechargeLogDto> result = new ArrayList<>();
+			SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+			filter.getExcludes().add("brandChargeLogs");
+			filter.getExcludes().add("shopChargeLogs");
             if (rechargeLogDto.getBrandChargeLogs() != null){
                 Map<String, Object> brandMap = rechargeLogDto.getBrandChargeLogs();
                 RechargeLogDto brandLogDto = new RechargeLogDto();
@@ -345,13 +353,10 @@ public class RechargeLogController extends GenericController{
                 brandLogDto.setRechargeSpNum(new BigDecimal(brandMap.get("rechargeSpNum").toString()));
                 brandLogDto.setRechargeGaSpNum(new BigDecimal(brandMap.get("rechargeGaSpNum").toString()));
                 result.add(brandLogDto);
-                SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-                filter.getExcludes().add("brandChargeLogs");
-                filter.getExcludes().add("shopChargeLogs");
-                String json = JSON.toJSONString(rechargeLogDto.getShopChargeLogs(),filter);
-                List<RechargeLogDto> shopLogs = JSON.parseObject(json,new TypeReference<List<RechargeLogDto>>(){});
-                result.addAll(shopLogs);
             }
+			String json = JSON.toJSONString(rechargeLogDto.getShopChargeLogs(),filter);
+			List<RechargeLogDto> shopLogs = JSON.parseObject(json,new TypeReference<List<RechargeLogDto>>(){});
+			result.addAll(shopLogs);
     		//导出文件名
     		String fileName = "充值报表"+beginDate+"至"+endDate+".xls";
     		//定义读取文件的路径

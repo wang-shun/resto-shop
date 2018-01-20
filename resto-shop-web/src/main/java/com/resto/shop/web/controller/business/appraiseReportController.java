@@ -63,6 +63,11 @@ public class appraiseReportController extends GenericController{
     public String list(){
 		return "appraiseReport/list";
     }
+
+	@RequestMapping("/shop/list")
+	public String shopList(){
+		return "appraiseReport/shopList";
+	}
 	
 	@RequestMapping("/brand_data")
 	@ResponseBody
@@ -246,7 +251,7 @@ public class appraiseReportController extends GenericController{
 	@ResponseBody
 	public Result report_brandExcel (String beginDate,String endDate,AppraiseDto appraiseDto,HttpServletRequest request, HttpServletResponse response){
 		//导出文件名
-        String fileName = "品牌评论报表"+beginDate+"至"+endDate+".xls";
+        String fileName = "评论报表"+beginDate+"至"+endDate+".xls";
         //定义读取文件的路径
         String path = request.getSession().getServletContext().getRealPath(fileName);
         //定义列
@@ -271,17 +276,17 @@ public class appraiseReportController extends GenericController{
         map.put("reportTitle", "品牌评论");//表的名字
         map.put("timeType", "yyyy-MM-dd");
         List<AppraiseDto> result = new LinkedList<>();
-        if (appraiseDto.getBrandAppraise() != null && appraiseDto.getShopAppraises() != null){
-            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-            filter.getExcludes().add("brandAppraise");
-            filter.getExcludes().add("shopAppraises");
-            String brandJson = JSON.toJSONString(appraiseDto.getBrandAppraise(),filter);
-            AppraiseDto brandAppraiseDto = JSON.parseObject(brandJson, AppraiseDto.class);
-            result.add(brandAppraiseDto);
-            String shopJson = JSON.toJSONString(appraiseDto.getShopAppraises(), filter);
-            List<AppraiseDto> appraiseDtos = JSON.parseObject(shopJson, new TypeReference<List<AppraiseDto>>(){});
-            result.addAll(appraiseDtos);
-        }
+		SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+		filter.getExcludes().add("brandAppraise");
+		filter.getExcludes().add("shopAppraises");
+		if (appraiseDto.getBrandAppraise() != null) {
+			String brandJson = JSON.toJSONString(appraiseDto.getBrandAppraise(), filter);
+			AppraiseDto brandAppraiseDto = JSON.parseObject(brandJson, AppraiseDto.class);
+			result.add(brandAppraiseDto);
+		}
+		String shopJson = JSON.toJSONString(appraiseDto.getShopAppraises(), filter);
+		List<AppraiseDto> appraiseDtos = JSON.parseObject(shopJson, new TypeReference<List<AppraiseDto>>(){});
+		result.addAll(appraiseDtos);
         String[][] headers = {{"品牌/店铺","25"},{"评价单数","25"},{"评价率","25"},{"评论红包总额","25"},{"订单总额(元)","25"},{"五星评价","25"},{"四星评价","25"},{"三星评价","25"},{"二星评价","25"},{"一星评价","25"}};
         //定义excel工具类对象
         ExcelUtil<AppraiseDto> excelUtil=new ExcelUtil<AppraiseDto>();
