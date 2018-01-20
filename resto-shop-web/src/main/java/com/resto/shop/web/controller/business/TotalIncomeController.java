@@ -68,6 +68,11 @@ public class TotalIncomeController extends GenericController {
         return "totalIncome/list";
     }
 
+    @RequestMapping("/shop/list")
+    public String shopList() {
+        return "totalIncome/shopList";
+    }
+
 
     @RequestMapping("reportIncome")
     @ResponseBody
@@ -253,7 +258,7 @@ public class TotalIncomeController extends GenericController {
         map.put("beginDate", beginDate);
         map.put("reportType", "品牌营业额报表");// 表的头，第一行内容
         map.put("endDate", endDate);
-        map.put("num", "15");// 显示的位置
+        map.put("num", "16");// 显示的位置
         map.put("reportTitle", "品牌收入条目");// 表的名字
         map.put("timeType", "yyyy-MM-dd");
 
@@ -268,11 +273,14 @@ public class TotalIncomeController extends GenericController {
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
         filter.getExcludes().add("brandIncomeDtos");
         filter.getExcludes().add("shopIncomeDtos");
-        String json = JSON.toJSONString(shopIncomeDto.getBrandIncomeDtos(), filter);
-        List<ShopIncomeDto> brandIncomeDto = JSON.parseObject(json, new TypeReference<List<ShopIncomeDto>>(){});
-        result.addAll(brandIncomeDto);
-        json = JSON.toJSONString(shopIncomeDto.getShopIncomeDtos(), filter);
-        List<ShopIncomeDto> shopIncomeDtos = JSON.parseObject(json, new TypeReference<List<ShopIncomeDto>>(){});
+        if (shopIncomeDto.getBrandIncomeDtos() != null) {
+            String brandJson = JSON.toJSONString(shopIncomeDto.getBrandIncomeDtos(), filter);
+            List<ShopIncomeDto> brandIncomeDto = JSON.parseObject(brandJson, new TypeReference<List<ShopIncomeDto>>() {
+            });
+            result.addAll(brandIncomeDto);
+        }
+        String shopJson = JSON.toJSONString(shopIncomeDto.getShopIncomeDtos(), filter);
+        List<ShopIncomeDto> shopIncomeDtos = JSON.parseObject(shopJson, new TypeReference<List<ShopIncomeDto>>(){});
         result.addAll(shopIncomeDtos);
         ExcelUtil<ShopIncomeDto> excelUtil = new ExcelUtil<>();
         try {
