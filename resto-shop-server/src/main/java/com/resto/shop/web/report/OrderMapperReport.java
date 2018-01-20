@@ -56,7 +56,7 @@ public interface OrderMapperReport{
 	 * @param endDate
 	 * @return
 	 */
-	List<RefundArticleOrder> addRefundArticleDto(@Param("beginDate") String beginDate, @Param("endDate") String endDate);
+	List<RefundArticleOrder> addRefundArticleDto(@Param("beginDate") String beginDate, @Param("endDate") String endDate,@Param("shopId") String shopId);
 
 	Integer selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 

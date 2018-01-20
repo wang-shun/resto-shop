@@ -413,7 +413,11 @@
         and IF(td.production_status = 6, td.production_status = 6, td.production_status in (2,3))
         and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
         and CONCAT(#{endDate},' 23:59:59') >= td.create_time
-        and toi.refund_count != 0 GROUP BY td.id
+        and toi.refund_count != 0
+        <if test="shopId != null">
+          and td.shop_detail_id = #{shopId}
+        </if>
+        GROUP BY td.id
     </select>
 
     <!--查询品牌菜品的总数 -->
