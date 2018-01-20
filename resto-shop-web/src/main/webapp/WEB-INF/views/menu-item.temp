@@ -24,9 +24,9 @@
                             </a>
                         </c:if>
                         <c:if test="${fn:length(subMenu.children)>0 }">
-                        <s:hasPermission name="${subMenu.permissionSign }">
                             <ul class="sub-menu">
                                 <c:forEach items="${subMenu.children }" var="subMenuChild">
+                        <s:hasPermission name="${subMenuChild.permissionSign }">
                                     <c:if test="${subMenuChild.menuType == 1 }">
                                         <li class="nav-item">
                                             <a href="${subMenuChild.permissionSign}" class="nav-link nav-toggle ${subMenuChild.menuType==1?'ajaxify':''} ${subMenuChild.menuType==2?'iframeify':''}">
@@ -34,9 +34,9 @@
                                             </a>
                                         </li>
                                     </c:if>
+                        </s:hasPermission>
                                 </c:forEach>
                             </ul>
-                        </s:hasPermission>
                         </c:if>
                     </li>
 		        </s:hasPermission>
