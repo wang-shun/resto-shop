@@ -58,6 +58,11 @@ public class OrderController extends GenericController{
 
 	}
 
+	@RequestMapping("/shop/list")
+	public String shopList(){
+		return "orderReport/shopList";
+	}
+
 	//查询已消费订单的订单份数和订单金额
 	@ResponseBody
 	@RequestMapping("brand_data")
@@ -73,6 +78,23 @@ public class OrderController extends GenericController{
         }
 		return getSuccessResult(object);
 	}
+
+	//查询已消费订单的订单份数和订单金额
+	@ResponseBody
+	@RequestMapping("shop_data")
+	public Result selectShopMoneyAndNumByDate(String beginDate,String endDate){
+		JSONObject object = new JSONObject();
+		try {
+			List<ShopOrderReportDto> resultMap = orderService.getBossAppOrderReport(getCurrentBrandId(), getCurrentShopDetails(), beginDate, endDate);
+			object.put("result",resultMap);
+		}catch (Exception e){
+			log.error("查看订单报表出错！");
+			e.printStackTrace();
+			return new Result(false);
+		}
+		return getSuccessResult(object);
+	}
+
 
 	private Map<String,Object> getResult(String beginDate,String endDate){
 		return orderService.callMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
@@ -90,7 +112,7 @@ public class OrderController extends GenericController{
 			shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
 		}
 		//导出文件名
-		String fileName = "品牌订单列表"+beginDate+"至"+endDate+".xls";
+		String fileName = "订单列表"+beginDate+"至"+endDate+".xls";
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
@@ -101,25 +123,26 @@ public class OrderController extends GenericController{
         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
         filter.getExcludes().add("brandOrderDto");
         filter.getExcludes().add("shopOrderDtos");
-        String json = JSON.toJSONString(shopOrderReportDto.getBrandOrderDto(), filter);
-        //OrderPayDto brandOrderDto = JSON.parseObject(json, OrderPayDto.class);
-		BrandOrderReportDto bandOrderReportDto=JSON.parseObject(json, BrandOrderReportDto.class);
-		ShopOrderReportDto b_shopOrderReportDto=new ShopOrderReportDto();
-		b_shopOrderReportDto.setShopName(bandOrderReportDto.getBrandName());
-		b_shopOrderReportDto.setShop_orderCount(bandOrderReportDto.getOrderCount());
-		b_shopOrderReportDto.setShop_orderPrice(bandOrderReportDto.getOrderPrice());
-		b_shopOrderReportDto.setShop_singlePrice(bandOrderReportDto.getSinglePrice());
-		b_shopOrderReportDto.setShop_peopleCount(bandOrderReportDto.getPeopleCount());
-		b_shopOrderReportDto.setShop_perPersonPrice(bandOrderReportDto.getPerPersonPrice());
-		b_shopOrderReportDto.setShop_tangshiCount(bandOrderReportDto.getTangshiCount());
-		b_shopOrderReportDto.setShop_tangshiPrice(bandOrderReportDto.getTangshiPrice());
-		b_shopOrderReportDto.setShop_waidaiCount(bandOrderReportDto.getWaidaiCount());
-		b_shopOrderReportDto.setShop_waidaiPrice(bandOrderReportDto.getWaidaiPrice());
-		b_shopOrderReportDto.setShop_waimaiCount(bandOrderReportDto.getWaimaiCount());
-		b_shopOrderReportDto.setShop_waimaiPrice(bandOrderReportDto.getWaimaiPrice());
-        result.add(b_shopOrderReportDto);
-        json = JSON.toJSONString(shopOrderReportDto.getShopOrderDtos(), filter);
-        List<ShopOrderReportDto> shopOrderDtos = JSON.parseObject(json, new TypeReference<List<ShopOrderReportDto>>(){});
+        if (shopOrderReportDto.getBrandOrderDto() != null) {
+			String brandJson = JSON.toJSONString(shopOrderReportDto.getBrandOrderDto(), filter);
+			BrandOrderReportDto bandOrderReportDto = JSON.parseObject(brandJson, BrandOrderReportDto.class);
+			ShopOrderReportDto b_shopOrderReportDto = new ShopOrderReportDto();
+			b_shopOrderReportDto.setShopName(bandOrderReportDto.getBrandName());
+			b_shopOrderReportDto.setShop_orderCount(bandOrderReportDto.getOrderCount());
+			b_shopOrderReportDto.setShop_orderPrice(bandOrderReportDto.getOrderPrice());
+			b_shopOrderReportDto.setShop_singlePrice(bandOrderReportDto.getSinglePrice());
+			b_shopOrderReportDto.setShop_peopleCount(bandOrderReportDto.getPeopleCount());
+			b_shopOrderReportDto.setShop_perPersonPrice(bandOrderReportDto.getPerPersonPrice());
+			b_shopOrderReportDto.setShop_tangshiCount(bandOrderReportDto.getTangshiCount());
+			b_shopOrderReportDto.setShop_tangshiPrice(bandOrderReportDto.getTangshiPrice());
+			b_shopOrderReportDto.setShop_waidaiCount(bandOrderReportDto.getWaidaiCount());
+			b_shopOrderReportDto.setShop_waidaiPrice(bandOrderReportDto.getWaidaiPrice());
+			b_shopOrderReportDto.setShop_waimaiCount(bandOrderReportDto.getWaimaiCount());
+			b_shopOrderReportDto.setShop_waimaiPrice(bandOrderReportDto.getWaimaiPrice());
+			result.add(b_shopOrderReportDto);
+		}
+		String shopJson = JSON.toJSONString(shopOrderReportDto.getShopOrderDtos(), filter);
+        List<ShopOrderReportDto> shopOrderDtos = JSON.parseObject(shopJson, new TypeReference<List<ShopOrderReportDto>>(){});
         result.addAll(shopOrderDtos);
 		String shopName="";
 		for (ShopDetail shopDetail : shopDetailList) {
@@ -132,7 +155,7 @@ public class OrderController extends GenericController{
 		map.put("beginDate", beginDate);
 		map.put("reportType", "品牌订单报表");//表的头，第一行内容
 		map.put("endDate", endDate);
-		map.put("num", "4");//显示的位置
+		map.put("num", "11");//显示的位置
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
@@ -172,11 +195,12 @@ public class OrderController extends GenericController{
 
 	//进入店铺订单报表页面
 	@RequestMapping("/show/shopReport")
-	public String showModal(String beginDate,String endDate,String shopId,String shopName,HttpServletRequest request){
+	public String showModal(String beginDate,String endDate,String shopId,String shopName, Integer type,HttpServletRequest request){
 		request.setAttribute("beginDate", beginDate);
 		request.setAttribute("endDate", endDate);
         request.setAttribute("shopId", shopId);
         request.setAttribute("shopName",shopName);
+        request.setAttribute("type", type);
 		return "orderReport/shopReport";
 	}
 
@@ -723,7 +747,7 @@ public class OrderController extends GenericController{
 			map.put("beginDate", year.concat("-").concat(month).concat("-01"));
 			map.put("reportType", typeName);// 表的头，第一行内容
 			map.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
-			map.put("num", "10");// 显示的位置
+			map.put("num", "11");// 显示的位置
 			map.put("timeType", "yyyy-MM-dd");
 			map.put("reportTitle", shopNames);// 表的名字
 			String[][] headers = {{"日期","25"},{"订单总数","25"},{"订单总额","25"},{"单均","25"},{"就餐人数","25"},{"人均","25"},{"堂吃订单数","25"},{"堂吃订单额","25"},{"外带订单数","25"},{"外带订单额","25"},{"R+外卖订单数","25"},{"R+外卖订单额","25"}};

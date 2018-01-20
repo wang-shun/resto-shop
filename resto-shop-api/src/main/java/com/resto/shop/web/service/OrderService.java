@@ -809,4 +809,6 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	List<String> posSelectNotCancelledOrdersIdByDate(String shopId, String beginDate, String endDate);
 
 	Order selectBySerialNumber(String serialNumber);
+
+	List<ShopOrderReportDto> getBossAppOrderReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate);
 }
