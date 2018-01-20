@@ -214,11 +214,11 @@
                 toastr.clear();
                 toastr.success("查询中...");
                 try {
-                    $.post("orderReport/shop_data", this.getDate(), function (result) {
+                    $.post("orderReport/brand_data", this.getDate(), function (result) {
                         if(result.success) {
                             that.shopOrderTable.clear();
-                            that.shopOrderTable.rows.add(result.data.result).draw();
-                            that.shopOrderList = result.data.result;
+                            that.shopOrderTable.rows.add(result.data.result.shopId).draw();
+                            that.shopOrderList = result.data.result.shopId;
                             toastr.clear();
                             toastr.success("查询成功");
                         }else{

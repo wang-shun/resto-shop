@@ -68,6 +68,11 @@ public class TotalIncomeController extends GenericController {
         return "totalIncome/list";
     }
 
+    @RequestMapping("/shop/list")
+    public String shopList() {
+        return "totalIncome/shopList";
+    }
+
 
     @RequestMapping("reportIncome")
     @ResponseBody

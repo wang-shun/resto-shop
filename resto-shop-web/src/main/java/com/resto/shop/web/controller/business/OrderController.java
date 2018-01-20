@@ -79,22 +79,6 @@ public class OrderController extends GenericController{
 		return getSuccessResult(object);
 	}
 
-	//查询已消费订单的订单份数和订单金额
-	@ResponseBody
-	@RequestMapping("shop_data")
-	public Result selectShopMoneyAndNumByDate(String beginDate,String endDate){
-		JSONObject object = new JSONObject();
-		try {
-			List<ShopOrderReportDto> resultMap = orderService.getBossAppOrderReport(getCurrentBrandId(), getCurrentShopDetails(), beginDate, endDate);
-			object.put("result",resultMap);
-		}catch (Exception e){
-			log.error("查看订单报表出错！");
-			e.printStackTrace();
-			return new Result(false);
-		}
-		return getSuccessResult(object);
-	}
-
 
 	private Map<String,Object> getResult(String beginDate,String endDate){
 		return orderService.callMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
