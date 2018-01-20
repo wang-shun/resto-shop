@@ -1006,7 +1006,7 @@ public class OrderAspect {
                     MQMessageProducer.sendPlaceOrderMessage(order);
                     MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                 } else {
-                    if (order.getOrderState() == OrderState.PAYMENT) {
+                    if (order.getOrderState() == OrderState.PAYMENT && order.getDataOrigin() != 0) {
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                         MQMessageProducer.sendModelFivePaySuccess(order);
                         if (order.getPrintTimes() == 0) {
