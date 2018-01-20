@@ -354,6 +354,7 @@ public class PosServiceImpl implements PosService {
     @Override
     public void syncPosOrderPay(String data) {
         JSONObject json = new JSONObject(data);
+        int productionStatus = json.getInt("productionStatus");
         Order order = orderService.selectById(json.getString("orderId"));
         if(order != null && order.getOrderState() == OrderState.SUBMIT){
 
@@ -368,6 +369,7 @@ public class PosServiceImpl implements PosService {
             }
             order.setOrderState(OrderState.PAYMENT);
             order.setPaymentAmount(BigDecimal.valueOf(0));
+            order.setProductionStatus(productionStatus);
             order.setAllowCancel(false);
             order.setAllowContinueOrder(false);
             orderService.update(order);
