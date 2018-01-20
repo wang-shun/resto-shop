@@ -316,6 +316,7 @@ public class PosServiceImpl implements PosService {
         order.setOrderMode(shopDetail.getShopMode());
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(json.getString("brandId"));
+        order.setDataOrigin(json.getInt("dataOrigin"));
         List<OrderItemDto> orderItemDtos =  orderDto.getOrderItem();
         List<OrderItem> orderItems = new ArrayList<>();
         for(OrderItemDto orderItemDto : orderItemDtos){
@@ -354,7 +355,6 @@ public class PosServiceImpl implements PosService {
     @Override
     public void syncPosOrderPay(String data) {
         JSONObject json = new JSONObject(data);
-        int productionStatus = json.getInt("productionStatus");
         Order order = orderService.selectById(json.getString("orderId"));
         if(order != null && order.getOrderState() == OrderState.SUBMIT){
 
@@ -369,7 +369,7 @@ public class PosServiceImpl implements PosService {
             }
             order.setOrderState(OrderState.PAYMENT);
             order.setPaymentAmount(BigDecimal.valueOf(0));
-            order.setProductionStatus(productionStatus);
+            order.setProductionStatus(2);
             order.setAllowCancel(false);
             order.setAllowContinueOrder(false);
             orderService.update(order);
