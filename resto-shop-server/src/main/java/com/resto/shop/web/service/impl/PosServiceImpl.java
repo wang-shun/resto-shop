@@ -609,7 +609,7 @@ public class PosServiceImpl implements PosService {
         Brand brand = brandService.selectByPrimaryKey(brandId);
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         param.put("service" , "【" + brand.getBrandName() + "】-" + shopDetail.getName() + "  Pos2.0系统");
-        String phones = "17671111590,13817420832,15616141529";
+        String phones = "17671111590";
         SMSUtils.sendMessage(phones, param , SMSUtils.SIGN, SMSUtils.SMS_SERVER_ERROR);
     }
 
