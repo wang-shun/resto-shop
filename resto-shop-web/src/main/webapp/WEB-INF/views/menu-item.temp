@@ -24,6 +24,7 @@
                             </a>
                         </c:if>
                         <c:if test="${fn:length(subMenu.children)>0 }">
+                        <s:hasPermission name="${subMenu.permissionSign }">
                             <ul class="sub-menu">
                                 <c:forEach items="${subMenu.children }" var="subMenuChild">
                                     <c:if test="${subMenuChild.menuType == 1 }">
@@ -35,6 +36,7 @@
                                     </c:if>
                                 </c:forEach>
                             </ul>
+                        </s:hasPermission>
                         </c:if>
                     </li>
 		        </s:hasPermission>
