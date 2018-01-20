@@ -350,7 +350,6 @@
         var object = {
             beginDate : beginDate,
             endDate : endDate,
-            brandIncomeDtos : dataSource.brandIncome,
             shopIncomeDtos : dataSource.shopIncome
         }
         try {
