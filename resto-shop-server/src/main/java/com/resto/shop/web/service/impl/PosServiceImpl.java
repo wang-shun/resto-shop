@@ -316,7 +316,7 @@ public class PosServiceImpl implements PosService {
         order.setOrderMode(shopDetail.getShopMode());
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(json.getString("brandId"));
-        order.setDataOrigin(json.getInt("dataOrigin"));
+        order.setDataOrigin(orderDto.getDataOrigin());
         List<OrderItemDto> orderItemDtos =  orderDto.getOrderItem();
         List<OrderItem> orderItems = new ArrayList<>();
         for(OrderItemDto orderItemDto : orderItemDtos){
