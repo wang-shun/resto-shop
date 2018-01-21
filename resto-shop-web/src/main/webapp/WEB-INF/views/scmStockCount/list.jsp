@@ -114,8 +114,8 @@
                     data:"createrName"
                 },
                 {
-                    title:"备注",
-                    data:"orderStatus"
+                    title:"状态",
+                    data:"orderStatusShow"
                 },
                 {
                     title : "操作",

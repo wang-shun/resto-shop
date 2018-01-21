@@ -22,7 +22,7 @@
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">菜品类别<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <select id="articleFamilyId" name="articleFamilyId" v-model="parameter.articleFamilyId"  class="bs-select form-control" @change='changeType1' >
+                                    <select  id="articleFamilyId" name="articleFamilyId" v-model="parameter.articleFamilyId"  class="bs-select form-control" @change='changeType1' >
                                         <option disabled selected value>请选择</option>
                                         <option  v-for="articleFamily in articleFamilyIdArr" value="{{articleFamily.articleFamilyId}}">
                                             {{articleFamily.name}}
@@ -31,10 +31,9 @@
                                 </div>
 
 
-
                                 <label class="col-md-2 control-label">菜品名称<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                <select id="articleId" name="articleId"  v-model="parameter.articleId"  class="bs-select form-control" @change='changeType2'>
+                                <select  id="articleId" name="articleId"  v-model="parameter.articleId"  class="bs-select form-control" @change='changeType2'>
                                     <option disabled selected value>请选择</option>
                                     <option  v-for="productName in productNameArr" value="{{productName.articleId}}" v-if="parameter.articleFamilyId == productName.articleFamilyId">
                                         {{productName.name}}
@@ -420,6 +419,10 @@
                     }
                 },
                 create:function(){ //打开新增弹窗
+
+                    $("#articleId").removeAttr("disabled","disabled");
+                    $("#articleFamilyId").removeAttr("disabled","disabled");
+
                     this.parameter= {
                         bomDetailDoList:[],//bom原材料显示
                         bomDetailDeleteIds:[],//删除的list节点
@@ -451,6 +454,10 @@
                     this.parameter.bomDetailDeleteIds=[];
                     this.showform=true;
                     this.parameter.articleId='';
+
+                    $("#articleId").attr("disabled","disabled");
+                    $("#articleFamilyId").attr("disabled","disabled");
+
                     setTimeout(function () {
                         that.tableBodyListsShow=false;
                         that.parameter.articleId=articleIdZhi;

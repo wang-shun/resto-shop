@@ -46,9 +46,9 @@ public class ScmCategoryController extends GenericController {
      */
     @RequestMapping("/query")
     @ResponseBody
-    public Result queryAll(String shopId,Long supPriceId) {
+    public Result queryAll(String shopId,Long supPriceId,Long pmsHeadId) {
         String shopDetailId = StringUtils.isEmpty(shopId)?getCurrentShopId():shopId;
-        List<CategoryOne> list = categoryService.queryAll(shopDetailId,supPriceId);
+        List<CategoryOne> list = categoryService.queryAll(shopDetailId,supPriceId,pmsHeadId);
         return getSuccessResult(list);
     }
 

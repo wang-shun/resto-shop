@@ -1,6 +1,7 @@
  package com.resto.shop.web.controller.scm;
 
  import com.resto.brand.core.entity.Result;
+ import com.resto.brand.web.model.BrandUser;
  import com.resto.brand.web.model.ShopDetail;
  import com.resto.brand.web.service.ShopDetailService;
  import com.resto.scm.web.dto.DocPmsPoHeaderDetailDo;
@@ -77,7 +78,8 @@ public class ScmDocPmsPoHeaderController extends GenericController{
 	@RequestMapping("approve")
 	@ResponseBody
 	public Result approve(Long id,Integer orderStatus){
-		docPmsPoHeaderService.updateStateById(id,orderStatus);
+		BrandUser currentBrandUser = getCurrentBrandUser();
+		docPmsPoHeaderService.updateStateById(id,orderStatus,currentBrandUser.getUsername());
 		return Result.getSuccess();
 	}
 
