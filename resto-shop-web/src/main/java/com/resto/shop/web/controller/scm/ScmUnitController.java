@@ -4,7 +4,6 @@
  import com.resto.brand.web.model.BrandSetting;
  import com.resto.brand.web.service.BrandSettingService;
  import com.resto.common.dao.domain.PageResult;
- import com.resto.scm.web.model.MdCategory;
  import com.resto.scm.web.model.MdUnit;
  import com.resto.scm.web.service.ScmUnitService;
  import com.resto.shop.web.constant.Common;
