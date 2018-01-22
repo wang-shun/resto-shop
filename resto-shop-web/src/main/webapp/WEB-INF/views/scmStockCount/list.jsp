@@ -79,6 +79,10 @@
             <div class="text-center" style="padding: 20px 0">
                 <a class="btn default" @click="detailsCli">取消</a>
             </div>
+            <div class="text-center" style="padding: 20px 0" v-if="approveBtn">
+                <a class="btn default" @click="approveCli1" >驳回</a>
+                <a class="btn blue pull-center" @click="approveCli2" >批准</a>
+            </div>
         </div>
     </div>
     <!--查看详情-->
@@ -122,10 +126,21 @@
                     data : "id",
                     createdCell:function(td,tdData,rowData){
                         var operator=[
+                            <s:hasPermission name="scmStockCount/approve">
+                            C.createApproveBtn(rowData),
+                            </s:hasPermission>
                             <s:hasPermission name="scmStockCount/showDetails">
                             C.findBtn(rowData),
                             </s:hasPermission>
                         ];
+
+                        if(rowData.orderStatus==12||rowData.orderStatus==13||rowData.orderStatus==15){
+                            operator=[
+                                <s:hasPermission name="scmStockCount/showDetails">
+                                C.findBtn(rowData),
+                                </s:hasPermission>
+                            ];
+                        }
                         $(td).html(operator);
                     }
                 },
@@ -137,6 +152,8 @@
             el:"#control",
             data:{
                 details:false,//查看详情
+                detailsBtn:false,//查看详情返回按钮
+                approveBtn:false,//查看详情（审核）-审核按钮
                 detailsArr:{},//查看详情对象
             },
             methods:{
@@ -146,6 +163,23 @@
                 },
                 detailsCli:function () { //关闭查看详情
                     this.details=false;
+                },
+
+                approve:function (data) { //开始审核
+                    this.details=true;
+                    this.detailsArr=data;
+                    this.approveBtn=true;
+                },
+                approveCli1:function () { //驳回审核
+                    this.details=false;
+                    this.approveBtn=false;
+                    C.systemButton('scmStockCount/approve',{id:this.detailsArr.id,orderStatus:'13'},['驳回成功','驳回失败']);
+                },
+                approveCli2:function () { //批准审核
+                    debugger
+                    this.details=false;
+                    this.approveBtn=false;
+                    C.systemButton('scmStockCount/approve',{id:this.detailsArr.id,orderStatus:'12'},['审核成功','审核失败']);
                 },
             },
         });

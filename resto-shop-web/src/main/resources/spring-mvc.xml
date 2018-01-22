@@ -31,27 +31,35 @@
     <!-- 以下 validator ConversionService 在使用 mvc:annotation-driven 会 自动注册 -->
     <mvc:annotation-driven validator="validator"/>
 
-    <mvc:annotation-driven>
-        <mvc:message-converters>
-            <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
-                <property name="objectMapper">
-                    <bean class="com.fasterxml.jackson.databind.ObjectMapper">
-                        <!-- 处理responseBody 里面日期类型 -->
-                        <property name="dateFormat">
-                            <bean class="java.text.SimpleDateFormat">
-                                <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />
-                                <!--<constructor-arg type="java.lang.String" value="yyyy-MM-dd" />-->
-                            </bean>
-                        </property>
-                        <!-- 为null字段时不显示 -->
-                        <!--<property name="serializationInclusion">-->
-                            <!--<value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>-->
+    <!--<mvc:annotation-driven>-->
+        <!--<mvc:message-converters>-->
+            <!--<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">-->
+                <!--<property name="supportedMediaTypes">-->
+                    <!--<list>-->
+                        <!--<value>text/plain;charset=UTF-8</value>-->
+                        <!--<value>application/json;charset=UTF-8</value>-->
+                        <!--<value>application/x-www-form-urlencoded;charset=UTF-8</value>-->
+                    <!--</list>-->
+                <!--</property>-->
+                <!--<property name="objectMapper">-->
+                    <!--<bean class="com.fasterxml.jackson.databind.ObjectMapper">-->
+                        <!--&lt;!&ndash; 处理responseBody 里面日期类型 &ndash;&gt;-->
+                        <!--<property name="dateFormat">-->
+                            <!--<bean class="java.text.SimpleDateFormat">-->
+                                <!--<constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />-->
+                                <!--&lt;!&ndash;<constructor-arg type="java.lang.String" value="yyyy-MM-dd" />&ndash;&gt;-->
+                            <!--</bean>-->
                         <!--</property>-->
-                    </bean>
-                </property>
-            </bean>
-        </mvc:message-converters>
-    </mvc:annotation-driven>
+
+                        <!--&lt;!&ndash; 为null字段时不显示 &ndash;&gt;-->
+                        <!--&lt;!&ndash;<property name="serializationInclusion">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</property>&ndash;&gt;-->
+                    <!--</bean>-->
+                <!--</property>-->
+            <!--</bean>-->
+        <!--</mvc:message-converters>-->
+    <!--</mvc:annotation-driven>-->
 
 
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
@@ -117,6 +125,18 @@
                 <value>application/x-www-form-urlencoded;charset=UTF-8</value>
             </list>
         </property>
+
+        <!--<property name="objectMapper">-->
+            <!--<bean class="com.fasterxml.jackson.databind.ObjectMapper">-->
+                <!--&lt;!&ndash; 处理responseBody 里面日期类型 &ndash;&gt;-->
+                <!--<property name="dateFormat">-->
+                    <!--<bean class="java.text.SimpleDateFormat">-->
+                        <!--<constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />-->
+                        <!--&lt;!&ndash;<constructor-arg type="java.lang.String" value="yyyy-MM-dd" />&ndash;&gt;-->
+                    <!--</bean>-->
+                <!--</property>-->
+            <!--</bean>-->
+        <!--</property>-->
     </bean>
 
 

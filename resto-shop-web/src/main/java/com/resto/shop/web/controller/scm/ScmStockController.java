@@ -74,12 +74,12 @@ public class ScmStockController extends GenericController{
      *审核
      * @return
      */
-    @RequestMapping("approveStockStatusById")
+    @RequestMapping("approve")
     @ResponseBody
-    public Result create(Long id,String status,String shopId){
+    public Result approveStockStatusById(Long id,String orderStatus,String shopId){
         try {
             String shopDetailId = StringUtils.isEmpty(shopId)?getCurrentShopId():shopId;
-            stockCountCheckService.approveStockStatusById(id,status,shopDetailId);
+            stockCountCheckService.approveStockStatusById(id,orderStatus,shopDetailId,getCurrentBrandUser().getUsername());
             return Result.getSuccess();
         }catch (Exception e){
             return new Result("保存失败", 5000,false);
