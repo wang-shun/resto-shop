@@ -977,7 +977,7 @@ public class OrderAspect {
 //                    sendPaySuccessMsg(order);
 //                }
                 log.info("检查打印异常");
-            } else if (ProductionStatus.PRINTED == order.getProductionStatus()) {
+            } else if (ProductionStatus.PRINTED == order.getProductionStatus() && order.getDataOrigin() != 0) { //  订单状态为已打印 并且 不是 Pos2.0下的单
                 BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("发送禁止加菜:" + setting.getCloseContinueTime() + "s 后发送");
                 if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayType() == PayType.PAY) {
@@ -1006,7 +1006,7 @@ public class OrderAspect {
                     MQMessageProducer.sendPlaceOrderMessage(order);
                     MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                 } else {
-                    if (order.getOrderState() == OrderState.PAYMENT && order.getDataOrigin() != 0) {
+                    if (order.getOrderState() == OrderState.PAYMENT) {
                         MQMessageProducer.sendAutoConfirmOrder(order, setting.getAutoConfirmTime() * 1000);
                         MQMessageProducer.sendModelFivePaySuccess(order);
                         if (order.getPrintTimes() == 0) {
@@ -1032,7 +1032,7 @@ public class OrderAspect {
                 }
                 log.info("发送打印信息");
                 log.info("打印成功后，发送自动确认订单通知！" + setting.getAutoConfirmTime() + "s 后发送" + ",orderId:" + order.getId());
-            } else if (ProductionStatus.HAS_CALL == order.getProductionStatus()) {
+            } else if (ProductionStatus.HAS_CALL == order.getProductionStatus() && order.getDataOrigin() != 0) {    //  如果 pos2.0 下单的单子，则不验证此逻辑
                 log.info("发送叫号信息");
                 MQMessageProducer.sendPlaceOrderMessage(order);
             }
