@@ -209,7 +209,8 @@
                                 <td>{{item.materialCode}}</td>
                                 <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                 <td>{{item.provinceName+item.cityName+item.districtName}}</td>
-                                <td>{{item.purchasePrice}}</td>
+                                <td>{{item.purchaseMoney}}</td>
+                                <%--<td>{{item.purchasePrice}}</td>--%>
                             </tr>
                             </tbody>
                         </table>
