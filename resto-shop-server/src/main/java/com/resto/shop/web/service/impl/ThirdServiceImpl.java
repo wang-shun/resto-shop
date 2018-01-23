@@ -1947,10 +1947,10 @@ public class ThirdServiceImpl implements ThirdService {
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(order.getPlatformOrderId());
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-        if(order.getProductionStatus() != 1){
-            order.setProductionStatus(1);
-            platformOrderService.update(order);
-        }
+//        if(order.getProductionStatus() != 1){
+//            order.setProductionStatus(1);
+//            platformOrderService.update(order);
+//        }
 
         if (selectPrinterId == null) {
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
