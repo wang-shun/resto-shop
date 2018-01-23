@@ -1945,9 +1945,9 @@ public class ThirdServiceImpl implements ThirdService {
 
             }
         }
-        if(order.getProductionStatus() == 1){
-            return null;
-        }
+//        if(order.getProductionStatus() == 1){
+//            return null;
+//        }
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(order.getPlatformOrderId());
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(order.getPlatformOrderId());
 
