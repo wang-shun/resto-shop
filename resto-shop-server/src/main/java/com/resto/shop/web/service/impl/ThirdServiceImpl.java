@@ -192,9 +192,9 @@ public class ThirdServiceImpl implements ThirdService {
             return printTask;
         }
 
-        if(order.getProductionStatus() == 1){
-            return null;
-        }
+//        if(order.getProductionStatus() == 1){
+//            return null;
+//        }
 
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(platformOrderId);
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(platformOrderId);
@@ -268,13 +268,12 @@ public class ThirdServiceImpl implements ThirdService {
         String print_id = ApplicationUtils.randomUUID();
         print.put("PRINT_TASK_ID", print_id);
         print.put("ADD_TIME", new Date().getTime());
-//
+
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getPlatformOrderId());
         data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
 //        data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getPlatformOrderId()));
         data.put("ITEMS", items);
-//
         data.put("DISTRIBUTION_MODE", "外卖");
         data.put("ORIGINAL_AMOUNT", order.getOriginalPrice());
         data.put("RESTAURANT_ADDRESS", shopDetail.getAddress());
@@ -286,7 +285,7 @@ public class ThirdServiceImpl implements ThirdService {
         data.put("RESTAURANT_NAME", shopDetail.getName());
         data.put("DATETIME", DateUtil.formatDate(new Date(), "yyyy-MM-dd HH:mm:ss"));
         data.put("ARTICLE_COUNT", sum);
-//
+
         List<Map<String, Object>> paymentList = new ArrayList<>();
         Map<String, Object> payment = new HashMap<>();
         payment.put("PAYMENT_MODE", "222");
@@ -304,15 +303,11 @@ public class ThirdServiceImpl implements ThirdService {
 
         data.put("CONTACT_NAME", order.getName());
         data.put("CONTACT_TEL", phone);
-//
         print.put("DATA", data);
         print.put("STATUS", 0);
-//
         print.put("TICKET_TYPE", TicketType.DeliveryReceipt);
         Brand brand = brandService.selectById(shopDetail.getBrandId());
         JSONObject json = new JSONObject(print);
-//        UserActionUtils.writeToFtp(LogType.POS_LOG, brand.getBrandName(), shopDetail.getName()
-//                , "订单:"+order.getOrderId()+"返回打印总单模版"+json.toString());
         log.info("订单:" + order.getPlatformOrderId() + "返回打印总单模版" + json.toString());
         Map map = new HashMap(4);
         map.put("brandName", brand.getBrandName());
