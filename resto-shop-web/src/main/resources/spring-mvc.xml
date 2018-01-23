@@ -126,17 +126,17 @@
             </list>
         </property>
 
-        <!--<property name="objectMapper">-->
-            <!--<bean class="com.fasterxml.jackson.databind.ObjectMapper">-->
-                <!--&lt;!&ndash; 处理responseBody 里面日期类型 &ndash;&gt;-->
-                <!--<property name="dateFormat">-->
-                    <!--<bean class="java.text.SimpleDateFormat">-->
-                        <!--<constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />-->
-                        <!--&lt;!&ndash;<constructor-arg type="java.lang.String" value="yyyy-MM-dd" />&ndash;&gt;-->
-                    <!--</bean>-->
-                <!--</property>-->
-            <!--</bean>-->
-        <!--</property>-->
+        <property name="objectMapper">
+            <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                <!-- 处理responseBody 里面日期类型 -->
+                <property name="dateFormat">
+                    <bean class="java.text.SimpleDateFormat">
+                        <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />
+                        <!--<constructor-arg type="java.lang.String" value="yyyy-MM-dd" />-->
+                    </bean>
+                </property>
+            </bean>
+        </property>
     </bean>
 
 

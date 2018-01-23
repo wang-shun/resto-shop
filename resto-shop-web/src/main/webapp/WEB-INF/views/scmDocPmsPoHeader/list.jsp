@@ -80,7 +80,7 @@
                                 <td>{{item.materialCode}}</td>
                                 <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                 <td>{{item.provinceName+item.cityName+item.districtName}}</td>
-                                <td>{{item.purchaseRealTaxMoney}}</td>
+                                <td>{{item.purchaseMoney}}</td>
                                 <td>{{item.actQty}}</td>
                             </tr>
                             </tbody>

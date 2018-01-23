@@ -60,9 +60,16 @@
 		 return getSuccessResult(mdMaterial);
 	 }
 
+	 /***
+	  *
+	  * @RequestBody 当时form表单提交的时候，不可以使用该注解
+	  * @param mdMaterial  application/x-www-form-urlencoded;charset=UTF-8
+	  * @return
+	  */
+
 	 @RequestMapping(value = "create")
 	 @ResponseBody
-	 public Result create(@Valid @RequestBody MdMaterial mdMaterial){
+	 public Result create(@Valid  MdMaterial mdMaterial){
 		 mdMaterial.setShopDetailId(getCurrentShopId());
 		 mdMaterial.setCreaterId(mdMaterial.getCreaterId());
 		 mdMaterial.setCreaterName(mdMaterial.getCreaterName());
@@ -75,7 +82,7 @@
 
 	 @RequestMapping("modify")
 	 @ResponseBody
-	 public Result modify(@Valid @RequestBody MdMaterial mdMaterial){
+	 public Result modify(@Valid  MdMaterial mdMaterial){
 		 Integer row = materialService.updateMaterial(mdMaterial);
 		 return Result.getSuccess();
 	 }

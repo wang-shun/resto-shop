@@ -125,6 +125,9 @@
                 {
                     title: "入库日期",
                     data: "gmtCreate",
+                    createdCell:function (td,tdData) {//td中的数据
+                        $(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+                    }
                 },
                 {
                     title : "入库人",

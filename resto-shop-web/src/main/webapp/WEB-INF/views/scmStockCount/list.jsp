@@ -111,7 +111,10 @@
                 },
                 {
                     title:"盘点日期",
-                    data:"publishedTime"
+                    data:"publishedTime",
+                    createdCell:function (td,tdData) {//td中的数据
+                        $(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+                    }
                 },
                 {
                     title:"盘点人",
