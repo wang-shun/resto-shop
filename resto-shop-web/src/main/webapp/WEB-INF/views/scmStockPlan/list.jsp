@@ -63,6 +63,7 @@
                                 <th>规格</th>
                                 <th>产地</th>
                                 <th>数量</th>
+                                <th>报价</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -76,6 +77,7 @@
                                 <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                 <td>{{item.provinceName+item.cityName+item.districtName}}</td>
                                 <td>{{item.actQty}}</td>
+                                <td>{{item.purchaseMoney}}</td>
                             </tr>
                             </tbody>
                         </table>
