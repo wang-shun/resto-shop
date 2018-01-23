@@ -269,6 +269,7 @@ public class ThirdServiceImpl implements ThirdService {
         print.put("PRINT_TASK_ID", print_id);
         print.put("ADD_TIME", new Date().getTime());
         print.put("PRINT_STATE", 0);
+        print.put("PRINT_STATUS", 0);
 //
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getPlatformOrderId());
@@ -370,6 +371,7 @@ public class ThirdServiceImpl implements ThirdService {
         print.put("PRINT_TASK_ID", print_id);
         print.put("ADD_TIME", new Date().getTime());
         print.put("PRINT_STATE", 0);
+        print.put("PRINT_STATUS", 0);
 //
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getPlatformOrderId());
@@ -496,6 +498,7 @@ public class ThirdServiceImpl implements ThirdService {
         print.put("ADD_TIME", new Date().getTime());
 //
         print.put("PRINT_STATE", 0);
+        print.put("PRINT_STATUS", 0);
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber());
         String orderNumber = (String) RedisUtil.get(order.getId() + "orderNumber");
@@ -635,6 +638,7 @@ public class ThirdServiceImpl implements ThirdService {
         print.put("PRINT_TASK_ID", print_id);
         print.put("ADD_TIME", new Date().getTime());
         print.put("PRINT_STATE", 0);
+        print.put("PRINT_STATUS", 0);
 //
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getSerialNumber());
@@ -1461,6 +1465,7 @@ public class ThirdServiceImpl implements ThirdService {
         print.put("PRINT_TASK_ID", print_id);
         print.put("ADD_TIME", new Date().getTime());
         print.put("PRINT_STATE", 0);
+        print.put("PRINT_STATUS", 0);
 //
         Map<String, Object> data = new HashMap<>();
         data.put("ORDER_ID", order.getOrderId());
