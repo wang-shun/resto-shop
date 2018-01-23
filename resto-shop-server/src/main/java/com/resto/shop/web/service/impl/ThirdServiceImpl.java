@@ -192,9 +192,9 @@ public class ThirdServiceImpl implements ThirdService {
             return printTask;
         }
 
-//        if(order.getProductionStatus() == 1){
-//            return null;
-//        }
+        if(order.getProductionStatus() == 1){
+            return null;
+        }
 
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(platformOrderId);
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(platformOrderId);
@@ -1912,7 +1912,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
 
-    public Map<String, Object> printReceipt(String orderId, Integer selectPrinterId) {
+    public Map<String, Object> printReceipt(String orderId, Integer selectPrinterId, String type) {
 
 
         PlatformOrder order = platformOrderService.selectById(orderId);
@@ -1945,9 +1945,9 @@ public class ThirdServiceImpl implements ThirdService {
 
             }
         }
-//        if(order.getProductionStatus() == 1){
-//            return null;
-//        }
+        if(order.getProductionStatus() == 1 && !"shoudong".equals(type)){
+            return null;
+        }
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(order.getPlatformOrderId());
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(order.getPlatformOrderId());
 
