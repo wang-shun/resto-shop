@@ -36,7 +36,7 @@ public class ScmDocPmsPoHeaderController extends GenericController{
 	public Result listData(String shopId){
     	String shopDetailId =StringUtils.isEmpty(shopId)?getCurrentShopId():shopId;
 		String currentShopName = null;
-		if(StringUtils.isEmpty(shopId)){
+		if(StringUtils.isEmpty(shopDetailId)){
 			ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopDetailId);
 			currentShopName = shopDetail.getName();
 
