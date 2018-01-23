@@ -2802,7 +2802,7 @@ AND o.brand_id = #{brandId}
     </select>
 
     <select id="selectPayBefore" resultType="java.math.BigDecimal">
-    select sum(pay_value) from tb_order_payment_item
+    select IFNULL(sum(pay_value), 0) from tb_order_payment_item
     where order_id = #{orderId} and payment_mode_id not in (13,14,15,20,21)
 </select>
 

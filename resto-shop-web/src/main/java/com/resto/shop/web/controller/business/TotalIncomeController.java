@@ -183,7 +183,7 @@ public class TotalIncomeController extends GenericController {
                     shopIncomeDto.setIntegralPayment(shopIncomeDto.getIntegralPayment().add(shopIncomeDtoPayMent.getIntegralPayment()));
                     shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(shopIncomeDtoPayMent.getArticleBackPay()));
                     shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(shopIncomeDtoPayMent.getOtherPayment()));
-                    shopIncomeDto.setRefundCrashPayment(shopIncomeDto.getRefundCrashPayment().add(shopIncomeDtoPayMent.getRefundCrashPayment()));
+                    shopIncomeDto.setRefundCrashPayment(shopIncomeDto.getRefundCrashPayment().add(shopIncomeDtoPayMent.getRefundCrashPayment().abs()));
                 }
             }
             brandIncomeDto.setOriginalAmount(brandIncomeDto.getOriginalAmount().add(shopIncomeDto.getOriginalAmount()));
