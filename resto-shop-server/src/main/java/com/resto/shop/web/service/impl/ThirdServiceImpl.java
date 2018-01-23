@@ -243,7 +243,7 @@ public class ThirdServiceImpl implements ThirdService {
                 Map<String, Object> item = new HashMap<>();
                 item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
                 item.put("ARTICLE_NAME", orderDetail.getShowName());
-                item.put("ARTICLE_COUNT", orderDetail.getQuantity());
+                item.put("ARTICLE_COUNT", orderDetail.getQuantity() == null ? 0 : orderDetail.getQuantity());
                 sum += orderDetail.getQuantity();
                 items.add(item);
             }
@@ -253,7 +253,7 @@ public class ThirdServiceImpl implements ThirdService {
             for (PlatformOrderExtra orderExtra : orderExtraList) {
                 Map<String, Object> item = new HashMap<>();
                 item.put("ARTICLE_NAME", orderExtra.getName());
-                item.put("ARTICLE_COUNT", orderExtra.getQuantity());
+                item.put("ARTICLE_COUNT", orderExtra.getQuantity() == null ? 0 : orderExtra.getQuantity());
                 item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
                 items.add(item);
             }
@@ -338,7 +338,7 @@ public class ThirdServiceImpl implements ThirdService {
                 Map<String, Object> item = new HashMap<>();
                 item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
                 item.put("ARTICLE_NAME", orderDetail.getShowName());
-                item.put("ARTICLE_COUNT", orderDetail.getQuantity());
+                item.put("ARTICLE_COUNT", orderDetail.getQuantity() == null ? 0 : orderDetail.getQuantity());
                 sum += orderDetail.getQuantity();
                 items.add(item);
             }
@@ -348,7 +348,7 @@ public class ThirdServiceImpl implements ThirdService {
             for (PlatformOrderExtra orderExtra : orderExtraList) {
                 Map<String, Object> item = new HashMap<>();
                 item.put("ARTICLE_NAME", orderExtra.getName());
-                item.put("ARTICLE_COUNT", orderExtra.getQuantity());
+                item.put("ARTICLE_COUNT", orderExtra.getQuantity() == null ? 0 : orderExtra.getQuantity());
                 item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
                 items.add(item);
             }
@@ -446,7 +446,7 @@ public class ThirdServiceImpl implements ThirdService {
                 Map<String, Object> item = new HashMap<>();
                 item.put("SUBTOTAL", orderDetail.getFinalPrice());
                 item.put("ARTICLE_NAME", orderDetail.getArticleName());
-                item.put("ARTICLE_COUNT", orderDetail.getCount());
+                item.put("ARTICLE_COUNT", orderDetail.getCount() == null ? 0 : orderDetail.getCount());
                 sum += orderDetail.getCount();
                 items.add(item);
             }
@@ -465,7 +465,7 @@ public class ThirdServiceImpl implements ThirdService {
             }
             item.put("SUBTOTAL", shopDetail.getMealFeePrice().multiply(mealCount));
             item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
-            item.put("ARTICLE_COUNT", mealCount);
+            item.put("ARTICLE_COUNT", mealCount == null ? 0 : mealCount);
             items.add(item);
         }
 
@@ -586,7 +586,7 @@ public class ThirdServiceImpl implements ThirdService {
                 Map<String, Object> item = new HashMap<>();
                 item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getCount());
                 item.put("ARTICLE_NAME", orderDetail.getArticleName());
-                item.put("ARTICLE_COUNT", orderDetail.getCount());
+                item.put("ARTICLE_COUNT", orderDetail.getCount() == null ? 0 : orderDetail.getCount());
                 sum += orderDetail.getCount();
                 items.add(item);
             }
@@ -605,7 +605,7 @@ public class ThirdServiceImpl implements ThirdService {
             }
             item.put("SUBTOTAL", shopDetail.getMealFeePrice().multiply(mealCount));
             item.put("ARTICLE_NAME", shopDetail.getMealFeeName());
-            item.put("ARTICLE_COUNT", mealCount);
+            item.put("ARTICLE_COUNT", mealCount == null ? 0 : mealCount);
             items.add(item);
         }
         /*if (orderExtraList != null) {
@@ -763,7 +763,7 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
 //                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                     Map<String, Object> items = new HashMap<String, Object>();
-                    items.put("ARTICLE_COUNT", article.getQuantity());
+                    items.put("ARTICLE_COUNT", article.getQuantity() == null ? 0 : article.getQuantity());
                     items.put("ARTICLE_NAME", article.getShowName());
                     data.put("ITEMS", items);
                     data.put("CUSTOMER_SATISFACTION", "暂无信息");
@@ -898,7 +898,7 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
 //                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                     Map<String, Object> items = new HashMap<String, Object>();
-                    items.put("ARTICLE_COUNT", article.getQuantity());
+                    items.put("ARTICLE_COUNT", article.getQuantity() == null ? 0 : article.getQuantity());
                     items.put("ARTICLE_NAME", article.getShowName());
                     data.put("ITEMS", items);
                     data.put("CUSTOMER_SATISFACTION", "暂无信息");
@@ -1036,7 +1036,7 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("ORDER_NUMBER", "00"+orderT);
 //                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                     Map<String, Object> items = new HashMap<String, Object>();
-                    items.put("ARTICLE_COUNT", article.getCount());
+                    items.put("ARTICLE_COUNT", article.getCount() == null ? 0 : article.getCount());
                     items.put("ARTICLE_NAME", article.getArticleName());
                     data.put("ITEMS", items);
                     data.put("CUSTOMER_SATISFACTION", "暂无信息");
@@ -1175,7 +1175,7 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("ORDER_NUMBER", "00"+orderT);
 //                    data.put("ORDER_NUMBER", nextNumber(order.getShopDetailId(), order.getId()));
                     Map<String, Object> items = new HashMap<String, Object>();
-                    items.put("ARTICLE_COUNT", article.getCount());
+                    items.put("ARTICLE_COUNT", article.getCount() == null ? 0 : article.getCount());
                     items.put("ARTICLE_NAME", article.getArticleName());
                     data.put("ITEMS", items);
                     data.put("CUSTOMER_SATISFACTION", "暂无信息");
@@ -1336,7 +1336,7 @@ public class ThirdServiceImpl implements ThirdService {
                     data.put("ORDER_NUMBER", RedisUtil.get(order.getId() + "orderNumber"));
 //                    data.put("ORDER_NUMBER", nextNumber(order.getRestaurantId().toString(), order.getId().toString()));
                     Map<String, Object> items = new HashMap<String, Object>();
-                    items.put("ARTICLE_COUNT", article.getQuantity());
+                    items.put("ARTICLE_COUNT", article.getQuantity() == null ? 0 : article.getQuantity());
                     items.put("ARTICLE_NAME", article.getName());
                     data.put("ITEMS", items);
                     data.put("CUSTOMER_SATISFACTION", "暂无信息");
@@ -1429,7 +1429,7 @@ public class ThirdServiceImpl implements ThirdService {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", article.getPrice().doubleValue() * article.getQuantity());
             item.put("ARTICLE_NAME", articleName);
-            item.put("ARTICLE_COUNT", article.getQuantity());
+            item.put("ARTICLE_COUNT", article.getQuantity() == null ? 0 : article.getQuantity());
             sum += article.getQuantity();
             items.add(item);
         }
@@ -1439,7 +1439,7 @@ public class ThirdServiceImpl implements ThirdService {
             Map<String, Object> item = new HashMap<>();
             item.put("SUBTOTAL", extra.getPrice().doubleValue() * extra.getQuantity());
             item.put("ARTICLE_NAME", extra.getName());
-            item.put("ARTICLE_COUNT", extra.getQuantity());
+            item.put("ARTICLE_COUNT", extra.getQuantity() == null ? 0 : extra.getQuantity());
             items.add(item);
         }
 
