@@ -238,26 +238,26 @@ public class ThirdServiceImpl implements ThirdService {
         }
         int sum = 0;
         List<Map<String, Object>> items = new ArrayList<>();
-        if (orderDetailList != null) {
-            for (PlatformOrderDetail orderDetail : orderDetailList) {
-                Map<String, Object> item = new HashMap<>();
-                item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
-                item.put("ARTICLE_NAME", orderDetail.getShowName());
-                item.put("ARTICLE_COUNT", orderDetail.getQuantity());
-                sum += orderDetail.getQuantity();
-                items.add(item);
-            }
-        }
-
-        if (orderExtraList != null) {
-            for (PlatformOrderExtra orderExtra : orderExtraList) {
-                Map<String, Object> item = new HashMap<>();
-                item.put("ARTICLE_NAME", orderExtra.getName());
-                item.put("ARTICLE_COUNT", orderExtra.getQuantity());
-                item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
-                items.add(item);
-            }
-        }
+//        if (orderDetailList != null) {
+//            for (PlatformOrderDetail orderDetail : orderDetailList) {
+//                Map<String, Object> item = new HashMap<>();
+//                item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
+//                item.put("ARTICLE_NAME", orderDetail.getShowName());
+//                item.put("ARTICLE_COUNT", orderDetail.getQuantity());
+//                sum += orderDetail.getQuantity();
+//                items.add(item);
+//            }
+//        }
+//
+//        if (orderExtraList != null) {
+//            for (PlatformOrderExtra orderExtra : orderExtraList) {
+//                Map<String, Object> item = new HashMap<>();
+//                item.put("ARTICLE_NAME", orderExtra.getName());
+//                item.put("ARTICLE_COUNT", orderExtra.getQuantity());
+//                item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
+//                items.add(item);
+//            }
+//        }
 
         Map<String, Object> print = new HashMap<>();
         print.put("TABLE_NO", "");
@@ -332,26 +332,26 @@ public class ThirdServiceImpl implements ThirdService {
         }
         int sum = 0;
         List<Map<String, Object>> items = new ArrayList<>();
-        if (orderDetailList != null) {
-            for (PlatformOrderDetail orderDetail : orderDetailList) {
-                Map<String, Object> item = new HashMap<>();
-                item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
-                item.put("ARTICLE_NAME", orderDetail.getShowName());
-                item.put("ARTICLE_COUNT", orderDetail.getQuantity());
-                sum += orderDetail.getQuantity();
-                items.add(item);
-            }
-        }
-
-        if (orderExtraList != null) {
-            for (PlatformOrderExtra orderExtra : orderExtraList) {
-                Map<String, Object> item = new HashMap<>();
-                item.put("ARTICLE_NAME", orderExtra.getName());
-                item.put("ARTICLE_COUNT", orderExtra.getQuantity());
-                item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
-                items.add(item);
-            }
-        }
+//        if (orderDetailList != null) {
+//            for (PlatformOrderDetail orderDetail : orderDetailList) {
+//                Map<String, Object> item = new HashMap<>();
+//                item.put("SUBTOTAL", orderDetail.getPrice().doubleValue() * orderDetail.getQuantity());
+//                item.put("ARTICLE_NAME", orderDetail.getShowName());
+//                item.put("ARTICLE_COUNT", orderDetail.getQuantity());
+//                sum += orderDetail.getQuantity();
+//                items.add(item);
+//            }
+//        }
+//
+//        if (orderExtraList != null) {
+//            for (PlatformOrderExtra orderExtra : orderExtraList) {
+//                Map<String, Object> item = new HashMap<>();
+//                item.put("ARTICLE_NAME", orderExtra.getName());
+//                item.put("ARTICLE_COUNT", orderExtra.getQuantity());
+//                item.put("SUBTOTAL", orderExtra.getPrice().doubleValue());
+//                items.add(item);
+//            }
+//        }
 
         Map<String, Object> print = new HashMap<>();
         print.put("TABLE_NO", "");
@@ -1417,30 +1417,30 @@ public class ThirdServiceImpl implements ThirdService {
         }
         int sum = 0;
         List<Map<String, Object>> items = new ArrayList<>();
-        for (HungerOrderDetail article : orderItems) {
-            String articleName = article.getName();
-            if (article.getSpecs() != null) {
-                JSONArray jsonArray = new JSONArray(article.getSpecs());
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    articleName += ("(" + jsonArray.get(i) + ")");
-                }
-            }
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", article.getPrice().doubleValue() * article.getQuantity());
-            item.put("ARTICLE_NAME", articleName);
-            item.put("ARTICLE_COUNT", article.getQuantity());
-            sum += article.getQuantity();
-            items.add(item);
-        }
-
-        List<HungerOrderExtra> extras = hungerOrderMapper.getExtra(order.getOrderId().toString());
-        for (HungerOrderExtra extra : extras) {
-            Map<String, Object> item = new HashMap<>();
-            item.put("SUBTOTAL", extra.getPrice().doubleValue() * extra.getQuantity());
-            item.put("ARTICLE_NAME", extra.getName());
-            item.put("ARTICLE_COUNT", extra.getQuantity());
-            items.add(item);
-        }
+//        for (HungerOrderDetail article : orderItems) {
+//            String articleName = article.getName();
+//            if (article.getSpecs() != null) {
+//                JSONArray jsonArray = new JSONArray(article.getSpecs());
+//                for (int i = 0; i < jsonArray.length(); i++) {
+//                    articleName += ("(" + jsonArray.get(i) + ")");
+//                }
+//            }
+//            Map<String, Object> item = new HashMap<>();
+//            item.put("SUBTOTAL", article.getPrice().doubleValue() * article.getQuantity());
+//            item.put("ARTICLE_NAME", articleName);
+//            item.put("ARTICLE_COUNT", article.getQuantity());
+//            sum += article.getQuantity();
+//            items.add(item);
+//        }
+//
+//        List<HungerOrderExtra> extras = hungerOrderMapper.getExtra(order.getOrderId().toString());
+//        for (HungerOrderExtra extra : extras) {
+//            Map<String, Object> item = new HashMap<>();
+//            item.put("SUBTOTAL", extra.getPrice().doubleValue() * extra.getQuantity());
+//            item.put("ARTICLE_NAME", extra.getName());
+//            item.put("ARTICLE_COUNT", extra.getQuantity());
+//            items.add(item);
+//        }
 
         Map<String, Object> print = new HashMap<>();
         print.put("TABLE_NO", "");
