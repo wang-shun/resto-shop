@@ -4498,7 +4498,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectById(order.getBrandId());
         log.info("开始确认订单:" + order.getId());
         Integer orginState = order.getOrderState();//订单开始确认的状体
-        if (order.getConfirmTime() == null && !order.getClosed()) {
+        if (order.getOrderState() != OrderState.CONFIRM) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
             order.setAllowCancel(false);
@@ -4535,7 +4535,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         log.info("开始确认订单:" + order.getId());
         Integer orginState = order.getOrderState();//订单开始确认的状体
-        if (order.getConfirmTime() == null && !order.getClosed()) {
+        if (order.getOrderState() != OrderState.CONFIRM) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
             order.setAllowCancel(false);
@@ -4575,7 +4575,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer orginState = order.getOrderState();
         Brand brand = brandService.selectById(order.getBrandId());
         log.info("开始确认订单:" + order.getId());
-        if (order.getConfirmTime() == null && !order.getClosed()) {
+        if (order.getOrderState() != OrderState.CONFIRM) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
             order.setAllowCancel(false);
