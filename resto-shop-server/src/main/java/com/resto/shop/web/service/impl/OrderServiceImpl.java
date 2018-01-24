@@ -2016,6 +2016,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             LogTemplateUtils.getChildOrderPrintSuccessByOrderType(brand.getBrandName(), order.getId(), order.getProductionStatus());
             LogTemplateUtils.getChildOrderPrintSuccessByPOSType(brand.getBrandName(), order.getId(), order.getProductionStatus());
         }
+        log.info("客户下单,发送成功下单通知11111111111" + order.getId());
         order.setProductionStatus(ProductionStatus.PRINTED);
         order.setPrintOrderTime(new Date());
         order.setAllowCancel(false);
@@ -4503,7 +4504,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Brand brand = brandService.selectById(order.getBrandId());
         log.info("开始确认订单:" + order.getId());
         Integer orginState = order.getOrderState();//订单开始确认的状体
-        if (order.getConfirmTime() == null && !order.getClosed()) {
+        if (order.getOrderState() != OrderState.CONFIRM) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
             order.setAllowCancel(false);
@@ -4540,7 +4541,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         log.info("开始确认订单:" + order.getId());
         Integer orginState = order.getOrderState();//订单开始确认的状体
-        if (order.getConfirmTime() == null && !order.getClosed()) {
+        if (order.getOrderState() != OrderState.CONFIRM) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
             order.setAllowCancel(false);
@@ -4580,7 +4581,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer orginState = order.getOrderState();
         Brand brand = brandService.selectById(order.getBrandId());
         log.info("开始确认订单:" + order.getId());
-        if (order.getConfirmTime() == null && !order.getClosed()) {
+        if (order.getOrderState() != OrderState.CONFIRM) {
             order.setOrderState(OrderState.CONFIRM);
             order.setConfirmTime(new Date());
             order.setAllowCancel(false);
@@ -9767,13 +9768,16 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         TableQrcode tableQrcode =  tableQrcodeService.selectByTableNumberShopId(order.getShopDetailId(), Integer.valueOf(order.getTableNumber()));
         //得到该笔订单的评论信息
         Appraise appraise = appraiseService.selectDeatilByOrderId(order.getId(), null);
-        //得到该笔订单给差评的菜品Id
-        String[] articleIds = appraise.getArticleId().split(",");
-        //得到差评菜品的订单信息
-        List<OrderItem> orderItems = orderItemService.selectByArticleIds(articleIds);
-        OrderItem[] orderItemList  = new OrderItem[orderItems.size()];
-        for (int i = 0; i < orderItems.size() ; i++){
-            orderItemList[i] = orderItems.get(i);
+        OrderItem[] orderItemList  = new OrderItem[0];
+        if (StringUtils.isNoneBlank(appraise.getArticleId())) {
+            //得到该笔订单给差评的菜品Id
+            String[] articleIds = appraise.getArticleId().split(",");
+            //得到差评菜品的订单信息
+            List<OrderItem> orderItems = orderItemService.selectByArticleIds(articleIds);
+            orderItemList = new OrderItem[orderItems.size()];
+            for (int i = 0; i < orderItems.size(); i++) {
+                orderItemList[i] = orderItems.get(i);
+            }
         }
         //封装打印模板
         for (Printer printer : printerList) {
@@ -9932,29 +9936,31 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     private void badAppraiseOrderGetKitchenModel(OrderItem[] orderItemList, Order order, Printer printer, Appraise appraise, TableQrcode tableQrcode, List<Map<String, Object>> printTask) {
         //保存 菜品的名称和数量
         List<Map<String, Object>> items = new ArrayList<>();
-        //封装菜品信息
-        OrderItem orderItem;
-        for (int i = 1; i < orderItemList.length; i++) {
-            for (int j = 0; j < orderItemList.length - i; j++) {
-                if (orderItemList[j].getArticleName().length() > orderItemList[j+1].getArticleName().length()){
-                    orderItem = orderItemList[j];
-                    orderItemList[j] = orderItemList[j+1];
-                    orderItemList[j+1] = orderItem;
+        if (orderItemList.length > 0) {
+            //封装菜品信息
+            OrderItem orderItem;
+            for (int i = 1; i < orderItemList.length; i++) {
+                for (int j = 0; j < orderItemList.length - i; j++) {
+                    if (orderItemList[j].getArticleName().length() > orderItemList[j + 1].getArticleName().length()) {
+                        orderItem = orderItemList[j];
+                        orderItemList[j] = orderItemList[j + 1];
+                        orderItemList[j + 1] = orderItem;
+                    }
                 }
             }
-        }
-        //得到最小的菜品名称的长度
-        Integer minLength = orderItemList.length > 0 ? orderItemList[0].getArticleName().length() : 0;
-        Map<String, Object> item = new HashMap<>();
-        for (OrderItem article : orderItemList){
-            if (article.getArticleName().length() > minLength){
-                item.put("ARTICLE_NAME", getSpaceNumber(10 - ((article.getArticleName().length() - minLength) * 2)).concat(article.getCount().toString()));
-            }else{
-                item.put("ARTICLE_NAME", getSpaceNumber(10).concat(article.getCount().toString()));
+            //得到最小的菜品名称的长度
+            Integer minLength = orderItemList.length > 0 ? orderItemList[0].getArticleName().length() : 0;
+            Map<String, Object> item = new HashMap<>();
+            for (OrderItem article : orderItemList) {
+                if (article.getArticleName().length() > minLength) {
+                    item.put("ARTICLE_NAME", getSpaceNumber(10 - ((article.getArticleName().length() - minLength) * 2)).concat(article.getCount().toString()));
+                } else {
+                    item.put("ARTICLE_NAME", getSpaceNumber(10).concat(article.getCount().toString()));
+                }
+                item.put("ARTICLE_COUNT", article.getArticleName());
+                items.add(item);
+                item = new HashMap<>();
             }
-            item.put("ARTICLE_COUNT", article.getArticleName());
-            items.add(item);
-            item = new HashMap<>();
         }
         String serialNumber = order.getSerialNumber();//序列号
         String modeText = DistributionType.getModeText(DistributionType.BAD_APPRAISE_ORDER);//就餐模式
