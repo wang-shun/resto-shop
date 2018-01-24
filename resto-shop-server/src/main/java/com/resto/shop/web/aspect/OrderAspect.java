@@ -164,12 +164,8 @@ public class OrderAspect {
                 shopCartService.deleteByGroup(order.getGroupId());
             }
 
-
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
             log.info("tttttttttttttt----------");
-            if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
-                MQMessageProducer.sendCreateOrderMessage(order);
-            }
 
             if (order.getPayMode() != PayMode.WEIXIN_PAY && StringUtils.isEmpty(order.getGroupId())) {
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());

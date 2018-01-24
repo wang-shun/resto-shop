@@ -1152,6 +1152,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             insert(order);
+            if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+                log.info("\n店铺开启了 Pos 2.0  给 new pos 推送新订单：" + order.getId());
+                MQMessageProducer.sendCreateOrderMessage(order);
+            }
             customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
             if (order.getPaymentAmount().doubleValue() == 0) {
                 payOrderSuccess(order);
@@ -6967,7 +6971,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
         insert(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
-
 
         jsonResult.setData(order);
         return jsonResult;
