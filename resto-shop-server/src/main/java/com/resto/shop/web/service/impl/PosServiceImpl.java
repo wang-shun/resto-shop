@@ -123,6 +123,10 @@ public class PosServiceImpl implements PosService {
     @Override
     public String syncOrderCreated(String orderId) {
         Order order = orderService.selectById(orderId);
+        if(order == null){
+            log.error("syncOrderCreated     未查到订单信息：" + orderId);
+            return "";
+        }
         OrderDto orderDto = new OrderDto(order);
         JSONObject jsonObject = new JSONObject(orderDto);
         jsonObject.put("dataType", "orderCreated");
