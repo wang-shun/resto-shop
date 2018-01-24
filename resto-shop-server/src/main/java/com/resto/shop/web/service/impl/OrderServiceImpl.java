@@ -2016,6 +2016,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             LogTemplateUtils.getChildOrderPrintSuccessByOrderType(brand.getBrandName(), order.getId(), order.getProductionStatus());
             LogTemplateUtils.getChildOrderPrintSuccessByPOSType(brand.getBrandName(), order.getId(), order.getProductionStatus());
         }
+        log.info("客户下单,发送成功下单通知11111111111" + order.getId());
         order.setProductionStatus(ProductionStatus.PRINTED);
         order.setPrintOrderTime(new Date());
         order.setAllowCancel(false);
