@@ -166,10 +166,6 @@ public class OrderAspect {
 
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
             log.info("tttttttttttttt----------");
-            if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
-                log.info("\n店铺开启了 Pos 2.0  给 new pos 推送新订单：" + order.getId());
-                MQMessageProducer.sendCreateOrderMessage(order);
-            }
 
             if (order.getPayMode() != PayMode.WEIXIN_PAY && StringUtils.isEmpty(order.getGroupId())) {
                 shopCartService.clearShopCart(order.getCustomerId(), order.getShopDetailId());
@@ -202,6 +198,10 @@ public class OrderAspect {
                 log.info("库存变更失败:" + order.getId());
             }
 
+            if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+                log.info("\n店铺开启了 Pos 2.0  给 new pos 推送新订单：" + order.getId());
+                MQMessageProducer.sendCreateOrderMessage(order);
+            }
         }
     }
 
