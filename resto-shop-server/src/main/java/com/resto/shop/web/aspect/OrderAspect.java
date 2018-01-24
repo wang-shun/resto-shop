@@ -1008,8 +1008,6 @@ public class OrderAspect {
     @AfterReturning(value = "printSuccess()", returning = "order")
     public void pushContent(Order order) {
         if(order != null ){
-            Customer customer = customerService.selectById(order.getCustomerId());
-            WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             Brand brand = brandService.selectById(order.getBrandId());
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -1091,177 +1089,159 @@ public class OrderAspect {
 
 
             //发送推送
-            if (order.getOrderMode() == ShopMode.HOUFU_ORDER
-                    && order.getOrderState() == OrderState.SUBMIT
-                    && order.getProductionStatus() == ProductionStatus.PRINTED) {
-                if (setting.getTemplateEdition() == 0) {
-                    StringBuffer msg = new StringBuffer();
-                    if (order.getParentOrderId() == null) {
-                        msg.append("下单成功!" + "\n");
-                    } else {
-                        msg.append("加菜成功!" + "\n");
-                    }
-                    msg.append("订单编号:" + order.getSerialNumber() + "\n");
-                    msg.append("桌号：" + order.getTableNumber() + "\n");
-                    msg.append("店铺名：" + shopDetail.getName() + "\n");
-                    msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
-                    //BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
-                    if (order.getServicePrice().compareTo(BigDecimal.ZERO) > 0) { //如果产生了服务费
-                        if (order.getIsUseNewService().equals(Common.YES)){ //如果开通了新版服务费
-                            if (order.getSauceFeeCount() != null && order.getSauceFeeCount() > 0){ //产生了餐具费
-                                msg.append(shopDetail.getSauceFeeName() + "：" + order.getSauceFeePrice() + "\n");
-                            }
-                            if (order.getTowelFeeCount() != null && order.getTowelFeeCount() > 0){ //产生了纸巾费
-                                msg.append(shopDetail.getTowelFeeName() + "：" + order.getTowelFeePrice() + "\n");
-                            }
-                            if (order.getTablewareFeeCount() != null && order.getTablewareFeeCount() > 0){ //产生了酱料费
-                                msg.append(shopDetail.getTablewareFeeName() + "：" + order.getTablewareFeePrice()  + "\n");
-                            }
-                        }else { //旧版服务费
-                            msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
-                        }
-                    }
-                    if (setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1) {
-                        msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
-                    }
-                    BigDecimal sum = order.getOrderMoney();
-                    List<Order> orders = orderService.selectByParentId(order.getId(), order.getPayType()); //得到子订单
-                    for (Order child : orders) { //遍历子订单
-                        sum = sum.add(child.getOrderMoney());
-                    }
-                    msg.append("订单明细：\n");
-                    Map<String, String> param = new HashMap<>();
-                    param.put("orderId", order.getId());
-                    List<OrderItem> orderItem = orderItemService.listByOrderId(param);
-                    for (OrderItem item : orderItem) {
-                        msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
-                    }
-                    msg.append("订单金额：" + sum + "\n");
-                    if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4 && order.getOrderBefore() == null) {
-                        String url = "";
+            Customer customer = customerService.selectById(order.getCustomerId());
+            if(customer != null){
+                WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+                if (order.getOrderMode() == ShopMode.HOUFU_ORDER
+                        && order.getOrderState() == OrderState.SUBMIT
+                        && order.getProductionStatus() == ProductionStatus.PRINTED) {
+                    if (setting.getTemplateEdition() == 0) {
+                        StringBuffer msg = new StringBuffer();
                         if (order.getParentOrderId() == null) {
-                            url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                            msg.append("下单成功!" + "\n");
                         } else {
-                            Order o = orderService.selectById(order.getParentOrderId());
-                            url = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                            msg.append("加菜成功!" + "\n");
                         }
-                        msg.append("<a href='" + url + "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
-                    }
-                    if (order.getGroupId() == null || "".equals(order.getGroupId())) {
-                        String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
-                        Map map = new HashMap(4);
-                        map.put("brandName", brand.getBrandName());
-                        map.put("fileName", customer.getId());
-                        map.put("type", "UserAction");
-                        map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                        doPostAnsc(LogUtils.url, map);
-                    } else {
-                        sendToGroupCustomerListMsg(order, msg.toString(), config, brand.getBrandName());
-                    }
-                } else {
-                    List<TemplateFlow> templateFlowList = templateService.selectTemplateId(config.getAppid(), "OPENTM408705883");
-                    if (templateFlowList != null && templateFlowList.size() != 0) {
-                        String templateId = templateFlowList.get(0).getTemplateId();
-                        String jumpUrl = "";
-                        if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4) {
-                            if (order.getParentOrderId() == null) {
-                                jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
-                            } else {
-                                Order o = orderService.selectById(order.getParentOrderId());
-                                jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                        msg.append("订单编号:" + order.getSerialNumber() + "\n");
+                        msg.append("桌号：" + order.getTableNumber() + "\n");
+                        msg.append("店铺名：" + shopDetail.getName() + "\n");
+                        msg.append("订单时间：" + DateFormatUtils.format(order.getCreateTime(), "yyyy-MM-dd HH:mm") + "\n");
+                        //BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
+                        if (order.getServicePrice().compareTo(BigDecimal.ZERO) > 0) { //如果产生了服务费
+                            if (order.getIsUseNewService().equals(Common.YES)){ //如果开通了新版服务费
+                                if (order.getSauceFeeCount() != null && order.getSauceFeeCount() > 0){ //产生了餐具费
+                                    msg.append(shopDetail.getSauceFeeName() + "：" + order.getSauceFeePrice() + "\n");
+                                }
+                                if (order.getTowelFeeCount() != null && order.getTowelFeeCount() > 0){ //产生了纸巾费
+                                    msg.append(shopDetail.getTowelFeeName() + "：" + order.getTowelFeePrice() + "\n");
+                                }
+                                if (order.getTablewareFeeCount() != null && order.getTablewareFeeCount() > 0){ //产生了酱料费
+                                    msg.append(shopDetail.getTablewareFeeName() + "：" + order.getTablewareFeePrice()  + "\n");
+                                }
+                            }else { //旧版服务费
+                                msg.append(shopDetail.getServiceName() + "：" + order.getServicePrice() + "\n");
                             }
                         }
-                        Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
-                        Map<String, Object> first = new HashMap<String, Object>();
-
-                        if (order.getParentOrderId() == null) {
-                            first.put("value", "下单成功！\n您于" + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss") + "的订单已下厨，请稍候~");
-                        } else {
-                            first.put("value", "加菜成功！\n您于" + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss") + "的订单已下厨，请稍候~");
+                        if (setting.getIsMealFee() == 1 && order.getDistributionModeId() == 3 && shopDetail.getIsMealFee() == 1) {
+                            msg.append(shopDetail.getMealFeeName() + "：" + order.getMealFeePrice() + "\n");
                         }
-                        first.put("color", "#00DB00");
-                        Map<String, Object> keyword1 = new HashMap<String, Object>();
-                        keyword1.put("value", order.getSerialNumber());
-                        keyword1.put("color", "#000000");
-                        Map<String, Object> keyword2 = new HashMap<String, Object>();
-                        keyword2.put("value", shopDetail.getName());
-                        keyword2.put("color", "#000000");
-                        Map<String, Object> keyword3 = new HashMap<String, Object>();
-                        if (order.getOrderMode() == 2) {
-                            keyword3.put("value", order.getVerCode());
-                        } else {
-                            keyword3.put("value", order.getTableNumber());
-                        }
-                        keyword3.put("color", "#000000");
                         BigDecimal sum = order.getOrderMoney();
                         List<Order> orders = orderService.selectByParentId(order.getId(), order.getPayType()); //得到子订单
                         for (Order child : orders) { //遍历子订单
                             sum = sum.add(child.getOrderMoney());
                         }
-                        Map<String, Object> keyword4 = new HashMap<String, Object>();
-                        keyword4.put("value", "￥" + sum);
-                        keyword4.put("color", "#000000");
-                        Map<String, Object> keyword5 = new HashMap<String, Object>();
+                        msg.append("订单明细：\n");
                         Map<String, String> param = new HashMap<>();
                         param.put("orderId", order.getId());
                         List<OrderItem> orderItem = orderItemService.listByOrderId(param);
-                        StringBuffer msg = new StringBuffer();
-                        for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
-                            OrderItem item = orderItem.get(i);
-                            if (i == 0) {
-                                msg.append("\n\t\t\t" + item.getArticleName() + "×" + item.getCount() + "\n");
+                        for (OrderItem item : orderItem) {
+                            msg.append("  " + item.getArticleName() + "x" + item.getCount() + "\n");
+                        }
+                        msg.append("订单金额：" + sum + "\n");
+                        if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4 && order.getOrderBefore() == null) {
+                            String url = "";
+                            if (order.getParentOrderId() == null) {
+                                url = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                             } else {
-                                msg.append("\t\t\t" + item.getArticleName() + "×" + item.getCount() + "\n");
+                                Order o = orderService.selectById(order.getParentOrderId());
+                                url = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
                             }
-                            if (orderItem.size() > 5) {
-                                msg.append("...");
-                            }
+                            msg.append("<a href='" + url + "'>点击这里进行\"加菜\"或\"买单\"</a> \n");
                         }
-                        keyword5.put("value", msg.toString());
-                        keyword5.put("color", "#000000");
-                        Map<String, Object> remark = new HashMap<String, Object>();
-                        if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getOrderBefore() == null) {
-                            remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
-                            remark.put("color", "#173177");
-                        }else{
-                            remark.put("value", "");
-                            remark.put("color", "#173177");
-                        }
-                        content.put("first", first);
-                        content.put("keyword1", keyword1);
-                        content.put("keyword2", keyword2);
-                        content.put("keyword3", keyword3);
-                        content.put("keyword4", keyword4);
-                        content.put("keyword5", keyword5);
-                        content.put("remark", remark);
                         if (order.getGroupId() == null || "".equals(order.getGroupId())) {
-                            String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                            String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
                             Map map = new HashMap(4);
                             map.put("brandName", brand.getBrandName());
                             map.put("fileName", customer.getId());
                             map.put("type", "UserAction");
-                            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + msg.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                             doPostAnsc(LogUtils.url, map);
-                            //发送短信
-                            com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                            smsParam.put("key1", order.getSerialNumber());
-                            smsParam.put("key2", shopDetail.getName());
-                            smsParam.put("key3", order.getTableNumber());
-                            com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105880019");
                         } else {
-                            String orderId = order.getId();
-                            if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
-                                orderId = order.getParentOrderId();
+                            sendToGroupCustomerListMsg(order, msg.toString(), config, brand.getBrandName());
+                        }
+                    } else {
+                        List<TemplateFlow> templateFlowList = templateService.selectTemplateId(config.getAppid(), "OPENTM408705883");
+                        if (templateFlowList != null && templateFlowList.size() != 0) {
+                            String templateId = templateFlowList.get(0).getTemplateId();
+                            String jumpUrl = "";
+                            if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getPayMode() != 3 && order.getPayMode() != 4) {
+                                if (order.getParentOrderId() == null) {
+                                    jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + order.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                                } else {
+                                    Order o = orderService.selectById(order.getParentOrderId());
+                                    jumpUrl = setting.getWechatWelcomeUrl() + "?orderBossId=" + o.getId() + "&articleBefore=1&dialog=closeRedPacket&shopId=" + order.getShopDetailId();
+                                }
                             }
-                            List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
-                            for (Participant p : participants) {
-                                Customer c = customerService.selectById(p.getCustomerId());
-                                String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                            Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+                            Map<String, Object> first = new HashMap<String, Object>();
+
+                            if (order.getParentOrderId() == null) {
+                                first.put("value", "下单成功！\n您于" + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss") + "的订单已下厨，请稍候~");
+                            } else {
+                                first.put("value", "加菜成功！\n您于" + DateUtil.formatDate(order.getCreateTime(), "yyyy-MM-dd HH:mm:ss") + "的订单已下厨，请稍候~");
+                            }
+                            first.put("color", "#00DB00");
+                            Map<String, Object> keyword1 = new HashMap<String, Object>();
+                            keyword1.put("value", order.getSerialNumber());
+                            keyword1.put("color", "#000000");
+                            Map<String, Object> keyword2 = new HashMap<String, Object>();
+                            keyword2.put("value", shopDetail.getName());
+                            keyword2.put("color", "#000000");
+                            Map<String, Object> keyword3 = new HashMap<String, Object>();
+                            if (order.getOrderMode() == 2) {
+                                keyword3.put("value", order.getVerCode());
+                            } else {
+                                keyword3.put("value", order.getTableNumber());
+                            }
+                            keyword3.put("color", "#000000");
+                            BigDecimal sum = order.getOrderMoney();
+                            List<Order> orders = orderService.selectByParentId(order.getId(), order.getPayType()); //得到子订单
+                            for (Order child : orders) { //遍历子订单
+                                sum = sum.add(child.getOrderMoney());
+                            }
+                            Map<String, Object> keyword4 = new HashMap<String, Object>();
+                            keyword4.put("value", "￥" + sum);
+                            keyword4.put("color", "#000000");
+                            Map<String, Object> keyword5 = new HashMap<String, Object>();
+                            Map<String, String> param = new HashMap<>();
+                            param.put("orderId", order.getId());
+                            List<OrderItem> orderItem = orderItemService.listByOrderId(param);
+                            StringBuffer msg = new StringBuffer();
+                            for (int i = 0; i < (orderItem.size() > 5 ? 6 : orderItem.size()); i++) {
+                                OrderItem item = orderItem.get(i);
+                                if (i == 0) {
+                                    msg.append("\n\t\t\t" + item.getArticleName() + "×" + item.getCount() + "\n");
+                                } else {
+                                    msg.append("\t\t\t" + item.getArticleName() + "×" + item.getCount() + "\n");
+                                }
+                                if (orderItem.size() > 5) {
+                                    msg.append("...");
+                                }
+                            }
+                            keyword5.put("value", msg.toString());
+                            keyword5.put("color", "#000000");
+                            Map<String, Object> remark = new HashMap<String, Object>();
+                            if (order.getOrderMode() == ShopMode.BOSS_ORDER && order.getOrderBefore() == null) {
+                                remark.put("value", "点击结果进行\"加菜\"或\"买单\"");
+                                remark.put("color", "#173177");
+                            }else{
+                                remark.put("value", "");
+                                remark.put("color", "#173177");
+                            }
+                            content.put("first", first);
+                            content.put("keyword1", keyword1);
+                            content.put("keyword2", keyword2);
+                            content.put("keyword3", keyword3);
+                            content.put("keyword4", keyword4);
+                            content.put("keyword5", keyword5);
+                            content.put("remark", remark);
+                            if (order.getGroupId() == null || "".equals(order.getGroupId())) {
+                                String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
                                 Map map = new HashMap(4);
                                 map.put("brandName", brand.getBrandName());
-                                map.put("fileName", c.getId());
+                                map.put("fileName", customer.getId());
                                 map.put("type", "UserAction");
-                                map.put("content", "系统向用户:" + c.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                                 doPostAnsc(LogUtils.url, map);
                                 //发送短信
                                 com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
@@ -1269,6 +1249,28 @@ public class OrderAspect {
                                 smsParam.put("key2", shopDetail.getName());
                                 smsParam.put("key3", order.getTableNumber());
                                 com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105880019");
+                            } else {
+                                String orderId = order.getId();
+                                if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+                                    orderId = order.getParentOrderId();
+                                }
+                                List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
+                                for (Participant p : participants) {
+                                    Customer c = customerService.selectById(p.getCustomerId());
+                                    String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                                    Map map = new HashMap(4);
+                                    map.put("brandName", brand.getBrandName());
+                                    map.put("fileName", c.getId());
+                                    map.put("type", "UserAction");
+                                    map.put("content", "系统向用户:" + c.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                                    doPostAnsc(LogUtils.url, map);
+                                    //发送短信
+                                    com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                                    smsParam.put("key1", order.getSerialNumber());
+                                    smsParam.put("key2", shopDetail.getName());
+                                    smsParam.put("key3", order.getTableNumber());
+                                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105880019");
+                                }
                             }
                         }
                     }
