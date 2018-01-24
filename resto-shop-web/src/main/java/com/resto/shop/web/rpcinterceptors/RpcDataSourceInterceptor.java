@@ -29,6 +29,11 @@ public class RpcDataSourceInterceptor implements SendInterceptor{
             if(StringUtils.isEmpty(brandId)){
                 log.info("pos.20===brandId====="+brandId);
                  brandId = httpRequest.getHeader("brandId");
+                if(StringUtils.isEmpty(brandId)){
+                    log.info("pos.20===brandid====="+brandId);
+                    brandId = httpRequest.getHeader("brandid");
+                }
+
             }
             request.setRequestHead(brandId);
             if(log.isInfoEnabled()){
