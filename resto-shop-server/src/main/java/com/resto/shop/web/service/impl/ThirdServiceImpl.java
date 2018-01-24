@@ -1475,14 +1475,10 @@ public class ThirdServiceImpl implements ThirdService {
         } else {
             number = "" + orderTotal;
         }
-
-        if (org.apache.commons.lang3.StringUtils.isEmpty(orderNumber)) {
-            orderNumber = number;
-        }
-        RedisUtil.set(order.getId() + "orderNumber", orderNumber);
+        RedisUtil.set(order.getId() + "orderNumber", number);
 
 
-        data.put("ORDER_NUMBER", orderNumber);
+        data.put("ORDER_NUMBER", number);
         data.put("ITEMS", items);
 //
         data.put("DISTRIBUTION_MODE", "外卖");
