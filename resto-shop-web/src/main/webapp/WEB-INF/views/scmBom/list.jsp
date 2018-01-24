@@ -210,6 +210,7 @@
     (function(){
 
         var that = this;
+        var allArticles = [];
         var tableBodyList = $("#tableBodyList>table");
         var tb = tableBodyList.DataTable({
             ajax : {
@@ -235,6 +236,7 @@
                 {
                     title : "菜品类别",
                     data : "productCategory",
+                    s_filter: true,
                     orderable:false,
                 },
 
@@ -345,8 +347,34 @@
                         $(td).addClass('bomDetailDoList');
                         $(td).html(html);
                     }
-                },
-                ],
+                },],
+                initComplete: function () {
+                    var api = this.api();
+                    api.search('');
+                    var data = api.data();
+                    for (var i = 0; i < data.length; i++) {
+                        allArticles.push(data[i]);
+                    }
+                    var columnsSetting = api.settings()[0].oInit.columns;
+                    $(columnsSetting).each(function (i) {
+                        if (this.s_filter) {
+                            var column = api.column(i);
+                            var title = this.title;
+                            var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+                            var that = this;
+                            column.data().unique().each(function (d) {
+                                select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
+                            });
+
+                            select.appendTo($(column.header()).empty()).on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+                                column.search(val ? '^' + val + '$' : '', true, false).draw();
+                            });
+                        }
+                    });
+                }
         });
         var C = new Controller(null,tb);
         var vueObj = new Vue({
@@ -358,7 +386,7 @@
                 treeView:false,//树状图
 
                 bomRawMaterial:[],//bom原材料
-
+                allArticles: allArticles,
                 articleFamilyIdArr:[],//菜品类别选项
                 productNameArr:[],//菜品名称选项
                 parameter:{

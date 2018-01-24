@@ -24,9 +24,10 @@ public class RpcDataSourceInterceptor implements SendInterceptor{
         if(interfaceName.matches("^com.resto.shop.web.service.*") || interfaceName.matches("^com.resto.scm.web.service.*")){
             HttpServletRequest httpRequest = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
             String brandId = (String) httpRequest.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
-            if(StringUtils.isEmpty(brandId)){
-                 brandId = StringUtils.isEmpty(httpRequest.getParameter("brandId"))?"31946c940e194311b117e3fff5327215":httpRequest.getParameter("brandId");
-            }
+            //for scm pos2.0 测试
+//            if(StringUtils.isEmpty(brandId)){
+//                 brandId = StringUtils.isEmpty(httpRequest.getParameter("brandId"))?"31946c940e194311b117e3fff5327215":httpRequest.getParameter("brandId");
+//            }
             request.setRequestHead(brandId);
             if(log.isInfoEnabled()){
                 log.info(request.getInterfaceName()+" add head:"+request.getRequestHead());
