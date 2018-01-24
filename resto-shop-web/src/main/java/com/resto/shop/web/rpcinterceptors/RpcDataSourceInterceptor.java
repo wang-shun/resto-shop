@@ -13,6 +13,7 @@ import com.resto.shop.web.config.SessionKey;
 import cn.restoplus.rpc.common.bean.RpcRequest;
 import cn.restoplus.rpc.common.listener.SendInterceptor;
 
+import java.util.Enumeration;
 
 
 public class RpcDataSourceInterceptor implements SendInterceptor{
@@ -25,9 +26,11 @@ public class RpcDataSourceInterceptor implements SendInterceptor{
             HttpServletRequest httpRequest = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();
             String brandId = (String) httpRequest.getSession().getAttribute(SessionKey.CURRENT_BRAND_ID);
             //for scm pos2.0 测试
-//            if(StringUtils.isEmpty(brandId)){
-//                 brandId = StringUtils.isEmpty(httpRequest.getParameter("brandId"))?"31946c940e194311b117e3fff5327215":httpRequest.getParameter("brandId");
-//            }
+            if(StringUtils.isEmpty(brandId)){
+                log.info("pos.20===brandId====="+brandId);
+                 brandId = httpRequest.getHeader("brandId");
+                 //brandId = getBrandIdFromHeader(httpRequest, brandId);
+            }
             request.setRequestHead(brandId);
             if(log.isInfoEnabled()){
                 log.info(request.getInterfaceName()+" add head:"+request.getRequestHead());
@@ -35,8 +38,24 @@ public class RpcDataSourceInterceptor implements SendInterceptor{
         }
     }
 
+    private String getBrandIdFromHeader(HttpServletRequest httpRequest, String brandId) {
+        String brandId1 = httpRequest.getHeader("brandId");
+        log.info("wwwww==="+brandId1);
+        Enumeration<String> headerNames = httpRequest.getHeaderNames();
+        while (headerNames.hasMoreElements()){
+            String s = headerNames.nextElement();
+            if("brandId".equals(s)){
+                brandId = httpRequest.getHeader(s);
+                log.info("brandId====="+brandId);
+                break;
+            }
 
-	public static void main(String[] args) {
+        }
+        return brandId;
+    }
+
+
+    public static void main(String[] args) {
 		boolean b = "com.resto.shop.web.service.AdvertService".matches("^com.resto.shop.web.service.*");
 					 
 		System.out.println(b);
