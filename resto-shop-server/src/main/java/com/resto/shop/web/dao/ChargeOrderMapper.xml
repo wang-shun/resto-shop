@@ -20,6 +20,10 @@
     <result column="end_amount" property="endAmount"/>
     <result column="type" property="type"/>
     <result column="charge_setting_id" property="chargeSettingId"/>
+    <association property="Customer" javaType="com.resto.shop.web.model.Customer">
+        <result column="wechat_id" property="wechatId"/>
+        <result column="account_id" property="accountId"/>
+    </association>
   </resultMap>
 
   <sql id="Base_Column_List" >
@@ -398,5 +402,19 @@ AND u.id =#{customerId}
         and finish_time &lt;= CONCAT(#{monthEnd},' 23:59:59')
 
     </select>
+
+
+  <select id="selectRemainderReturn" resultMap="BaseResultMap">
+      SELECT
+          tco.*,
+          tc.wechat_id,
+          tc.account_id
+      FROM
+          tb_charge_order tco
+      INNER JOIN tb_customer tc ON tco.customer_id = tc.id
+      WHERE
+          tco.order_state = 1
+      AND tco.number_day_now > 0
+  </select>
 
 </mapper>
