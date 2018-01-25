@@ -2161,8 +2161,8 @@
     <select id="getPayment" parameterType="java.util.Map" resultType="java.math.BigDecimal">
         select ifnull(sum(t2.pay_value),0) from tb_order t
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
-        where t2.pay_time &gt;= CONCAT(#{beginDate}, ' 00:00:00')
-        and t2.pay_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
+        where t.create_time &gt;= CONCAT(#{beginDate}, ' 00:00:00')
+        and t.create_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
         and t2.payment_mode_id = #{type}
         and t.shop_detail_id = #{shopId}
         and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3))

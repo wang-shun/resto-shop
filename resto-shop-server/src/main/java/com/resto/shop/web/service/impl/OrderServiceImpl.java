@@ -1915,7 +1915,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     private boolean validOrderCanPush(Order order) throws AppException {
-        if (order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY
+        if (order.getPayMode() != null && (order.getPayMode() == OrderPayMode.ALI_PAY || order.getPayMode() == OrderPayMode.WX_PAY)
                 && order.getProductionStatus().equals(ProductionStatus.NOT_ORDER) && order.getOrderState().equals(OrderState.SUBMIT)) {
             return true;
         }
@@ -1933,15 +1933,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         log.error("立即下单失败: " + order.getId());
                         throw new AppException(AppException.ORDER_STATE_ERR);
                     }
-                } else if (order.getPayType() == PayType.NOPAY) {
-                    if (order.getOrderState() != OrderState.SUBMIT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
-                        log.error("立即下单失败: " + order.getId());
-                        throw new AppException(AppException.ORDER_STATE_ERR);
-                    }
                 }
                 break;
             case ShopMode.CALL_NUMBER:
                 if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
+                    if(ProductionStatus.HAS_ORDER == order.getProductionStatus()){
+                        return false;
+                    }
                     log.error("立即下单失败: " + order.getId());
                     throw new AppException(AppException.ORDER_STATE_ERR);
                 }
