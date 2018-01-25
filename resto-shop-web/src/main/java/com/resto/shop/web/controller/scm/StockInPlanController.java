@@ -80,7 +80,7 @@ public class StockInPlanController extends GenericController {
     @ResponseBody
     public Result approve(Long id, String orderStatus) {
         BrandUser currentBrandUser = getCurrentBrandUser();
-        stockinplanService.updateDocStkStatusById(id, orderStatus,currentBrandUser.getUsername());
+        stockinplanService.updateDocStkStatusById(id, orderStatus,currentBrandUser.getUsername(),getCurrentShopName());
         return Result.getSuccess();
     }
 

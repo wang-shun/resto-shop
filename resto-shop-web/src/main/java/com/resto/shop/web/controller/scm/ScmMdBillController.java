@@ -36,11 +36,10 @@ public class ScmMdBillController extends GenericController{
            }
        }
 
-
 	@RequestMapping("/list_all")
 	@ResponseBody
 	public Result listData(String beginDate,String endDate){
-		return getSuccessResult(mdBillService.queryJoin4Page(getCurrentShopId(),beginDate,endDate));
+		return getSuccessResult(mdBillService.queryJoin4PageAndBill(getCurrentShopId(),beginDate,endDate));
 	}
 	
 	@RequestMapping("list_one")
@@ -63,7 +62,7 @@ public class ScmMdBillController extends GenericController{
 		mdBillService.update(mdBill);
 		return Result.getSuccess();
 	}
-	
+
 	@RequestMapping("delete")
 	@ResponseBody
 	public Result delete(Long id){
