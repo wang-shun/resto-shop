@@ -953,6 +953,9 @@ public class OrderAspect {
                 if (order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)) {
                     return;
                 }
+                if (order.getPayMode() != null && order.getPayMode() == OrderPayMode.WX_PAY && order.getOrderState().equals(OrderState.SUBMIT)) {
+                    return;
+                }
 //                BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
                 log.info("客户下单,发送成功下单通知" + order.getId());
 
