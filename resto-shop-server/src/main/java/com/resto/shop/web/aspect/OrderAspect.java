@@ -950,7 +950,8 @@ public class OrderAspect {
         log.info("切面pushOrderAfter" + joinPoint.getSignature().getName());
         if (order != null) {
             if (ProductionStatus.HAS_ORDER == order.getProductionStatus()) {
-                if (order.getPayMode() != null && order.getPayMode() == OrderPayMode.ALI_PAY && order.getOrderState().equals(OrderState.SUBMIT)) {
+                if (order.getPayMode() != null && (order.getPayMode() == OrderPayMode.ALI_PAY || order.getPayMode() == OrderPayMode.WX_PAY)
+                        && order.getOrderState().equals(OrderState.SUBMIT)) {
                     return;
                 }
 //                BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
