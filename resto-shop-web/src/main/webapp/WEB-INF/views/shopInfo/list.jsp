@@ -822,7 +822,7 @@
 					<div class="form-group">
 						<label class="col-md-4 control-label" :class="{ formBox : m.isPush == 1}">新版pos店铺订单宣传语：</label>
 						<div  class="col-md-6">
-							<input type="text"  class="form-control" name="orderWelcomeMessage" v-if="m.orderWelcomeMessage" v-model="m.orderWelcomeMessage"
+							<input type="text"  class="form-control" name="orderWelcomeMessage" v-model="m.orderWelcomeMessage"
 								   required="required" maxlength="20">
 							<span class="help-block">最大长度为 20 个汉字</span>
 						</div>
