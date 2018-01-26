@@ -337,7 +337,7 @@ public class PosServiceImpl implements PosService {
             //子订单
             Order parent = orderService.selectById(order.getParentOrderId());
             order.setVerCode(parent.getVerCode());
-            orderService.insert(order);
+            orderMapper.insertSelective(order);
             orderItemService.insertItems(orderItems);
             updateParent(order);
 
@@ -346,7 +346,7 @@ public class PosServiceImpl implements PosService {
             if(StringUtils.isEmpty(order.getVerCode())){
                 order.setVerCode(generateString(5));
             }
-            orderService.insert(order);
+            orderMapper.insertSelective(order);
             orderItemService.insertItems(orderItems);
         }
         // 更新库存
