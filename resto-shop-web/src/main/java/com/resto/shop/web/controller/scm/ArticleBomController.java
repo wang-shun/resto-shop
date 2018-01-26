@@ -10,6 +10,7 @@
  import com.resto.scm.web.service.ArticleBomHeadService;
  import com.resto.shop.web.constant.Common;
  import com.resto.shop.web.controller.GenericController;
+ import org.apache.commons.lang3.StringUtils;
  import org.springframework.stereotype.Controller;
  import org.springframework.web.bind.annotation.RequestBody;
  import org.springframework.web.bind.annotation.RequestMapping;
@@ -54,14 +55,17 @@ public class ArticleBomController extends GenericController{
 	}
 	@RequestMapping("effectiveBomHead")
 	@ResponseBody
-	public Result effectiveBomHead(String articleId){
-		List<MdRulArticleBomHead> articleboms = articlebomService.findEffectiveBomHeadByState(getCurrentShopId(),articleId);
+	public Result effectiveBomHead(String articleId,Integer state){
+		List<MdRulArticleBomHead> articleboms = articlebomService.findBomHeadByState(getCurrentShopId(),articleId,state);
 
 		if(ListUtil.isNotEmpty(articleboms)){
-			return new Result("该供菜品存在有效的BOM清单："+articleboms.get(0).getBomCode(), 0, true);
+			return new Result("该菜品存在BOM清单："+articleboms.get(0).getBomCode(), 0, true);
 		}
-
-		return getSuccessResult(articleboms);
+		Result result =getSuccessResult(articleboms);
+		if(StringUtils.isEmpty(result.getMessage())){
+			result.setMessage("");
+		}
+		return result;
 	}
 
 

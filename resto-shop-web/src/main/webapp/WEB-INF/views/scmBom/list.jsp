@@ -411,7 +411,7 @@
             },
             methods:{
                 changeType1: function (ele) {
-                    debugger
+
                     this.parameter.productCategory = $(ele.target).find("option:selected").text();
                     this.parameter.articleFamilyId = ele.target.value;
 
@@ -427,7 +427,7 @@
 
 
                 changeType2: function (ele) {
-                    debugger
+
                     this.parameter.productName = $(ele.target).find("option:selected").text();
                     this.parameter.articleId = ele.target.value;
                     for(var i=0;i<this.productNameArr.length;i++){
@@ -494,9 +494,9 @@
                 save:function(e){ //新增and编辑保存
                     var _this=this;
                     var savearr=[];
-                    debugger
+
                     for(var i=0;i<_this.parameter.bomDetailDoList.length;i++){
-                        debugger
+
                         savearr[i]={
                             id:_this.parameter.bomDetailDoList[i].id,
                             materialId:_this.parameter.bomDetailDoList[i].idTwo,
@@ -531,7 +531,7 @@
                     else if(!this.parameter.startEffect) message='开始时间';
                     else if(!this.parameter.endEffect) message='结束时间';
                     else  submit=true;
-                     debugger
+
                     if(this.parameter.state ='' ||!this.parameter.state){
                         this.parameter.state =0;
                     }else{
@@ -585,37 +585,42 @@
 
 
                     }else{
-                        if(submit){
-                            $.ajax({
-                                type:"POST",
-                                url:url,
-                                contentType:"application/json",
-                                datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
-                                data:JSON.stringify(_this.parameter),
-                                beforeSend:function(){ //请求之前执行
-                                    console.log("请求之前执行");
-                                    _this.showform=false;
-                                },
-                                success:function(data){ //成功后返回
-                                    console.log(data);
-                                    C.systemButtonNo('success','成功');
-                                },
-                                error: function(){ //失败后执行
-                                    C.systemButtonNo('error','失败');
-                                }
-                            });
-                            this.parameter= {
-                                bomDetailDoList:[],//bom原材料显示
-                                bomDetailDeleteIds:[],//删除的list节点
-                                bomCode:'',
-                                productCode:'',
-                                measurementUnit:'',
-                                state:'',
-                            };
-                        }else {
-                            _this.bomRawMaterial =_this.parameter.bomDetailDoList;
-                            C.systemButtonNo('error','请填写'+message);
-                        }
+                        $.get("scmBom/effectiveBomHead"+'?articleId='+_this.parameter.articleId,function (result) {
+                           debugger
+                          C.confirmDialog((result.message != "" && _this.parameter.state=='1') ? result.message:+ "你确定要启用改bom吗?," + "你确定要启用改bom吗?", "提醒", function () {
+                                   if(submit){
+                                        $.ajax({
+                                            type:"POST",
+                                            url:url,
+                                            contentType:"application/json",
+                                            datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
+                                            data:JSON.stringify(_this.parameter),
+                                            beforeSend:function(){ //请求之前执行
+                                                console.log("请求之前执行");
+                                                _this.showform=false;
+                                            },
+                                            success:function(data){ //成功后返回
+                                                console.log(data);
+                                                C.systemButtonNo('success','成功');
+                                            },
+                                            error: function(){ //失败后执行
+                                                C.systemButtonNo('error','失败');
+                                            }
+                                        });
+                                        this.parameter= {
+                                            bomDetailDoList:[],//bom原材料显示
+                                            bomDetailDeleteIds:[],//删除的list节点
+                                            bomCode:'',
+                                            productCode:'',
+                                            measurementUnit:'',
+                                            state:'',
+                                        };
+                                    }else {
+                                        _this.bomRawMaterial =_this.parameter.bomDetailDoList;
+                                        C.systemButtonNo('error','请填写'+message);
+                                    }
+                              });
+                        });
 
                     }
 
@@ -674,13 +679,13 @@
             ready:function(){//钩子加载后---*vue挂载之后执行*
                 var that = this;
                 $('#tableBodyList').on('click','table tbody tr',function () {//显示详情
-                    debugger
+
                     that.tableBodyListsShow=true;
                     $('#tableBodyLists table').html('');
                     $('#tableBodyLists table').html($(this).find('.bomDetailDoList').html());
                 });
                 $.get('articlefamily/list_all',function (data) { //菜品类别选项
-                    debugger;
+
                     for(var i=0;i<data.length;i++){
                         that.articleFamilyIdArr.push({articleFamilyId:data[i].id , name:data[i].name});
                     }
@@ -688,7 +693,7 @@
                 $.get('article/list_all',function (data) { //菜品名称选项
                     console.log(data);
                     for(var i=0;i<data.length;i++){
-                        debugger
+
                         that.productNameArr.push({articleId:data[i].id, name:data[i].name,articleFamilyId:data[i].articleFamilyId,unit:data[i].unit});
                     }
                 })

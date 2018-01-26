@@ -94,7 +94,6 @@ public class SupplierController extends GenericController{
 	public Result querySupplierAndSupPrice(String shopId){
 		return getSuccessResult(supplierService.querySupplierAndSupPrice(shopId));
 	}
-
 	/***
 	 * pos2.0供应商和采购单接口查询
 	 * @param
