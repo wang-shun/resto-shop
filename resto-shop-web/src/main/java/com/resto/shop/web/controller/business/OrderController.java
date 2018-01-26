@@ -577,7 +577,7 @@ public class OrderController extends GenericController{
 			BrandOrderReportDto[][] result = new BrandOrderReportDto[1][monthDay];
 			//查询本月订单
 			List<Order> orderList = orderService.selectListBybrandId(year.concat("-").concat(month).concat("-01"), year.concat("-").concat(month).concat("-" + String.valueOf(monthDay))
-					, getCurrentBrandId());
+					, getCurrentBrandId(), Common.YES);
 			//用来保存每次循环没有用到的订单
 			List<Order> orders = new ArrayList<>();
 			//声明迭代器

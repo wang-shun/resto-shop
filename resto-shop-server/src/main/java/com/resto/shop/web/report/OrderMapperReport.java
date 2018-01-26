@@ -48,7 +48,7 @@ public interface OrderMapperReport{
 	 * @param brandId
 	 * @return
 	 */
-	List<Order> selectListBybrandId(@Param("beginDate")Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
+	List<Order> selectListBybrandId(@Param("beginDate")Date begin,@Param("endDate") Date end,@Param("brandId") String brandId,@Param("type") Integer type);
 
 	/**
 	 * 查询退菜报表list

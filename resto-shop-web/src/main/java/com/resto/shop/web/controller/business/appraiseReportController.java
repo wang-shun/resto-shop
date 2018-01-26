@@ -87,7 +87,7 @@ public class appraiseReportController extends GenericController{
 	}
 
 	private Map<String,Object> getSuccess(String beginDate,String endDate){
-		List<Order> olist =  orderService.selectListBybrandId(beginDate,endDate,getCurrentBrandId());
+		List<Order> olist =  orderService.selectListBybrandId(beginDate,endDate,getCurrentBrandId(), Common.NO);
 		Map<String, Object> orderCountMap = orderService.callMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
 		int appraiseNum=0;//评价单数
 		BrandOrderReportDto brandOrderReportDto = (BrandOrderReportDto)orderCountMap.get("brandId");
@@ -466,7 +466,7 @@ public class appraiseReportController extends GenericController{
 			AppraiseDto[][] result = new AppraiseDto[1][monthDay];
 			//查询本月订单
 			List<Order> orderList = orderService.selectListBybrandId(year.concat("-").concat(month).concat("-01"), year.concat("-").concat(month).concat("-" + String.valueOf(monthDay))
-					, getCurrentBrandId());
+					, getCurrentBrandId(), Common.NO);
 			//用来保存每次循环没有用到的订单
 			List<Order> orders = new ArrayList<>();
 			//声明迭代器
