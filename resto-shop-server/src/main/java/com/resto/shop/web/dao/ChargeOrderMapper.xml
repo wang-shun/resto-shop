@@ -20,7 +20,7 @@
     <result column="end_amount" property="endAmount"/>
     <result column="type" property="type"/>
     <result column="charge_setting_id" property="chargeSettingId"/>
-    <association property="Customer" javaType="com.resto.shop.web.model.Customer">
+    <association property="customer" javaType="com.resto.shop.web.model.Customer">
         <result column="wechat_id" property="wechatId"/>
         <result column="account_id" property="accountId"/>
     </association>
