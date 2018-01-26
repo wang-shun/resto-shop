@@ -357,7 +357,7 @@ public class PosServiceImpl implements PosService {
         //  插入订单信息
         orderService.insert(order);
         orderItemService.insertItems(orderItems);
-        orderPaymentItemService.insertItems(orderPaymentItems);
+//        orderPaymentItemService.insertItems(orderPaymentItems);
         // 更新库存
         Boolean updateStockSuccess = false;
         try {
