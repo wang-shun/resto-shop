@@ -346,9 +346,21 @@ public class PosServiceImpl implements PosService {
         }
 
         if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){    //  子订单
+
+        //  订单支付项
+        List<OrderPaymentDto> orderPaymentDtos = orderDto.getOrderPayment();
+        List<OrderPaymentItem> orderPaymentItems = new ArrayList<>();
+        if(orderPaymentDtos != null){
+            for(OrderPaymentDto orderPaymentDto : orderPaymentDtos){
+                OrderPaymentItem orderPaymentItem = new OrderPaymentItem(orderPaymentDto);
+                orderPaymentItems.add(orderPaymentItem);
+            }
+        }
+        if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){    //  子订单
             Order parent = orderService.selectById(order.getParentOrderId());
             order.setVerCode(parent.getVerCode());
             updateParent(order);
+        }else{  //  主订单
         }else{  //  主订单
             if(StringUtils.isEmpty(order.getVerCode())){
                 order.setVerCode(generateString(5));
@@ -358,6 +370,15 @@ public class PosServiceImpl implements PosService {
         orderService.insert(order);
         orderItemService.insertItems(orderItems);
 //        orderPaymentItemService.insertItems(orderPaymentItems);
+        }
+        //  插入订单信息
+        orderMapper.insertSelective(order);
+        orderItemService.insertItems(orderItems);
+        orderPaymentItemService.insertItems(orderPaymentItems);
+        //  更新主订单
+        if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){
+            updateParent(order);
+        }
         // 更新库存
         Boolean updateStockSuccess = false;
         try {

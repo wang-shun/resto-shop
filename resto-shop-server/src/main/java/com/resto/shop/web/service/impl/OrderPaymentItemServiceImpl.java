@@ -179,6 +179,15 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
     }
 
     @Override
+    public void insertItems(List<OrderPaymentItem> orderPaymentItems) {
+        if(orderPaymentItems != null){
+            for(OrderPaymentItem paymentItem : orderPaymentItems){
+                orderpaymentitemMapper.insertSelective(paymentItem);
+            }
+        }
+    }
+
+    @Override
     public List<OrderPaymentItem> selectPayMentByPayMode(String orderId, Integer payMode, Integer type) {
         return orderpaymentitemMapper.selectPayMentByPayMode(orderId, payMode, type);
     }
