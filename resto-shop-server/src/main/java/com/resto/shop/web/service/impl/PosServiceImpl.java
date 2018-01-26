@@ -326,6 +326,7 @@ public class PosServiceImpl implements PosService {
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(json.getString("brandId"));
         order.setDataOrigin(orderDto.getDataOrigin());
+        //  订单项
         List<OrderItemDto> orderItemDtos =  orderDto.getOrderItem();
         List<OrderItem> orderItems = new ArrayList<>();
         for(OrderItemDto orderItemDto : orderItemDtos){
@@ -333,21 +334,31 @@ public class PosServiceImpl implements PosService {
             orderItems.add(orderItem);
         }
         order.setOrderItems(orderItems);
-        if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){
-            //子订单
+
+        //  订单支付项
+        List<OrderPaymentDto> orderPaymentDtos = orderDto.getOrderPayment();
+        List<OrderPaymentItem> orderPaymentItems = new ArrayList<>();
+        if(orderPaymentDtos != null){
+            for(OrderPaymentDto orderPaymentDto : orderPaymentDtos){
+                OrderPaymentItem orderPaymentItem = new OrderPaymentItem(orderPaymentDto);
+                orderPaymentItems.add(orderPaymentItem);
+            }
+        }
+        if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){    //  子订单
             Order parent = orderService.selectById(order.getParentOrderId());
             order.setVerCode(parent.getVerCode());
-            orderMapper.insertSelective(order);
-            orderItemService.insertItems(orderItems);
-            updateParent(order);
-
-        }else{
-            //主订单
+        }else{  //  主订单
             if(StringUtils.isEmpty(order.getVerCode())){
                 order.setVerCode(generateString(5));
             }
-            orderMapper.insertSelective(order);
-            orderItemService.insertItems(orderItems);
+        }
+        //  插入订单信息
+        orderMapper.insertSelective(order);
+        orderItemService.insertItems(orderItems);
+        orderPaymentItemService.insertItems(orderPaymentItems);
+        //  更新主订单
+        if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){
+            updateParent(order);
         }
         // 更新库存
         Boolean updateStockSuccess = false;
