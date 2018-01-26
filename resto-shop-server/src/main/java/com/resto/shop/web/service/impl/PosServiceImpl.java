@@ -292,13 +292,17 @@ public class PosServiceImpl implements PosService {
     @Override
     public void printSuccess(String orderId) {
         Order order = orderService.selectById(orderId);
-        Brand brand = brandService.selectById(order.getBrandId());
-        BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
-        AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-        try {
-            orderService.printSuccess(orderId,brandSetting.getOpenBrandAccount() == 1,accountSetting);
-        } catch (AppException e) {
-            e.printStackTrace();
+        if(order != null){
+            Brand brand = brandService.selectById(order.getBrandId());
+            BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
+            AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+            try {
+                orderService.printSuccess(orderId,brandSetting.getOpenBrandAccount() == 1,accountSetting);
+            } catch (AppException e) {
+                e.printStackTrace();
+            }
+        }else {
+            log.error("Pos2.0 打印失败：为找到响应订单；orderId：" + orderId);
         }
     }
 
@@ -308,6 +312,7 @@ public class PosServiceImpl implements PosService {
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
         Order serverDataBaseOrder = orderMapper.selectByPrimaryKey(orderDto.getId());
         if(serverDataBaseOrder != null){  //  判断服务器数据库是否已经存在此订单
+            log.error("Pos2.0   创建订单失败：数据库已存在此订单");
             return;
         }
         if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){
@@ -328,7 +333,7 @@ public class PosServiceImpl implements PosService {
             orderItems.add(orderItem);
         }
         order.setOrderItems(orderItems);
-        if(!StringUtils.isEmpty(orderDto.getParentOrderId())){
+        if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){
             //子订单
             Order parent = orderService.selectById(order.getParentOrderId());
             order.setVerCode(parent.getVerCode());
