@@ -5494,10 +5494,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public List<Order> selectListBybrandId(String beginDate, String endDate, String brandId) {
+    public List<Order> selectListBybrandId(String beginDate, String endDate, String brandId, Integer type) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapperReport.selectListBybrandId(begin, end, brandId);
+        return orderMapperReport.selectListBybrandId(begin, end, brandId,type);
     }
 
     @Override
