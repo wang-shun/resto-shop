@@ -386,15 +386,26 @@
 
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
         SELECT
-            o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.create_time,o.customer_count,
+            o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.customer_count,
             o.distribution_mode_id,o.parent_order_id
+            <if test="type == 1">
+                ,o.create_time
+            </if>
+            <if test="type == 0">
+                ,a.create_time
+            </if>
         from tb_order o
         LEFT JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         LEFT JOIN  tb_appraise a
         on o.id = a.order_id
         WHERE o.order_state in (10,11,12,2) and o.production_status in (2,3,4)
-        and <![CDATA[ a.create_time >= #{beginDate} and a.create_time <= #{endDate}]]>
+        <if test="type == 0">
+          and <![CDATA[ a.create_time >= #{beginDate} and a.create_time <= #{endDate}]]>
+        </if>
+        <if test="type == 1">
+            and <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
+        </if>
         and o.brand_id = #{brandId}
         GROUP BY o.id
     </select>

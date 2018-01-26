@@ -528,4 +528,26 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     public BigDecimal selectTotalBalanceByTimeAndShopId(Date monthBegin, Date monthEnd, String shopId) {
         return chargeOrderMapper.selectTotalBalanceByTimeAndShopId(monthBegin,monthEnd,shopId);
     }
+
+	@Override
+	public List<ChargeOrder> selectRemainderReturn() {
+		return chargeOrderMapper.selectRemainderReturn();
+	}
+
+	@Override
+	public void updateRemainderReturn(ChargeOrder chargeOrder) {
+		//记录此次的返还金额
+		BigDecimal returnAmount = BigDecimal.ZERO;
+		//还剩余多次返还
+		if (chargeOrder.getNumberDayNow() > 1){
+			returnAmount = chargeOrder.getArrivalAmount();
+		}else{ //最后一次返还
+			returnAmount = chargeOrder.getEndAmount();
+		}
+		chargeOrder.setNumberDayNow(chargeOrder.getNumberDayNow() - 1);
+		chargeOrder.setRewardBalance(chargeOrder.getRewardBalance().add(returnAmount));
+		chargeOrder.setTotalBalance(chargeOrder.getTotalBalance().add(returnAmount));
+		chargeOrderMapper.updateByPrimaryKeySelective(chargeOrder);
+		accountService.addAccount(returnAmount, chargeOrder.getCustomer().getAccountId(), "充值赠送", AccountLog.SOURCE_CHARGE_REWARD, chargeOrder.getShopDetailId());
+	}
 }

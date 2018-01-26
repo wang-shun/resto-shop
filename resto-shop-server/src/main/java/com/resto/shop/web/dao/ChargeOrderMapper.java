@@ -54,4 +54,6 @@ public interface ChargeOrderMapper  extends GenericDao<ChargeOrder,String> {
     List<String> selectCustomerChargeOrder(List<String> customerIds);
 
     BigDecimal selectTotalBalanceByTimeAndShopId(@Param("monthBegin") Date monthBegin, @Param("monthEnd") Date monthEnd,@Param("shopId") String shopId);
+
+    List<ChargeOrder> selectRemainderReturn();
 }

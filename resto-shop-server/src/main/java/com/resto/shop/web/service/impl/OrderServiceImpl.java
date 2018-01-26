@@ -394,10 +394,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         order.setId(orderId);
         order.setPosDiscount(new BigDecimal(1));
         Customer customer = customerService.selectById(order.getCustomerId());
+        Brand brand = brandService.selectById(order.getBrandId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         Boolean loginFlag = (Boolean) RedisUtil.get(order.getShopDetailId() + "loginStatus");
         if (shopDetail.getPosVersion() == PosVersion.VERSION_2_0) {
             if (loginFlag == null || loginFlag == false) {
+                //  短信发送预警      -   lmx
+                com.alibaba.fastjson.JSONObject param = new com.alibaba.fastjson.JSONObject();
+                param.put("service" , "【" + brand.getBrandName() + "】-" + shopDetail.getName() + " Pos2.0 未登录，客户无法下单    ");
+                SMSUtils.sendMessage("17671111590",param ,SMSUtils.SIGN, SMSUtils.SMS_SERVER_ERROR);
+
+                //  提示微信端，禁止下单
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("当前店铺暂未开启在线点餐，请联系服务员详询，谢谢");
                 return jsonResult;
@@ -463,8 +470,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             jsonResult.setMessage("桌号异常,请扫码正确的二维码！");
             return jsonResult;
         }
-
-        Brand brand = brandService.selectById(order.getBrandId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
         if (order.getOrderItems().isEmpty()) {
             throw new AppException(AppException.ORDER_ITEMS_EMPTY);
@@ -5499,10 +5504,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public List<Order> selectListBybrandId(String beginDate, String endDate, String brandId) {
+    public List<Order> selectListBybrandId(String beginDate, String endDate, String brandId, Integer type) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapperReport.selectListBybrandId(begin, end, brandId);
+        return orderMapperReport.selectListBybrandId(begin, end, brandId,type);
     }
 
     @Override
