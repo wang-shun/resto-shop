@@ -81,7 +81,8 @@
                                 <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                 <td>{{item.provinceName+item.cityName+item.districtName}}</td>
                                 <td>{{item.purchaseMoney}}</td>
-                                <td>{{item.actQty}}</td>
+                                <%--<td>{{item.actQty}}</td>--%>
+                                <td>{{item.planQty}}</td>
                             </tr>
                             </tbody>
                         </table>

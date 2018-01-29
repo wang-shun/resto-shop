@@ -102,7 +102,7 @@
                     <div class="form-group row">
                         <label class="col-md-2 control-label">入库人</label>
                         <div class="col-md-4">
-                            {{detailsArr.createrName}}
+                            {{detailsArr.publishedName}}
                         </div>
                         <label class="col-md-2 control-label">审核人</label>
                         <div class="col-md-4">
@@ -315,10 +315,9 @@
                     this.m = {};
                 },
                 findBtn : function(model,url,urlData){
-
+                    var that =this;
                 var button = $("<button class='btn btn-xs btn-primary'>查看</button>");
                 button.click(function(){
-                    var that = this;
                     if(that){
                         that.showDetails(model);
                     }
@@ -392,11 +391,8 @@
                     try{
                         $.post("scmMdBill/list_all",that.getDate(),function(result){
                             if (result.success){
-
-
                                 //清空表格
                                 that.mdBillTable.clear();
-
                                 //重绘表格
                                 that.mdBillTable.rows.add(result.data).draw();
                                 that.mdBillList = result.data;
@@ -459,6 +455,7 @@
                     this.searchInfo();
                 },
                 showDetails:function (data) { //查看详情
+                    debugger
                     this.details=true;
                     this.detailsArr=data;
                     this.detailsBtn=true;
