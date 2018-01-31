@@ -14,6 +14,7 @@ public class CouponSource {
         public static final String SHARE_COUPON = "5"; //分享赠送优惠券
         public static final String REAL_TIME_COUPON = "6"; //实时优惠券
         public static final String DRAIN_AROUSAL_COUPON = "7"; //流失唤醒优惠券
+        public static final String CONSUMPTION_REBATE_COUPON = "8"; //流失唤醒优惠券
 
         public static final String getCouponSourceByType(Integer couponType){
                 switch (couponType) {
@@ -29,6 +30,8 @@ public class CouponSource {
                                 return REAL_TIME_COUPON;
                         case 5:
                                 return DRAIN_AROUSAL_COUPON;
+                        case 6:
+                                return CONSUMPTION_REBATE_COUPON;
                         default:
                                 return "-1";
                 }
