@@ -7391,6 +7391,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPaymentAmount(order.getPaymentAmount().subtract(orderItem.getFinalPrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().subtract(orderItem.getFinalPrice()));
+                order.setCountWithChild(order.getCountWithChild() - orderItem.getCount());
             }
 
             orderItem.setCount(count);
@@ -7409,6 +7410,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().add(orderItem.getFinalPrice()));
+                order.setCountWithChild(order.getCountWithChild() + orderItem.getCount());
             }
 
             if (orderItem.getCount() == 0) {
