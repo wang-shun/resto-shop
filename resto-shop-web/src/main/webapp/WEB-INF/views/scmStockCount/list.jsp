@@ -23,7 +23,7 @@
                     <div class="form-group row">
                         <label class="col-md-2 control-label">类型</label>
                         <div class="col-md-4">
-                            {{detailsArr.materialType}}
+                            {{detailsArr.materialTypes}}
                         </div>
                         <label class="col-md-2 control-label">物料种类</label>
                         <div class="col-md-4">

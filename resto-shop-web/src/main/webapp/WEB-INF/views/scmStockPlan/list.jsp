@@ -23,7 +23,7 @@
                     <div class="form-group row">
                         <label class="col-md-2 control-label">类型</label>
                         <div class="col-md-4">
-                            {{detailsArr.materialType}}
+                            {{detailsArr.materialTypes}}
                         </div>
                         <label class="col-md-2 control-label">供应商</label>
                         <div class="col-md-4">
@@ -224,14 +224,14 @@
                 showDetails:function (data) { //查看详情
                     this.details=true;
                     this.detailsArr=data;
-                    for(var i=0;i<this.detailsArr.docStkInPlanDetailDoList.length;i++){
-                        switch(this.detailsArr.docStkInPlanDetailDoList[i].materialType){
-                            case 'INGREDIENTS':this.detailsArr.docStkInPlanDetailDoList[i].materialType='主料';break;
-                            case 'ACCESSORIES':this.detailsArr.docStkInPlanDetailDoList[i].materialType='辅料';break;
-                            case 'SEASONING':this.detailsArr.docStkInPlanDetailDoList[i].materialType='配料';break;
-                            case 'MATERIEL':this.detailsArr.docStkInPlanDetailDoList[i].materialType='物料';break;
-                        }
-                    }
+//                    for(var i=0;i<this.detailsArr.docStkInPlanDetailDoList.length;i++){
+//                        switch(this.detailsArr.docStkInPlanDetailDoList[i].materialType){
+//                            case 'INGREDIENTS':this.detailsArr.docStkInPlanDetailDoList[i].materialType='主料';break;
+//                            case 'ACCESSORIES':this.detailsArr.docStkInPlanDetailDoList[i].materialType='辅料';break;
+//                            case 'SEASONING':this.detailsArr.docStkInPlanDetailDoList[i].materialType='配料';break;
+//                            case 'MATERIEL':this.detailsArr.docStkInPlanDetailDoList[i].materialType='物料';break;
+//                        }
+//                    }
 
                     this.detailsBtn=true;
                 },

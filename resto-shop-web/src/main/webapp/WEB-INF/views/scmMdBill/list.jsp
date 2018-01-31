@@ -82,7 +82,7 @@
                     <div class="form-group row">
                         <label class="col-md-2 control-label">类型</label>
                         <div class="col-md-4">
-                            {{detailsArr.materialType}}
+                            {{detailsArr.materialTypes}}
                         </div>
                         <label class="col-md-2 control-label">供应商</label>
                         <div class="col-md-4">
@@ -459,6 +459,15 @@
                     this.details=true;
                     this.detailsArr=data;
                     this.detailsBtn=true;
+
+                    for(var i=0;i<this.detailsArr.docStkInPlanDetailDoList.length;i++){
+                        switch(this.detailsArr.docStkInPlanDetailDoList[i].materialType){
+                            case 'INGREDIENTS':this.detailsArr.docStkInPlanDetailDoList[i].materialType='主料';break;
+                            case 'ACCESSORIES':this.detailsArr.docStkInPlanDetailDoList[i].materialType='辅料';break;
+                            case 'SEASONING':this.detailsArr.docStkInPlanDetailDoList[i].materialType='配料';break;
+                            case 'MATERIEL':this.detailsArr.docStkInPlanDetailDoList[i].materialType='物料';break;
+                        }
+                    }
                 },
                 detailsCli:function () { //关闭查看详情
                     this.details=false;
