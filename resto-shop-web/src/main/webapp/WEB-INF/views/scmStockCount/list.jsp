@@ -163,6 +163,16 @@
                 showDetails:function (data) { //查看详情
                     this.details=true;
                     this.detailsArr=data;
+
+                    for(var i=0;i<this.detailsArr.stockCountDetailList.length;i++){
+                        switch(this.detailsArr.stockCountDetailList[i].materialType){
+                            case 'INGREDIENTS':this.detailsArr.stockCountDetailList[i].materialType='主料';break;
+                            case 'ACCESSORIES':this.detailsArr.stockCountDetailList[i].materialType='辅料';break;
+                            case 'SEASONING':this.detailsArr.stockCountDetailList[i].materialType='配料';break;
+                            case 'MATERIEL':this.detailsArr.stockCountDetailList[i].materialType='物料';break;
+                        }
+                    }
+
                 },
                 detailsCli:function () { //关闭查看详情
                     this.details=false;

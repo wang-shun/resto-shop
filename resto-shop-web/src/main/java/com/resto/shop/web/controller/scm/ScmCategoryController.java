@@ -42,7 +42,6 @@ public class ScmCategoryController extends GenericController {
     }
 
     /***
-     * queryAll(String shopId,Long supPriceId,Long pmsHeadId)
      * @return
      */
     @RequestMapping("/query")
@@ -53,7 +52,7 @@ public class ScmCategoryController extends GenericController {
             supPriceId =0l;
         }
         if(pmsHeadId== null){
-            supPriceId =0l;
+            pmsHeadId =0l;
         }
         List<CategoryOne> list = categoryService.queryAll(shopDetailId,supPriceId,pmsHeadId);
         return getSuccessResult(list);
