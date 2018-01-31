@@ -186,4 +186,8 @@
             and id not in (${realTimeCouponIds})
         </if>
     </select>
+
+    <select id="selectConsumptionRebateCoupon" resultType="NewCustomCoupon">
+        select * from tb_new_custom_coupon where coupon_type = 6 and is_activty = 1
+    </select>
 </mapper>

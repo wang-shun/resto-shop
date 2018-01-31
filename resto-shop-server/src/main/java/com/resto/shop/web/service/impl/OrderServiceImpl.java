@@ -219,6 +219,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private TableGroupService tableGroupService;
 
+    @Resource
+    NewCustomCouponService newCustomCouponService;
+
     Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
@@ -1351,6 +1354,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 log.error("子订单自动下单失败:" + e.getMessage());
                 changePushOrder(order);
             }
+        }
+        //排除掉子订单，在支付时给用户发放消费返利优惠券
+        if (StringUtils.isBlank(order.getParentOrderId())){
+            //查询出所有消费返利优惠券
+            List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon();
         }
         return order;
     }
