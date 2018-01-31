@@ -273,8 +273,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<ArticleSellDto> selectShopArticleSellByDateAndId(@Param("shopId")String shopId,@Param("beginDate") Date begin, @Param("endDate")Date end,@Param("sort") String sort);
 
-	List<Order> selectListByTime(@Param("beginDate")Date begin, @Param("endDate")Date end,@Param("shopId") String shopId,@Param("customerId") String customerId);
-
 	Order selectOrderDetails(String orderId);
 
 
@@ -282,14 +280,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	List<ArticleSellDto> selectArticleFamilyByBrandAndFamilyName(@Param("brandId")String brandId,@Param("beginDate") Date begin, @Param("endDate")Date end,
 			@Param("articleFamilyName")String articleFamilyName);
-	/**
-	 * 查询已消费的订单
-	 * @param begin
-	 * @param end
-	 * @param brandId
-	 * @return
-	 */
-	List<Order> selectListBybrandId(@Param("beginDate")Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
 
 	List<Order> selectAppraiseByShopId(@Param("beginDate")Date beginDate, @Param("endDate")Date endDate, @Param("shopId")String shopId);
 
@@ -428,25 +418,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<ShopArticleReportDto> selectShopArticleSum(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
 
     /**
-     * 查询品牌下每个店铺的菜品销售和
-     * @param begin
-     * @param end
-     * @param brandId
-     * @return
-     */
-    List<ShopArticleReportDto> selectShopArticleSell(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
-
-    /**
-     * 查询店铺下所有的已消费的订单
-     * @param begin
-     * @param end
-     * @param shopId
-     * @return
-     */
-
-    List<Order> selectListByShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String shopId);
-
-    /**
      * 根据订单状态和生产状态查询指定店铺的订单
      * @param shopId
      * @param orderStates
@@ -483,11 +454,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
     List<Order> selectHasPayListOrderByBrandId(@Param("beginDate") Date begin,@Param("endDate") Date end,@Param("brandId") String brandId);
 
     List<Order> selectHasPayOrderPayMentItemListBybrandId(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
-
-
-    Integer selectBrandArticleNum(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
-
-    List<brandArticleReportDto> selectConfirmMoney(@Param("beginDate") Date begin, @Param("endDate") Date end, @Param("brandId") String brandId);
 
     /**
      * 手动取消订单
@@ -702,30 +668,13 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
     List<Order> selectMonthIncomeDto(Map<String, Object> selectMap);
 
-
-	List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap);
-
-	ShopOrderReportDto procDayAllOrderItemShop(Date beginDate, Date endDate, String shopId);
-
-	BrandOrderReportDto procDayAllOrderItemBrand(Map<String, Object> selectMap);
-
-	List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap);
-
 	void fixAllowContinueOrder(@Param("beginDate") Date begin);
 
 	List<Order> getAllowAppraise();
+
 	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
+
     void colseOrder(String orderId);
-
-	/**
-	 * 查询退菜报表list
-	 * @param beginDate
-	 * @param endDate
-	 * @return
-	 */
-	List<RefundArticleOrder> addRefundArticleDto(@Param("beginDate") String beginDate,@Param("endDate") String endDate);
-
-	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
 
 	/**
 	 * yz 2017/07/28
@@ -782,15 +731,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	 * @return
      */
 	Order selectAfterValidOrderByCustomerId(String customerId);
-
-	/**
-	 * 每个店铺的交易笔数
-	 * @param brandId
-	 * @param beginDate
-	 * @param endDate
-	 * @return
-	 */
-    List<OrderNumDto> selectOrderNumByTimeAndBrandId(@Param("brandId") String brandId, @Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
 
 	/**
 	 * Pos 2.0 数据同步方法，根据 orderId 查询订单信息

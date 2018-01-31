@@ -114,4 +114,12 @@ public interface ChargeOrderService extends GenericService<ChargeOrder, String> 
 	 * @return
 	 */
     BigDecimal selectTotalBalanceByTimeAndShopId(Date monthBegin, Date monthEnd, String shopId);
+
+	/**
+	 * 查询还有赠送金额未返还的订单
+	 * @return
+	 */
+	List<ChargeOrder> selectRemainderReturn();
+
+	void updateRemainderReturn(ChargeOrder chargeOrder);
 }

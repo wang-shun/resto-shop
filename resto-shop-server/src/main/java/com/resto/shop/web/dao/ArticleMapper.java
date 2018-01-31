@@ -118,10 +118,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void addArticleLikes(String articleId);
 	
 	List<Article> selectsingleItem(@Param("shopId") String shopId);
-	
-	List<ArticleSellDto> queryOrderArtcile(Map<String, Object> selectMap);
-	
-
 
 	/**
 	 * 根据分类查询分类下的所有菜品
@@ -131,10 +127,6 @@ public interface ArticleMapper extends GenericDao<Article, String>{
 	void updateInitialsById(@Param("initials") String initials, @Param("articleId") String articleId);
 
 	List<Article> selectArticleList();
-
-    List<ArticleSellDto> selectArticleByType(Map<String, Object> selectMap);
-
-    Map<String, Object> selectArticleOrderCount(Map<String, Object> selectMap);
 
     List<String> selectArticleSort(Map<String, Object> selectMap);
 

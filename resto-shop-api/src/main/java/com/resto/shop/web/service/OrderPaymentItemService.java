@@ -91,17 +91,17 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
     void posSyncDeleteByOrderId(String orderId);
 
     /**
-     * 批量插入订单支付项（用于 POS 端订单同步）
-     * @param orderPaymentItems
-     */
-    void insertItems(List<OrderPaymentItem> orderPaymentItems);
-
-    /**
      * Pos 2.0 数据同步方法，根据 orderId 查询订单支付项
      * @param orderId
      * @return
      */
     List<OrderPaymentItem> posSyncListByOrderId(String orderId);
+
+    /**
+     * 批量插入订单支付项（用于 POS 端订单同步）
+     * @param orderPaymentItems
+     */
+    void insertItems(List<OrderPaymentItem> orderPaymentItems);
 
     List<OrderPaymentItem> selectPayMentByPayMode(String orderId, Integer payMode, Integer type);
 }

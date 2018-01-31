@@ -1,10 +1,18 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div id="controlShop">
-    <a class="btn btn-info ajaxify" href="platformReport/list">
-        <span class="glyphicon glyphicon-circle-arrow-left"></span>
-        返回
-    </a>
+    <c:if test="${empty type}">
+        <a class="btn btn-info ajaxify" href="platformReport/list">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
+    <c:if test="${!empty type}">
+        <a class="btn btn-info ajaxify" href="platformReport/shop/list">
+            <span class="glyphicon glyphicon-circle-arrow-left"></span>
+            返回
+        </a>
+    </c:if>
     <h2 class="text-center">
         <strong>${shopName}店铺外卖订单表</strong>
     </h2>
@@ -227,9 +235,9 @@
                     toastr.clear();
                     toastr.error("开始时间应该少于结束时间！");
                     return false;
-                }/*else if(timeCha > 604800000){
+                }/*else if(timeCha > 2678400000){
                     toastr.clear();
-                    toastr.error("暂时未开放大于一周以内的查询！");
+                    toastr.error("暂时未开放大于一月以内的查询！");
                     return false;
                 }*/
                 toastr.clear();

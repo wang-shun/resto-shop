@@ -123,6 +123,10 @@ public class PosServiceImpl implements PosService {
     @Override
     public String syncOrderCreated(String orderId) {
         Order order = orderService.selectById(orderId);
+        if(order == null){
+            log.error("syncOrderCreated     未查到订单信息：" + orderId);
+            return "";
+        }
         OrderDto orderDto = new OrderDto(order);
         JSONObject jsonObject = new JSONObject(orderDto);
         jsonObject.put("dataType", "orderCreated");
@@ -288,13 +292,17 @@ public class PosServiceImpl implements PosService {
     @Override
     public void printSuccess(String orderId) {
         Order order = orderService.selectById(orderId);
-        Brand brand = brandService.selectById(order.getBrandId());
-        BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
-        AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-        try {
-            orderService.printSuccess(orderId,brandSetting.getOpenBrandAccount() == 1,accountSetting);
-        } catch (AppException e) {
-            e.printStackTrace();
+        if(order != null){
+            Brand brand = brandService.selectById(order.getBrandId());
+            BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
+            AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+            try {
+                orderService.printSuccess(orderId,brandSetting.getOpenBrandAccount() == 1,accountSetting);
+            } catch (AppException e) {
+                e.printStackTrace();
+            }
+        }else {
+            log.error("Pos2.0 打印失败：为找到响应订单；orderId：" + orderId);
         }
     }
 
@@ -304,6 +312,7 @@ public class PosServiceImpl implements PosService {
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
         Order serverDataBaseOrder = orderMapper.selectByPrimaryKey(orderDto.getId());
         if(serverDataBaseOrder != null){  //  判断服务器数据库是否已经存在此订单
+            log.error("Pos2.0   创建订单失败：数据库已存在此订单");
             return;
         }
         if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){
@@ -316,6 +325,7 @@ public class PosServiceImpl implements PosService {
         order.setOrderMode(shopDetail.getShopMode());
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(json.getString("brandId"));
+        order.setDataOrigin(orderDto.getDataOrigin());
         //  订单项
         List<OrderItemDto> orderItemDtos =  orderDto.getOrderItem();
         List<OrderItem> orderItems = new ArrayList<>();
@@ -334,20 +344,22 @@ public class PosServiceImpl implements PosService {
                 orderPaymentItems.add(orderPaymentItem);
             }
         }
-
         if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){    //  子订单
             Order parent = orderService.selectById(order.getParentOrderId());
             order.setVerCode(parent.getVerCode());
-            updateParent(order);
         }else{  //  主订单
             if(StringUtils.isEmpty(order.getVerCode())){
                 order.setVerCode(generateString(5));
             }
         }
         //  插入订单信息
-        orderService.insert(order);
+        orderMapper.insertSelective(order);
         orderItemService.insertItems(orderItems);
         orderPaymentItemService.insertItems(orderPaymentItems);
+        //  更新主订单
+        if(StringUtils.isNotEmpty(orderDto.getParentOrderId())){
+            updateParent(order);
+        }
         // 更新库存
         Boolean updateStockSuccess = false;
         try {
@@ -379,6 +391,7 @@ public class PosServiceImpl implements PosService {
             order.setPaymentAmount(BigDecimal.valueOf(0));
             order.setAllowCancel(false);
             order.setAllowContinueOrder(false);
+            order.setPayMode(json.getInt("payMode"));
             orderService.update(order);
             if(!StringUtils.isEmpty(order.getParentOrderId())){
                 updateParent(order);

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.resto.shop.web.report.AppraiseMapperReport">
+  <resultMap id="BaseResultMap" type="com.resto.shop.web.model.Appraise">
+    <id column="id" property="id" jdbcType="VARCHAR"/>
+    <result column="picture_url" property="pictureUrl" jdbcType="VARCHAR"/>
+    <result column="level" property="level" jdbcType="TINYINT"/>
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+    <result column="content" property="content" jdbcType="VARCHAR"/>
+    <result column="status" property="status" jdbcType="TINYINT"/>
+    <result column="type" property="type" jdbcType="TINYINT"/>
+    <result column="feedback" property="feedback" jdbcType="VARCHAR"/>
+    <result column="red_money" property="redMoney" jdbcType="DECIMAL"/>
+    <result column="customer_id" property="customerId" jdbcType="VARCHAR"/>
+    <result column="order_id" property="orderId" jdbcType="VARCHAR"/>
+    <result column="article_id" property="articleId" jdbcType="VARCHAR"/>
+    <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+    <result column="feedback_article" property="feedbackArticle" jdbcType="VARCHAR"/>
+  </resultMap>
+  <sql id="Base_Column_List">id, picture_url, level, create_time, content, status, type, feedback, red_money, customer_id, order_id, article_id, shop_detail_id</sql>
+
+
+    <select id="selectAppraiseShopDto" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.AppraiseShopDto">
+        select
+        ta.`level`,
+        CASE ta.`level`
+        WHEN 1 THEN '一星'
+        WHEN 2 THEN '二星'
+        WHEN 3 THEN '三星'
+        WHEN 4 THEN '四星'
+        WHEN 5 THEN '五星'
+        END levelName,
+        ta.feedback feedBack,
+        ta.create_time createTime,
+        IFNULL(tc.telephone,'--') telephone,
+        td.order_money orderMoney,
+        ta.red_money redMoney,
+        ta.content,
+        td.table_number tablenumber
+        from tb_appraise ta
+        inner join tb_order td
+        on ta.order_id = td.id
+        inner join tb_customer tc
+        on ta.customer_id = tc.id
+        where ta.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
+        and ta.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
+        and td.shop_detail_id = #{shopId}
+    </select>
+</mapper>

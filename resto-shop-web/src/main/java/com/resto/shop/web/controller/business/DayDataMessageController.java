@@ -43,14 +43,8 @@ public class DayDataMessageController extends GenericController{
 	    //判断是否要显示旬 和 月
        int type= DateUtil.getEarlyMidLateEnd(new Date());
        ModelAndView mv = new ModelAndView();
-        Date date = new Date();
-        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
-            getRequest().setAttribute("netOpen", true);
-            mv.setViewName("notopen");
-        }else{
-            mv.setViewName("daydatamessage/list");
-            mv.addObject("type",type);
-        }
+        mv.setViewName("daydatamessage/list");
+        mv.addObject("type",type);
        return mv;
     }
 

@@ -13,6 +13,7 @@ import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
+import com.resto.shop.web.report.AppraiseMapperReport;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.StringUtils;
 
@@ -33,6 +34,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 
     @Resource
     private AppraiseMapper appraiseMapper;
+
+    @Resource
+	private AppraiseMapperReport appraiseMapperReport;
 
     @Resource
     OrderService orderService;
@@ -273,7 +277,7 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 
     @Override
     public List<AppraiseShopDto> selectAppraiseShopDto(Map<String, Object> selectMap) {
-        return appraiseMapper.selectAppraiseShopDto(selectMap);
+        return appraiseMapperReport.selectAppraiseShopDto(selectMap);
     }
 
 	@Override
