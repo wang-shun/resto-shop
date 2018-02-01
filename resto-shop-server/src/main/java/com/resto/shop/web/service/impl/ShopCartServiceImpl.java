@@ -244,5 +244,6 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
     @Override
     public void updateShopCartRecommend(Integer id) {
         shopcartMapper.updateShopCartRecommend(id);
+        shopcartMapper.delMealItem(id.toString());
     }
 }
