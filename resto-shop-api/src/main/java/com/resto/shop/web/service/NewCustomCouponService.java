@@ -50,5 +50,5 @@ public interface NewCustomCouponService extends GenericService<NewCustomCoupon, 
      * 查询消费返利优惠券
      * @return
      */
-    List<NewCustomCoupon> selectConsumptionRebateCoupon();
+    List<NewCustomCoupon> selectConsumptionRebateCoupon(String shopId);
 }

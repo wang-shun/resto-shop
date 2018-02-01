@@ -248,4 +248,8 @@
             )
         </foreach>
     </insert>
+
+    <select id="selectLastTimeRebate" resultType="Coupon">
+        select * from tb_coupon where coupon_type = 5 ORDER BY add_time desc LIMIT 1
+    </select>
 </mapper>

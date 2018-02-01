@@ -392,7 +392,7 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     }
 
     @Override
-    public List<NewCustomCoupon> selectConsumptionRebateCoupon() {
-        return newcustomcouponMapper.selectConsumptionRebateCoupon();
+    public List<NewCustomCoupon> selectConsumptionRebateCoupon(String shopId) {
+        return newcustomcouponMapper.selectConsumptionRebateCoupon(shopId);
     }
 }

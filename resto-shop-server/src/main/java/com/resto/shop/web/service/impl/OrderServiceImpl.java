@@ -1358,9 +1358,42 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         //排除掉子订单，在支付时给用户发放消费返利优惠券
         if (StringUtils.isBlank(order.getParentOrderId())){
             //查询出所有消费返利优惠券
-            List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon();
+            List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
+            if (newCustomCoupons != null && newCustomCoupons.size() > 0){
+                //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
+                Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
+                Customer customer = customerService.selectById(order.getCustomerId());
+                for (NewCustomCoupon newCustomCoupon : newCustomCoupons){
+                    if (coupon != null){
+                        Integer hours = hoursBetween(coupon.getAddTime(), new Date());
+                        //如果上一次领取到的消费返利优惠券距今的小时数>=当前优惠券所设置的每隔多少小时领取
+                        if (hours.compareTo(newCustomCoupon.getNextHour()) >= 0){
+                            couponService.addCoupon(newCustomCoupon, customer);
+                        }
+                    }else{
+                        couponService.addCoupon(newCustomCoupon, customer);
+                    }
+                }
+            }
         }
         return order;
+    }
+
+    /**
+     * 得到两个日期相差的小时数
+     * @param beginDate
+     * @param endDate
+     * @return
+     * @throws ParseException
+     */
+    public static Integer hoursBetween(Date beginDate,Date endDate){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(beginDate);
+        long time1 = cal.getTimeInMillis();
+        cal.setTime(endDate);
+        long time2 = cal.getTimeInMillis();
+        long between_days=(time2-time1)/(1000*3600);
+        return Integer.valueOf(String.valueOf(between_days));
     }
 
     private int selectArticleCountById(String id, Integer shopMode) {

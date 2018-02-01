@@ -189,5 +189,6 @@
 
     <select id="selectConsumptionRebateCoupon" resultType="NewCustomCoupon">
         select * from tb_new_custom_coupon where coupon_type = 6 and is_activty = 1
+        and (is_brand = 1 or shop_detail_id = #{shopId})
     </select>
 </mapper>

@@ -39,5 +39,5 @@ public interface NewCustomCouponMapper  extends GenericDao<NewCustomCoupon,Long>
 
     List<NewCustomCoupon> selectRealTimeCoupon(Map<String, Object> selectMap);
 
-    List<NewCustomCoupon> selectConsumptionRebateCoupon();
+    List<NewCustomCoupon> selectConsumptionRebateCoupon(@Param("shopId") String shopId);
 }
