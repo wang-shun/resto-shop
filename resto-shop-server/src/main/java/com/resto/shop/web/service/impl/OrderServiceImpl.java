@@ -9008,6 +9008,26 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map1.put("content", "用户:"+order.getCustomerId()+"的订单："+order.getId()+"在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map1);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
+        if (StringUtils.isBlank(order.getParentOrderId())) {
+            //查询出所有消费返利优惠券
+            List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
+            if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
+                //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
+                Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
+                Customer customer = customerService.selectById(order.getCustomerId());
+                for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
+                    if (coupon != null) {
+                        Integer hours = hoursBetween(coupon.getAddTime(), new Date());
+                        //如果上一次领取到的消费返利优惠券距今的小时数>=当前优惠券所设置的每隔多少小时领取
+                        if (hours.compareTo(newCustomCoupon.getNextHour()) >= 0) {
+                            couponService.addCoupon(newCustomCoupon, customer);
+                        }
+                    } else {
+                        couponService.addCoupon(newCustomCoupon, customer);
+                    }
+                }
+            }
+        }
         return order;
     }
 
