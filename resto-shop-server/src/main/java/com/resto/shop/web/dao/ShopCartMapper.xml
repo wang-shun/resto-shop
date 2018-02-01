@@ -223,6 +223,6 @@
     <update id="updateShopCartRecommend">
         update tb_shop_cart
         set shop_type = 1
-        where id = {id}
+        where id = #{id}
     </update>
 </mapper>
