@@ -10092,8 +10092,62 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
                 //修改主订单
                 order.setAmountWithChildren(order.getOrderMoney().add(sum));
+                order.setOrderPosDiscountMoney(order.getBaseOrderMoney().subtract(order.getAmountWithChildren()));
                 orderMapper.updateByPrimaryKeySelective(order);
             }
+        }
+        return order;
+    }
+
+    public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, BigDecimal posDiscount, Order order, BigDecimal eraseMoney,
+                                   BigDecimal noDiscountMoney, BigDecimal shijiMoney, boolean flag){
+        ShopDetail shop = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+        BigDecimal sum = new BigDecimal(0);
+        //修改菜品项
+        for(OrderItem oItem : orderItems){
+            oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(posDiscount).setScale(2,BigDecimal.ROUND_HALF_UP));
+            oItem.setPosDiscount(posDiscount.multiply(new BigDecimal(100)) + "%");
+            oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
+            sum = sum.add(oItem.getFinalPrice());
+            orderItemService.update(oItem);
+        }
+        //修改子订单
+        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+            if(flag){
+                order.setOrderMoney(sum);
+                order.setPaymentAmount(sum);
+            }else{
+                order.setOrderMoney(shijiMoney);
+                order.setPaymentAmount(shijiMoney);
+            }
+            order.setPosDiscount(discount);
+            orderMapper.updateByPrimaryKeySelective(order);
+        }
+        //修改主订单
+        if(order.getParentOrderId() == null || "".equals(order.getParentOrderId())){
+            if(shop.getServicePrice().doubleValue() > 0 && shop.getIsUseServicePrice() == 1 && brandSetting.getIsUseServicePrice() == 1 && order.getCustomerCount() > 0){
+                order.setServicePrice(posDiscount.multiply(shop.getServicePrice()).multiply(new BigDecimal(order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
+            if(order.getMealFeePrice().doubleValue() > 0){
+                order.setMealFeePrice(posDiscount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
+            if(flag){
+                order.setOrderMoney((shijiMoney.compareTo(sum) >= 0 ? sum : shijiMoney).add(order.getServicePrice()).add(order.getMealFeePrice()));
+                order.setPaymentAmount((shijiMoney.compareTo(sum) >= 0 ? sum : shijiMoney).add(order.getServicePrice()).add(order.getMealFeePrice()));
+            }else{
+                order.setOrderMoney(shijiMoney);
+                order.setPaymentAmount(shijiMoney);
+            }
+            order.setEraseMoney(eraseMoney);
+            order.setNoDiscountMoney(noDiscountMoney);
+            BigDecimal value = orderMapper.selectPayBefore(order.getId());
+            if(value != null && value.doubleValue() > 0){
+                order.setPaymentAmount(sum.subtract(value));
+            }
+            order.setPosDiscount(discount);
+            order.setOrderPosDiscountMoney(order.getBaseOrderMoney().subtract(order.getOrderMoney()));
+            orderMapper.updateByPrimaryKeySelective(order);
         }
         return order;
     }
@@ -10222,58 +10276,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date beginDate = DateUtil.getformatBeginDate(begin);
         Date endDate = DateUtil.getformatEndDate(end);
         return orderMapperReport.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
-    }
-
-    public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, BigDecimal posDiscount, Order order, BigDecimal eraseMoney,
-                                   BigDecimal noDiscountMoney, BigDecimal shijiMoney, boolean flag){
-        ShopDetail shop = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
-        BigDecimal sum = new BigDecimal(0);
-        //修改菜品项
-        for(OrderItem oItem : orderItems){
-            oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(posDiscount).setScale(2,BigDecimal.ROUND_HALF_UP));
-            oItem.setPosDiscount(posDiscount.multiply(new BigDecimal(100)) + "%");
-            oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
-            sum = sum.add(oItem.getFinalPrice());
-            orderItemService.update(oItem);
-        }
-        //修改子订单
-        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
-            if(flag){
-                order.setOrderMoney(sum);
-                order.setPaymentAmount(sum);
-            }else{
-                order.setOrderMoney(shijiMoney);
-                order.setPaymentAmount(shijiMoney);
-            }
-            order.setPosDiscount(discount);
-            orderMapper.updateByPrimaryKeySelective(order);
-        }
-        //修改主订单
-        if(order.getParentOrderId() == null || "".equals(order.getParentOrderId())){
-            if(shop.getServicePrice().doubleValue() > 0 && shop.getIsUseServicePrice() == 1 && brandSetting.getIsUseServicePrice() == 1 && order.getCustomerCount() > 0){
-                order.setServicePrice(posDiscount.multiply(shop.getServicePrice()).multiply(new BigDecimal(order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
-            }
-            if(order.getMealFeePrice().doubleValue() > 0){
-                order.setMealFeePrice(posDiscount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
-            }
-            if(flag){
-                order.setOrderMoney((shijiMoney.compareTo(sum) >= 0 ? sum : shijiMoney).add(order.getServicePrice()).add(order.getMealFeePrice()));
-                order.setPaymentAmount((shijiMoney.compareTo(sum) >= 0 ? sum : shijiMoney).add(order.getServicePrice()).add(order.getMealFeePrice()));
-            }else{
-                order.setOrderMoney(shijiMoney);
-                order.setPaymentAmount(shijiMoney);
-            }
-            order.setEraseMoney(eraseMoney);
-            order.setNoDiscountMoney(noDiscountMoney);
-            BigDecimal value = orderMapper.selectPayBefore(order.getId());
-            if(value != null && value.doubleValue() > 0){
-                order.setPaymentAmount(sum.subtract(value));
-            }
-            order.setPosDiscount(discount);
-            orderMapper.updateByPrimaryKeySelective(order);
-        }
-        return order;
     }
 
     @Override
