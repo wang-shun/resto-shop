@@ -1397,11 +1397,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     pushMsgMap.put("couponCount", newCustomCoupon.getCouponNumber());
                     pushMsgMap.put("url", newCustomCoupon.getIsBrand().equals(Common.YES) ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my"
                             : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + "");
-                    StrSubstitutor substitutor = new StrSubstitutor();
-                    pushMsg = substitutor.replace(pushMsgMap);
+                    StrSubstitutor substitutor = new StrSubstitutor(pushMsgMap);
+                    pushMsg = substitutor.replace(pushMsg);
                     WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
                     //如果用户注册添加短信推送
                     if (StringUtils.isNotBlank(customer.getTelephone())) {
+                        pushMsgMap.put("couponName", newCustomCoupon.getCouponName() + newCustomCoupon.getCouponNumber() + "张");
                         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
                         filter.getExcludes().add("couponCount");
                         filter.getExcludes().add("url");
@@ -9077,8 +9078,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     pushMsgMap.put("couponCount", newCustomCoupon.getCouponNumber());
                     pushMsgMap.put("url", newCustomCoupon.getIsBrand().equals(Common.YES) ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my"
                             : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + "");
-                    StrSubstitutor substitutor = new StrSubstitutor();
-                    pushMsg = substitutor.replace(pushMsgMap);
+                    StrSubstitutor substitutor = new StrSubstitutor(pushMsgMap);
+                    pushMsg = substitutor.replace(pushMsg);
                     WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
                     //如果用户注册添加短信推送
                     if (StringUtils.isNotBlank(customer.getTelephone())) {
@@ -9402,8 +9403,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     pushMsgMap.put("couponCount", newCustomCoupon.getCouponNumber());
                     pushMsgMap.put("url", newCustomCoupon.getIsBrand().equals(Common.YES) ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my"
                             : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + "");
-                    StrSubstitutor substitutor = new StrSubstitutor();
-                    pushMsg = substitutor.replace(pushMsgMap);
+                    StrSubstitutor substitutor = new StrSubstitutor(pushMsgMap);
+                    pushMsg = substitutor.replace(pushMsg);
                     WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
                     //如果用户注册添加短信推送
                     if (StringUtils.isNotBlank(customer.getTelephone())) {
