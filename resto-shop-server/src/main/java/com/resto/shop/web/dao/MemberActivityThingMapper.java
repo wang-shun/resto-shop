@@ -18,4 +18,6 @@ public interface MemberActivityThingMapper extends GenericDao<MemberActivityThin
 
     int updateByPrimaryKey(MemberActivityThing record);
 
+    MemberActivityThing selectByTelephone(String telephone);
+
 }

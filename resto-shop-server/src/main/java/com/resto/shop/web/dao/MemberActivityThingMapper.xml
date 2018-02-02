@@ -46,5 +46,8 @@
         select * from tb_member_activity_thing
     </select>
 
+    <select id="selectByTelephone" resultType="MemberActivityThing" parameterType="java.lang.String">select
+        <include refid="Base_Column_List"/> from tb_member_activity_thing where telephone = #{telephone}
+    </select>
 
 </mapper>

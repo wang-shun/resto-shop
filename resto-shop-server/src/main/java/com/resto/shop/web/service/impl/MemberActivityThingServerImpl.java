@@ -20,4 +20,9 @@ public class MemberActivityThingServerImpl extends GenericServiceImpl<MemberActi
     public GenericDao<MemberActivityThing, Integer> getDao() {
         return memberActivityThingMapper;
     }
+
+    @Override
+    public MemberActivityThing selectByTelephone(String telephone) {
+        return memberActivityThingMapper.selectByTelephone(telephone);
+    }
 }
