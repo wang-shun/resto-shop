@@ -326,6 +326,26 @@ public class Order implements Serializable {
 
     private Integer isUseNewService;
 
+    private BigDecimal orderPosDiscountMoney;
+
+    private BigDecimal memberDiscountMoney;
+
+    public BigDecimal getOrderPosDiscountMoney() {
+        return orderPosDiscountMoney;
+    }
+
+    public void setOrderPosDiscountMoney(BigDecimal orderPosDiscountMoney) {
+        this.orderPosDiscountMoney = orderPosDiscountMoney;
+    }
+
+    public BigDecimal getMemberDiscountMoney() {
+        return memberDiscountMoney;
+    }
+
+    public void setMemberDiscountMoney(BigDecimal memberDiscountMoney) {
+        this.memberDiscountMoney = memberDiscountMoney;
+    }
+
     public Integer getDataOrigin() {
         return dataOrigin;
     }
