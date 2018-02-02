@@ -49,7 +49,7 @@
             <if test="type != null">type = #{type},</if>
         </set> where id = #{id}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.MemberActivity">update tb_member_activity set create_time = #{createTime},name = #{name},disconut = #{disconut},update_time = #{updateTime},brand_id = #{brandId},type = #{type} where id = #{id,jdbcType=VARCHAR}</update>
+    <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.MemberActivity">update tb_member_activity set create_time = #{createTime},name = #{name},disconut = #{disconut},update_time = #{updateTime},brand_id = #{brandId},type = #{type} where id = #{id}</update>
     <select id="selectList" resultType="MemberActivity">
         select * from tb_member_activity
     </select>

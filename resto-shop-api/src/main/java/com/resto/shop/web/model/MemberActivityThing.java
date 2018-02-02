@@ -1,6 +1,7 @@
 package com.resto.shop.web.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class MemberActivityThing implements Serializable {
@@ -12,6 +13,8 @@ public class MemberActivityThing implements Serializable {
     private String telephone;
 
     private Integer activityId;
+
+    private BigDecimal discount;
 
     public Integer getId() {
         return id;
@@ -43,5 +46,13 @@ public class MemberActivityThing implements Serializable {
 
     public void setActivityId(Integer activityId) {
         this.activityId = activityId;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
     }
 }
