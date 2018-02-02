@@ -250,6 +250,6 @@
     </insert>
 
     <select id="selectLastTimeRebate" resultType="Coupon">
-        select * from tb_coupon where coupon_type = 5 ORDER BY add_time desc LIMIT 1
+        select * from tb_coupon where coupon_type = 6 and customer_id = #{customerId} ORDER BY add_time desc LIMIT 1
     </select>
 </mapper>

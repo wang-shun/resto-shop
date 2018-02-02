@@ -1402,6 +1402,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
                     //如果用户注册添加短信推送
                     if (StringUtils.isNotBlank(customer.getTelephone())) {
+                        pushMsgMap.put("couponName", newCustomCoupon.getCouponName() + newCustomCoupon.getCouponNumber() + "张");
                         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
                         filter.getExcludes().add("couponCount");
                         filter.getExcludes().add("url");
