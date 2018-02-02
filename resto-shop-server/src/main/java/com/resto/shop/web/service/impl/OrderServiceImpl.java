@@ -7364,29 +7364,36 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (count > orderItem.getCount()) {
                 result.setSuccess(false);
                 result.setMessage("餐品修改数量有误");
+                map.put("content", shopDetail.getName() + "修改菜品失败：餐品修改数量有误。 itemId："+ orderItemId +"" +",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(url, map);
                 return result;
             }
             BigDecimal baseArticleCount = new BigDecimal(orderItem.getCount());
             if (orderItem.getType() == OrderItemType.MEALS_CHILDREN) {
                 result.setSuccess(false);
                 result.setMessage("套餐子品暂不支持修改");
+                map.put("content", shopDetail.getName() + "修改菜品失败：套餐子品暂不支持修改。 itemId："+ orderItemId +"" +",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(url, map);
                 return result;
             }
-            order.setArticleCount(order.getArticleCount() - orderItem.getCount());
 
             if (order.getParentOrderId() == null) {
                 if (order.getArticleCount() == 0 && count == 0) {
                     result.setSuccess(false);
                     result.setMessage("菜品数量不可为空");
+                    map.put("content", shopDetail.getName() + "修改菜品失败：菜品数量不可为空。 itemId："+ orderItemId +"" +",请求服务器地址为:" + MQSetting.getLocalIP());
+                    doPostAnsc(url, map);
                     return result;
                 }
             }
 
+            order.setArticleCount(order.getArticleCount() - orderItem.getCount());
             order.setOrderMoney(order.getOrderMoney().subtract(orderItem.getFinalPrice()));
             order.setOriginalAmount(order.getOriginalAmount().subtract(new BigDecimal(orderItem.getCount()).multiply(orderItem.getOriginalPrice())));
             order.setPaymentAmount(order.getPaymentAmount().subtract(orderItem.getFinalPrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().subtract(orderItem.getFinalPrice()));
+                order.setCountWithChild(order.getCountWithChild() - orderItem.getCount());
             }
 
             orderItem.setCount(count);
@@ -7405,6 +7412,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().add(orderItem.getFinalPrice()));
+                order.setCountWithChild(order.getCountWithChild() + orderItem.getCount());
             }
 
             if (orderItem.getCount() == 0) {
