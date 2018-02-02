@@ -215,6 +215,8 @@
         <result column="tableware_fee_price" property="tablewareFeePrice"/>
         <result column="is_use_new_service" property="isUseNewService"/>
         <result column="data_origin" property="dataOrigin"/>
+        <result column="order_pos_discount_money" property="orderPosDiscountMoney"/>
+        <result column="member_discount_money" property="memberDiscountMoney"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -383,7 +385,8 @@
         last_order_time,customer_count,service_price,pay_mode,base_money,base_order_money,base_customer_count,meal_fee_price,meal_all_number
         ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
         print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, is_consumption_rebate, group_id, before_id, order_before
-        ,sauce_fee_count,sauce_fee_price,towel_fee_count,towel_fee_price,tableware_fee_count,tableware_fee_price,is_use_new_service,data_origin
+        ,sauce_fee_count,sauce_fee_price,towel_fee_count,towel_fee_price,tableware_fee_count,tableware_fee_price,is_use_new_service,data_origin,
+        order_pos_discount_money,member_discount_money
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -655,6 +658,12 @@
             <if test="dataOrigin != null">
                 data_origin,
             </if>
+            <if test="orderPosDiscountMoney != null">
+                order_pos_discount_money,
+            </if>
+            <if test="memberDiscountMoney != null">
+                member_discount_money,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -858,6 +867,12 @@
             <if test="dataOrigin != null">
                 #{dataOrigin},
             </if>
+            <if test="orderPosDiscountMoney != null">
+                #{orderPosDiscountMoney},
+            </if>
+            <if test="memberDiscountMoney != null">
+                #{memberDiscountMoney},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order">
@@ -1058,6 +1073,12 @@
             </if>
             <if test="dataOrigin != null">
                 data_origin = #{dataOrigin},
+            </if>
+            <if test="orderPosDiscountMoney != null">
+                order_pos_discount_money = #{orderPosDiscountMoney},
+            </if>
+            <if test="memberDiscountMoney != null">
+                member_discount_money = #{memberDiscountMoney},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
