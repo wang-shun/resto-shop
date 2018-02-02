@@ -1065,8 +1065,8 @@ public class OrderAspect {
             log.info("发送打印信息");
             log.info("打印成功后，发送自动确认订单通知！" + setting.getAutoConfirmTime() + "s 后发送" + ",orderId:" + order.getId());
 
-            //
-            if (order.getPayType() == PayType.PAY && (order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.WX_PAY
+            //  New Pos 创建未支付订单时，会触发此方法，当时未支付，所以加上 PayMode 非空验证， 后续优化 Pos 端创建订单的逻辑。
+            if (order.getPayMode() != null && order.getPayType() == PayType.PAY && (order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.WX_PAY
                     || order.getPayMode() == OrderPayMode.ALI_PAY)) {
                 String shopId = order.getShopDetailId();
                 if (!MemcachedUtils.add(order.getId(), 1)) {
@@ -1489,18 +1489,18 @@ public class OrderAspect {
                             List<Participant> participants = participantService.selectCustomerListByGroupIdOrderId(order.getGroupId(), orderId);
                             for (Participant p : participants) {
                                 Customer c = customerService.selectById(p.getCustomerId());
-                                String result = WeChatUtils.sendTemplate(customer.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                                String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
                                 Map map = new HashMap(4);
                                 map.put("brandName", brand.getBrandName());
-                                map.put("fileName", customer.getId());
+                                map.put("fileName", c.getId());
                                 map.put("type", "UserAction");
-                                map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+                                map.put("content", "系统向用户:" + c.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
                                 doPostAnsc(LogUtils.url, map);
                                 //发送短信
                                 if (setting.getMessageSwitch() == 1) {
                                     com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
                                     smsParam.put("name", brand.getBrandName());
-                                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(), smsParam, "餐加", "SMS_105945069");
+                                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(c.getTelephone(), smsParam, "餐加", "SMS_105945069");
                                 }
                             }
                         }
