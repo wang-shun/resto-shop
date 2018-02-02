@@ -32,6 +32,7 @@ import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.BrandAccountSendUtil;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
@@ -9008,13 +9009,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map1.put("content", "用户:"+order.getCustomerId()+"的订单："+order.getId()+"在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map1);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
-        if (StringUtils.isBlank(order.getParentOrderId())) {
+        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
                 //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
                 Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
                 Customer customer = customerService.selectById(order.getCustomerId());
+                BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                WechatConfig wechatConfig = wechatConfigService.selectByBrandId(order.getBrandId());
                 for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
                     if (coupon != null) {
                         Integer hours = hoursBetween(coupon.getAddTime(), new Date());
@@ -9025,6 +9028,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     } else {
                         couponService.addCoupon(newCustomCoupon, customer);
                     }
+                    //微信推送文案
+                    String pushMsg = "${brandName}衷心感谢您的光临，特赠予您价值${couponValue}元的${couponName}${couponCount}张，欢迎您下次再来~  <a href='${url}'>前往查看</a>";
+                    //封装推送的文案信息
+                    Map<String, Object> pushMsgMap = new HashMap<>();
+                    pushMsgMap.put("brandName", brand.getBrandName());
+                    pushMsgMap.put("couponValue", newCustomCoupon.getCouponValue());
+                    pushMsgMap.put("couponName", newCustomCoupon.getCouponName());
+                    pushMsgMap.put("couponCount", newCustomCoupon.getCouponNumber());
+                    pushMsgMap.put("url", newCustomCoupon.getIsBrand().equals(Common.YES) ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my"
+                            : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + "");
+                    StrSubstitutor substitutor = new StrSubstitutor();
+                    pushMsg = substitutor.replace(pushMsgMap);
+                    WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
                 }
             }
         }
