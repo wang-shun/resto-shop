@@ -1009,7 +1009,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
             order.setOriginalAmount(originMoney.add(order.getServicePrice()).add(order.getMealFeePrice()).add(extraMoney));// 原价
             order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
-            order.setOrderMoney(totalMoney.add(order.getServicePrice()).add(order.getMealFeePrice())); // 订单实际金额
+            order.setOrderMoney(totalMoney.subtract(order.getMemberDiscountMoney()).add(order.getServicePrice()).add(order.getMealFeePrice())); // 订单实际金额
             order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
             order.setPrintTimes(0);
             //判断当前订单所在店铺的服务费类型  0：经典版  1：升级版
