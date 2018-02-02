@@ -1375,13 +1375,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
                     if (coupon != null) {
                         Integer hours = hoursBetween(coupon.getAddTime(), new Date());
-                        //如果上一次领取到的消费返利优惠券距今的小时数>=当前优惠券所设置的每隔多少小时领取
-                        if (hours.compareTo(newCustomCoupon.getNextHour()) >= 0) {
-                            couponService.addCoupon(newCustomCoupon, customer);
+                        //如果上一次领取到的消费返利优惠券距今的小时数<当前优惠券所设置的每隔多少小时领取
+                        if (hours.compareTo(newCustomCoupon.getNextHour()) < 0) {
+                            //退出当前循环不执行发放操作
+                            continue;
                         }
-                    } else {
-                        couponService.addCoupon(newCustomCoupon, customer);
                     }
+                    if (order.getOrderMoney().compareTo(newCustomCoupon.getMinimumAmount()) < 0){
+                        //订单不满足优惠券最低订单金额条件不执行发放操作
+                        continue;
+                    }
+                    //发放
+                    couponService.addCoupon(newCustomCoupon, customer);
                     //微信推送文案
                     String pushMsg = "${brandName}衷心感谢您的光临，特赠予您价值${couponValue}元的${couponName}${couponCount}张，欢迎您下次再来~  <a href='${url}'>前往查看</a>";
                     //封装推送的文案信息
@@ -1396,7 +1401,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     pushMsg = substitutor.replace(pushMsgMap);
                     WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
                     //如果用户注册添加短信推送
-                    if (StringUtils.isNotBlank(customer.getTelephone())){
+                    if (StringUtils.isNotBlank(customer.getTelephone())) {
                         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
                         filter.getExcludes().add("couponCount");
                         filter.getExcludes().add("url");
@@ -9050,13 +9055,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
                     if (coupon != null) {
                         Integer hours = hoursBetween(coupon.getAddTime(), new Date());
-                        //如果上一次领取到的消费返利优惠券距今的小时数>=当前优惠券所设置的每隔多少小时领取
-                        if (hours.compareTo(newCustomCoupon.getNextHour()) >= 0) {
-                            couponService.addCoupon(newCustomCoupon, customer);
+                        //如果上一次领取到的消费返利优惠券距今的小时数<当前优惠券所设置的每隔多少小时领取
+                        if (hours.compareTo(newCustomCoupon.getNextHour()) < 0) {
+                            //退出当前循环不执行发放操作
+                            continue;
                         }
-                    } else {
-                        couponService.addCoupon(newCustomCoupon, customer);
                     }
+                    if (order.getOrderMoney().compareTo(newCustomCoupon.getMinimumAmount()) < 0){
+                        //订单不满足优惠券最低订单金额条件不执行发放操作
+                        continue;
+                    }
+                    //发放
+                    couponService.addCoupon(newCustomCoupon, customer);
                     //微信推送文案
                     String pushMsg = "${brandName}衷心感谢您的光临，特赠予您价值${couponValue}元的${couponName}${couponCount}张，欢迎您下次再来~  <a href='${url}'>前往查看</a>";
                     //封装推送的文案信息
@@ -9071,7 +9081,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     pushMsg = substitutor.replace(pushMsgMap);
                     WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
                     //如果用户注册添加短信推送
-                    if (StringUtils.isNotBlank(customer.getTelephone())){
+                    if (StringUtils.isNotBlank(customer.getTelephone())) {
                         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
                         filter.getExcludes().add("couponCount");
                         filter.getExcludes().add("url");
@@ -9370,13 +9380,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
                     if (coupon != null) {
                         Integer hours = hoursBetween(coupon.getAddTime(), new Date());
-                        //如果上一次领取到的消费返利优惠券距今的小时数>=当前优惠券所设置的每隔多少小时领取
-                        if (hours.compareTo(newCustomCoupon.getNextHour()) >= 0) {
-                            couponService.addCoupon(newCustomCoupon, customer);
+                        //如果上一次领取到的消费返利优惠券距今的小时数<当前优惠券所设置的每隔多少小时领取
+                        if (hours.compareTo(newCustomCoupon.getNextHour()) < 0) {
+                            //退出当前循环不执行发放操作
+                            continue;
                         }
-                    } else {
-                        couponService.addCoupon(newCustomCoupon, customer);
                     }
+                    if (order.getOrderMoney().compareTo(newCustomCoupon.getMinimumAmount()) < 0){
+                        //订单不满足优惠券最低订单金额条件不执行发放操作
+                        continue;
+                    }
+                    //发放
+                    couponService.addCoupon(newCustomCoupon, customer);
                     //微信推送文案
                     String pushMsg = "${brandName}衷心感谢您的光临，特赠予您价值${couponValue}元的${couponName}${couponCount}张，欢迎您下次再来~  <a href='${url}'>前往查看</a>";
                     //封装推送的文案信息
@@ -9391,7 +9406,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     pushMsg = substitutor.replace(pushMsgMap);
                     WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
                     //如果用户注册添加短信推送
-                    if (StringUtils.isNotBlank(customer.getTelephone())){
+                    if (StringUtils.isNotBlank(customer.getTelephone())) {
                         SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
                         filter.getExcludes().add("couponCount");
                         filter.getExcludes().add("url");

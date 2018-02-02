@@ -84,15 +84,15 @@ public class NewCustomCoupon implements Serializable{
 
     private String realTimeCouponEndTimeString;
 
-    private Integer minimumAmount;
+    private BigDecimal minimumAmount;
 
     private Integer nextHour;
 
-    public Integer getMinimumAmount() {
+    public BigDecimal getMinimumAmount() {
         return minimumAmount;
     }
 
-    public void setMinimumAmount(Integer minimumAmount) {
+    public void setMinimumAmount(BigDecimal minimumAmount) {
         this.minimumAmount = minimumAmount;
     }
 
