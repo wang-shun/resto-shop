@@ -326,6 +326,10 @@ public class PosServiceImpl implements PosService {
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(json.getString("brandId"));
         order.setDataOrigin(orderDto.getDataOrigin());
+        //  电视叫号，下单会走 pushOrder 切面。需要先设置一个值。
+        if(order.getPayMode() == null){
+            order.setPayMode(0);
+        }
         //  订单项
         List<OrderItemDto> orderItemDtos =  orderDto.getOrderItem();
         List<OrderItem> orderItems = new ArrayList<>();
