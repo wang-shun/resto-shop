@@ -47,6 +47,10 @@ public class ScmCategoryController extends GenericController {
     @RequestMapping("/query")
     @ResponseBody
     public Result queryAll(String shopId,Long supPriceId,Long pmsHeadId) {
+
+        log.info("supPriceId====="+supPriceId);
+
+        log.info("pmsHeadId====="+pmsHeadId);
         String shopDetailId = StringUtils.isEmpty(shopId)?getCurrentShopId():shopId;
         if(supPriceId== null){
             supPriceId =0l;
