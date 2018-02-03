@@ -568,10 +568,13 @@ public class PosServiceImpl implements PosService {
         JSONObject json = new JSONObject(data);
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(orderDto.getShopDetailId());
-        syncPosLocalOrder(orderDto, shopDetail);
-        for(OrderDto childrenOrderDto : orderDto.getChildrenOrders()){
-            syncPosLocalOrder(childrenOrderDto, shopDetail);
-        }
+//        syncPosLocalOrder(orderDto, shopDetail);
+//        for(OrderDto childrenOrderDto : orderDto.getChildrenOrders()){
+//            syncPosLocalOrder(childrenOrderDto, shopDetail);
+//        }
+        log.info("\n\n 【" + shopDetail.getName() + "】 本地 POS 同步订单信息 ：" + orderDto.getId() + "\n");
+        log.info(data);
+        log.info("\n\n本地 POS 同步订单信息 ");
         return true;
     }
 
@@ -708,20 +711,16 @@ public class PosServiceImpl implements PosService {
 
     @Override
     public JSONArray serverExceptionOrderList(String shopId) {
-        List<String> orderList = new ArrayList<>();
+        JSONArray orderList = new JSONArray();
         Date today = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String beginDate = format.format(DateUtil.getDateBegin(today));
         String endDate = format.format(DateUtil.getDateEnd(today));
         List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, true, beginDate, endDate);
-        JSONArray list = new JSONArray();
         for(String orderId : orderIds){
-            list.put(syncOrderCreated(orderId));
-            orderList.add(syncOrderCreated(orderId));
+            orderList.put(syncOrderCreated(orderId));
         }
-
-//        return orderList;
-        return list;
+        return orderList;
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
