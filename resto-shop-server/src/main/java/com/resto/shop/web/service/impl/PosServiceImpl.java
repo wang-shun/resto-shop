@@ -22,6 +22,7 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -706,25 +707,21 @@ public class PosServiceImpl implements PosService {
     }
 
     @Override
-    public List<String> serverExceptionOrderList(String shopId) {
+    public JSONArray serverExceptionOrderList(String shopId) {
         List<String> orderList = new ArrayList<>();
         Date today = new Date();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String beginDate = format.format(DateUtil.getDateBegin(today));
         String endDate = format.format(DateUtil.getDateEnd(today));
         List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, true, beginDate, endDate);
-
-        log.info("\n\n  orderIds：" + orderIds.size());
-        log.info("\n\n  orderIds：" + orderIds.toString());
-
+        JSONArray list = new JSONArray();
         for(String orderId : orderIds){
-            log.info("\n\n  orderId："+ orderId +"\n\n");
-            log.info("\n\n  EX-info：");
-            log.info(syncOrderCreated(orderId));
-            log.info("\n\n");
+            list.put(syncOrderCreated(orderId));
             orderList.add(syncOrderCreated(orderId));
         }
-        return orderList;
+
+//        return orderList;
+        return list;
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
