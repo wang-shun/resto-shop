@@ -144,8 +144,8 @@ public class PosServiceImpl implements PosService {
             jsonObject.put("customer", new JSONObject(new CustomerDto(customer)));
         }
         jsonObject.put("orderItem", orderItemDtos);
-        if(order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
-                || order.getPayMode() == OrderPayMode.YL_PAY){
+        if(order.getPayMode() != null && (order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
+                || order.getPayMode() == OrderPayMode.YL_PAY)){
             List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
             if(!CollectionUtils.isEmpty(payItemsList)){
                 List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
