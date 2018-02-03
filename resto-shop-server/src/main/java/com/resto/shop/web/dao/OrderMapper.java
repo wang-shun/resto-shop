@@ -752,4 +752,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	Order selectBySerialNumber(String serialNumber);
 
 	BigDecimal selectSurplusAmountByPayMode(@Param("orderId") String orderId,@Param("payMode") Integer payMode);
+
+    List<String> serverExceptionOrderList( @Param("shopId") String shopId, @Param("isFirstPay") boolean isFirstPay, @Param("beginDate") String beginDate, @Param("endDate") String endDate);
 }

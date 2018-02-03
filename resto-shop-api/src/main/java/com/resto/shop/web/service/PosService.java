@@ -186,5 +186,12 @@ public interface PosService {
      */
     void posPrintOrder(String orderId);
 
+    /**
+     * 获取该店铺，当天的异常订单
+     * @param shopId
+     * @return
+     */
+    List<String> serverExceptionOrderList(String shopId);
+
     void test();
 }

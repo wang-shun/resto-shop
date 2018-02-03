@@ -703,6 +703,21 @@ public class PosServiceImpl implements PosService {
         }
     }
 
+    @Override
+    public List<String> serverExceptionOrderList(String shopId) {
+        List<String> orderList = new ArrayList<>();
+        Date today = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String beginDate = format.format(DateUtil.getDateBegin(today));
+        String endDate = format.format(DateUtil.getDateEnd(today));
+        List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, true, beginDate, endDate);
+
+        for(String orderId : orderIds){
+            orderList.add(syncOrderCreated(orderId));
+        }
+        return orderList;
+    }
+
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
         String orderId = orderDto.getId();
         StringBuffer backUps = new StringBuffer();
