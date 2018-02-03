@@ -179,5 +179,12 @@ public interface PosService {
      */
     void posCallNumber(String orderId);
 
+    /**
+     * pos端手动打印订单
+     * 此功能用于 手动改变订单状态为 已打印
+     * @param orderId
+     */
+    void posPrintOrder(String orderId);
+
     void test();
 }

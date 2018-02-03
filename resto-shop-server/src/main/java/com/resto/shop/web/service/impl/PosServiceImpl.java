@@ -302,7 +302,7 @@ public class PosServiceImpl implements PosService {
                 e.printStackTrace();
             }
         }else {
-            log.error("Pos2.0 打印失败：为找到响应订单；orderId：" + orderId);
+            log.error("Pos2.0 打印失败：为找到相应订单；orderId：" + orderId);
         }
     }
 
@@ -676,6 +676,25 @@ public class PosServiceImpl implements PosService {
     @Override
     public void posCallNumber(String orderId) {
         orderService.callNumber(orderId);
+    }
+
+    @Override
+    public void posPrintOrder(String orderId) {
+        Order order = orderService.selectById(orderId);
+        if(order == null && order.getPayType() != null){
+            return;
+        }
+        if(order.getPayType() == 0){    //  先付
+            //  如果已付款，并且已下单了
+            if(order.getOrderState() == OrderState.PAYMENT && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+                printSuccess(orderId);
+            }
+        }else if(order.getPayType() == 1){  //  后付
+            //  如果已付款，并且已下单了
+            if(order.getOrderState() == OrderState.SUBMIT && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+                printSuccess(orderId);
+            }
+        }
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
