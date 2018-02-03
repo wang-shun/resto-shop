@@ -706,7 +706,14 @@ public class PosServiceImpl implements PosService {
         String endDate = format.format(DateUtil.getDateEnd(today));
         List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, true, beginDate, endDate);
 
+        log.info("\n\n  orderIds：" + orderIds.size());
+        log.info("\n\n  orderIds：" + orderIds.toString());
+
         for(String orderId : orderIds){
+            log.info("\n\n  orderId：\n\n");
+            log.info(orderId);
+            log.info("\n\n  EX-info：\n\n");
+            log.info(syncOrderCreated(orderId));
             orderList.add(syncOrderCreated(orderId));
         }
         return orderList;
