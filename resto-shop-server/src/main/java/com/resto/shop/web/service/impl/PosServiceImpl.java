@@ -140,7 +140,9 @@ public class PosServiceImpl implements PosService {
             orderItemDtos.add(orderItemDto);
         }
         Customer customer = customerService.selectById(order.getCustomerId());
-        jsonObject.put("customer", new JSONObject(new CustomerDto(customer)));
+        if(customer != null){
+            jsonObject.put("customer", new JSONObject(new CustomerDto(customer)));
+        }
         jsonObject.put("orderItem", orderItemDtos);
         if(order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
                 || order.getPayMode() == OrderPayMode.YL_PAY){
@@ -710,10 +712,10 @@ public class PosServiceImpl implements PosService {
         log.info("\n\n  orderIds：" + orderIds.toString());
 
         for(String orderId : orderIds){
-            log.info("\n\n  orderId：\n\n");
-            log.info(orderId);
-            log.info("\n\n  EX-info：\n\n");
+            log.info("\n\n  orderId："+ orderId +"\n\n");
+            log.info("\n\n  EX-info：");
             log.info(syncOrderCreated(orderId));
+            log.info("\n\n");
             orderList.add(syncOrderCreated(orderId));
         }
         return orderList;
