@@ -2,6 +2,7 @@ package com.resto.shop.web.service;
 
 import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.posDto.ArticleSupport;
+import org.json.JSONArray;
 
 import java.util.List;
 
@@ -191,7 +192,7 @@ public interface PosService {
      * @param shopId
      * @return
      */
-    List<String> serverExceptionOrderList(String shopId);
+    JSONArray serverExceptionOrderList(String shopId);
 
     void test();
 }
