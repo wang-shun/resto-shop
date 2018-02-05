@@ -114,4 +114,22 @@ public class MemberActivityController extends GenericController {
         }
         return getSuccessResult();
     }
+
+    /**
+     * 会员折扣下的会员
+     * @param id
+     * @return
+     */
+    @RequestMapping("/deleteMemberActivityThing")
+    @ResponseBody
+    public Result deleteMemberActivityThing(Integer id){
+        try{
+            memberActivityThingService.delete(id);
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error("删除会员折扣失败");
+            return new Result(false);
+        }
+        return getSuccessResult();
+    }
 }

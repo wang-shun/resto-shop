@@ -173,7 +173,7 @@
                     createdCell:function (td,tdData) {
                         var button = $("<button class='btn btn-xs btn-danger'>删除</button>");
                         button.click(function () {
-                            vueObj.showModel(tdData);
+                            vueObj.deleteCustomer(tdData);
                         });
                         $(td).html(button);
                     }
@@ -239,6 +239,19 @@
                                 toastr.error("录入会员失败");
                             }
 						}
+                    });
+                },
+                deleteCustomer : function (id) {
+				    var that = this;
+                    $.post("memberActivity/deleteMemberActivityThing", {id: id}, function (result) {
+                        if (result.success){
+                            toastr.clear();
+                            toastr.success("删除成功");
+                            that.showModel(that.id);
+                        }else{
+                            toastr.clear();
+							toastr.error("删除失败");
+                        }
                     });
                 }
 			}
