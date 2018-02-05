@@ -217,6 +217,7 @@
         <result column="data_origin" property="dataOrigin"/>
         <result column="order_pos_discount_money" property="orderPosDiscountMoney"/>
         <result column="member_discount_money" property="memberDiscountMoney"/>
+        <result column="member_discount" property="memberDiscount"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -386,7 +387,7 @@
         ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
         print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, is_consumption_rebate, group_id, before_id, order_before
         ,sauce_fee_count,sauce_fee_price,towel_fee_count,towel_fee_price,tableware_fee_count,tableware_fee_price,is_use_new_service,data_origin,
-        order_pos_discount_money,member_discount_money
+        order_pos_discount_money,member_discount_money,member_discount
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -664,6 +665,9 @@
             <if test="memberDiscountMoney != null">
                 member_discount_money,
             </if>
+            <if test="memberDiscount != null">
+                member_discount,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -873,6 +877,9 @@
             <if test="memberDiscountMoney != null">
                 #{memberDiscountMoney},
             </if>
+            <if test="memberDiscount != null">
+                #{memberDiscount},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order">
@@ -1079,6 +1086,9 @@
             </if>
             <if test="memberDiscountMoney != null">
                 member_discount_money = #{memberDiscountMoney},
+            </if>
+            <if test="memberDiscount != null">
+                member_discount = #{memberDiscount},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}

@@ -330,6 +330,16 @@ public class Order implements Serializable {
 
     private BigDecimal memberDiscountMoney;
 
+    private BigDecimal memberDiscount;
+
+    public BigDecimal getMemberDiscount() {
+        return memberDiscount;
+    }
+
+    public void setMemberDiscount(BigDecimal memberDiscount) {
+        this.memberDiscount = memberDiscount;
+    }
+
     public BigDecimal getOrderPosDiscountMoney() {
         return orderPosDiscountMoney;
     }
