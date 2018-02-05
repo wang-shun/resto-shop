@@ -22,7 +22,7 @@
     <insert id="insertSelective" parameterType="com.resto.shop.web.model.MemberActivity">insert into tb_member_activity
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="createTime != null">create_time,</if>
+            create_time,
             <if test="name != null">name,</if>
             <if test="disconut != null">disconut,</if>
             <if test="updateTime != null">update_time,</if>
@@ -31,7 +31,7 @@
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id},</if>
-            <if test="createTime != null">#{createTime},</if>
+            now(),
             <if test="name != null">#{name},</if>
             <if test="disconut != null">#{disconut},</if>
             <if test="updateTime != null">#{updateTime},</if>
@@ -44,7 +44,7 @@
             <if test="createTime != null">create_time = #{createTime},</if>
             <if test="name != null">name = #{name},</if>
             <if test="disconut != null">disconut = #{disconut},</if>
-            <if test="updateTime != null">update_time = #{updateTime},</if>
+            update_time = now(),
             <if test="brandId != null">brand_id = #{brandId},</if>
             <if test="type != null">type = #{type},</if>
         </set> where id = #{id}

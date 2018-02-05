@@ -549,6 +549,9 @@ public class SpringContextConfig {
     @Bean
     public MemberActivityService memberActivityService() { return proxy.create(MemberActivityService.class); }
 
+    @Bean
+    public MemberActivityThingService memberActivityThingService() { return proxy.create(MemberActivityThingService.class); }
+
     //------------scm server config start-----------
 
     @Bean

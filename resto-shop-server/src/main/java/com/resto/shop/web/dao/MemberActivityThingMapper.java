@@ -1,7 +1,11 @@
 package com.resto.shop.web.dao;
 
+import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.MemberActivityThing;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 
 public interface MemberActivityThingMapper extends GenericDao<MemberActivityThing,Integer> {
@@ -19,5 +23,7 @@ public interface MemberActivityThingMapper extends GenericDao<MemberActivityThin
     int updateByPrimaryKey(MemberActivityThing record);
 
     MemberActivityThing selectByTelephone(String telephone);
+
+    List<JSONObject> selectCustomerInfo(@Param("memberActivityId") Integer memberActivityId);
 
 }
