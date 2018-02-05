@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <div id="control">
-    <div class="row form-div" v-if="showform">
+    <div class="row form-div" v-if="showform" @click="detailsCli">
         <div class="col-md-offset-3 col-md-6">
             <div class="portlet light bordered">
                 <div class="portlet-title">
@@ -120,7 +120,7 @@
                             {{detailsArr.taxNumber}}
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row" style="max-height: 400px;overflow-y: scroll;">
                         <table class="table table-bordered" >
                             <thead>
                             <tr>
