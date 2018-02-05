@@ -96,10 +96,4 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
      * @return
      */
     List<OrderPaymentItem> posSyncListByOrderId(String orderId);
-
-    /**
-     * 批量插入订单支付项（用于 POS 端订单同步）
-     * @param orderPaymentItems
-     */
-    void insertItems(List<OrderPaymentItem> orderPaymentItems);
 }

@@ -56,7 +56,13 @@ public class BrandMarketingController extends GenericController{
 
     @RequestMapping("/redList")
     public String redList(){
-        return "brandMarketing/redList";
+        Date date = new Date();
+        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+            getRequest().setAttribute("netOpen", true);
+            return "notopen";
+        }else{
+            return "brandMarketing/redList";
+        }
     }
 
     /**
@@ -190,13 +196,14 @@ public class BrandMarketingController extends GenericController{
         selectMap.put("redPacket","redPacket");
         for(RedPacketDto redPacketDto : redPacketDtos){
             selectMap.put("shopDetailId",redPacketDto.getShopDetailId());
-            Map<String, BigDecimal> useOrder = redPacketService.selectUseRedOrder(selectMap);
+            Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
             if(useOrder == null){
                 redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
                 redPacketDto.setUseRedOrderMoney(BigDecimal.ZERO);
             }else{
-                redPacketDto.setUseRedOrderCount(useOrder.get("useRedOrderCount"));
-                redPacketDto.setUseRedOrderMoney(useOrder.get("useRedOrderMoney"));
+                String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
+                redPacketDto.setUseRedOrderCount(new BigDecimal(useRedOrder[0]));
+                redPacketDto.setUseRedOrderMoney(new BigDecimal(useRedOrder[1]));
             }
         }
         return redPacketDtos;
@@ -221,13 +228,14 @@ public class BrandMarketingController extends GenericController{
         selectMap.put("chargeOrder","chargeOrder");
         for(RedPacketDto redPacketDto : redPacketDtos){
             selectMap.put("shopDetailId",redPacketDto.getShopDetailId());
-            Map<String, BigDecimal> useOrder = redPacketService.selectUseRedOrder(selectMap);
+            Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
             if(useOrder == null){
                 redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
                 redPacketDto.setUseRedOrderMoney(BigDecimal.ZERO);
             }else{
-                redPacketDto.setUseRedOrderCount(useOrder.get("useRedOrderCount"));
-                redPacketDto.setUseRedOrderMoney(useOrder.get("useRedOrderMoney"));
+                String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
+                redPacketDto.setUseRedOrderCount(new BigDecimal(useRedOrder[0]));
+                redPacketDto.setUseRedOrderMoney(new BigDecimal(useRedOrder[1]));
             }
         }
         return redPacketDtos;
@@ -252,13 +260,14 @@ public class BrandMarketingController extends GenericController{
         selectMap.put("getNumber","getNumber");
         for(RedPacketDto redPacketDto : redPacketDtos){
             selectMap.put("shopDetailId",redPacketDto.getShopDetailId());
-            Map<String, BigDecimal> useOrder = redPacketService.selectUseRedOrder(selectMap);
+            Map<String, Object> useOrder = redPacketService.selectUseRedOrder(selectMap);
             if(useOrder == null){
                 redPacketDto.setUseRedOrderCount(BigDecimal.ZERO);
                 redPacketDto.setUseRedOrderMoney(BigDecimal.ZERO);
             }else{
-                redPacketDto.setUseRedOrderCount(useOrder.get("useRedOrderCount"));
-                redPacketDto.setUseRedOrderMoney(useOrder.get("useRedOrderMoney"));
+                String[] useRedOrder = useOrder.get("useOrder").toString().split(",");
+                redPacketDto.setUseRedOrderCount(new BigDecimal(useRedOrder[0]));
+                redPacketDto.setUseRedOrderMoney(new BigDecimal(useRedOrder[1]));
             }
         }
         return redPacketDtos;
@@ -375,7 +384,13 @@ public class BrandMarketingController extends GenericController{
 
     @RequestMapping("/couponList")
     public String couponList(){
-        return "brandMarketing/couponList";
+        Date date = new Date();
+        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+            getRequest().setAttribute("netOpen", true);
+            return "notopen";
+        }else{
+            return "brandMarketing/couponList";
+        }
     }
 
     /**

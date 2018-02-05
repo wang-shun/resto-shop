@@ -42,18 +42,25 @@ public interface ChargeOrderMapper  extends GenericDao<ChargeOrder,String> {
     List<ChargeOrder> selectByDateAndShopId(@Param("beginDate") Date begin,@Param("endDate") Date end, @Param("shopId") String shopId);
 
     List<ChargeOrder> selectByDateAndBrandId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("brandId") String brandId);
+    List<ChargeOrder>  shopChargeCodes(@Param("shopDetailId")String shopDetailId,@Param("beginDate")Date beginDate, @Param("endDate")Date endDate);
 
     List<Map<String, Object>> selectByShopToDay(Map<String, Object> selectMap);
+
+    List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap);
 
     List<ChargeOrder> selectListByDateAndShopId(@Param("beginDate") Date begin, @Param("endDate") Date end,@Param("shopId") String id);
 
     List<ChargeOrder> selectByCustomerIdAndBrandId(@Param("customerId") String customerId, @Param("brandId") String brandId);
+
+    List<ChargeOrder> selectMonthDto(Map<String, Object> selectMap);
+
+    RechargeLogDto selectRechargeLog(@Param("begin")Date begin, @Param("end")Date end, @Param("brandId")String brandId);
+
+    RechargeLogDto selectShopRechargeLog(@Param("begin")Date begin,@Param("end")Date end,@Param("shopId")String shopId);
 
     List<Map<String, Object>> getChargeSumInfo(Map<String, Object> selectMap);
 
     List<String> selectCustomerChargeOrder(List<String> customerIds);
 
     BigDecimal selectTotalBalanceByTimeAndShopId(@Param("monthBegin") Date monthBegin, @Param("monthEnd") Date monthEnd,@Param("shopId") String shopId);
-
-    List<ChargeOrder> selectRemainderReturn();
 }

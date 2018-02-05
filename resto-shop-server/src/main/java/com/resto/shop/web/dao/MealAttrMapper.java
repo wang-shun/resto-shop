@@ -25,6 +25,7 @@ public interface MealAttrMapper extends GenericDao<MealAttr, Integer> {
 
     void deleteByIds(@Param("ids") List<Integer> ids);
 
+    List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap);
     /**
      * 根据 店铺ID 查询店铺下的所有  MealAttr  数据
      * Pos2.0 数据拉取接口			By___lmx

@@ -14,7 +14,6 @@ import com.resto.shop.web.dao.MealAttrMapper;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.MealAttr;
 import com.resto.shop.web.model.MealItem;
-import com.resto.shop.web.report.MealAttrMapperReport;
 import com.resto.shop.web.service.MealAttrService;
 import com.resto.shop.web.service.MealItemService;
 
@@ -28,9 +27,6 @@ public class MealAttrServiceImpl extends GenericServiceImpl<MealAttr, Integer> i
 
     @Resource
     private MealAttrMapper mealattrMapper;
-
-    @Resource
-	private MealAttrMapperReport mealAttrMapperReport;
 
     @Resource
     MealItemService mealItemService; 
@@ -99,7 +95,7 @@ public class MealAttrServiceImpl extends GenericServiceImpl<MealAttr, Integer> i
 
 	@Override
 	public List<ArticleSellDto> queryArticleMealAttr(Map<String, Object> selectMap) {
-		return mealAttrMapperReport.queryArticleMealAttr(selectMap);
+		return mealattrMapper.queryArticleMealAttr(selectMap);
 	}
     @Override
     public List<MealAttr> selectMealAttrByShopId(String shopId) {

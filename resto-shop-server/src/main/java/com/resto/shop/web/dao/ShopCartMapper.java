@@ -62,6 +62,4 @@ public interface ShopCartMapper  extends GenericDao<ShopCart,Integer> {
 
     void updateShopCartByGroupId(@Param("groupId") String groupId,@Param("shopId") String shopId
     ,@Param("customerId") String customerId);
-
-    void  updateShopCartRecommend(Integer id);
 }

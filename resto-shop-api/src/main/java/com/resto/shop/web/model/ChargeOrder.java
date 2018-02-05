@@ -43,16 +43,6 @@ public class ChargeOrder implements Serializable {
 
     private String chargeSettingId;
 
-    private Customer customer;
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-    }
-
     public String getTelephone() {
         return telephone;
     }

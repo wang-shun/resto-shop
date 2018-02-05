@@ -396,7 +396,6 @@ public class PosServiceImpl implements PosService {
             }
             order.setOrderState(OrderState.PAYMENT);
             order.setPaymentAmount(BigDecimal.valueOf(0));
-            order.setProductionStatus(2);
             order.setAllowCancel(false);
             order.setAllowContinueOrder(false);
             orderService.update(order);

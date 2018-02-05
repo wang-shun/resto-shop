@@ -51,12 +51,13 @@ public class RefundArticleController extends GenericController{
 
     @RequestMapping("/list")
     public String list(){
-        return "refundArticle/list";
-    }
-
-    @RequestMapping("/shop/list")
-    public String shopList(){
-        return "refundArticle/shopList";
+        Date date = new Date();
+        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
+            getRequest().setAttribute("netOpen", true);
+            return "notopen";
+        }else{
+            return "refundArticle/list";
+        }
     }
 
     /**
@@ -70,36 +71,7 @@ public class RefundArticleController extends GenericController{
     public Result getRefundArticleList(String beginDate, String endDate){
         try{
             //得到所有退菜单信息
-            List<RefundArticleOrder> refundArticleOrders = orderService.addRefundArticleDto(beginDate, endDate, null);
-            for (RefundArticleOrder articleOrder : refundArticleOrders){
-                for (ShopDetail shopDetail : getCurrentShopDetails()){
-                    if (articleOrder.getShopId().equalsIgnoreCase(shopDetail.getId())){
-                        articleOrder.setShopName(shopDetail.getName());
-                        break;
-                    }
-                }
-            }
-            return getSuccessResult(refundArticleOrders);
-        }catch (Exception e){
-            e.printStackTrace();
-            log.error("查询退菜报表出错" + e.getMessage());
-            return new Result(false);
-        }
-    }
-
-
-    /**
-     * 查询退菜报表list
-     * @param beginDate
-     * @param endDate
-     * @return
-     */
-    @RequestMapping("/shop/getRefundArticleList")
-    @ResponseBody
-    public Result getShopRefundArticleList(String beginDate, String endDate){
-        try{
-            //得到所有退菜单信息
-            List<RefundArticleOrder> refundArticleOrders = orderService.addRefundArticleDto(beginDate, endDate, getCurrentShopId());
+            List<RefundArticleOrder> refundArticleOrders = orderService.addRefundArticleDto(beginDate, endDate);
             for (RefundArticleOrder articleOrder : refundArticleOrders){
                 for (ShopDetail shopDetail : getCurrentShopDetails()){
                     if (articleOrder.getShopId().equalsIgnoreCase(shopDetail.getId())){

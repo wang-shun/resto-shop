@@ -33,6 +33,15 @@ public interface OffLineOrderMapper  extends GenericDao<OffLineOrder,String> {
      */
     OffLineOrder selectByTimeSourceAndShopId(@Param("source") Integer source,@Param("shopId") String shopId,@Param("beginDate") Date begin,@Param("endDate") Date end);
 
+    /**
+     * 查询当月下的所有线下pos订单
+     * @param shopId
+     * @param beginDate
+     * @param endDate
+     * @return
+     */
+    List<OffLineOrder> selectlistByTimeSourceAndShopId(@Param("shopId") String shopId,@Param("beginDate") Date beginDate,@Param("endDate") Date endDate,@Param("source") Integer source);
+
     List<OffLineOrder> selectByShopIdAndTime(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate")Date endDate);
 
     /**
@@ -52,6 +61,8 @@ public interface OffLineOrderMapper  extends GenericDao<OffLineOrder,String> {
     BigDecimal selectTotalMoney(@Param("shopId") String shopId, @Param("beginDate") Date beginDate, @Param("endDate")Date endDate);
 
     OffLineOrder selectSumByTimeSourceAndShopId(@Param("orderType") int offlinePos, @Param("shopId") String id,@Param("beginDate") Date begin,@Param("endDate") Date end);
+
+    List<OrderNumDto> selectOrderNumByTimeAndBrandId(@Param("brandId") String brandId, @Param("beginDate") Date beginDate,@Param("endDate") Date endDate);
 
     /**
      * 结店 时 查询线下 日 和月的线下数据

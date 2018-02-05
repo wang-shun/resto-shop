@@ -128,16 +128,6 @@ public class OrderDto implements Serializable {
 
     private List<OrderRefundRemark> orderRefundRemarks;
 
-    private Integer dataOrigin;
-
-    public Integer getDataOrigin() {
-        return dataOrigin;
-    }
-
-    public void setDataOrigin(Integer dataOrigin) {
-        this.dataOrigin = dataOrigin;
-    }
-
     public Integer getMealAllNumber() {
         return mealAllNumber;
     }

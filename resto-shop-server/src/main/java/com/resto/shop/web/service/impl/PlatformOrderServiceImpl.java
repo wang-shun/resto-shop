@@ -11,7 +11,6 @@ import com.resto.brand.web.dto.PlatformReportDto;
 import com.resto.shop.web.dao.PlatformOrderMapper;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.PlatformOrder;
-import com.resto.shop.web.report.PlatformOrderMapperReport;
 import com.resto.shop.web.service.PlatformOrderDetailService;
 import com.resto.shop.web.service.PlatformOrderExtraService;
 import com.resto.shop.web.service.PlatformOrderService;
@@ -32,8 +31,6 @@ public class PlatformOrderServiceImpl extends GenericServiceImpl<PlatformOrder, 
 
     @Resource
     private PlatformOrderMapper platformorderMapper;
-    @Resource
-    private PlatformOrderMapperReport platformOrderMapperReport;
     @Resource
     private PlatformOrderDetailService platformOrderDetailService;
     @Resource
@@ -65,7 +62,7 @@ public class PlatformOrderServiceImpl extends GenericServiceImpl<PlatformOrder, 
     public PlatformReportDto proc_shopdetailId(String beginDate, String endDate, String shopDetailId){
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return platformOrderMapperReport.proc_shopdetailId(begin,end,shopDetailId);
+        return platformorderMapper.proc_shopdetailId(begin,end,shopDetailId);
     }
 
     @Override
@@ -76,11 +73,11 @@ public class PlatformOrderServiceImpl extends GenericServiceImpl<PlatformOrder, 
         map.put("beginDate",begin);
         map.put("endDate",end);
         map.put("shopDetailId",shopDetailId);
-        return platformOrderMapperReport.selectshopDetailIdList(map);
+        return platformorderMapper.selectshopDetailIdList(map);
     }
     @Override
     public List<PlatformOrder> getPlatformOrderDetailList(String platformOrderId) {
-        return platformOrderMapperReport.getPlatformOrderDetailList(platformOrderId);
+        return platformorderMapper.getPlatformOrderDetailList(platformOrderId);
     }
 
     @Override

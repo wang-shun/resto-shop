@@ -819,14 +819,6 @@
 						</div>
 					</div>
 
-					<div class="form-group">
-						<label class="col-md-4 control-label" :class="{ formBox : m.isPush == 1}">新版pos店铺订单宣传语：</label>
-						<div  class="col-md-6">
-							<input type="text"  class="form-control" name="orderWelcomeMessage" v-if="m.orderWelcomeMessage" v-model="m.orderWelcomeMessage"
-								   required="required">
-						</div>
-					</div>
-
 					<div class="text-center">
 						<input class="btn green" type="submit" value="保存" />&nbsp;&nbsp;&nbsp;
 						<a class="btn default" @click="cancel">取消</a>

@@ -64,10 +64,4 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
      * 将购物车中groupId为空的更新groupid
      */
     void updateShopCartByGroupId(String groupId,String shopId,String customerId);
-
-    /**
-     * 更新推荐菜为单品
-     * @param id
-     */
-    void  updateShopCartRecommend(Integer id);
 }

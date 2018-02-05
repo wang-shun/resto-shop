@@ -145,9 +145,9 @@
                     toastr.clear();
                     toastr.error("开始时间应该少于结束时间！");
                     return false;
-                }else if(timeCha > 2678400000){
+                }else if(timeCha > 604800000){
                     toastr.clear();
-                    toastr.error("暂时未开放大于一月以内的查询！");
+                    toastr.error("暂时未开放大于一周以内的查询！");
                     return false;
                 }
                 toastr.clear();

@@ -240,10 +240,4 @@ public class ShopCartServiceImpl extends GenericServiceImpl<ShopCart, Integer> i
 
         shopcartMapper.updateShopCartByGroupId(groupId,shopId,customerId);
     }
-
-    @Override
-    public void updateShopCartRecommend(Integer id) {
-        shopcartMapper.updateShopCartRecommend(id);
-        shopcartMapper.delMealItem(id.toString());
-    }
 }

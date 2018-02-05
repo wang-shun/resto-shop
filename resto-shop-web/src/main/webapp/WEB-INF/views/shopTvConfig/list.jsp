@@ -49,7 +49,7 @@
 							<div>
 								<input type="hidden" name="tvBackground" v-model="m.tvBackground">
 								<img-file-upload class="form-control" @success="uploadSuccess"
-												 @error="uploadError" cut="false"></img-file-upload>
+												 @error="uploadError"></img-file-upload>
 								<img v-if="m.tvBackground" :src="m.tvBackground" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
 							</div>
 						</div>

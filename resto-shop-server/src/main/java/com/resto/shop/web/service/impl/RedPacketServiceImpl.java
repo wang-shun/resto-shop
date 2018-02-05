@@ -18,7 +18,6 @@ import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.dao.RedPacketMapper;
 import com.resto.shop.web.dto.ShareMoneyDto;
 import com.resto.shop.web.model.*;
-import com.resto.shop.web.report.RedPacketMapperReport;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.RedPacketService;
@@ -35,9 +34,6 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
 
     @Resource
     private RedPacketMapper redPacketMapper;
-
-    @Resource
-    private RedPacketMapperReport redPacketMapperReport;
 
     @Resource
     private OrderPaymentItemService orderPaymentItemService;
@@ -159,12 +155,12 @@ public class RedPacketServiceImpl extends GenericServiceImpl<RedPacket, String> 
 
     @Override
     public List<RedPacketDto> selectRedPacketLog(Map<String, Object> selectMap) {
-        return redPacketMapperReport.selectRedPacketLog(selectMap);
+        return redPacketMapper.selectRedPacketLog(selectMap);
     }
 
     @Override
-    public Map<String, BigDecimal> selectUseRedOrder(Map<String, Object> selectMap) {
-        return redPacketMapperReport.selectUseRedOrder(selectMap);
+    public Map<String, Object> selectUseRedOrder(Map<String, Object> selectMap) {
+        return redPacketMapper.selectUseRedOrder(selectMap);
     }
 
     @Override

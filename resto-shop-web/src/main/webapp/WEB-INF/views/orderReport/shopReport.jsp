@@ -2,13 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags"%>
 <div id="control">
-    <c:if test="${!empty shopId and !empty type}">
-        <a class="btn btn-info ajaxify" href="orderReport/shop/list">
-            <span class="glyphicon glyphicon-circle-arrow-left"></span>
-            返回
-        </a>
-    </c:if>
-    <c:if test="${!empty shopId and empty type}">
+    <c:if test="${!empty shopId}">
         <a class="btn btn-info ajaxify" href="orderReport/list">
             <span class="glyphicon glyphicon-circle-arrow-left"></span>
             返回
@@ -320,9 +314,9 @@
                     toastr.clear();
                     toastr.error("开始时间应该少于结束时间！");
                     return false;
-                }else if(timeCha > 2678400000){
+                }else if(timeCha > 604800000){
                     toastr.clear();
-                    toastr.error("暂时未开放大于一月以内的查询！");
+                    toastr.error("暂时未开放大于一周以内的查询！");
                     return false;
                 }
                 toastr.clear();

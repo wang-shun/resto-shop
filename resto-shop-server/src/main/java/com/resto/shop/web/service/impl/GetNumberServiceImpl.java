@@ -14,7 +14,6 @@ import com.resto.shop.web.model.GetNumber;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.producer.MQMessageProducer;
-import com.resto.shop.web.report.GetNumberMapperReport;
 import com.resto.shop.web.service.GetNumberService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +32,6 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
 
     @Resource
     private GetNumberMapper getNumberMapper;
-
-    @Resource
-    private GetNumberMapperReport getNumberMapperReport;
 
     @Autowired
     private ShopDetailService shopDetailService;
@@ -143,7 +139,7 @@ public class GetNumberServiceImpl extends GenericServiceImpl<GetNumber, String> 
 
     @Override
     public List<RedPacketDto> selectGetNumberRed(Map<String, Object> selectMap) {
-        return getNumberMapperReport.selectGetNumberRed(selectMap);
+        return getNumberMapper.selectGetNumberRed(selectMap);
     }
 
     @Override

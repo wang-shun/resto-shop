@@ -86,6 +86,16 @@
     select * from tb_article_family where name = #{name} and shop_detail_id = #{shopId}
   </select>
 
+    <select id="selectByShopId" resultType="com.resto.brand.web.dto.ArticleSellDto">
+        select id articleFamilyId, name articleFamilyName,0 <if test="shopId != null">shopSellNum</if>
+        <if test="shopId == null">brandSellNum</if>,0 salles,0 discountMoney,0 refundCount,0 refundTotal,0 likes from tb_article_family
+        <where>
+            <if test="shopId != null">
+                shop_detail_id=#{shopId}
+            </if>
+        </where>
+    </select>
+
     <!--新版pos -->
     <select id="selectnewPosListPage" resultType="ArticleFamily">
         	select * from tb_article_family where shop_detail_id=#{shopId}

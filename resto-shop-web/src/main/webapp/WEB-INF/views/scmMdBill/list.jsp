@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <div id="control">
-    <div class="row form-div" v-if="showform">
+    <div class="row form-div" v-if="showform" @click="detailsCli">
         <div class="col-md-offset-3 col-md-6">
             <div class="portlet light bordered">
                 <div class="portlet-title">
@@ -60,6 +60,107 @@
         </div>
     </div>
 
+
+    <!--查看详情开始-->
+    <div class="row form-div" v-show="details">
+        <div class="col-md-offset-3 col-md-6" style="background: #FFF;">
+            <div class="text-center" style="padding: 20px 0">
+                <span class="caption-subject bold font-blue-hoki">查看详情</span>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label class="col-md-2 control-label">账单号</label>
+                        <div class="col-md-4">
+                            {{detailsArr.billNumber}}
+                        </div>
+                        <label class="col-md-2 control-label">入库时间</label>
+                        <div class="col-md-4">
+                            {{detailsArr.gmtCreate}}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2 control-label">类型</label>
+                        <div class="col-md-4">
+                            {{detailsArr.materialTypes}}
+                        </div>
+                        <label class="col-md-2 control-label">供应商</label>
+                        <div class="col-md-4">
+                            {{detailsArr.supName}}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2 control-label">联系人</label>
+                        <div class="col-md-4">
+                            {{detailsArr.topContact}}
+                        </div>
+                        <label class="col-md-2 control-label">备注</label>
+                        <div class="col-md-4">
+                            {{detailsArr.note}}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-2 control-label">入库人</label>
+                        <div class="col-md-4">
+                            {{detailsArr.publishedName}}
+                        </div>
+                        <label class="col-md-2 control-label">审核人</label>
+                        <div class="col-md-4">
+                            {{detailsArr.auditName}}
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-md-2 control-label">账单金额</label>
+                        <div class="col-md-4">
+                            {{detailsArr.billAmount}}
+                        </div>
+                        <label class="col-md-2 control-label">纳税人识别号</label>
+                        <div class="col-md-4">
+                            {{detailsArr.taxNumber}}
+                        </div>
+                    </div>
+                    <div class="form-group row" style="max-height: 400px;overflow-y: scroll;">
+                        <table class="table table-bordered" >
+                            <thead>
+                            <tr>
+                                <th>类型</th>
+                                <th>一级类别</th>
+                                <th>二级类别</th>
+                                <th>品牌名</th>
+                                <th>材料名</th>
+                                <th>编码</th>
+                                <th>规格</th>
+                                <th>产地</th>
+                                <th>数量</th>
+                                <th>报价</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="item in detailsArr.docStkInPlanDetailDoList">
+                                <td>{{item.materialType}}</td>
+                                <td>{{item.categoryOneName}}</td>
+                                <td>{{item.categoryTwoName}}</td>
+                                <td>{{item.categoryThirdName}}</td>
+                                <td>{{item.materialName}}</td>
+                                <td>{{item.materialCode}}</td>
+                                <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
+                                <td>{{item.provinceName+item.cityName+item.districtName}}</td>
+                                <td>{{item.actQty}}</td>
+                                <td>{{item.purchaseMoney}}</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center" style="padding: 20px 0">
+                <a class="btn default" @click="detailsCli" v-if="detailsBtn">取消</a>
+            </div>
+        </div>
+    </div>
+    <!--查看详情结束-->
+
     <div class="table-div">
         <div class="table-operator">
             <%--暂时不需要--%>
@@ -103,6 +204,65 @@
 <script src="assets/customer/date.js" type="text/javascript"></script>
 <script>
     (function () {
+        var cid="#control";
+//        var $table = $(".table-body>table");
+//        var mdBillTable = $table.DataTable({
+//            ajax : {
+//                url : "scmMdBill/list_all",
+//                dataSrc : "data",
+//
+//            },
+//            bServerSide : true,
+//            columns : [
+//                {
+//                    title: "账单单号",
+//                    data: "billNumber",
+//                },
+//                {
+//                    title: "门店",
+//                    data: "shopDetailName",
+//                },
+//                {
+//                    title: "入库单名称",
+////                                data: "stockPlanName",
+//                    data: "orderName",
+//                },
+//                {
+//                    title: "入库单号",
+////                                data: "stockPlanNumber",
+//                    data: "orderCode",
+//                },
+//                {
+//                    title: "账单金额",
+//                    data: "billAmount",
+//                },
+//                {
+//                    title: "供应商",
+//                    data: "supName",
+//                },
+//                {
+//                    title: "纳税人识别号",
+////                                data: "supplierTax",
+//                    data: "taxNumber",
+//                },
+//                {
+//                    title: "生成时间",
+//                    data: "gmtCreate",
+//                },
+//                {
+//                    title : "操作",
+//                    data : "id",
+//                    createdCell:function(td,tdData,rowData){
+//                        var operator=[
+//                            C.findBtn(rowData),
+//                        ];
+//                        $(td).html(operator);
+//                    }
+//                },
+//            ],
+//        });
+       // var C = new Controller(null,mdBillTable);
+
         var vueObj = new Vue({
             el: "#control",
             data: {
@@ -111,10 +271,14 @@
                     beginDate : '',
                     endDate : '',
                 },
+                details:false,//查看详情
                 mdBillTable:{},
                 mdBillList : [],
+                detailsArr:{},//查看详情对象
+                detailsBtn:false,//查看详情返回按钮
 
             },
+
             /***
              *  这是它的一个生命周期钩子函数，就是一个vue实例被生成后调用这个函数。
              */
@@ -150,6 +314,16 @@
                     this.showform = false;
                     this.m = {};
                 },
+                findBtn : function(model,url,urlData){
+                    var that =this;
+                var button = $("<button class='btn btn-xs btn-primary'>查看</button>");
+                button.click(function(){
+                    if(that){
+                        that.showDetails(model);
+                    }
+                });
+                return button;
+            },
                 initDataTables:function () {
                     //that代表 vue对象
                     var that = this;
@@ -166,11 +340,13 @@
                             },
                             {
                                 title: "入库单名称",
-                                data: "stockPlanName",
+//                                data: "stockPlanName",
+                                data: "orderName",
                             },
                             {
                                 title: "入库单号",
-                                data: "stockPlanNumber",
+//                                data: "stockPlanNumber",
+                                data: "orderCode",
                             },
                             {
                                 title: "账单金额",
@@ -178,15 +354,26 @@
                             },
                             {
                                 title: "供应商",
-                                data: "supplierName",
+                                data: "supName",
                             },
                             {
                                 title: "纳税人识别号",
-                                data: "supplierTax",
+//                                data: "supplierTax",
+                                data: "taxNumber",
                             },
                             {
                                 title: "生成时间",
                                 data: "gmtCreate",
+                            },
+                            {
+                                title : "操作",
+                                data : "id",
+                                createdCell:function(td,tdData,rowData){
+                                    var operator=[
+                                        that.findBtn(rowData),
+                                    ];
+                                    $(td).html(operator);
+                                }
                             },
                         ]
                     });
@@ -205,7 +392,7 @@
                         $.post("scmMdBill/list_all",that.getDate(),function(result){
                             if (result.success){
                                 //清空表格
-                                that.mdBillTable.clear()
+                                that.mdBillTable.clear();
                                 //重绘表格
                                 that.mdBillTable.rows.add(result.data).draw();
                                 that.mdBillList = result.data;
@@ -247,7 +434,7 @@
                     var date = new Date().format("yyyy-MM-dd");
                     this.grantSearchDate.beginDate = date
                     this.grantSearchDate.endDate = date
-                    this.initDataTables();
+
                     this.searchInfo();
                 },
                 yesterDay : function(){
@@ -267,59 +454,80 @@
                     this.grantSearchDate.endDate  = new Date().format("yyyy-MM-dd")
                     this.searchInfo();
                 },
-                save: function () {//提交
-                    var _this = this;
-                    var saveObj = {};
-                    saveObj.stockPlanId = this.m.stockPlanId;
-                    saveObj.stockPlanName = this.m.stockPlanName;
-                    saveObj.stockPlanNumber = this.m.stockPlanNumber;
-                    saveObj.billAmount = this.m.billAmount;
-                    saveObj.supplierId = this.m.supplierId;
-                    saveObj.supplierTax = this.m.supplierTax;
-                    saveObj.state = this.m.state;
-                    saveObj.remark = this.m.remark;
+                showDetails:function (data) { //查看详情
+                    debugger
+                    this.details=true;
+                    this.detailsArr=data;
+                    this.detailsBtn=true;
 
-                    var url = 'scmMdBill/modify';
-                    if (!this.m.id) {
-                        url = 'scmMdBill/create';
-                        _this.m;
+                    for(var i=0;i<this.detailsArr.docStkInPlanDetailDoList.length;i++){
+                        switch(this.detailsArr.docStkInPlanDetailDoList[i].materialType){
+                            case 'INGREDIENTS':this.detailsArr.docStkInPlanDetailDoList[i].materialType='主料';break;
+                            case 'ACCESSORIES':this.detailsArr.docStkInPlanDetailDoList[i].materialType='辅料';break;
+                            case 'SEASONING':this.detailsArr.docStkInPlanDetailDoList[i].materialType='配料';break;
+                            case 'MATERIEL':this.detailsArr.docStkInPlanDetailDoList[i].materialType='物料';break;
+                        }
                     }
-                    var submit = false;
-                    var message = '';
-                    if (!this.m.stockPlanName) message = '入库单';
-                    if (!this.m.stockPlanNumber) message = '入库单号';
-                    if (!this.m.billAmount) message = '账单金额';
-                    if (!this.m.supplierId) message = '供应商id';
-                    if (!this.m.supplierTax) message = '税人编号';
-                    else submit = true;
-                    if (this.m.state = '' || !this.m.state) {
-                        this.m.state = 1;
-                    } else {
-                        this.m.state = 0;
-                    }
-                    if (submit) {
-                        $.ajax({
-                            type: "POST",
-                            url: url,
-                            contentType: "application/json",
-                            datatype: "json",
-                            data: JSON.stringify(saveObj),
-                            success: function (data) { //成功后返回
-                                C.systemButtonNo('success', '成功');
-                                _this.showform = false;
-                            },
-                            error: function () { //失败后执行
-                                C.systemButtonNo('error', '失败');
-                                _this.showform = false;
-                            }
-                        });
-                    } else {
-                        C.systemButtonNo('error', '请填写' + message);
-                    }
-                }
+                },
+                detailsCli:function () { //关闭查看详情
+                    this.details=false;
+                    this.detailsBtn=false;
+                },
+//                save: function () {//提交
+//                    var _this = this;
+//                    var saveObj = {};
+//                    saveObj.stockPlanId = this.m.stockPlanId;
+//                    saveObj.stockPlanName = this.m.stockPlanName;
+//                    saveObj.stockPlanNumber = this.m.stockPlanNumber;
+//                    saveObj.billAmount = this.m.billAmount;
+//                    saveObj.supplierId = this.m.supplierId;
+//                    saveObj.supplierTax = this.m.supplierTax;
+//                    saveObj.state = this.m.state;
+//                    saveObj.remark = this.m.remark;
+//
+//                    var url = 'scmMdBill/modify';
+//                    if (!this.m.id) {
+//                        url = 'scmMdBill/create';
+//                        _this.m;
+//                    }
+//                    var submit = false;
+//                    var message = '';
+//                    if (!this.m.stockPlanName) message = '入库单';
+//                    if (!this.m.stockPlanNumber) message = '入库单号';
+//                    if (!this.m.billAmount) message = '账单金额';
+//                    if (!this.m.supplierId) message = '供应商id';
+//                    if (!this.m.supplierTax) message = '税人编号';
+//                    else submit = true;
+//                    if (this.m.state = '' || !this.m.state) {
+//                        this.m.state = 1;
+//                    } else {
+//                        this.m.state = 0;
+//                    }
+//                    if (submit) {
+//                        $.ajax({
+//                            type: "POST",
+//                            url: url,
+//                            contentType: "application/json",
+//                            datatype: "json",
+//                            data: JSON.stringify(saveObj),
+//                            success: function (data) { //成功后返回
+//                                C.systemButtonNo('success', '成功');
+//                                _this.showform = false;
+//                            },
+//                            error: function () { //失败后执行
+//                                C.systemButtonNo('error', '失败');
+//                                _this.showform = false;
+//                            }
+//                        });
+//                    } else {
+//                        C.systemButtonNo('error', '请填写' + message);
+//                    }
+//                }
 
             },
         });
+
+//        C.vue=vueObj;
 
         Vue.filter('moment', function (value, formatString) {
             formatString = formatString || 'YYYY-MM-DD HH:mm:ss';
