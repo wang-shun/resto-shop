@@ -120,7 +120,8 @@
                                     <td>{{item.materialTypeShow?item.materialTypeShow:item.materialType}}</td>
                                     <td>{{item.materialName}}</td>
                                     <td>{{item.minMeasureUnit}}{{item.unitName}}/{{item.specName}}</td>
-                                    <td>{{item.minMeasureUnit}}/{{item.minUnitName}}</td>
+                                    <%--<td>{{item.minMeasureUnit}}/{{item.minUnitName}}</td>--%>
+                                    <td>{{item.minMeasureUnit}}{{item.minUnitName}}</td>
                                     <td><input style="width: 50px" type="text" v-model="item.materialCount" value="{{(item.materialCount?item.materialCount:1)}}" ></td>
                                     <td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
