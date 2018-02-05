@@ -18,6 +18,7 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONArray;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -150,10 +151,12 @@ public class PosServiceImpl implements PosService {
             orderItemDtos.add(orderItemDto);
         }
         Customer customer = customerService.selectById(order.getCustomerId());
-        jsonObject.put("customer", new JSONObject(new CustomerDto(customer)));
+        if(customer != null){
+            jsonObject.put("customer", new JSONObject(new CustomerDto(customer)));
+        }
         jsonObject.put("orderItem", orderItemDtos);
-        if(order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
-                || order.getPayMode() == OrderPayMode.YL_PAY){
+        if(order.getPayMode() != null && (order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
+                || order.getPayMode() == OrderPayMode.YL_PAY)){
             List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
             if(!CollectionUtils.isEmpty(payItemsList)){
                 List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
@@ -312,7 +315,7 @@ public class PosServiceImpl implements PosService {
                 e.printStackTrace();
             }
         }else {
-            log.error("Pos2.0 打印失败：为找到响应订单；orderId：" + orderId);
+            log.error("Pos2.0 打印失败：为找到相应订单；orderId：" + orderId);
         }
     }
 
@@ -637,10 +640,13 @@ public class PosServiceImpl implements PosService {
         JSONObject json = new JSONObject(data);
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(orderDto.getShopDetailId());
-        syncPosLocalOrder(orderDto, shopDetail);
-        for(OrderDto childrenOrderDto : orderDto.getChildrenOrders()){
-            syncPosLocalOrder(childrenOrderDto, shopDetail);
-        }
+//        syncPosLocalOrder(orderDto, shopDetail);
+//        for(OrderDto childrenOrderDto : orderDto.getChildrenOrders()){
+//            syncPosLocalOrder(childrenOrderDto, shopDetail);
+//        }
+        log.info("\n\n 【" + shopDetail.getName() + "】 本地 POS 同步订单信息 ：" + orderDto.getId() + "\n");
+        log.info(data);
+        log.info("\n\n本地 POS 同步订单信息 ");
         return true;
     }
 
@@ -754,6 +760,39 @@ public class PosServiceImpl implements PosService {
     @Override
     public void posCallNumber(String orderId) {
         orderService.callNumber(orderId);
+    }
+
+    @Override
+    public void posPrintOrder(String orderId) {
+        Order order = orderService.selectById(orderId);
+        if(order == null && order.getPayType() != null){
+            return;
+        }
+        if(order.getPayType() == 0){    //  先付
+            //  如果已付款，并且已下单了
+            if(order.getOrderState() == OrderState.PAYMENT && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+                printSuccess(orderId);
+            }
+        }else if(order.getPayType() == 1){  //  后付
+            //  如果已付款，并且已下单了
+            if(order.getOrderState() == OrderState.SUBMIT && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+                printSuccess(orderId);
+            }
+        }
+    }
+
+    @Override
+    public JSONArray serverExceptionOrderList(String shopId) {
+        JSONArray orderList = new JSONArray();
+        Date today = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String beginDate = format.format(DateUtil.getDateBegin(today));
+        String endDate = format.format(DateUtil.getDateEnd(today));
+        List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, true, beginDate, endDate);
+        for(String orderId : orderIds){
+            orderList.put(syncOrderCreated(orderId));
+        }
+        return orderList;
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){

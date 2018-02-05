@@ -3365,11 +3365,16 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     </select>
 
     <select id="posSelectNotCancelledOrdersIdByDate" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT id from tb_order where shop_detail_id = ${shopId} and parent_order_id is null and order_state != 9
-        and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time
+        SELECT id from tb_order where shop_detail_id = #{shopId} and parent_order_id is null and order_state != 9
+        and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time ASC
     </select>
 
     <select id="selectBySerialNumber" parameterType="java.lang.String" resultType="Order">
         SELECT * from tb_order where serial_number = #{serialNumber}
+    </select>
+
+    <select id="serverExceptionOrderList" parameterType="java.lang.String" resultType="java.lang.String">
+        SELECT id from tb_order where shop_detail_id = #{shopId} and production_status = 1
+        and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time ASC
     </select>
 </mapper>

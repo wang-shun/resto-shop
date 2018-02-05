@@ -750,4 +750,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	List<String> posSelectNotCancelledOrdersIdByDate(@Param("shopId") String shopId, @Param("beginDate") String beginDate, @Param("endDate") String endDate);
 
 	Order selectBySerialNumber(String serialNumber);
+
+	List<String> serverExceptionOrderList( @Param("shopId") String shopId, @Param("isFirstPay") boolean isFirstPay, @Param("beginDate") String beginDate, @Param("endDate") String endDate);
 }
