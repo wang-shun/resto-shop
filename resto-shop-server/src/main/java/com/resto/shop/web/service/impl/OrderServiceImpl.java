@@ -749,7 +749,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             item.setRemark(remark);
             if(order.getMemberDiscount() != null && order.getMemberDiscount().doubleValue() > 0){
-                fans_price = fans_price.multiply(order.getMemberDiscount());
+                if(fans_price != null){
+                    fans_price = fans_price.multiply(order.getMemberDiscount());
+                }else{
+                    price = price.multiply(order.getMemberDiscount());
+                }
             }
             if (fans_price != null && "pos".equals(order.getCreateOrderByAddress()) && shopDetail.getPosPlusType() == 1) {
                 item.setUnitPrice(price);
