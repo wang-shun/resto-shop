@@ -154,6 +154,7 @@
 
         var $customerTable = $("#customerTable");
         var customerTable = $customerTable.DataTable({
+            lengthMenu: [ [10, 50, 100, 150], [10, 50, 100, "All"] ],
             columns : [
                 {
                     title : "电话号码",
