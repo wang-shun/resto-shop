@@ -23,7 +23,7 @@ public interface ThirdService {
 
     HungerOrder getOutFoodInfo(String id);
 
-    public Map<String, Object> printReceipt(String orderId,Integer selectPrinterId);
+    public Map<String, Object> printReceipt(String orderId,Integer selectPrinterId, String type);
 
     List<Map<String, Object>>  printKitchenReceipt(String oid);
 
