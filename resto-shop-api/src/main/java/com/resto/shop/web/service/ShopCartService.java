@@ -65,5 +65,9 @@ public interface ShopCartService extends GenericService<ShopCart, Integer> {
      */
     void updateShopCartByGroupId(String groupId,String shopId,String customerId);
 
-    void updateShopCartRecommend(Integer id);
+    /**
+     * 更新推荐菜为单品
+     * @param id
+     */
+    void  updateShopCartRecommend(Integer id);
 }
