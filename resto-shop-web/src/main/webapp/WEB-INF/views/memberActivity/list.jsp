@@ -7,7 +7,7 @@
 			<div class="portlet light bordered">
 	            <div class="portlet-title">
 	                <div class="caption">
-	                    <span class="caption-subject bold font-blue-hoki"> 表单</span>
+	                    <span class="caption-subject bold font-blue-hoki">会员折扣</span>
 	                </div>
 	            </div>
 	            <div class="portlet-body">
@@ -170,10 +170,10 @@
                 {
                     title : "操作",
                     data : "id",
-                    createdCell:function (td,tdData) {
+                    createdCell:function (td,tdData,rowData) {
                         var button = $("<button class='btn btn-xs btn-danger'>删除</button>");
                         button.click(function () {
-                            vueObj.deleteCustomer(tdData);
+                            vueObj.deleteCustomer(tdData, rowData.telephone);
                         });
                         $(td).html(button);
                     }
@@ -241,12 +241,13 @@
 						}
                     });
                 },
-                deleteCustomer : function (id) {
+                deleteCustomer : function (id, telephone) {
 				    var that = this;
                     $.post("memberActivity/deleteMemberActivityThing", {id: id}, function (result) {
                         if (result.success){
                             toastr.clear();
                             toastr.success("删除成功");
+                            that.telephones.replace(telephone, "");
                             that.showModel(that.id);
                         }else{
                             toastr.clear();

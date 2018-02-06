@@ -239,9 +239,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     NewCustomCouponService newCustomCouponService;
 
-    @Resource
-    SmsLogService smsLogService;
-
     Logger log = LoggerFactory.getLogger(getClass());
 
     @Override
