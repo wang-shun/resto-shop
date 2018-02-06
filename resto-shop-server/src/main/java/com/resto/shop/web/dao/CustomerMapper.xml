@@ -654,12 +654,6 @@
     select count(1) from tb_customer where id = #{0} and telephone is null
   </select>
 
-    <select id="selectBrandUser" resultType="java.lang.String">
-    select CONCAT_WS(',',(select count(1) from tb_customer),(select IFNULL(count(1),0) from tb_customer where is_bind_phone=1)
-    ,(select IFNULL(count(1),0) from tb_customer where is_bind_phone=0),(select IFNULL(count(1),0) from tb_customer where sex=1)
-    ,(select IFNULL(count(1),0) from tb_customer where sex=2),(select IFNULL(count(1),0) from tb_customer where sex=0)) count
-  </select>
-
     <select id="selectListByBrandIdHasRegister" resultType="com.resto.shop.web.model.Customer">
     SELECT 
 	    id,wechat_id,nickname,telephone,head_photo,is_bind_phone,regiest_time,
@@ -668,11 +662,6 @@
     WHERE is_bind_phone = 1
     AND
     <![CDATA[ regiest_time >= #{beginDate} and  regiest_time <= #{endDate}]]> AND  brand_id=#{brandId}
-    </select>
-
-    <!-- 得到品牌下的所有用户信息，得到用户已消费的订单 -->
-    <select id="selectListMemberUser" resultType="com.resto.brand.web.dto.MemberUserDto">
-	    CALL proc_list_member_user(#{beginDate},#{endDate})
     </select>
 
     <select id="selectCustomerAccount" parameterType="String" resultType="com.resto.shop.web.model.Customer">

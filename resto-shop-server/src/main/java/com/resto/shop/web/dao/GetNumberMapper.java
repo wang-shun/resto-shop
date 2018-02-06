@@ -32,8 +32,6 @@ public interface GetNumberMapper  extends GenericDao<GetNumber,String> {
 
     Integer getWaitNumber(GetNumber getNumber);
 
-    List<RedPacketDto> selectGetNumberRed(Map<String, Object> selectMap);
-
     GetNumber selectGetNumberInfo(String id);
 
     List<GetNumber> selectWaitCountByCodeId(@Param("shopId") String shopId, @Param("codeId") String codeId);

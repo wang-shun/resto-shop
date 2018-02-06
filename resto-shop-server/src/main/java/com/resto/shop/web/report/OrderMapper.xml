@@ -213,24 +213,24 @@
 
     <select id="selectListByTime" resultMap="selectOrdersMap">
         SELECT
-        o.id,
-        o.brand_id,
-        o.parent_order_id,
-        o.shop_detail_id,
-        o.create_time,
-        o.distribution_mode_id,
-        o.ver_code,
-        o.order_money,
-        o.order_state,
-        o.production_status,
-        o.service_price,
-        o.order_mode,
-        o.distribution_mode_id,
-        o.table_number,
-        c.telephone,
-        a.level,
-        oi.pay_value,
-        oi.payment_mode_id
+            o.id,
+            o.brand_id,
+            o.parent_order_id,
+            o.shop_detail_id,
+            o.create_time,
+            o.distribution_mode_id,
+            o.ver_code,
+            o.order_money,
+            o.order_state,
+            o.production_status,
+            o.service_price,
+            o.order_mode,
+            o.distribution_mode_id,
+            o.table_number,
+            c.telephone,
+            a.level,
+            oi.pay_value,
+            oi.payment_mode_id
         FROM
         tb_order o
         LEFT JOIN tb_customer c ON o.customer_id = c.id
@@ -293,11 +293,11 @@
 
     <select id="callProcDayAllOrderItem" resultType="com.resto.brand.web.dto.ShopIncomeDto">
         SELECT
-        td.shop_detail_id shopDetailId,
-        td.parent_order_id parentOrderId,
-        td.create_time createTime,
-        td.original_amount originalAmount,
-        td.order_money totalIncome
+            td.shop_detail_id shopDetailId,
+            td.parent_order_id parentOrderId,
+            td.create_time createTime,
+            td.original_amount originalAmount,
+            td.order_money totalIncome
         FROM
         tb_order td
         WHERE
@@ -306,7 +306,7 @@
         and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
         and CONCAT(#{endDate},' 23:59:59') >= td.create_time
         <if test="shopId != null">
-            and td.shop_detail_id = #{shopId}
+          and td.shop_detail_id = #{shopId}
         </if>
         GROUP BY
         td.id
@@ -317,31 +317,31 @@
 
     <select id="callProcDayAllOrderPayMent" resultType="com.resto.brand.web.dto.ShopIncomeDto">
         select td.shop_detail_id shopDetailId,td.id orderId, td.create_time createTime,
-        SUM(IF(top.payment_mode_id = 1, top.pay_value, 0)) wechatIncome,
-        SUM(IF(top.payment_mode_id = 2, top.pay_value, 0)) redIncome,
-        SUM(IF(top.payment_mode_id = 3, top.pay_value, 0)) couponIncome,
-        SUM(IF(top.payment_mode_id = 4, top.pay_value, 0)) otherPayment,
-        SUM(IF(top.payment_mode_id = 5, top.pay_value, 0)) backCartPay,
-        SUM(IF(top.payment_mode_id = 6, top.pay_value, 0)) chargeAccountIncome,
-        SUM(IF(top.payment_mode_id = 7, top.pay_value, 0)) chargeGifAccountIncome,
-        SUM(IF(top.payment_mode_id = 8, top.pay_value, 0)) waitNumberIncome,
-        SUM(IF(top.payment_mode_id = 10, top.pay_value, 0)) aliPayment,
-        ABS(SUM(IF(top.payment_mode_id = 11, top.pay_value, 0))) articleBackPay,
-        SUM(IF(top.payment_mode_id = 12, top.pay_value, 0)) + SUM(IF(top.payment_mode_id = 18, top.pay_value, 0)) moneyPay,
-        SUM(IF(top.payment_mode_id = 16, top.pay_value, 0)) shanhuiPayment,
-        SUM(IF(top.payment_mode_id = 17, top.pay_value, 0)) integralPayment,
-        SUM(IF(top.payment_mode_id = 19, top.pay_value, 0)) refundCrashPayment
+            SUM(IF(top.payment_mode_id = 1, top.pay_value, 0)) wechatIncome,
+            SUM(IF(top.payment_mode_id = 2, top.pay_value, 0)) redIncome,
+            SUM(IF(top.payment_mode_id = 3, top.pay_value, 0)) couponIncome,
+            SUM(IF(top.payment_mode_id = 4, top.pay_value, 0)) otherPayment,
+            SUM(IF(top.payment_mode_id = 5, top.pay_value, 0)) backCartPay,
+            SUM(IF(top.payment_mode_id = 6, top.pay_value, 0)) chargeAccountIncome,
+            SUM(IF(top.payment_mode_id = 7, top.pay_value, 0)) chargeGifAccountIncome,
+            SUM(IF(top.payment_mode_id = 8, top.pay_value, 0)) waitNumberIncome,
+            SUM(IF(top.payment_mode_id = 10, top.pay_value, 0)) aliPayment,
+            ABS(SUM(IF(top.payment_mode_id = 11, top.pay_value, 0))) articleBackPay,
+            SUM(IF(top.payment_mode_id = 12, top.pay_value, 0)) + SUM(IF(top.payment_mode_id = 18, top.pay_value, 0)) moneyPay,
+            SUM(IF(top.payment_mode_id = 16, top.pay_value, 0)) shanhuiPayment,
+            SUM(IF(top.payment_mode_id = 17, top.pay_value, 0)) integralPayment,
+            SUM(IF(top.payment_mode_id = 19, top.pay_value, 0)) refundCrashPayment
         from tb_order td
-        left join tb_order_payment_item top
-        on td.id = top.order_id
-        where td.order_state in (2,10,11,12)
-        and td.production_status in (2,3)
-        and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
-        and CONCAT(#{endDate},' 23:59:59') >= td.create_time
-        and top.payment_mode_id not in (13,14,15)
-        <if test="shopId != null">
-            and td.shop_detail_id = #{shopId}
-        </if>
+            left join tb_order_payment_item top
+            on td.id = top.order_id
+            where td.order_state in (2,10,11,12)
+            and td.production_status in (2,3)
+            and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
+            and CONCAT(#{endDate},' 23:59:59') >= td.create_time
+            and top.payment_mode_id not in (13,14,15)
+            <if test="shopId != null">
+              and td.shop_detail_id = #{shopId}
+            </if>
         GROUP BY td.id
         ORDER BY td.create_time asc
         LIMIT #{pageNo},1000;
@@ -390,14 +390,14 @@
 
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
         SELECT
-        o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.customer_count,
-        o.distribution_mode_id,o.parent_order_id
-        <if test="type == 1">
-            ,o.create_time
-        </if>
-        <if test="type == 0">
-            ,a.create_time
-        </if>
+            o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.customer_count,
+            o.distribution_mode_id,o.parent_order_id
+            <if test="type == 1">
+                ,o.create_time
+            </if>
+            <if test="type == 0">
+                ,a.create_time
+            </if>
         from tb_order o
         LEFT JOIN tb_order_payment_item oi
         on o.id = oi.order_id
@@ -405,7 +405,7 @@
         on o.id = a.order_id
         WHERE o.order_state in (10,11,12,2) and o.production_status in (2,3,4)
         <if test="type == 0">
-            and <![CDATA[ a.create_time >= #{beginDate} and a.create_time <= #{endDate}]]>
+          and <![CDATA[ a.create_time >= #{beginDate} and a.create_time <= #{endDate}]]>
         </if>
         <if test="type == 1">
             and <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
@@ -416,9 +416,9 @@
 
     <select id="addRefundArticleDto" resultType="com.resto.brand.web.dto.RefundArticleOrder">
         select
-        td.id orderId, td.shop_detail_id shopId, td.table_number, IFNULL(tc.telephone,'--') telephone
-        ,tc.nickname nickName, IFNULL(SUM(toi.refund_count),0) refund_count, IFNULL(SUM(toi.refund_count * toi.unit_price),0) refundMoney
-        ,DATE_FORMAT(td.create_time,'%Y-%m-%d %H:%I:%s') pushOrderTime
+            td.id orderId, td.shop_detail_id shopId, td.table_number, IFNULL(tc.telephone,'--') telephone
+            ,tc.nickname nickName, IFNULL(SUM(toi.refund_count),0) refund_count, IFNULL(SUM(toi.refund_count * toi.unit_price),0) refundMoney
+            ,DATE_FORMAT(td.create_time,'%Y-%m-%d %H:%I:%s') pushOrderTime
         from tb_order td
         left join tb_order_item toi
         on td.id = toi.order_id
@@ -430,7 +430,7 @@
         and CONCAT(#{endDate},' 23:59:59') >= td.create_time
         and toi.refund_count != 0
         <if test="shopId != null">
-            and td.shop_detail_id = #{shopId}
+          and td.shop_detail_id = #{shopId}
         </if>
         GROUP BY td.id
     </select>
@@ -478,15 +478,15 @@
 
     <select id="selectMealServiceSales" resultType="java.util.Map">
         SELECT
-        td.shop_detail_id shopId,
-        IFNULL(SUM(td.meal_all_number),0) mealSellNum,
-        IFNULL(SUM(td.meal_fee_price),0) mealSalles,
-        IFNULL(SUM(td.customer_count),0) serviceSellNum,
-        IFNULL(SUM(td.service_price),0) serviceSalles,
-        IFNULL(SUM(td.base_meal_all_count-td.meal_all_number),0) refundMealNum,
-        IFNULL(SUM(td.base_meal_all_count-td.meal_all_number) * (SUM(td.meal_fee_price)/SUM(td.meal_all_number)),0) refundMealSalles,
-        IFNULL(SUM(td.base_customer_count-td.customer_count),0) refundServiceCount,
-        IFNULL(IF(SUM(td.service_price) = 0 or SUM(td.customer_count) = 0,0,SUM(td.base_customer_count-td.customer_count) * (SUM(td.service_price)/SUM(td.customer_count))),0) refundServiceSalles
+            td.shop_detail_id shopId,
+            IFNULL(SUM(td.meal_all_number),0) mealSellNum,
+            IFNULL(SUM(td.meal_fee_price),0) mealSalles,
+            IFNULL(SUM(td.customer_count),0) serviceSellNum,
+            IFNULL(SUM(td.service_price),0) serviceSalles,
+            IFNULL(SUM(td.base_meal_all_count-td.meal_all_number),0) refundMealNum,
+            IFNULL(SUM(td.base_meal_all_count-td.meal_all_number) * (SUM(td.meal_fee_price)/SUM(td.meal_all_number)),0) refundMealSalles,
+            IFNULL(SUM(td.base_customer_count-td.customer_count),0) refundServiceCount,
+            IFNULL(IF(SUM(td.service_price) = 0 or SUM(td.customer_count) = 0,0,SUM(td.base_customer_count-td.customer_count) * (SUM(td.service_price)/SUM(td.customer_count))),0) refundServiceSalles
         FROM
         tb_order td
         WHERE
