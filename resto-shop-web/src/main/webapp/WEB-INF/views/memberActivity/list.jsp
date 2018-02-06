@@ -243,16 +243,18 @@
                 },
                 deleteCustomer : function (id, telephone) {
 				    var that = this;
-                    $.post("memberActivity/deleteMemberActivityThing", {id: id}, function (result) {
-                        if (result.success){
-                            toastr.clear();
-                            toastr.success("删除成功");
-                            that.telephones = that.telephones.replace(telephone, "");
-                            that.showModel(that.id);
-                        }else{
-                            toastr.clear();
-							toastr.error("删除失败");
-                        }
+				    C.confirmDialog("确认删除该会员？", "提示", function () {
+                        $.post("memberActivity/deleteMemberActivityThing", {id: id}, function (result) {
+                            if (result.success){
+                                toastr.clear();
+                                toastr.success("删除成功");
+                                that.telephones = that.telephones.replace(telephone, "");
+                                that.showModel(that.id);
+                            }else{
+                                toastr.clear();
+                                toastr.error("删除失败");
+                            }
+                        });
                     });
                 }
 			}
