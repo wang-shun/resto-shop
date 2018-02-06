@@ -5269,10 +5269,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         //菜品总数单独算是因为 要出去套餐的数量
-        Integer totalNums = orderMapper.selectBrandArticleNum(begin, end, brandId);
+        Integer totalNums = orderMapperReport.selectBrandArticleNum(begin, end, brandId);
         //查询菜品总额，退菜总数，退菜金额
         brandArticleReportDto bo = new brandArticleReportDto(brandName, 0, BigDecimal.ZERO, 0, BigDecimal.ZERO, BigDecimal.ZERO);
-        List<brandArticleReportDto> articleReportDto = orderMapper.selectConfirmMoney(begin, end, brandId);
+        List<brandArticleReportDto> articleReportDto = orderMapperReport.selectConfirmMoney(begin, end, brandId);
         if (articleReportDto != null && !articleReportDto.isEmpty()) {
             for (brandArticleReportDto reportDto : articleReportDto) {
                 bo.setSellIncome(bo.getSellIncome().add(reportDto.getSellIncome()));
@@ -9564,8 +9564,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate) {
-        return orderMapperReport.addRefundArticleDto(beginDate, endDate);
+    public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate, String shopId) {
+        return orderMapperReport.addRefundArticleDto(beginDate, endDate, shopId);
     }
 
 	@Override
@@ -9751,7 +9751,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap) {
-        return orderMapper.selectMealServiceSales(selectMap);
+        return orderMapperReport.selectMealServiceSales(selectMap);
     }
 
     @Override
@@ -10305,7 +10305,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<OrderNumDto> selectOrderNumByTimeAndBrandId(String brandId, String begin, String end) {
         Date beginDate = DateUtil.getformatBeginDate(begin);
         Date endDate = DateUtil.getformatEndDate(end);
-        return orderMapper.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
+        return orderMapperReport.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
     }
 
     @Override

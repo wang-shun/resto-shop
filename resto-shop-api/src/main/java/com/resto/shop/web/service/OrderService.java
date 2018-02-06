@@ -688,7 +688,8 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	void fixErrorGroup();
 
 	Order customerByOrderForMyPage(String customerId, String shopId);
-	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate);
+
+	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate, String shopId);
 
 	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
 
