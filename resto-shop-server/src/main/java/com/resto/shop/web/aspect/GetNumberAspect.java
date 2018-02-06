@@ -334,7 +334,7 @@ public class GetNumberAspect {
                             keyword5.put("value", "排队中");
                             keyword5.put("color", "#000000");
                             Map<String, Object> remark = new HashMap<String, Object>();
-                            remark.put("value", "太好了，马上就可以用餐了，请您提前做好准备哦！！！！！！！！！！！！");
+                            remark.put("value", shop.getWaitRemindText());
                             remark.put("color", "#173177");
                             content.put("first", first);
                             content.put("keyword1", keyword1);
@@ -344,18 +344,10 @@ public class GetNumberAspect {
                             content.put("keyword5", keyword5);
                             content.put("remark", remark);
                             String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
-                            Brand brand = brandService.selectById(customer.getBrandId());
-                            Map map = new HashMap(4);
-                            map.put("brandName", brand.getBrandName());
-                            map.put("fileName", customer.getId());
-                            map.put("type", "UserAction");
-                            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                            doPostAnsc(LogUtils.url, map);
-
                             //发送短信
                             if(setting.getMessageSwitch()==1){
                                 com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                                com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_109365264");
+                                com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(c.getTelephone(),smsParam,"餐加","SMS_109365264");
                             }
                         }else{
                             Brand brand = brandService.selectById(customer.getBrandId());
