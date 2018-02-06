@@ -111,7 +111,7 @@ public class GetNumberAspect {
                         keyword5.put("value", "叫号中");
                         keyword5.put("color", "#000000");
                         Map<String, Object> remark = new HashMap<String, Object>();
-                        remark.put("value", "感谢您的耐心等待，现已为您准备好舒适餐位，请前往就餐");
+                        remark.put("value", shop.getWaitJiaohao());
                         remark.put("color", "#173177");
                         content.put("first", first);
                         content.put("keyword1", keyword1);
@@ -166,7 +166,7 @@ public class GetNumberAspect {
                         String jumpUrl =setting.getWechatWelcomeUrl() + "?dialog=waitScan";
                         Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                         Map<String, Object> first = new HashMap<String, Object>();
-                        first.put("value", "终于等到您，赶紧就坐下点单吧！");
+                        first.put("value", shop.getWaitJiucan());
                         first.put("color", "#00DB00");
                         Map<String, Object> keyword1 = new HashMap<String, Object>();
                         keyword1.put("value", shop.getName());
@@ -261,7 +261,7 @@ public class GetNumberAspect {
                         keyword5.put("value", "已过号");
                         keyword5.put("color", "#000000");
                         Map<String, Object> remark = new HashMap<String, Object>();
-                        remark.put("value", "您的号码已过号，欢迎下次再来！");
+                        remark.put("value", shop.getWaitGuohao());
                         remark.put("color", "#173177");
                         content.put("first", first);
                         content.put("keyword1", keyword1);
@@ -300,7 +300,7 @@ public class GetNumberAspect {
                     (getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_ONE) || getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_TWO))){
                 List<GetNumber> getNumberList = getNumberService.selectAfterNumberByCodeId(getNumber.getShopDetailId(), getNumber.getCodeId(), getNumber.getCreateTime());
                 if(getNumberList.size() > (shop.getWaitRemindNumber() - 1) && (getNumberList.size() + 1) >= shop.getWaitRemindNumber()){
-                    GetNumber gn = getNumberList.get(shop.getWaitRemindNumber() - 1);
+                    GetNumber gn = getNumberList.get(shop.getWaitRemindNumber());
                     Customer c = customerService.selectById(gn.getCustomerId());
                     StringBuffer msg = new StringBuffer();
                     if(setting.getTemplateEdition()==0){
