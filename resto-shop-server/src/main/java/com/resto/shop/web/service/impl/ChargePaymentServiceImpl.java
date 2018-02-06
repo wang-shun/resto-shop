@@ -12,6 +12,7 @@ import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.dto.RechargeLogDto;
 import com.resto.shop.web.dao.ChargePaymentMapper;
 import com.resto.shop.web.model.ChargePayment;
+import com.resto.shop.web.report.ChargePaymentMapperReport;
 import com.resto.shop.web.service.ChargePaymentService;
 
 /**
@@ -23,6 +24,9 @@ public class ChargePaymentServiceImpl extends GenericServiceImpl<ChargePayment, 
     @Resource
     private ChargePaymentMapper chargepaymentMapper;
 
+    @Resource
+    private ChargePaymentMapperReport chargePaymentMapperReport;
+
     @Override
     public GenericDao<ChargePayment, String> getDao() {
         return chargepaymentMapper;
@@ -33,7 +37,7 @@ public class ChargePaymentServiceImpl extends GenericServiceImpl<ChargePayment, 
         //获取开始时间
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return chargepaymentMapper.selectPayList(begin,end);
+        return chargePaymentMapperReport.selectPayList(begin,end);
     }
 
 	@Override
