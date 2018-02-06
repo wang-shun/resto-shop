@@ -2172,23 +2172,6 @@
         where id = #{articleId}
     </select>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <select id="getPayment" parameterType="java.util.Map" resultType="java.math.BigDecimal">
         select ifnull(sum(t2.pay_value),0) from tb_order t
         INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
