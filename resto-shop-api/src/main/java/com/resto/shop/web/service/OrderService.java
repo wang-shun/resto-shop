@@ -333,9 +333,9 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	public List<ArticleSellDto> selectArticleFamilyByBrandAndFamilyName(String currentBrandId, String beginDate,
 			String endDate, String selectValue);
-	
+
 	//查询品牌所有已消费的订单
-	public List<Order> selectListBybrandId(String beginDate, String endDate, String currentBrandId);
+	public List<Order> selectListBybrandId(String beginDate, String endDate, String currentBrandId, Integer type);
 
 	//查询店铺所有的已消费的订单
 	public  List<Order> selectListByShopId(String beginDate,String endDate,String shopId);
