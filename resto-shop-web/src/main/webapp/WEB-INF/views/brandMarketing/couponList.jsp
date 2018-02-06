@@ -216,13 +216,13 @@
                     toastr.clear();
                     toastr.error("使用周期开始时间应该少于结束时间！");
                     return false
-                }else if(timeCha1 > 604800000){
+                }else if(timeCha1 > 2678400000){
                     toastr.clear();
-                    toastr.error("发放周期暂时未开放大于一周以内的查询！");
+                    toastr.error("发放周期暂时未开放大于一月以内的查询！");
                     return false;
-                }else if(timeCha2 > 604800000){
+                }else if(timeCha2 > 2678400000){
                     toastr.clear();
-                    toastr.error("使用周期暂时未开放大于一周以内的查询！");
+                    toastr.error("使用周期暂时未开放大于一月以内的查询！");
                     return false;
                 }
                 toastr.clear();
