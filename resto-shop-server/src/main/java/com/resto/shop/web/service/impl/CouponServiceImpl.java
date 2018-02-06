@@ -448,4 +448,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 
 
     }
+
+    @Override
+    public Coupon selectLastTimeRebate(String customerId) {
+        return couponMapper.selectLastTimeRebate(customerId);
+    }
 }

@@ -49,4 +49,11 @@ public interface CouponService extends GenericService<Coupon, String> {
 	void addCoupon(NewCustomCoupon newCustomCoupon, Customer customer);
 
 	void addCouponBatch(List<Customer> customerList,NewCustomCoupon newCustomCoupon,String brandId) throws SQLException;
+
+	/**
+	 * 查询到用户上一次领取到的消费返利优惠券
+	 * @param customerId
+	 * @return
+	 */
+	Coupon selectLastTimeRebate(String customerId);
 }

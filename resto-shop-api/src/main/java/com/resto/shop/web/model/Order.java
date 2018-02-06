@@ -326,6 +326,35 @@ public class Order implements Serializable {
 
     private Integer dataOrigin;
 
+    private BigDecimal orderPosDiscountMoney;
+
+    private BigDecimal memberDiscountMoney;
+
+    private BigDecimal memberDiscount;
+
+    public BigDecimal getMemberDiscount() {
+        return memberDiscount;
+    }
+
+    public void setMemberDiscount(BigDecimal memberDiscount) {
+        this.memberDiscount = memberDiscount;
+    }
+
+    public BigDecimal getOrderPosDiscountMoney() {
+        return orderPosDiscountMoney;
+    }
+
+    public void setOrderPosDiscountMoney(BigDecimal orderPosDiscountMoney) {
+        this.orderPosDiscountMoney = orderPosDiscountMoney;
+    }
+
+    public BigDecimal getMemberDiscountMoney() {
+        return memberDiscountMoney;
+    }
+
+    public void setMemberDiscountMoney(BigDecimal memberDiscountMoney) {
+        this.memberDiscountMoney = memberDiscountMoney;
+    }
 
     public Integer getDataOrigin() {
         return dataOrigin;
@@ -398,7 +427,6 @@ public class Order implements Serializable {
     public void setTowelFeeCount(Integer towelFeeCount) {
         this.towelFeeCount = towelFeeCount;
     }
-
 
     public BigDecimal getTowelFeePrice() {
         return towelFeePrice;

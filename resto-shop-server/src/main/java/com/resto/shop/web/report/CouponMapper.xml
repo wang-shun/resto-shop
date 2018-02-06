@@ -35,6 +35,7 @@
             WHEN 3 THEN '分享优惠券'
             WHEN 4 THEN '实时优惠券'
             WHEN 5 THEN '流失唤醒优惠券'
+            WHEN 6 THEN '消费返利优惠券'
             END couponType,
             IF(tc.brand_id is not null,'品牌','店铺') couponSoure,
             tc.`name` couponName,
