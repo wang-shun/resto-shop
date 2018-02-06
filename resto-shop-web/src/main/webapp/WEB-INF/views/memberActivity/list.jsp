@@ -247,7 +247,7 @@
                         if (result.success){
                             toastr.clear();
                             toastr.success("删除成功");
-                            that.telephones.replace(telephone, "");
+                            that.telephones = that.telephones.replace(telephone, "");
                             that.showModel(that.id);
                         }else{
                             toastr.clear();
