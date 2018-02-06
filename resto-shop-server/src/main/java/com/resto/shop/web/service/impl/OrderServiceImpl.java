@@ -5603,7 +5603,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<Order> selectListByShopId(String beginDate, String endDate, String shopId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListByShopId(begin, end, shopId);
+        return orderMapperReport.selectListByShopId(begin, end, shopId);
     }
 
 
