@@ -50,25 +50,6 @@
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.resto.shop.web.model.ChargePayment">update tb_charge_payment set payment_money = #{paymentMoney,jdbcType=DECIMAL}, create_time = #{createTime,jdbcType=TIMESTAMP}, charge_order_id = #{chargeOrderId,jdbcType=VARCHAR}, pay_data = #{payData,jdbcType=LONGVARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ChargePayment">update tb_charge_payment set payment_money = #{paymentMoney,jdbcType=DECIMAL}, create_time = #{createTime,jdbcType=TIMESTAMP}, charge_order_id = #{chargeOrderId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="ChargePayment">select * from tb_charge_payment</select>
-  
-  <!-- 查询微信充值订单记录 -->
-		  <select id="selectPayList" resultType="ChargePayment">
-		  SELECT
-			cp.create_time,
-			cp.payment_money,
-			co.reward_money,
-			tc.telephone,
-			co.shop_detail_id,
-			co.brand_id
-		FROM
-			tb_charge_payment cp
-		INNER JOIN tb_charge_order co
-		ON cp.charge_order_id = co.id
-		INNER JOIN tb_customer tc
-		ON co.customer_id = tc.id
-		where 
-		 <![CDATA[ cp.create_time>#{begin} AND cp.create_time<#{end}]]>
-		  </select>
 
 	<!-- 所有品牌充值记录 -->
 	<select id="selectRechargeLog" resultType="com.resto.brand.web.dto.RechargeLogDto">
