@@ -95,6 +95,31 @@
 
   </select>
 
+  <resultMap id="PlatformOrderDetailMap" type="com.resto.shop.web.model.PlatformOrder" >
+          <id column="id" property="id" jdbcType="VARCHAR"/>
+          <result column="type" property="type" jdbcType="INTEGER"/>
+          <result column="platform_order_id" property="platformOrderId" jdbcType="VARCHAR"/>
+          <result column="shop_detail_id" property="shopDetailId" jdbcType="VARCHAR"/>
+          <result column="original_price" property="originalPrice" jdbcType="DECIMAL"/>
+          <result column="total_price" property="totalPrice" jdbcType="DECIMAL"/>
+          <result column="address" property="address" jdbcType="VARCHAR"/>
+          <result column="phone" property="phone" jdbcType="VARCHAR"/>
+          <result column="name" property="name" jdbcType="VARCHAR"/>
+          <result column="order_create_time" property="orderCreateTime" jdbcType="TIMESTAMP"/>
+          <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+          <result column="pay_type" property="payType" jdbcType="VARCHAR"/>
+          <result column="remark" property="remark" jdbcType="VARCHAR"/>
+          <result column="production_status" property="productionStatus"/>
+          <collection property="platformOrderDetails" javaType="List" ofType="com.resto.shop.web.model.PlatformOrderDetail">
+              <id column="did" property="id" jdbcType="VARCHAR"/>
+              <result column="dplatform_order_id" property="platformOrderId" jdbcType="VARCHAR"/>
+              <result column="dname" property="name" jdbcType="VARCHAR"/>
+              <result column="price" property="price" jdbcType="DECIMAL"/>
+              <result column="quantity" property="quantity" jdbcType="INTEGER"/>
+              <result column="show_name" property="showName" jdbcType="VARCHAR"/>
+          </collection>
+  </resultMap>
+
   <resultMap id="countMap" type="com.resto.brand.web.dto.PlatformReportDto">
     <result column="allcount" property="allCount" jdbcType="INTEGER"/>
     <result column="allprice" property="allPrice" jdbcType="DECIMAL"/>

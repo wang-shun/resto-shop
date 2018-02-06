@@ -14,7 +14,7 @@
                 <div class="portlet-body">
                         <div class="form-body">
                             <div class="form-group row" >
-                                <label class="col-md-4 control-label">分类名称<span style="color:#FF0000;">*</span></label>
+                                <label class="col-md-4 control-label">品牌名称<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
                                     <input type="text" class="form-control" name="categoryName" v-model="parameter.categoryName" required="required">
                                 </div>

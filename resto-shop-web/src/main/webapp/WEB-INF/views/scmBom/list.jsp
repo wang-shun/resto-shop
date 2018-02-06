@@ -22,7 +22,7 @@
                             <div class="form-group row">
                                 <label class="col-md-2 control-label">菜品类别<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                    <select name="articleFamilyId" v-model="parameter.articleFamilyId"  class="bs-select form-control" @change='changeType1' >
+                                    <select  id="articleFamilyId" name="articleFamilyId" v-model="parameter.articleFamilyId"  class="bs-select form-control" @change='changeType1' >
                                         <option disabled selected value>请选择</option>
                                         <option  v-for="articleFamily in articleFamilyIdArr" value="{{articleFamily.articleFamilyId}}">
                                             {{articleFamily.name}}
@@ -30,9 +30,10 @@
                                     </select>
                                 </div>
 
+
                                 <label class="col-md-2 control-label">菜品名称<span style="color:#FF0000;">*</span></label>
                                 <div class="col-md-3">
-                                <select name="articleId"  v-model="parameter.articleId"  class="bs-select form-control" @change='changeType2'>
+                                <select  id="articleId" name="articleId"  v-model="parameter.articleId"  class="bs-select form-control" @change='changeType2'>
                                     <option disabled selected value>请选择</option>
                                     <option  v-for="productName in productNameArr" value="{{productName.articleId}}" v-if="parameter.articleFamilyId == productName.articleFamilyId">
                                         {{productName.name}}
@@ -114,13 +115,13 @@
                                 </tr></thead>
                                 <tbody>
                                 <tr v-for="(index,item) in parameter.bomDetailDoList">
-
                                     <td>{{index+1}}</td>
                                     <td>{{item.materialCode}}</td>
                                     <td>{{item.materialTypeShow?item.materialTypeShow:item.materialType}}</td>
                                     <td>{{item.materialName}}</td>
                                     <td>{{item.minMeasureUnit}}{{item.unitName}}/{{item.specName}}</td>
-                                    <td>{{item.minMeasureUnit}}/{{item.minUnitName}}</td>
+                                    <%--<td>{{item.minMeasureUnit}}/{{item.minUnitName}}</td>--%>
+                                    <td>{{item.minMeasureUnit}}{{item.minUnitName}}</td>
                                     <td><input style="width: 50px" type="text" v-model="item.materialCount" value="{{(item.materialCount?item.materialCount:1)}}" ></td>
                                     <td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
@@ -210,6 +211,7 @@
     (function(){
 
         var that = this;
+        var allArticles = [];
         var tableBodyList = $("#tableBodyList>table");
         var tb = tableBodyList.DataTable({
             ajax : {
@@ -235,6 +237,7 @@
                 {
                     title : "菜品类别",
                     data : "productCategory",
+                    s_filter: true,
                     orderable:false,
                 },
 
@@ -345,8 +348,34 @@
                         $(td).addClass('bomDetailDoList');
                         $(td).html(html);
                     }
-                },
-                ],
+                },],
+                initComplete: function () {
+                    var api = this.api();
+                    api.search('');
+                    var data = api.data();
+                    for (var i = 0; i < data.length; i++) {
+                        allArticles.push(data[i]);
+                    }
+                    var columnsSetting = api.settings()[0].oInit.columns;
+                    $(columnsSetting).each(function (i) {
+                        if (this.s_filter) {
+                            var column = api.column(i);
+                            var title = this.title;
+                            var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
+                            var that = this;
+                            column.data().unique().each(function (d) {
+                                select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
+                            });
+
+                            select.appendTo($(column.header()).empty()).on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+                                column.search(val ? '^' + val + '$' : '', true, false).draw();
+                            });
+                        }
+                    });
+                }
         });
         var C = new Controller(null,tb);
         var vueObj = new Vue({
@@ -358,7 +387,7 @@
                 treeView:false,//树状图
 
                 bomRawMaterial:[],//bom原材料
-
+                allArticles: allArticles,
                 articleFamilyIdArr:[],//菜品类别选项
                 productNameArr:[],//菜品名称选项
                 parameter:{
@@ -383,12 +412,23 @@
             },
             methods:{
                 changeType1: function (ele) {
+
                     this.parameter.productCategory = $(ele.target).find("option:selected").text();
                     this.parameter.articleFamilyId = ele.target.value;
 
+                    for(var i=0;i<this.productNameArr.length;i++){
+                       if(this.parameter.articleId = this.productNameArr[i].articleId){
+                           this.parameter.articleId =this.productNameArr[i].articleId;
+                           this.parameter.productName = this.productNameArr[i].name;
+                           break;
+                       }
+                    }
+
                 },
+
+
                 changeType2: function (ele) {
-                    console.log(this.productNameArr);
+
                     this.parameter.productName = $(ele.target).find("option:selected").text();
                     this.parameter.articleId = ele.target.value;
                     for(var i=0;i<this.productNameArr.length;i++){
@@ -397,8 +437,21 @@
                             break;
                         }
                     }
+
+                    for(var i=0;i<this.articleFamilyIdArr.length;i++){
+                        if(this.productNameArr[i].articleFamilyId==this.articleFamilyIdArr[i].id){
+                            this.parameter.productCategory = this.articleFamilyIdArr[i].name;
+                            this.parameter.articleFamilyId =this.articleFamilyIdArr[i].id;
+                            break;
+                        }
+
+                    }
                 },
                 create:function(){ //打开新增弹窗
+
+                    $("#articleId").removeAttr("disabled","disabled");
+                    $("#articleFamilyId").removeAttr("disabled","disabled");
+
                     this.parameter= {
                         bomDetailDoList:[],//bom原材料显示
                         bomDetailDeleteIds:[],//删除的list节点
@@ -430,6 +483,10 @@
                     this.parameter.bomDetailDeleteIds=[];
                     this.showform=true;
                     this.parameter.articleId='';
+
+                    $("#articleId").attr("disabled","disabled");
+                    $("#articleFamilyId").attr("disabled","disabled");
+
                     setTimeout(function () {
                         that.tableBodyListsShow=false;
                         that.parameter.articleId=articleIdZhi;
@@ -438,9 +495,9 @@
                 save:function(e){ //新增and编辑保存
                     var _this=this;
                     var savearr=[];
-                    debugger
+
                     for(var i=0;i<_this.parameter.bomDetailDoList.length;i++){
-                        debugger
+
                         savearr[i]={
                             id:_this.parameter.bomDetailDoList[i].id,
                             materialId:_this.parameter.bomDetailDoList[i].idTwo,
@@ -475,7 +532,7 @@
                     else if(!this.parameter.startEffect) message='开始时间';
                     else if(!this.parameter.endEffect) message='结束时间';
                     else  submit=true;
-                     debugger
+
                     if(this.parameter.state ='' ||!this.parameter.state){
                         this.parameter.state =0;
                     }else{
@@ -489,7 +546,6 @@
                             message='请填写原料数量';
                         }
                     }
-
                     if(url =="scmBom/modify"){
                         $.get("scmBom/effectiveBomHead"+'?articleId='+_this.parameter.articleId,function (result) {
                             C.confirmDialog((result.message != null && _this.parameter.state=='1') ? result.message:+ "你确定要启用改bom吗?" + ",你确定要启用改bom吗?", "提醒", function () {
@@ -530,37 +586,42 @@
 
 
                     }else{
-                        if(submit){
-                            $.ajax({
-                                type:"POST",
-                                url:url,
-                                contentType:"application/json",
-                                datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
-                                data:JSON.stringify(_this.parameter),
-                                beforeSend:function(){ //请求之前执行
-                                    console.log("请求之前执行");
-                                    _this.showform=false;
-                                },
-                                success:function(data){ //成功后返回
-                                    console.log(data);
-                                    C.systemButtonNo('success','成功');
-                                },
-                                error: function(){ //失败后执行
-                                    C.systemButtonNo('error','失败');
-                                }
-                            });
-                            this.parameter= {
-                                bomDetailDoList:[],//bom原材料显示
-                                bomDetailDeleteIds:[],//删除的list节点
-                                bomCode:'',
-                                productCode:'',
-                                measurementUnit:'',
-                                state:'',
-                            };
-                        }else {
-                            _this.bomRawMaterial =_this.parameter.bomDetailDoList;
-                            C.systemButtonNo('error','请填写'+message);
-                        }
+                        $.get("scmBom/effectiveBomHead"+'?articleId='+_this.parameter.articleId,function (result) {
+                           debugger
+                          C.confirmDialog((result.message != "" && _this.parameter.state=='1') ? result.message:+ "你确定要启用改bom吗?," + "你确定要启用改bom吗?", "提醒", function () {
+                                   if(submit){
+                                        $.ajax({
+                                            type:"POST",
+                                            url:url,
+                                            contentType:"application/json",
+                                            datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".//返回数据的格式
+                                            data:JSON.stringify(_this.parameter),
+                                            beforeSend:function(){ //请求之前执行
+                                                console.log("请求之前执行");
+                                                _this.showform=false;
+                                            },
+                                            success:function(data){ //成功后返回
+                                                console.log(data);
+                                                C.systemButtonNo('success','成功');
+                                            },
+                                            error: function(){ //失败后执行
+                                                C.systemButtonNo('error','失败');
+                                            }
+                                        });
+                                        this.parameter= {
+                                            bomDetailDoList:[],//bom原材料显示
+                                            bomDetailDeleteIds:[],//删除的list节点
+                                            bomCode:'',
+                                            productCode:'',
+                                            measurementUnit:'',
+                                            state:'',
+                                        };
+                                    }else {
+                                        _this.bomRawMaterial =_this.parameter.bomDetailDoList;
+                                        C.systemButtonNo('error','请填写'+message);
+                                    }
+                              });
+                        });
 
                     }
 
@@ -619,13 +680,13 @@
             ready:function(){//钩子加载后---*vue挂载之后执行*
                 var that = this;
                 $('#tableBodyList').on('click','table tbody tr',function () {//显示详情
-                    debugger
+
                     that.tableBodyListsShow=true;
                     $('#tableBodyLists table').html('');
                     $('#tableBodyLists table').html($(this).find('.bomDetailDoList').html());
                 });
                 $.get('articlefamily/list_all',function (data) { //菜品类别选项
-                    debugger;
+
                     for(var i=0;i<data.length;i++){
                         that.articleFamilyIdArr.push({articleFamilyId:data[i].id , name:data[i].name});
                     }
@@ -633,6 +694,7 @@
                 $.get('article/list_all',function (data) { //菜品名称选项
                     console.log(data);
                     for(var i=0;i<data.length;i++){
+
                         that.productNameArr.push({articleId:data[i].id, name:data[i].name,articleFamilyId:data[i].articleFamilyId,unit:data[i].unit});
                     }
                 })

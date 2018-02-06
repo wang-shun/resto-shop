@@ -1,18 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <div id="controlShop">
-    <c:if test="${empty type}">
-        <a class="btn btn-info ajaxify" href="platformReport/list">
-            <span class="glyphicon glyphicon-circle-arrow-left"></span>
-            返回
-        </a>
-    </c:if>
-    <c:if test="${!empty type}">
-        <a class="btn btn-info ajaxify" href="platformReport/shop/list">
-            <span class="glyphicon glyphicon-circle-arrow-left"></span>
-            返回
-        </a>
-    </c:if>
+    <a class="btn btn-info ajaxify" href="platformReport/list">
+        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+        返回
+    </a>
     <h2 class="text-center">
         <strong>${shopName}店铺外卖订单表</strong>
     </h2>

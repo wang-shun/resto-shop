@@ -144,7 +144,7 @@
             columns : [
                 {
                     title : "序号",
-                    data : "version",
+                    data : "id",
                     orderable:true,
                 },
                 {

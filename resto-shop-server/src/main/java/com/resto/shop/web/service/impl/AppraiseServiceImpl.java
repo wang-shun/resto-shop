@@ -7,9 +7,12 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 
+import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.dto.AppraiseShopDto;
 import com.resto.brand.web.model.BrandSetting;
+import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.RedType;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.producer.MQMessageProducer;
@@ -67,6 +70,9 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
 
 	@Resource
 	BrandSettingService brandSettingService;
+
+	@Resource
+	WechatConfigService wechatConfigService;
 
     @Override
     public GenericDao<Appraise, String> getDao() {
@@ -188,11 +194,19 @@ public class AppraiseServiceImpl extends GenericServiceImpl<Appraise, String> im
             redPacketService.insert(redPacket);
 			log.info("评论奖励红包: "+money+" 元"+order.getId());
 			if(brandSetting.getDelayAppraiseMoneyTime() != 0){
+				shareDelayMsg(cus, brandSetting);
 				RedPacket rp = redPacketService.selectById(uuid);
 				MQMessageProducer.sendShareGiveMoneyMsg(rp, brandSetting.getDelayAppraiseMoneyTime() * 1000);
 			}
 		}
 		return money;
+	}
+
+	private void shareDelayMsg(Customer customer, BrandSetting brandSetting) {
+		StringBuffer msg = new StringBuffer();
+		WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
+		msg.append("感谢您的评价，红包将在" + brandSetting.getDelayAppraiseMoneyTime() / 60 + "分钟后发放至您的账户~");
+		WeChatUtils.sendCustomerMsgASync(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 	}
 
 	private String getPicture(Appraise appraise) {

@@ -333,7 +333,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	public List<ArticleSellDto> selectArticleFamilyByBrandAndFamilyName(String currentBrandId, String beginDate,
 			String endDate, String selectValue);
-	
+
 	//查询品牌所有已消费的订单
 	public List<Order> selectListBybrandId(String beginDate, String endDate, String currentBrandId, Integer type);
 
@@ -688,6 +688,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	void fixErrorGroup();
 
 	Order customerByOrderForMyPage(String customerId, String shopId);
+
 	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate, String shopId);
 
 	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
@@ -809,6 +810,4 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	List<String> posSelectNotCancelledOrdersIdByDate(String shopId, String beginDate, String endDate);
 
 	Order selectBySerialNumber(String serialNumber);
-
-	List<ShopOrderReportDto> getBossAppOrderReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate);
 }

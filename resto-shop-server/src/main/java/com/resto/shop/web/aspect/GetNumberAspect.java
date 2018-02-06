@@ -95,9 +95,8 @@ public class GetNumberAspect {
                         Map<String, Object> keyword1 = new HashMap<String, Object>();
                         keyword1.put("value", shop.getName());
                         keyword1.put("color", "#000000");
-                        GetNumber getNumber_ = getNumberService.selectGetNumberInfo(getNumber.getId());
                         Map<String, Object> keyword2 = new HashMap<String, Object>();
-                        keyword2.put("value", getNumber_.getCodeValue());
+                        keyword2.put("value", getNumber.getCodeValue());
                         keyword2.put("color", "#000000");
                         //获取此getNumber取号单前方还有多少位等位桌数
                         List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(shop.getId(), getNumber.getCodeId(), getNumber.getCreateTime());
@@ -111,7 +110,7 @@ public class GetNumberAspect {
                         keyword5.put("value", "叫号中");
                         keyword5.put("color", "#000000");
                         Map<String, Object> remark = new HashMap<String, Object>();
-                        remark.put("value", "感谢您的耐心等待，现已为您准备好舒适餐位，请前往就餐");
+                        remark.put("value", shop.getWaitJiaohao());
                         remark.put("color", "#173177");
                         content.put("first", first);
                         content.put("keyword1", keyword1);
@@ -166,14 +165,13 @@ public class GetNumberAspect {
                         String jumpUrl =setting.getWechatWelcomeUrl() + "?dialog=waitScan";
                         Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
                         Map<String, Object> first = new HashMap<String, Object>();
-                        first.put("value", "终于等到您，赶紧就坐下点单吧！");
+                        first.put("value", shop.getWaitJiucan());
                         first.put("color", "#00DB00");
                         Map<String, Object> keyword1 = new HashMap<String, Object>();
                         keyword1.put("value", shop.getName());
                         keyword1.put("color", "#000000");
-                        GetNumber getNumber_ = getNumberService.selectGetNumberInfo(getNumber.getId());
                         Map<String, Object> keyword2 = new HashMap<String, Object>();
-                        keyword2.put("value", getNumber_.getCodeValue());
+                        keyword2.put("value", getNumber.getCodeValue());
                         keyword2.put("color", "#000000");
                         //获取此getNumber取号单前方还有多少位等位桌数
                         List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(shop.getId(), getNumber.getCodeId(), getNumber.getCreateTime());
@@ -245,9 +243,8 @@ public class GetNumberAspect {
                         Map<String, Object> keyword1 = new HashMap<String, Object>();
                         keyword1.put("value", shop.getName());
                         keyword1.put("color", "#000000");
-                        GetNumber getNumber_ = getNumberService.selectGetNumberInfo(getNumber.getId());
                         Map<String, Object> keyword2 = new HashMap<String, Object>();
-                        keyword2.put("value", getNumber_.getCodeValue());
+                        keyword2.put("value", getNumber.getCodeValue());
                         keyword2.put("color", "#000000");
                         //获取此getNumber取号单前方还有多少位等位桌数
                         List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(shop.getId(), getNumber.getCodeId(), getNumber.getCreateTime());
@@ -261,7 +258,7 @@ public class GetNumberAspect {
                         keyword5.put("value", "已过号");
                         keyword5.put("color", "#000000");
                         Map<String, Object> remark = new HashMap<String, Object>();
-                        remark.put("value", "您的号码已过号，欢迎下次再来！");
+                        remark.put("value", shop.getWaitGuohao());
                         remark.put("color", "#173177");
                         content.put("first", first);
                         content.put("keyword1", keyword1);
@@ -300,7 +297,7 @@ public class GetNumberAspect {
                     (getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_ONE) || getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_TWO))){
                 List<GetNumber> getNumberList = getNumberService.selectAfterNumberByCodeId(getNumber.getShopDetailId(), getNumber.getCodeId(), getNumber.getCreateTime());
                 if(getNumberList.size() > (shop.getWaitRemindNumber() - 1) && (getNumberList.size() + 1) >= shop.getWaitRemindNumber()){
-                    GetNumber gn = getNumberList.get(shop.getWaitRemindNumber() - 1);
+                    GetNumber gn = getNumberList.get(shop.getWaitRemindNumber());
                     Customer c = customerService.selectById(gn.getCustomerId());
                     StringBuffer msg = new StringBuffer();
                     if(setting.getTemplateEdition()==0){
@@ -318,14 +315,13 @@ public class GetNumberAspect {
                             Map<String, Object> keyword1 = new HashMap<String, Object>();
                             keyword1.put("value", shop.getName());
                             keyword1.put("color", "#000000");
-                            GetNumber getNumber_ = getNumberService.selectGetNumberInfo(getNumber.getId());
                             Map<String, Object> keyword2 = new HashMap<String, Object>();
-                            keyword2.put("value", getNumber_.getCodeValue());
+                            keyword2.put("value", gn.getCodeValue());
                             keyword2.put("color", "#000000");
                             //获取此getNumber取号单前方还有多少位等位桌数
                             //List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(shop.getId(), getNumber.getCodeId(), getNumber.getCreateTime());
                             Map<String, Object> keyword3 = new HashMap<String, Object>();
-                            keyword3.put("value", getNumberList.size());
+                            keyword3.put("value", getNumberList.size() - 1);
                             keyword3.put("color", "#000000");
                             Map<String, Object> keyword4 = new HashMap<String, Object>();
                             keyword4.put("value", "--");
@@ -334,7 +330,7 @@ public class GetNumberAspect {
                             keyword5.put("value", "排队中");
                             keyword5.put("color", "#000000");
                             Map<String, Object> remark = new HashMap<String, Object>();
-                            remark.put("value", "太好了，马上就可以用餐了，请您提前做好准备哦！！！！！！！！！！！！");
+                            remark.put("value", shop.getWaitRemindText());
                             remark.put("color", "#173177");
                             content.put("first", first);
                             content.put("keyword1", keyword1);
@@ -344,18 +340,10 @@ public class GetNumberAspect {
                             content.put("keyword5", keyword5);
                             content.put("remark", remark);
                             String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
-                            Brand brand = brandService.selectById(customer.getBrandId());
-                            Map map = new HashMap(4);
-                            map.put("brandName", brand.getBrandName());
-                            map.put("fileName", customer.getId());
-                            map.put("type", "UserAction");
-                            map.put("content", "系统向用户:" + customer.getNickname() + "推送微信消息:" + content.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
-                            doPostAnsc(LogUtils.url, map);
-
                             //发送短信
                             if(setting.getMessageSwitch()==1){
                                 com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                                com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(customer.getTelephone(),smsParam,"餐加","SMS_109365264");
+                                com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(c.getTelephone(),smsParam,"餐加","SMS_109365264");
                             }
                         }else{
                             Brand brand = brandService.selectById(customer.getBrandId());

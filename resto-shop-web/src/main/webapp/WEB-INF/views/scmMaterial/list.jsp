@@ -563,6 +563,18 @@
                 },
             },
             methods:{
+                openForm:function(){
+                    this.showform = true;
+                },
+
+                closeForm:function(){
+                    this.m={};
+                    this.showform = false;
+                },
+                cancel:function(){
+                    this.m={};
+                    this.closeForm();
+                },
                 categoryOneIdCh:function () {//点击监控一级类别
                     this.m.categoryTwoId='';
                     this.m.categoryThirdId='';

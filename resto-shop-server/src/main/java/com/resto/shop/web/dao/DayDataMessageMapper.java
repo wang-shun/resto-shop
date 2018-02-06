@@ -19,5 +19,4 @@ public interface DayDataMessageMapper  extends GenericDao<DayDataMessage,String>
     int updateByPrimaryKeySelective(DayDataMessage record);
 
     int updateByPrimaryKey(DayDataMessage record);
-
 }

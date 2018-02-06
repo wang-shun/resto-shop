@@ -24,7 +24,6 @@ public class ArticleFamilyServiceImpl extends GenericServiceImpl<ArticleFamily, 
 
     @Resource
     private ArticleFamilyMapper articlefamilyMapper;
-
     @Resource
 	private ArticleFamilyMapperReport articleFamilyMapperReport;
 

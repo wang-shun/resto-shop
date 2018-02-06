@@ -3,7 +3,7 @@
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <div id="control">
     <!--查看详情-->
-    <div class="row form-div" v-show="details">
+    <div class="row form-div" v-show="details" @click="close">
         <div class="col-md-offset-3 col-md-6" style="background: #FFF;">
             <div class="text-center" style="padding: 20px 0">
                 <span class="caption-subject bold font-blue-hoki">查看详情</span>
@@ -54,7 +54,7 @@
                             {{detailsArr.auditName}}
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row" style="max-height: 400px;overflow-y: scroll;">
                         <table class="table table-bordered" >
                             <thead>
                             <tr>
@@ -80,8 +80,9 @@
                                 <td>{{item.materialCode}}</td>
                                 <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                 <td>{{item.provinceName+item.cityName+item.districtName}}</td>
-                                <td>{{item.purchaseRealTaxMoney}}</td>
-                                <td>{{item.actQty}}</td>
+                                <td>{{item.purchaseMoney}}</td>
+                                <%--<td>{{item.actQty}}</td>--%>
+                                <td>{{item.planQty}}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -219,8 +220,10 @@
                 detailsArr:{},//查看详情对象
             },
             methods:{
+                close:function () {
+                  this.details = false;
+                },
                 approve:function (data) { //开始审核
-
                     this.details=true;
                     this.detailsArr=data;
                     this.approveBtn=true;
@@ -239,7 +242,17 @@
                 showDetails:function (data) { //查看详情
                     this.details=true;
                     this.detailsArr=data;
+
+                    for(var i=0;i<this.detailsArr.docPmsPoDetailDos.length;i++){
+                        switch(this.detailsArr.docPmsPoDetailDos[i].materialType){
+                            case 'INGREDIENTS':this.detailsArr.docPmsPoDetailDos[i].materialType='主料';break;
+                            case 'ACCESSORIES':this.detailsArr.docPmsPoDetailDos[i].materialType='辅料';break;
+                            case 'SEASONING':this.detailsArr.docPmsPoDetailDos[i].materialType='配料';break;
+                            case 'MATERIEL':this.detailsArr.docPmsPoDetailDos[i].materialType='物料';break;
+                        }
+                    }
                     this.detailsBtn=true;
+
                 },
                 detailsCli:function () { //关闭查看详情
                     this.details=false;

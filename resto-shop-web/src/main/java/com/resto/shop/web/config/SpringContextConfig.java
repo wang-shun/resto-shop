@@ -545,6 +545,13 @@ public class SpringContextConfig {
     public DistrictService districtService(){
         return proxy.create(DistrictService.class);
     }
+
+    @Bean
+    public MemberActivityService memberActivityService() { return proxy.create(MemberActivityService.class); }
+
+    @Bean
+    public MemberActivityThingService memberActivityThingService() { return proxy.create(MemberActivityThingService.class); }
+
     //------------scm server config start-----------
 
     @Bean
