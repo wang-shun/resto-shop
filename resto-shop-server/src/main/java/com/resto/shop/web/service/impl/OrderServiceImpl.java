@@ -21,7 +21,6 @@ import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
-import com.resto.shop.web.datasource.DataSourceContextHolderReport;
 import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
@@ -1182,7 +1181,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
 
-            insert(order);
+            orderMapper.insertSelective(order);
             customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
             if (order.getPaymentAmount().doubleValue() == 0) {
                 payOrderSuccess(order);
@@ -1232,7 +1231,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setCustomerId("0");
             order.setOrderMode(ShopMode.CALL_NUMBER);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
-            insert(order);
+            orderMapper.insertSelective(order);
             jsonResult.setData(order);
             switch (order.getPayMode()) {
                 case OrderPayMode.WX_PAY:
@@ -7071,7 +7070,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Order parentOrder = selectById(order.getParentOrderId());
             order.setTableNumber(parentOrder.getTableNumber());
         }
-        insert(order);
+        orderMapper.insertSelective(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
 
 
@@ -10565,5 +10564,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order afterPayShareBenefits(String orderId) {
         return orderMapper.selectByPrimaryKey(orderId);
+    }
+
+    @Override
+    public void sendPosNewOrder(ShopDetail shopDetail, Order order) {
+        log.info("\n\nsendPosNewOrder   ----------\n");
+        if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+            MQMessageProducer.sendCreateOrderMessage(order);
+        }
     }
 }
