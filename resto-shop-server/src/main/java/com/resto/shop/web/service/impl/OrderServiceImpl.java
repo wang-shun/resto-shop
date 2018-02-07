@@ -10124,6 +10124,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //修改主订单
                 order.setAmountWithChildren(order.getOrderMoney().add(sum));
                 order.setOrderPosDiscountMoney(order.getBaseOrderMoney().subtract(order.getAmountWithChildren()));
+                if(order.getOrderPosDiscountMoney().doubleValue() <= 0 && orderPosDiscountMoney.doubleValue() > 0){
+                    order.setOrderPosDiscountMoney(orderPosDiscountMoney);
+                }
                 orderMapper.updateByPrimaryKeySelective(order);
             }
         }
@@ -10153,9 +10156,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 order.setPaymentAmount(shijiMoney);
             }
             order.setPosDiscount(discount);
-            if(order.getOrderPosDiscountMoney().doubleValue() <= 0){
-                order.setOrderPosDiscountMoney(orderPosDiscountMoney);
-            }
             orderMapper.updateByPrimaryKeySelective(order);
         }
         //修改主订单
@@ -10181,7 +10181,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             order.setPosDiscount(discount);
             order.setOrderPosDiscountMoney(order.getBaseOrderMoney().subtract(order.getOrderMoney()));
-            if(order.getOrderPosDiscountMoney().doubleValue() <= 0){
+            if(order.getOrderPosDiscountMoney().doubleValue() <= 0 && orderPosDiscountMoney.doubleValue() > 0){
                 order.setOrderPosDiscountMoney(orderPosDiscountMoney);
             }
             orderMapper.updateByPrimaryKeySelective(order);
