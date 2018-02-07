@@ -10083,7 +10083,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
      * @return
      */
     @Override
-    public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type) {
+    public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type, BigDecimal orderPosDiscountMoney) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order.getPosDiscount().compareTo(new BigDecimal(1)) == 0
                 && order.getEraseMoney().compareTo(new BigDecimal(0)) == 0
@@ -10104,7 +10104,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("orderId", orderId);
             map.put("count", "1=1");
             List<OrderItem> oItems = orderItemService.selectOrderItemByOrderId(map);
-            order = posDiscountAction(oItems, discount, posDiscount, order, eraseMoney, noDiscountMoney, shijiMoney, flag);
+            order = posDiscountAction(oItems, discount, posDiscount, order, eraseMoney, noDiscountMoney, shijiMoney, flag, orderPosDiscountMoney);
             shijiMoney = shijiMoney.subtract(order.getOrderMoney());
             if(flag){
                 BigDecimal sum = new BigDecimal(0);
@@ -10114,9 +10114,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     map.put("orderId", oP.getId());
                     map.put("count", "1=1");
                     if((i + 1) == pOrder.size()){
-                        oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, posDiscount, oP, eraseMoney, noDiscountMoney, shijiMoney, false);
+                        oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, posDiscount, oP, eraseMoney, noDiscountMoney, shijiMoney, false, orderPosDiscountMoney);
                     }else{
-                        oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, posDiscount, oP, eraseMoney, noDiscountMoney, shijiMoney, true);
+                        oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, posDiscount, oP, eraseMoney, noDiscountMoney, shijiMoney, true, orderPosDiscountMoney);
                     }
                     shijiMoney = shijiMoney.subtract(oP.getOrderMoney());
                     sum = sum.add(oP.getOrderMoney());
@@ -10124,6 +10124,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 //修改主订单
                 order.setAmountWithChildren(order.getOrderMoney().add(sum));
                 order.setOrderPosDiscountMoney(order.getBaseOrderMoney().subtract(order.getAmountWithChildren()));
+                if(order.getOrderPosDiscountMoney().doubleValue() <= 0 && orderPosDiscountMoney.doubleValue() > 0){
+                    order.setOrderPosDiscountMoney(orderPosDiscountMoney);
+                }
                 orderMapper.updateByPrimaryKeySelective(order);
             }
         }
@@ -10131,7 +10134,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, BigDecimal posDiscount, Order order, BigDecimal eraseMoney,
-                                   BigDecimal noDiscountMoney, BigDecimal shijiMoney, boolean flag){
+                                   BigDecimal noDiscountMoney, BigDecimal shijiMoney, boolean flag, BigDecimal orderPosDiscountMoney){
         ShopDetail shop = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
         BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
         BigDecimal sum = new BigDecimal(0);
@@ -10178,6 +10181,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             order.setPosDiscount(discount);
             order.setOrderPosDiscountMoney(order.getBaseOrderMoney().subtract(order.getOrderMoney()));
+            if(order.getOrderPosDiscountMoney().doubleValue() <= 0 && orderPosDiscountMoney.doubleValue() > 0){
+                order.setOrderPosDiscountMoney(orderPosDiscountMoney);
+            }
             orderMapper.updateByPrimaryKeySelective(order);
         }
         return order;
