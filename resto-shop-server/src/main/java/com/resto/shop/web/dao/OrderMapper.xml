@@ -3356,8 +3356,12 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         SELECT * from tb_order where serial_number = #{serialNumber}
     </select>
 
-    <select id="serverExceptionOrderList" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT id from tb_order where shop_detail_id = #{shopId} and production_status = 1
+    <select id="serverExceptionOrderList" resultType="java.lang.String">
+        SELECT id from tb_order where shop_detail_id = #{shopId}
+        <if test="isFirstPay == true">
+            and order_state in (2, 10, 11)
+        </if>
+        and production_status = 1
         and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time ASC
     </select>
 </mapper>

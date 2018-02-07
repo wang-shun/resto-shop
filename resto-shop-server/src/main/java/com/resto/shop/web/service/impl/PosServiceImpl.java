@@ -772,6 +772,10 @@ public class PosServiceImpl implements PosService {
             if(order.getOrderState() == OrderState.PAYMENT && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
                 printSuccess(orderId);
             }
+            //  如果用户出现 待下单状态，但是POS接收到订单
+            if(order.getOrderState() == OrderState.CONFIRM && order.getProductionStatus() == ProductionStatus.NOT_ORDER){
+                printSuccess(orderId);
+            }
         }else if(order.getPayType() == 1){  //  后付
             //  如果已付款，并且已下单了
             if(order.getOrderState() == OrderState.SUBMIT && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
@@ -787,7 +791,13 @@ public class PosServiceImpl implements PosService {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String beginDate = format.format(DateUtil.getDateBegin(today));
         String endDate = format.format(DateUtil.getDateEnd(today));
-        List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, true, beginDate, endDate);
+        Boolean isFirstPay = true;
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
+        //  如果是 Boss 模式的后付
+        if(shopDetail.getShopMode() == ShopMode.BOSS_ORDER && shopDetail.getAllowAfterPay() == 0){
+            isFirstPay = false;
+        }
+        List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, isFirstPay, beginDate, endDate);
         for(String orderId : orderIds){
             orderList.put(syncOrderCreated(orderId));
         }

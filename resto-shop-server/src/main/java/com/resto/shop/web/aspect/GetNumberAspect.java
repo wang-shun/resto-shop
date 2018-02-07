@@ -95,9 +95,8 @@ public class GetNumberAspect {
                         Map<String, Object> keyword1 = new HashMap<String, Object>();
                         keyword1.put("value", shop.getName());
                         keyword1.put("color", "#000000");
-                        GetNumber getNumber_ = getNumberService.selectGetNumberInfo(getNumber.getId());
                         Map<String, Object> keyword2 = new HashMap<String, Object>();
-                        keyword2.put("value", getNumber_.getCodeValue());
+                        keyword2.put("value", getNumber.getCodeValue());
                         keyword2.put("color", "#000000");
                         //获取此getNumber取号单前方还有多少位等位桌数
                         List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(shop.getId(), getNumber.getCodeId(), getNumber.getCreateTime());
@@ -171,9 +170,8 @@ public class GetNumberAspect {
                         Map<String, Object> keyword1 = new HashMap<String, Object>();
                         keyword1.put("value", shop.getName());
                         keyword1.put("color", "#000000");
-                        GetNumber getNumber_ = getNumberService.selectGetNumberInfo(getNumber.getId());
                         Map<String, Object> keyword2 = new HashMap<String, Object>();
-                        keyword2.put("value", getNumber_.getCodeValue());
+                        keyword2.put("value", getNumber.getCodeValue());
                         keyword2.put("color", "#000000");
                         //获取此getNumber取号单前方还有多少位等位桌数
                         List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(shop.getId(), getNumber.getCodeId(), getNumber.getCreateTime());
@@ -245,9 +243,8 @@ public class GetNumberAspect {
                         Map<String, Object> keyword1 = new HashMap<String, Object>();
                         keyword1.put("value", shop.getName());
                         keyword1.put("color", "#000000");
-                        GetNumber getNumber_ = getNumberService.selectGetNumberInfo(getNumber.getId());
                         Map<String, Object> keyword2 = new HashMap<String, Object>();
-                        keyword2.put("value", getNumber_.getCodeValue());
+                        keyword2.put("value", getNumber.getCodeValue());
                         keyword2.put("color", "#000000");
                         //获取此getNumber取号单前方还有多少位等位桌数
                         List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(shop.getId(), getNumber.getCodeId(), getNumber.getCreateTime());
@@ -318,14 +315,13 @@ public class GetNumberAspect {
                             Map<String, Object> keyword1 = new HashMap<String, Object>();
                             keyword1.put("value", shop.getName());
                             keyword1.put("color", "#000000");
-                            GetNumber getNumber_ = getNumberService.selectGetNumberInfo(getNumber.getId());
                             Map<String, Object> keyword2 = new HashMap<String, Object>();
-                            keyword2.put("value", getNumber_.getCodeValue());
+                            keyword2.put("value", gn.getCodeValue());
                             keyword2.put("color", "#000000");
                             //获取此getNumber取号单前方还有多少位等位桌数
                             //List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(shop.getId(), getNumber.getCodeId(), getNumber.getCreateTime());
                             Map<String, Object> keyword3 = new HashMap<String, Object>();
-                            keyword3.put("value", getNumberList.size());
+                            keyword3.put("value", getNumberList.size() - 1);
                             keyword3.put("color", "#000000");
                             Map<String, Object> keyword4 = new HashMap<String, Object>();
                             keyword4.put("value", "--");
