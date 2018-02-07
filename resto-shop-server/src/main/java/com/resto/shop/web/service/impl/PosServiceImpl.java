@@ -797,6 +797,7 @@ public class PosServiceImpl implements PosService {
         if(shopDetail.getShopMode() == ShopMode.BOSS_ORDER && shopDetail.getAllowAfterPay() == 0){
             isFirstPay = false;
         }
+        log.info( "\n\n" + shopDetail.getName() + "  isFirstPay：" + isFirstPay + "\n\n" );
         List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, isFirstPay, beginDate, endDate);
         for(String orderId : orderIds){
             orderList.put(syncOrderCreated(orderId));
