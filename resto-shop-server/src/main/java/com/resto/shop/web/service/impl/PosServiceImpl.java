@@ -791,7 +791,13 @@ public class PosServiceImpl implements PosService {
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String beginDate = format.format(DateUtil.getDateBegin(today));
         String endDate = format.format(DateUtil.getDateEnd(today));
-        List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, true, beginDate, endDate);
+        Boolean isFirstPay = true;
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
+        //  如果是 Boss 模式的后付
+        if(shopDetail.getShopMode() == ShopMode.BOSS_ORDER && shopDetail.getAllowAfterPay() == 0){
+            isFirstPay = false;
+        }
+        List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, isFirstPay, beginDate, endDate);
         for(String orderId : orderIds){
             orderList.put(syncOrderCreated(orderId));
         }
