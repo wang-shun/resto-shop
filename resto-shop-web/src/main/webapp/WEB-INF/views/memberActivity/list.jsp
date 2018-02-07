@@ -11,14 +11,14 @@
 	                </div>
 	            </div>
 	            <div class="portlet-body">
-	            	<form role="form"  action="{{m.id?'memberActivity/modify':'memberActivity/create'}}" @submit.prevent="save">
+	            	<form role="form"  id = "memberActivity" action="{{m.id?'memberActivity/modify':'memberActivity/create'}}" @submit.prevent="save">
 						<div class="form-group">
 						    <label>活动名称</label>
 						    <input type="text" class="form-control" name="name" v-model="m.name" required="required">
 						</div>
 						<div class="form-group">
 						    <label>活动折扣(0-1之间)</label>
-						    <input type="text" class="form-control" name="disconut" v-model="m.disconut" required="required" >
+						    <input type="text" class="form-control" id ="disconut" name="disconut" v-model="m.disconut" required="required" >
 						</div>
 						<div class="form-group">
 							<label class="col-md-4 control-label">是否开启：</label>
@@ -27,7 +27,7 @@
 									<input type="radio" name="type" v-model="m.type" value="0"> 不开启
 								</label>
 								<label class="radio-inline">
-									<input type="radio" name="type" v-model="m.type" value="1"> 开启
+									<input type="radio" name="type" v-model="m.type" value="1" checked> 开启
 								</label>
 							</div>
 						</div>
@@ -196,6 +196,28 @@
 			},
 			mixins:[C.formVueMix],
 			methods:{
+			    save : function () {
+			        var that = this;
+					var reg = /^[0-1]$|^00?\.(?:0[1-9]|[1-9][0-9]?)$/;
+					if (!reg.test(that.m.disconut)){
+					    toastr.clear();
+					    toastr.error("活动折扣请输入0-1之间的数字，可保留小数点后两位数字");
+					    return;
+					}
+					var action = $("#memberActivity").attr("action");
+					$.post(action, $("#memberActivity").serialize(), function (result) {
+						if (result.success){
+						    toastr.clear();
+						    toastr.success("保存成功");
+                            that.showform = false;
+                            that.m = {type : 1};
+                            tb.ajax.reload();
+						}else{
+                            toastr.clear();
+                            toastr.error("保存失败");
+						}
+                    });
+                },
 				create : function(){
                      this.showform = true;
 				},
