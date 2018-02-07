@@ -17,7 +17,7 @@
                         </div>
                         <label class="col-md-2 control-label">盘点时间</label>
                         <div class="col-md-4">
-                            {{detailsArr.publishedTime}}
+                            {{detailsArr.publishedTime | moment}}
                         </div>
                     </div>
                     <div class="form-group row">
@@ -198,6 +198,10 @@
                     C.systemButton('scmStockCount/approve',{id:this.detailsArr.id,orderStatus:'12'},['审核成功','审核失败']);
                 },
             },
+        });
+        Vue.filter('moment', function (value, formatString) {
+            formatString = formatString || 'YYYY-MM-DD HH:mm:ss';
+            return moment(value).format(formatString);
         });
         C.vue=vueObj;
     }());

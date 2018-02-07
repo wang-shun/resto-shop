@@ -17,7 +17,7 @@
                         </div>
                         <label class="col-md-2 control-label">入库时间</label>
                         <div class="col-md-4">
-                            {{detailsArr.gmtCreate}}
+                            {{detailsArr.gmtCreate | moment}}
                         </div>
                     </div>
                     <div class="form-group row">
@@ -240,6 +240,10 @@
                     this.detailsBtn=false;
                 },
             },
+        });
+        Vue.filter('moment', function (value, formatString) {
+            formatString = formatString || 'YYYY-MM-DD HH:mm:ss';
+            return moment(value).format(formatString);
         });
         C.vue=vueObj;
     }());
