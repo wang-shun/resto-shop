@@ -156,6 +156,9 @@
                                 <label class="radio-inline">
                                     <input type="radio" name="couponType" id="inlineRadio7" value="5" v-model="m.couponType">礼&nbsp;品
                                 </label>
+                                <label class="radio-inline">
+                                    <input type="radio" name="couponType" id="inlineRadio8" value="6" v-model="m.couponType">消费返利
+                                </label>
                             </div>
 
                             <div class="form-group" v-if="m.couponType == 1">
@@ -175,6 +178,22 @@
                                            name="distanceBirthdayDay" placeholder="(建议输入整数)"
                                            v-model="m.distanceBirthdayDay" required="required" min="0"> 日
                                 </div>
+                            </div>
+
+                            <div class="form-group" v-if="m.couponType == 6">
+                                <label>领取优惠券订单最低金额：
+                                    <input type="number"
+                                          name="minimumAmount" placeholder="(建议输入整数)"
+                                          v-model="m.minimumAmount" required="required" min="0"> 元
+                                </label>
+                            </div>
+
+                            <div class="form-group" v-if="m.couponType == 6">
+                                <label>每个用户
+                                    <input type="number"
+                                           name="nextHour" placeholder="(建议输入整数)"
+                                           v-model="m.nextHour" required="required" min="0"> 小时可领取一次
+                                </label>
                             </div>
 
                             <div class="form-group" v-if="m.couponType == 4">
@@ -281,6 +300,8 @@
                             $(td).html("<span class='label label-danger'>实&nbsp;时</span>");
                         }else if (tdData == 5){
                             $(td).html("<span class='label label-default'>礼&nbsp;品</span>");
+                        }else if (tdData == 6){
+                            $(td).html("<span class='label' style='background-color: #666633;color: #FFFFFF'>消费返利</span>");
                         }
                     }
                 },

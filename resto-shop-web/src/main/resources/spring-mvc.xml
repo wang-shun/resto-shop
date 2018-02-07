@@ -17,6 +17,8 @@
     <!-- 扫描controller（controller层注入） -->
     <context:component-scan base-package="com.resto.shop.web.controller"/>
 
+    <context:component-scan base-package="com.resto.scm.web"/>
+
     <context:component-scan base-package="com.resto.shop.web.task"/>
     
 	<!-- 解决ApplicationContext 和WebApplicationContext 不同域的问题 -->
@@ -26,22 +28,29 @@
 	
     <!-- 会自动注册DefaultAnnotationHandlerMapping与AnnotationMethodHandlerAdapter 两个bean,是spring MVC为@Controllers分发请求所必须的 -->
     <!-- 指定自己定义的validator -->
+    <!-- 以下 validator ConversionService 在使用 mvc:annotation-driven 会 自动注册 -->
     <mvc:annotation-driven validator="validator"/>
 
     <!--<mvc:annotation-driven>-->
-
-
         <!--<mvc:message-converters>-->
             <!--<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">-->
+                <!--<property name="supportedMediaTypes">-->
+                    <!--<list>-->
+                        <!--<value>text/plain;charset=UTF-8</value>-->
+                        <!--<value>application/json;charset=UTF-8</value>-->
+                        <!--<value>application/x-www-form-urlencoded;charset=UTF-8</value>-->
+                    <!--</list>-->
+                <!--</property>-->
                 <!--<property name="objectMapper">-->
                     <!--<bean class="com.fasterxml.jackson.databind.ObjectMapper">-->
                         <!--&lt;!&ndash; 处理responseBody 里面日期类型 &ndash;&gt;-->
                         <!--<property name="dateFormat">-->
                             <!--<bean class="java.text.SimpleDateFormat">-->
                                 <!--<constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />-->
-                                <!--<constructor-arg type="java.lang.String" value="yyyy-MM-dd" />-->
+                                <!--&lt;!&ndash;<constructor-arg type="java.lang.String" value="yyyy-MM-dd" />&ndash;&gt;-->
                             <!--</bean>-->
                         <!--</property>-->
+
                         <!--&lt;!&ndash; 为null字段时不显示 &ndash;&gt;-->
                         <!--&lt;!&ndash;<property name="serializationInclusion">&ndash;&gt;-->
                             <!--&lt;!&ndash;<value type="com.fasterxml.jackson.annotation.JsonInclude.Include">NON_NULL</value>&ndash;&gt;-->
@@ -52,12 +61,14 @@
         <!--</mvc:message-converters>-->
     <!--</mvc:annotation-driven>-->
 
-    <!-- 以下 validator ConversionService 在使用 mvc:annotation-driven 会 自动注册 -->
+
     <bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
         <property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
         <!-- 如果不加默认到 使用classpath下的 ValidationMessages.properties -->
         <property name="validationMessageSource" ref="messageSource"/>
     </bean>
+
+
 
     <!-- 国际化的消息资源文件（本系统中主要用于显示/错误消息定制） -->
     <bean id="messageSource" class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
@@ -113,6 +124,18 @@
                 <value>application/json;charset=UTF-8</value>
                 <value>application/x-www-form-urlencoded;charset=UTF-8</value>
             </list>
+        </property>
+
+        <property name="objectMapper">
+            <bean class="com.fasterxml.jackson.databind.ObjectMapper">
+                <!-- 处理responseBody 里面日期类型 -->
+                <property name="dateFormat">
+                    <bean class="java.text.SimpleDateFormat">
+                        <constructor-arg type="java.lang.String" value="yyyy-MM-dd HH:mm:ss" />
+                        <!--<constructor-arg type="java.lang.String" value="yyyy-MM-dd" />-->
+                    </bean>
+                </property>
+            </bean>
         </property>
     </bean>
 

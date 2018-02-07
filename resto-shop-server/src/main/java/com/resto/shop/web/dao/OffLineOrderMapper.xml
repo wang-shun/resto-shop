@@ -133,6 +133,7 @@ and
         AND resource = #{orderType}
     </select>
 
+
     <select id="selectDateAndMonthByShopId" resultType="com.resto.shop.web.dto.UnderLineOrderDto">
 
         SELECT a.todayEnterCount,a.todayEnterTotal,a.todayDeliverOrders,a.todayOrderBooks ,b.monthEnterCount,b.monthEnterTotal,b.monthDeliverOrders,b.monthOrderBooks FROM

@@ -84,6 +84,26 @@ public class NewCustomCoupon implements Serializable{
 
     private String realTimeCouponEndTimeString;
 
+    private BigDecimal minimumAmount;
+
+    private Integer nextHour;
+
+    public BigDecimal getMinimumAmount() {
+        return minimumAmount;
+    }
+
+    public void setMinimumAmount(BigDecimal minimumAmount) {
+        this.minimumAmount = minimumAmount;
+    }
+
+    public Integer getNextHour() {
+        return nextHour;
+    }
+
+    public void setNextHour(Integer nextHour) {
+        this.nextHour = nextHour;
+    }
+
     public String getRealTimeCouponBeginTimeString() {
         return realTimeCouponBeginTimeString;
     }

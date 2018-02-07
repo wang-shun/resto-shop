@@ -12,7 +12,7 @@ public class AccessControlAllowInterceptor implements HandlerInterceptor {
 
 		httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
 		httpServletResponse.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
-		httpServletResponse.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Accept-Encoding, Accept-Language, Host, Referer, Connection, User-Agent, Authorization, sw-useragent, sw-version, localPath");
+		httpServletResponse.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Accept-Encoding, Accept-Language, Host, Referer, Connection, User-Agent, Authorization, sw-useragent, sw-version, localPath,brandId");
 		httpServletResponse.setHeader("Access-Control-Allow-Credentials"," true");
 		// Just REPLY OK if request method is OPTIONS for CORS (pre-flight)
 		if ( httpServletRequest.getMethod().equals("OPTIONS") ) {

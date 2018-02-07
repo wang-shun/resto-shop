@@ -137,7 +137,7 @@
         <result column="customer_id" property="customerId"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <result column="payment_mode_id" property="paymentModeId"/>
-			<result column="pay_value" property="payValue"/>
+            <result column="pay_value" property="payValue"/>
         </collection>
 
     </resultMap>
@@ -3342,6 +3342,15 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         SELECT * from tb_order where serial_number = #{serialNumber}
     </select>
 
+    <select id="serverExceptionOrderList" resultType="java.lang.String">
+        SELECT id from tb_order where shop_detail_id = #{shopId}
+        <if test="isFirstPay == true or isFirstPay == 'true'">
+            and order_state in (2, 10, 11)
+        </if>
+        and production_status = 1
+        and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time ASC
+    </select>
+
     <select id="selectSurplusAmountByPayMode" resultType="java.math.BigDecimal">
         SELECT
         IFNULL(SUM(top.pay_value),0) payValue
@@ -3360,10 +3369,5 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
             AND top.payment_mode_id not in (2,3,4,6,7,8,11,13,14,15,20,21)
             AND (top.result_data IS NULL OR top.result_data = '')
         </if>
-    </select>
-
-    <select id="serverExceptionOrderList" parameterType="java.lang.String" resultType="java.lang.String">
-        SELECT id from tb_order where shop_detail_id = #{shopId} and production_status = 1
-        and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time ASC
     </select>
 </mapper>
