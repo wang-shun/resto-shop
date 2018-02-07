@@ -1183,6 +1183,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
 
             orderMapper.insertSelective(order);
+
+            log.info("tttttttttttttt----------");
+            if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+                MQMessageProducer.sendCreateOrderMessage(order);
+            }
             customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
             if (order.getPaymentAmount().doubleValue() == 0) {
                 payOrderSuccess(order);
