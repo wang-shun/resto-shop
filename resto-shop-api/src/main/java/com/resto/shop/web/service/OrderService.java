@@ -6,13 +6,10 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.AccountSetting;
-import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.model.WechatConfig;
 import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
-import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
@@ -810,4 +807,6 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	List<String> posSelectNotCancelledOrdersIdByDate(String shopId, String beginDate, String endDate);
 
 	Order selectBySerialNumber(String serialNumber);
+
+	void sendPosNewOrder(ShopDetail shopDetail, Order order);
 }
