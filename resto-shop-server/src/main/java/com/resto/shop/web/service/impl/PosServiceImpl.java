@@ -136,11 +136,11 @@ public class PosServiceImpl implements PosService {
         Order order = orderService.selectById(orderId);
         if(order == null){
             log.error("syncOrderCreated     未查到订单信息：" + orderId);
-            if(RedisUtil.get(orderId+"orderCreated") != null && (Integer)RedisUtil.get(orderId+"orderCreated") >= 5){
+            if(RedisUtil.get(orderId+"orderCreated") != null && (Integer)RedisUtil.get(orderId+"orderCreated") >= 10){
                 return "";
             }
             try {
-                Thread.sleep(1000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
