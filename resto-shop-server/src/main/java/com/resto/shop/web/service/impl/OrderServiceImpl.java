@@ -1182,7 +1182,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
 
-            insert(order);
+            orderMapper.insertSelective(order);
             customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
             if (order.getPaymentAmount().doubleValue() == 0) {
                 payOrderSuccess(order);
@@ -1232,7 +1232,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setCustomerId("0");
             order.setOrderMode(ShopMode.CALL_NUMBER);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
-            insert(order);
+            orderMapper.insertSelective(order);
             jsonResult.setData(order);
             switch (order.getPayMode()) {
                 case OrderPayMode.WX_PAY:
@@ -7066,7 +7066,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Order parentOrder = selectById(order.getParentOrderId());
             order.setTableNumber(parentOrder.getTableNumber());
         }
-        insert(order);
+        orderMapper.insertSelective(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
 
 
