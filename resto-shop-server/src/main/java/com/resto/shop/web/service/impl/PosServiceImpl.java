@@ -18,8 +18,8 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONArray;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -132,11 +132,24 @@ public class PosServiceImpl implements PosService {
     }
 
     @Override
-    public String syncOrderCreated(String orderId) {
+    public String syncOrderCreated(String orderId){
         Order order = orderService.selectById(orderId);
         if(order == null){
             log.error("syncOrderCreated     未查到订单信息：" + orderId);
-            return "";
+            if(RedisUtil.get(orderId+"orderCreated") != null && (Integer)RedisUtil.get(orderId+"orderCreated") >= 5){
+                return "";
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if(RedisUtil.get(orderId+"orderCreated") == null){
+                RedisUtil.set(orderId+"orderCreated",1);
+            }else{
+                RedisUtil.set(orderId+"orderCreated",((Integer) RedisUtil.get(orderId+"orderCreated")) + 1);
+            }
+            syncOrderCreated(orderId);
         }
         OrderDto orderDto = new OrderDto(order);
         JSONObject jsonObject = new JSONObject(orderDto);
