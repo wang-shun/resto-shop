@@ -8390,6 +8390,56 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } catch (Exception e) {
             log.error(e.getMessage());
         }
+
+        //排除掉子订单，在支付时给用户发放消费返利优惠券
+        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+            //查询出所有消费返利优惠券
+            List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
+            if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
+                //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
+                Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
+                BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                WechatConfig wechatConfig = wechatConfigService.selectByBrandId(order.getBrandId());
+                for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
+                    if (coupon != null) {
+                        Integer hours = hoursBetween(coupon.getAddTime(), new Date());
+                        //如果上一次领取到的消费返利优惠券距今的小时数<当前优惠券所设置的每隔多少小时领取
+                        if (hours.compareTo(newCustomCoupon.getNextHour()) < 0) {
+                            //退出当前循环不执行发放操作
+                            continue;
+                        }
+                    }
+                    if (order.getOrderMoney().compareTo(newCustomCoupon.getMinimumAmount()) < 0){
+                        //订单不满足优惠券最低订单金额条件不执行发放操作
+                        continue;
+                    }
+                    //发放
+                    couponService.addCoupon(newCustomCoupon, customer);
+                    //微信推送文案
+                    String pushMsg = "${brandName}衷心感谢您的光临，特赠予您价值${couponValue}元的${couponName}${couponCount}张，欢迎您下次再来~  <a href='${url}'>前往查看</a>";
+                    //封装推送的文案信息
+                    Map<String, Object> pushMsgMap = new HashMap<>();
+                    pushMsgMap.put("brandName", brand.getBrandName());
+                    pushMsgMap.put("couponValue", newCustomCoupon.getCouponValue());
+                    pushMsgMap.put("couponName", newCustomCoupon.getCouponName());
+                    pushMsgMap.put("couponCount", newCustomCoupon.getCouponNumber());
+                    pushMsgMap.put("url", newCustomCoupon.getIsBrand().equals(Common.YES) ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my"
+                            : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + "");
+                    StrSubstitutor substitutor = new StrSubstitutor(pushMsgMap);
+                    pushMsg = substitutor.replace(pushMsg);
+                    WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
+                    //如果用户注册添加短信推送
+                    if (StringUtils.isNotBlank(customer.getTelephone())) {
+                        pushMsgMap.put("couponName", newCustomCoupon.getCouponName() + newCustomCoupon.getCouponNumber() + "张");
+                        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+                        filter.getExcludes().add("couponCount");
+                        filter.getExcludes().add("url");
+                        com.alibaba.fastjson.JSONObject object = JSON.parseObject(JSON.toJSONString(pushMsgMap, filter));
+                        smsLogService.sendMessage(brand.getId(), shopDetail.getId(), SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_CONSUMPTION_REBATE, customer.getTelephone(), object);
+                    }
+                }
+            }
+        }
         return order;
 
     }
