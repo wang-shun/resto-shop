@@ -150,6 +150,7 @@ public class PosServiceImpl implements PosService {
                 RedisUtil.set(orderId+"orderCreated",((Integer) RedisUtil.get(orderId+"orderCreated")) + 1);
             }
             syncOrderCreated(orderId);
+            return "";
         }
         OrderDto orderDto = new OrderDto(order);
         JSONObject jsonObject = new JSONObject(orderDto);
