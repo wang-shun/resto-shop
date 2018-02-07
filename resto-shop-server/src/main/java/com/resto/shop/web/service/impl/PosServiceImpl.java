@@ -772,6 +772,10 @@ public class PosServiceImpl implements PosService {
             if(order.getOrderState() == OrderState.PAYMENT && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
                 printSuccess(orderId);
             }
+            //  如果用户出现 待下单状态，但是POS接收到订单
+            if(order.getOrderState() == OrderState.CONFIRM && order.getProductionStatus() == ProductionStatus.NOT_ORDER){
+                printSuccess(orderId);
+            }
         }else if(order.getPayType() == 1){  //  后付
             //  如果已付款，并且已下单了
             if(order.getOrderState() == OrderState.SUBMIT && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
