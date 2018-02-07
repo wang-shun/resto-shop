@@ -107,6 +107,7 @@ public class OrderAspect {
 
     @AfterReturning(value = "createOrder()", returning = "jsonResult")
     public void createOrderAround(JSONResult jsonResult) throws Throwable {
+        log.error("哈哈哈哈哈哈哈----------");
         String time = DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
         if (jsonResult.isSuccess() == true) {
 
