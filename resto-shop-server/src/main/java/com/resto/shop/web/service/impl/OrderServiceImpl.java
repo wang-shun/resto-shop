@@ -8391,7 +8391,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         //排除掉子订单，在支付时给用户发放消费返利优惠券
-        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())
+                && !order.getPayMode().equals(OrderPayMode.XJ_PAY) && !order.getPayMode().equals(OrderPayMode.YL_PAY)) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
