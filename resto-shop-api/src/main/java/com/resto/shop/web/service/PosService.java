@@ -2,6 +2,7 @@ package com.resto.shop.web.service;
 
 import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.posDto.ArticleSupport;
+import org.json.JSONArray;
 
 import java.util.List;
 
@@ -171,6 +172,27 @@ public interface PosService {
      * @return
      */
     List<String> getServerOrderIds(String shopId);
+
+
+    /**
+     * Pos 叫号
+     * @param orderId
+     */
+    void posCallNumber(String orderId);
+
+    /**
+     * pos端手动打印订单
+     * 此功能用于 手动改变订单状态为 已打印
+     * @param orderId
+     */
+    void posPrintOrder(String orderId);
+
+    /**
+     * 获取该店铺，当天的异常订单
+     * @param shopId
+     * @return
+     */
+    JSONArray serverExceptionOrderList(String shopId);
 
     void test();
 }

@@ -308,6 +308,62 @@ public class Order implements Serializable {
     //新版服务费的集合 包括：餐具费、纸巾费、酱料费
     private List<JSONObject> serviceList;
 
+    private String groupId;
+
+    private Integer sauceFeeCount;
+
+    private BigDecimal sauceFeePrice;
+
+    private Integer towelFeeCount;
+
+    private BigDecimal towelFeePrice;
+
+    private Integer tablewareFeeCount;
+
+    private BigDecimal tablewareFeePrice;
+
+    private Integer isUseNewService;
+
+    private Integer dataOrigin;
+
+    private BigDecimal orderPosDiscountMoney;
+
+    private BigDecimal memberDiscountMoney;
+
+    private BigDecimal memberDiscount;
+
+    public BigDecimal getMemberDiscount() {
+        return memberDiscount;
+    }
+
+    public void setMemberDiscount(BigDecimal memberDiscount) {
+        this.memberDiscount = memberDiscount;
+    }
+
+    public BigDecimal getOrderPosDiscountMoney() {
+        return orderPosDiscountMoney;
+    }
+
+    public void setOrderPosDiscountMoney(BigDecimal orderPosDiscountMoney) {
+        this.orderPosDiscountMoney = orderPosDiscountMoney;
+    }
+
+    public BigDecimal getMemberDiscountMoney() {
+        return memberDiscountMoney;
+    }
+
+    public void setMemberDiscountMoney(BigDecimal memberDiscountMoney) {
+        this.memberDiscountMoney = memberDiscountMoney;
+    }
+
+    public Integer getDataOrigin() {
+        return dataOrigin;
+    }
+
+    public void setDataOrigin(Integer dataOrigin) {
+        this.dataOrigin = dataOrigin;
+    }
+
     public List<JSONObject> getServiceList() {
         return serviceList;
     }
@@ -348,22 +404,6 @@ public class Order implements Serializable {
         this.refundType = refundType;
     }
 
-    private String groupId;
-
-    private Integer sauceFeeCount;
-
-    private BigDecimal sauceFeePrice;
-
-    private Integer towelFeeCount;
-
-    private BigDecimal towelFeePrice;
-
-    private Integer tablewareFeeCount;
-
-    private BigDecimal tablewareFeePrice;
-
-    private Integer isUseNewService;
-
     public Integer getSauceFeeCount() {
         return sauceFeeCount;
     }
@@ -387,7 +427,6 @@ public class Order implements Serializable {
     public void setTowelFeeCount(Integer towelFeeCount) {
         this.towelFeeCount = towelFeeCount;
     }
-
 
     public BigDecimal getTowelFeePrice() {
         return towelFeePrice;

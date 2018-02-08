@@ -48,13 +48,12 @@ public class PlatformReportController extends GenericController {
 
     @RequestMapping("/list")
     public String list(){
-        Date date = new Date();
-        if((date.getHours() >= 11 && date.getHours() < 13) || (date.getHours()>=17 && date.getHours() < 20)){
-            getRequest().setAttribute("netOpen", true);
-            return "notopen";
-        }else{
-            return "platformReport/list";
-        }
+        return "platformReport/list";
+    }
+
+    @RequestMapping("/shop/list")
+    public String shopList(){
+        return "platformReport/shopList";
     }
 
     @RequestMapping("/datas")
@@ -73,9 +72,9 @@ public class PlatformReportController extends GenericController {
         BigDecimal allElmPrice=new BigDecimal("0.00");
         int allMtCount=0;
         BigDecimal allMtPrice=new BigDecimal("0.00");
-        int allBdCount=0;
-        BigDecimal allBdPrice=new BigDecimal("0.00");
-
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        BigDecimal elmTotalPrice = BigDecimal.ZERO;
+        BigDecimal mtTotalPrice = BigDecimal.ZERO;
         List<PlatformReportDto> platformlist= new ArrayList<PlatformReportDto>();//第三方外卖店铺数据list
         long startTime=System.currentTimeMillis();
         /*for (ShopDetail shopDetail : shoplist) {*/
@@ -95,11 +94,6 @@ public class PlatformReportController extends GenericController {
             if(platformReportDto.getMtPrice()!=null){
                 allMtPrice=allMtPrice.add(platformReportDto.getMtPrice());
             }
-            allBdCount+=platformReportDto.getBdCount();
-            if(platformReportDto.getBdPrice()!=null){
-                allBdPrice=allBdPrice.add(platformReportDto.getBdPrice());
-            }
-
             //第三方外卖店铺数据
             platformReportDto.setShopId(shopDetail.getId());
             platformReportDto.setShopName(shopDetail.getName());
@@ -113,9 +107,9 @@ public class PlatformReportController extends GenericController {
             if(platformReportDto.getMtPrice()==null){
                 platformReportDto.setMtPrice(v);
             }
-            if(platformReportDto.getBdPrice()==null){
-                platformReportDto.setBdPrice(v);
-            }
+            totalPrice.add(platformReportDto.getTotalPrice());
+            elmTotalPrice.add(platformReportDto.getElmTotalPrice());
+            mtTotalPrice.add(platformReportDto.getMtTotalPrice());
             platformlist.add(platformReportDto);
         }
         long endTime=System.currentTimeMillis();
@@ -127,9 +121,9 @@ public class PlatformReportController extends GenericController {
         allPlatformReportDto.setAllElmPrice(allElmPrice);
         allPlatformReportDto.setAllMtCount(allMtCount);
         allPlatformReportDto.setAllMtPrice(allMtPrice);
-        allPlatformReportDto.setAllBdCount(allBdCount);
-        allPlatformReportDto.setAllBdPrice(allBdPrice);
-
+        allPlatformReportDto.setTotalPrice(totalPrice);
+        allPlatformReportDto.setElmTotalPrice(elmTotalPrice);
+        allPlatformReportDto.setMtTotalPrice(mtTotalPrice);
         //把三方外卖品牌和店铺的数据封装成map返回给前台
         Map<String,Object> map = new HashMap<>();
         map.put("allPlatformReportDto", allPlatformReportDto);
@@ -147,8 +141,7 @@ public class PlatformReportController extends GenericController {
         //定义读取文件的路径
         String path = request.getSession().getServletContext().getRealPath(fileName);
         //定义列
-        //String[]columns={"shopName","allCount","elmCount","mtCount","bdCount","allPrice","elmPrice","mtPrice","bdPrice"};
-        String[]columns={"shopName","allCount","elmCount","mtCount","allPrice","elmPrice","mtPrice"};
+        String[]columns={"shopName","allCount","elmCount","mtCount","allPrice","totalPrice","elmPrice","elmTotalPrice","mtPrice","mtTotalPrice"};
         //定义数据
 
         //定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
@@ -171,10 +164,10 @@ public class PlatformReportController extends GenericController {
         map.put("reportTitle", "外卖表");//表的名字
         map.put("timeType", "yyyy-MM-dd");
         List<PlatformReportDto> result = new LinkedList<>();
-        if (platformReportDto.getBrandAppraise() != null && platformReportDto.getShopAppraises() != null){
-            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-            filter.getExcludes().add("brandAppraise");
-            filter.getExcludes().add("shopAppraises");
+        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+        filter.getExcludes().add("brandAppraise");
+        filter.getExcludes().add("shopAppraises");
+        if (platformReportDto.getBrandAppraise() != null){
             String brandJson = JSON.toJSONString(platformReportDto.getBrandAppraise(),filter);
             AllPlatformReportDto allPlatformReportDto=JSON.parseObject(brandJson, AllPlatformReportDto.class);
             PlatformReportDto brandPlatformReportDto = new PlatformReportDto();
@@ -182,18 +175,18 @@ public class PlatformReportController extends GenericController {
             brandPlatformReportDto.setAllCount(allPlatformReportDto.getCount());
             brandPlatformReportDto.setElmCount(allPlatformReportDto.getAllElmCount());
             brandPlatformReportDto.setMtCount(allPlatformReportDto.getAllMtCount());
-            brandPlatformReportDto.setBdCount(allPlatformReportDto.getAllBdCount());
             brandPlatformReportDto.setAllPrice(allPlatformReportDto.getPrice());
             brandPlatformReportDto.setElmPrice(allPlatformReportDto.getAllElmPrice());
             brandPlatformReportDto.setMtPrice(allPlatformReportDto.getAllMtPrice());
-            brandPlatformReportDto.setBdPrice(allPlatformReportDto.getAllBdPrice());
+            brandPlatformReportDto.setTotalPrice(allPlatformReportDto.getTotalPrice());
+            brandPlatformReportDto.setElmTotalPrice(allPlatformReportDto.getElmTotalPrice());
+            brandPlatformReportDto.setMtTotalPrice(allPlatformReportDto.getMtTotalPrice());
             result.add(brandPlatformReportDto);
-            String shopJson = JSON.toJSONString(platformReportDto.getShopAppraises(), filter);
-            List<PlatformReportDto> platformReportDtos = JSON.parseObject(shopJson, new TypeReference<List<PlatformReportDto>>(){});
-            result.addAll(platformReportDtos);
         }
-        //String[][] headers = {{"品牌/店铺","25"},{"外卖订单数","25"},{"饿了吗订单数","25"},{"美团外卖订单数","25"},{"百度外卖订单数","25"},{"外卖订单额","25"},{"饿了吗订单额","25"},{"美团外卖订单额","25"},{"百度外卖订单额","25"}};
-        String[][] headers = {{"品牌/店铺","25"},{"外卖订单数","25"},{"饿了吗订单数","25"},{"美团外卖订单数","25"},{"外卖订单额","25"},{"饿了吗订单额","25"},{"美团外卖订单额","25"}};
+        String shopJson = JSON.toJSONString(platformReportDto.getShopAppraises(), filter);
+        List<PlatformReportDto> platformReportDtos = JSON.parseObject(shopJson, new TypeReference<List<PlatformReportDto>>(){});
+        result.addAll(platformReportDtos);
+        String[][] headers = {{"品牌/店铺","25"},{"外卖订单数","25"},{"饿了吗订单数","25"},{"美团外卖订单数","25"},{"外卖订单额","25"},{"外卖订单实收额","25"},{"饿了吗订单额","25"},{"饿了吗订单实收额","25"},{"美团外卖订单额","25"},{"美团外卖订单实收额","25"}};
         //定义excel工具类对象
         ExcelUtil<PlatformReportDto> excelUtil=new ExcelUtil<PlatformReportDto>();
         OutputStream out  = null;
@@ -228,9 +221,10 @@ public class PlatformReportController extends GenericController {
     }
 
     @RequestMapping("shopReport")
-    public String showModal(String beginDate,String endDate,String shopId,HttpServletRequest request){
+    public String showModal(String beginDate,String endDate,String shopId, Integer type,HttpServletRequest request){
         request.setAttribute("beginDate", beginDate);
         request.setAttribute("endDate", endDate);
+        request.setAttribute("type", type);
         ShopDetail shop = shopDetailService.selectById(shopId);
         if(shopId!=null){
             request.setAttribute("shopId", shopId);

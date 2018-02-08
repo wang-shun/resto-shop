@@ -390,4 +390,9 @@ public class NewCustomCouponServiceImpl extends GenericServiceImpl<NewCustomCoup
     public List<NewCustomCoupon> selectRealTimeCoupon(Map<String, Object> selectMap) {
         return newcustomcouponMapper.selectRealTimeCoupon(selectMap);
     }
+
+    @Override
+    public List<NewCustomCoupon> selectConsumptionRebateCoupon(String shopId) {
+        return newcustomcouponMapper.selectConsumptionRebateCoupon(shopId);
+    }
 }

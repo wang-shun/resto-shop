@@ -50,11 +50,12 @@
                             <th>外卖订单数</th>
                             <th>饿了么订单数</th>
                             <th>美团外卖订单数</th>
-                           <%-- <th>百度外卖订单数</th>--%>
                             <th>外卖订单额</th>
+                            <th>外卖订单实收额</th>
                             <th>饿了么订单额</th>
+                            <th>饿了么订单实收额</th>
                             <th>美团外卖订单额</th>
-                            <%--<th>百度外卖订单额</th>--%>
+                            <th>美团外卖订单实收额</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -64,11 +65,12 @@
                                 <td>{{brandAppraise.count}}</td>
                                 <td>{{brandAppraise.allElmCount}}</td>
                                 <td>{{brandAppraise.allMtCount}}</td>
-                                <%--<td>{{brandAppraise.allBdCount}}</td>--%>
                                 <td>{{brandAppraise.price}}</td>
+                                <td>{{brandAppraise.totalPrice}}</td>
                                 <td>{{brandAppraise.allElmPrice}}</td>
+                                <td>{{brandAppraise.elmTotalPrice}}</td>
                                 <td>{{brandAppraise.allMtPrice}}</td>
-                                <%--<td>{{brandAppraise.allBdPrice}}</td>--%>
+                                <td>{{brandAppraise.mtTotalPrice}}</td>
                             </tr>
                         </template>
                         <template v-else>
@@ -182,12 +184,24 @@
                             data : "allPrice"
                         },
                         {
+                            title : "外卖订单实收额",
+                            data : "totalPrice"
+                        },
+                        {
                             title : "饿了么订单额",
                             data : "elmPrice"
                         },
                         {
+                            title : "饿了么订单实收额",
+                            data : "elmTotalPrice"
+                        },
+                        {
                             title : "美团外卖订单额",
                             data : "mtPrice"
+                        },
+                        {
+                            title : "美团外卖订单实收额",
+                            data : "mtTotalPrice"
                         },
                         /*{
                             title : "百度外卖订单额",
@@ -212,9 +226,9 @@
                     toastr.clear();
                     toastr.error("开始时间应该少于结束时间！");
                     return false;
-                }/*else if(timeCha > 604800000){
+                }/*else if(timeCha > 2678400000){
                     toastr.clear();
-                    toastr.error("暂时未开放大于一周以内的查询！");
+                    toastr.error("暂时未开放大于一月以内的查询！");
                     return false;
                 }*/
                 toastr.clear();

@@ -74,8 +74,6 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
      */
     List<Coupon> getListByCustomerId(String customerId);
 
-    List<CouponDto> selectCouponDto(Map<String, Object> selectMap);
-
     List<Coupon> usedCouponBeforeByOrderId(String orderId);
 
     Coupon selectPosPayOrderCanUseCoupon(Map<String, Object> selectMap);
@@ -83,4 +81,6 @@ public interface CouponMapper  extends GenericDao<Coupon,String> {
     List<Coupon> getCouponByShopId(@Param("shopId") String shopId,@Param("time") Integer day,@Param("type") Integer type);
 
     void insertCouponBatch(@Param("list") List<Coupon> list);
+
+    Coupon selectLastTimeRebate(@Param("customerId") String customerId);
 }

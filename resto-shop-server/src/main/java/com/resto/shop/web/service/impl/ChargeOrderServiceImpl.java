@@ -1,7 +1,6 @@
 package com.resto.shop.web.service.impl;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.List;
@@ -26,13 +25,9 @@ import com.resto.shop.web.constant.PayMode;
 import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.ChargeSettingMapper;
 import com.resto.shop.web.model.*;
+import com.resto.shop.web.report.ChargeOrderMapperReport;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.LogTemplateUtils;
-import org.json.JSONObject;
-
-import javax.annotation.Resource;
-import javax.swing.*;
-import java.math.BigDecimal;
 import java.util.*;
 
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
@@ -51,14 +46,20 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     private ChargeOrderMapper chargeorderMapper;
 
     @Resource
+	private ChargeOrderMapperReport chargeOrderMapperReport;
+
+    @Resource
     private ChargePaymentService chargePaymentService;
 
     @Resource
     private AccountService accountService;
+
     @Resource
     CustomerService customerService;
+
     @Resource
     OrderPaymentItemService orderPaymentItemService;
+
     @Resource
     BrandService brandService;
 
@@ -284,7 +285,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	 */
 	@Override
 	public List<ChargeOrder> shopChargeCodes(String shopDetailId, Date beginDate, Date endDate) {
-		return chargeorderMapper.shopChargeCodes(shopDetailId,beginDate,endDate);
+		return chargeOrderMapperReport.shopChargeCodes(shopDetailId,beginDate,endDate);
 	}
 
 	/**
@@ -301,7 +302,7 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 	public Map<String, Object> shopChargeCodesSetDto(String shopDetailId, String beginDate, String endDate, String shopname) {
 		Date begin = DateUtil.getformatBeginDate(beginDate);
 		Date end = DateUtil.getformatEndDate(endDate);
-		List<ChargeOrder>  chargeList=chargeOrderMapper.shopChargeCodes(shopDetailId,begin,end);
+		List<ChargeOrder>  chargeList=chargeOrderMapperReport.shopChargeCodes(shopDetailId,begin,end);
 		List<ShopDetailDto> ShopDetailDtoList=new ArrayList<>();
 		if(chargeList!=null&&chargeList.size()>0){
 	    for (ChargeOrder charge:chargeList) {
@@ -483,28 +484,26 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
 
     @Override
     public List<RedPacketDto> selectChargeRedPacket(Map<String, Object> selectMap) {
-        return chargeorderMapper.selectChargeRedPacket(selectMap);
+        return chargeOrderMapperReport.selectChargeRedPacket(selectMap);
     }
 
     @Override
     public List<ChargeOrder> selectMonthDto(Map<String, Object> selectMap) {
-        return chargeOrderMapper.selectMonthDto(selectMap);
+        return chargeOrderMapperReport.selectMonthDto(selectMap);
     }
 
     @Override
     public RechargeLogDto selectRechargeLog(String beginDate, String endDate, String brandId) {
-        // TODO Auto-generated method stub
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return chargeOrderMapper.selectRechargeLog(begin,end,brandId);
+        return chargeOrderMapperReport.selectRechargeLog(begin,end,brandId);
     }
 
     @Override
     public RechargeLogDto selectShopRechargeLog(String beginDate, String endDate, String shopId) {
-        // TODO Auto-generated method stub
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return chargeOrderMapper.selectShopRechargeLog(begin,end,shopId);
+        return chargeOrderMapperReport.selectShopRechargeLog(begin,end,shopId);
     }
 
 
@@ -523,4 +522,26 @@ public class ChargeOrderServiceImpl extends GenericServiceImpl<ChargeOrder, Stri
     public BigDecimal selectTotalBalanceByTimeAndShopId(Date monthBegin, Date monthEnd, String shopId) {
         return chargeOrderMapper.selectTotalBalanceByTimeAndShopId(monthBegin,monthEnd,shopId);
     }
+
+	@Override
+	public List<ChargeOrder> selectRemainderReturn() {
+		return chargeOrderMapper.selectRemainderReturn();
+	}
+
+	@Override
+	public void updateRemainderReturn(ChargeOrder chargeOrder) {
+		//记录此次的返还金额
+		BigDecimal returnAmount = BigDecimal.ZERO;
+		//还剩余多次返还
+		if (chargeOrder.getNumberDayNow() > 1){
+			returnAmount = chargeOrder.getArrivalAmount();
+		}else{ //最后一次返还
+			returnAmount = chargeOrder.getEndAmount();
+		}
+		chargeOrder.setNumberDayNow(chargeOrder.getNumberDayNow() - 1);
+		chargeOrder.setRewardBalance(chargeOrder.getRewardBalance().add(returnAmount));
+		chargeOrder.setTotalBalance(chargeOrder.getTotalBalance().add(returnAmount));
+		chargeOrderMapper.updateByPrimaryKeySelective(chargeOrder);
+		accountService.addAccount(returnAmount, chargeOrder.getCustomer().getAccountId(), "充值赠送", AccountLog.SOURCE_CHARGE_REWARD, chargeOrder.getShopDetailId());
+	}
 }

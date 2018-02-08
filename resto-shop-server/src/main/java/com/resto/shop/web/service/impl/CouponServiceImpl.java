@@ -22,6 +22,7 @@ import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.datasource.DynamicDataSource;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
+import com.resto.shop.web.report.CouponMapperReport;
 import com.resto.shop.web.service.*;
 import org.apache.commons.lang3.text.StrSubstitutor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,9 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 
     @Resource
     private CouponMapper couponMapper;
+
+    @Resource
+    private CouponMapperReport couponMapperReport;
 
     @Override
     public GenericDao<Coupon, String> getDao() {
@@ -221,7 +225,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
 
     @Override
     public List<CouponDto> selectCouponDto(Map<String, Object> selectMap) {
-        return couponMapper.selectCouponDto(selectMap);
+        return couponMapperReport.selectCouponDto(selectMap);
     }
 
     @Override
@@ -447,5 +451,10 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
         couponMapper.insertCouponBatch(coupons);
 
 
+    }
+
+    @Override
+    public Coupon selectLastTimeRebate(String customerId) {
+        return couponMapper.selectLastTimeRebate(customerId);
     }
 }

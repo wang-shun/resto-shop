@@ -3,6 +3,7 @@ package com.resto.shop.web.service.impl;
 import cn.restoplus.rpc.common.util.StringUtil;
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
@@ -20,18 +21,19 @@ import com.resto.shop.web.constant.*;
 import com.resto.shop.web.container.OrderProductionStateContainer;
 import com.resto.shop.web.dao.*;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
-import com.resto.shop.web.datasource.DataSourceContextHolderReport;
 import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.model.Employee;
 import com.resto.shop.web.producer.MQMessageProducer;
+import com.resto.shop.web.report.MealAttrMapperReport;
 import com.resto.shop.web.report.OrderMapperReport;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.BrandAccountSendUtil;
 import com.resto.shop.web.util.LogTemplateUtils;
 import com.resto.shop.web.util.RedisUtil;
+import org.apache.commons.lang.text.StrSubstitutor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.json.JSONArray;
@@ -79,6 +81,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private OrderMapperReport orderMapperReport;
+
+    @Resource
+    private MealAttrMapperReport mealAttrMapperReport;
 
     @Resource
     private OrderItemMapper orderitemMapper;
@@ -233,6 +238,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Resource
     private TableGroupService tableGroupService;
+
+    @Resource
+    NewCustomCouponService newCustomCouponService;
 
     Logger log = LoggerFactory.getLogger(getClass());
 
@@ -717,8 +725,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         child.setOriginalPrice(mealItem.getPriceDif());
                         child.setStatus(1);
                         child.setSort(0);
-                        child.setUnitPrice(mealItem.getPriceDif());
-                        child.setBaseUnitPrice(mealItem.getPriceDif());
+                        child.setUnitPrice(mealItem.getPriceDif().multiply(order.getMemberDiscount()));
+                        child.setBaseUnitPrice(mealItem.getPriceDif().multiply(order.getMemberDiscount()));
                         child.setType(OrderItemType.MEALS_CHILDREN);
                         child.setCustomerId(item.getCustomerId());
                         BigDecimal finalMoney = child.getUnitPrice().multiply(new BigDecimal(child.getCount())).setScale(2, BigDecimal.ROUND_HALF_UP);
@@ -750,6 +758,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 return jsonResult;
             }
             item.setRemark(remark);
+            if(order.getMemberDiscount() != null && order.getMemberDiscount().doubleValue() > 0){
+                if(fans_price != null){
+                    fans_price = fans_price.multiply(order.getMemberDiscount());
+                }else{
+                    price = price.multiply(order.getMemberDiscount());
+                }
+            }
             if (fans_price != null && "pos".equals(order.getCreateOrderByAddress()) && shopDetail.getPosPlusType() == 1) {
                 item.setUnitPrice(price);
             } else if (fans_price != null && "pos".equals(order.getCreateOrderByAddress()) && shopDetail.getPosPlusType() != 1) {
@@ -1009,7 +1024,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             order.setClosed(false); // 订单是否关闭 否
             order.setSerialNumber(DateFormatUtils.format(new Date(), "yyyyMMddHHmmssSSSS")); // 流水号
-            order.setOriginalAmount(originMoney.add(order.getServicePrice()).add(order.getMealFeePrice()).add(extraMoney));// 原价
+            order.setOriginalAmount(originMoney.add(order.getServicePrice().divide(order.getMemberDiscount())).add(order.getMealFeePrice().divide(order.getMemberDiscount())).add(extraMoney));// 原价
             order.setReductionAmount(BigDecimal.ZERO);// 折扣金额
             order.setOrderMoney(totalMoney.add(order.getServicePrice()).add(order.getMealFeePrice())); // 订单实际金额
             order.setPaymentAmount(payMoney); // 订单剩余需要维修支付的金额
@@ -1166,7 +1181,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
 
-            insert(order);
+            orderMapper.insertSelective(order);
             customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
             if (order.getPaymentAmount().doubleValue() == 0) {
                 payOrderSuccess(order);
@@ -1216,7 +1231,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setCustomerId("0");
             order.setOrderMode(ShopMode.CALL_NUMBER);
             order.setProductionStatus(ProductionStatus.NOT_ORDER);
-            insert(order);
+            orderMapper.insertSelective(order);
             jsonResult.setData(order);
             switch (order.getPayMode()) {
                 case OrderPayMode.WX_PAY:
@@ -1362,7 +1377,76 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 changePushOrder(order);
             }
         }
+        //排除掉子订单，在支付时给用户发放消费返利优惠券
+        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+            //查询出所有消费返利优惠券
+            List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
+            if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
+                //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
+                Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
+                Customer customer = customerService.selectById(order.getCustomerId());
+                Brand brand = brandService.selectById(order.getBrandId());
+                ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+                BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                WechatConfig wechatConfig = wechatConfigService.selectByBrandId(order.getBrandId());
+                for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
+                    if (coupon != null) {
+                        Integer hours = hoursBetween(coupon.getAddTime(), new Date());
+                        //如果上一次领取到的消费返利优惠券距今的小时数<当前优惠券所设置的每隔多少小时领取
+                        if (hours.compareTo(newCustomCoupon.getNextHour()) < 0) {
+                            //退出当前循环不执行发放操作
+                            continue;
+                        }
+                    }
+                    if (order.getOrderMoney().compareTo(newCustomCoupon.getMinimumAmount()) < 0){
+                        //订单不满足优惠券最低订单金额条件不执行发放操作
+                        continue;
+                    }
+                    //发放
+                    couponService.addCoupon(newCustomCoupon, customer);
+                    //微信推送文案
+                    String pushMsg = "${brandName}衷心感谢您的光临，特赠予您价值${couponValue}元的${couponName}${couponCount}张，欢迎您下次再来~  <a href='${url}'>前往查看</a>";
+                    //封装推送的文案信息
+                    Map<String, Object> pushMsgMap = new HashMap<>();
+                    pushMsgMap.put("brandName", brand.getBrandName());
+                    pushMsgMap.put("couponValue", newCustomCoupon.getCouponValue());
+                    pushMsgMap.put("couponName", newCustomCoupon.getCouponName());
+                    pushMsgMap.put("couponCount", newCustomCoupon.getCouponNumber());
+                    pushMsgMap.put("url", newCustomCoupon.getIsBrand().equals(Common.YES) ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my"
+                            : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + "");
+                    StrSubstitutor substitutor = new StrSubstitutor(pushMsgMap);
+                    pushMsg = substitutor.replace(pushMsg);
+                    WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
+                    //如果用户注册添加短信推送
+                    if (StringUtils.isNotBlank(customer.getTelephone())) {
+                        pushMsgMap.put("couponName", newCustomCoupon.getCouponName() + newCustomCoupon.getCouponNumber() + "张");
+                        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+                        filter.getExcludes().add("couponCount");
+                        filter.getExcludes().add("url");
+                        com.alibaba.fastjson.JSONObject object = JSON.parseObject(JSON.toJSONString(pushMsgMap, filter));
+                        smsLogService.sendMessage(brand.getId(), shopDetail.getId(), SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_CONSUMPTION_REBATE, customer.getTelephone(), object);
+                    }
+                }
+            }
+        }
         return order;
+    }
+
+    /**
+     * 得到两个日期相差的小时数
+     * @param beginDate
+     * @param endDate
+     * @return
+     * @throws ParseException
+     */
+    public static Integer hoursBetween(Date beginDate,Date endDate){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(beginDate);
+        long time1 = cal.getTimeInMillis();
+        cal.setTime(endDate);
+        long time2 = cal.getTimeInMillis();
+        long between_days=(time2-time1)/(1000*3600);
+        return Integer.valueOf(String.valueOf(between_days));
     }
 
     private int selectArticleCountById(String id, Integer shopMode) {
@@ -5184,10 +5268,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
         //菜品总数单独算是因为 要出去套餐的数量
-        Integer totalNums = orderMapper.selectBrandArticleNum(begin, end, brandId);
+        Integer totalNums = orderMapperReport.selectBrandArticleNum(begin, end, brandId);
         //查询菜品总额，退菜总数，退菜金额
         brandArticleReportDto bo = new brandArticleReportDto(brandName, 0, BigDecimal.ZERO, 0, BigDecimal.ZERO, BigDecimal.ZERO);
-        List<brandArticleReportDto> articleReportDto = orderMapper.selectConfirmMoney(begin, end, brandId);
+        List<brandArticleReportDto> articleReportDto = orderMapperReport.selectConfirmMoney(begin, end, brandId);
         if (articleReportDto != null && !articleReportDto.isEmpty()) {
             for (brandArticleReportDto reportDto : articleReportDto) {
                 bo.setSellIncome(bo.getSellIncome().add(reportDto.getSellIncome()));
@@ -5209,7 +5293,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             shopDetails = shopDetailService.selectByBrandId(brandId);
         }
         //查询每个店铺的菜品销售的和
-        List<ShopArticleReportDto> list = orderMapper.selectShopArticleSell(begin, end, brandId);
+        List<ShopArticleReportDto> list = orderMapperReport.selectShopArticleSell(begin, end, brandId);
         List<ShopArticleReportDto> listArticles = new ArrayList<>();
         for (ShopDetail shop : shopDetails) {
             ShopArticleReportDto st = new ShopArticleReportDto(shop.getId(), shop.getName(), 0, BigDecimal.ZERO, "0.00%", 0, BigDecimal.ZERO, BigDecimal.ZERO);
@@ -5512,17 +5596,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public List<Order> selectListBybrandId(String beginDate, String endDate, String brandId) {
+    public List<Order> selectListBybrandId(String beginDate, String endDate, String brandId, Integer type) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListBybrandId(begin, end, brandId);
+        return orderMapperReport.selectListBybrandId(begin, end, brandId,type);
     }
 
     @Override
     public List<Order> selectListByShopId(String beginDate, String endDate, String shopId) {
         Date begin = DateUtil.getformatBeginDate(beginDate);
         Date end = DateUtil.getformatEndDate(endDate);
-        return orderMapper.selectListByShopId(begin, end, shopId);
+        return orderMapperReport.selectListByShopId(begin, end, shopId);
     }
 
 
@@ -6106,7 +6190,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                     selectMap.put("articleId", orderItem.getArticleId());
                                     selectMap.put("beginDate", beginDate);
                                     selectMap.put("endDate", endDate);
-                                    List<ArticleSellDto> articleSellDtos = mealAttrMapper.queryArticleMealAttr(selectMap);
+                                    List<ArticleSellDto> articleSellDtos = mealAttrMapperReport.queryArticleMealAttr(selectMap);
                                     for (ArticleSellDto articleSellDto : articleSellDtos) {
                                         if (orderItem.getArticleId().equalsIgnoreCase(articleSellDto.getArticleId()) && articleSellDto.getBrandSellNum() != 0) {
                                             itemMap = new HashMap<>();
@@ -6981,7 +7065,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Order parentOrder = selectById(order.getParentOrderId());
             order.setTableNumber(parentOrder.getTableNumber());
         }
-        insert(order);
+        orderMapper.insertSelective(order);
         customerService.changeLastOrderShop(order.getShopDetailId(), order.getCustomerId());
 
 
@@ -8305,6 +8389,56 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         } catch (Exception e) {
             log.error(e.getMessage());
         }
+
+        //排除掉子订单，在支付时给用户发放消费返利优惠券
+        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+            //查询出所有消费返利优惠券
+            List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
+            if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
+                //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
+                Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
+                BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                WechatConfig wechatConfig = wechatConfigService.selectByBrandId(order.getBrandId());
+                for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
+                    if (coupon != null) {
+                        Integer hours = hoursBetween(coupon.getAddTime(), new Date());
+                        //如果上一次领取到的消费返利优惠券距今的小时数<当前优惠券所设置的每隔多少小时领取
+                        if (hours.compareTo(newCustomCoupon.getNextHour()) < 0) {
+                            //退出当前循环不执行发放操作
+                            continue;
+                        }
+                    }
+                    if (order.getOrderMoney().compareTo(newCustomCoupon.getMinimumAmount()) < 0){
+                        //订单不满足优惠券最低订单金额条件不执行发放操作
+                        continue;
+                    }
+                    //发放
+                    couponService.addCoupon(newCustomCoupon, customer);
+                    //微信推送文案
+                    String pushMsg = "${brandName}衷心感谢您的光临，特赠予您价值${couponValue}元的${couponName}${couponCount}张，欢迎您下次再来~  <a href='${url}'>前往查看</a>";
+                    //封装推送的文案信息
+                    Map<String, Object> pushMsgMap = new HashMap<>();
+                    pushMsgMap.put("brandName", brand.getBrandName());
+                    pushMsgMap.put("couponValue", newCustomCoupon.getCouponValue());
+                    pushMsgMap.put("couponName", newCustomCoupon.getCouponName());
+                    pushMsgMap.put("couponCount", newCustomCoupon.getCouponNumber());
+                    pushMsgMap.put("url", newCustomCoupon.getIsBrand().equals(Common.YES) ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my"
+                            : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + "");
+                    StrSubstitutor substitutor = new StrSubstitutor(pushMsgMap);
+                    pushMsg = substitutor.replace(pushMsg);
+                    WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
+                    //如果用户注册添加短信推送
+                    if (StringUtils.isNotBlank(customer.getTelephone())) {
+                        pushMsgMap.put("couponName", newCustomCoupon.getCouponName() + newCustomCoupon.getCouponNumber() + "张");
+                        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+                        filter.getExcludes().add("couponCount");
+                        filter.getExcludes().add("url");
+                        com.alibaba.fastjson.JSONObject object = JSON.parseObject(JSON.toJSONString(pushMsgMap, filter));
+                        smsLogService.sendMessage(brand.getId(), shopDetail.getId(), SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_CONSUMPTION_REBATE, customer.getTelephone(), object);
+                    }
+                }
+            }
+        }
         return order;
 
     }
@@ -8979,6 +9113,54 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map1.put("content", "用户:"+order.getCustomerId()+"的订单："+order.getId()+"在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map1);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
+        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+            //查询出所有消费返利优惠券
+            List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
+            if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
+                //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
+                Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
+                Customer customer = customerService.selectById(order.getCustomerId());
+                BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                WechatConfig wechatConfig = wechatConfigService.selectByBrandId(order.getBrandId());
+                for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
+                    if (coupon != null) {
+                        Integer hours = hoursBetween(coupon.getAddTime(), new Date());
+                        //如果上一次领取到的消费返利优惠券距今的小时数<当前优惠券所设置的每隔多少小时领取
+                        if (hours.compareTo(newCustomCoupon.getNextHour()) < 0) {
+                            //退出当前循环不执行发放操作
+                            continue;
+                        }
+                    }
+                    if (order.getOrderMoney().compareTo(newCustomCoupon.getMinimumAmount()) < 0){
+                        //订单不满足优惠券最低订单金额条件不执行发放操作
+                        continue;
+                    }
+                    //发放
+                    couponService.addCoupon(newCustomCoupon, customer);
+                    //微信推送文案
+                    String pushMsg = "${brandName}衷心感谢您的光临，特赠予您价值${couponValue}元的${couponName}${couponCount}张，欢迎您下次再来~  <a href='${url}'>前往查看</a>";
+                    //封装推送的文案信息
+                    Map<String, Object> pushMsgMap = new HashMap<>();
+                    pushMsgMap.put("brandName", brand.getBrandName());
+                    pushMsgMap.put("couponValue", newCustomCoupon.getCouponValue());
+                    pushMsgMap.put("couponName", newCustomCoupon.getCouponName());
+                    pushMsgMap.put("couponCount", newCustomCoupon.getCouponNumber());
+                    pushMsgMap.put("url", newCustomCoupon.getIsBrand().equals(Common.YES) ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my"
+                            : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + "");
+                    StrSubstitutor substitutor = new StrSubstitutor(pushMsgMap);
+                    pushMsg = substitutor.replace(pushMsg);
+                    WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
+                    //如果用户注册添加短信推送
+                    if (StringUtils.isNotBlank(customer.getTelephone())) {
+                        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+                        filter.getExcludes().add("couponCount");
+                        filter.getExcludes().add("url");
+                        com.alibaba.fastjson.JSONObject object = JSON.parseObject(JSON.toJSONString(pushMsgMap, filter));
+                        smsLogService.sendMessage(brand.getId(), shopDetail.getId(), SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_CONSUMPTION_REBATE, customer.getTelephone(), object);
+                    }
+                }
+            }
+        }
         return order;
     }
 
@@ -9258,6 +9440,52 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
 			updateBrandAccount(order,true,accountSetting);
 		}
+        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+            //查询出所有消费返利优惠券
+            List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
+            if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
+                //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
+                Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
+                WechatConfig wechatConfig = wechatConfigService.selectByBrandId(order.getBrandId());
+                for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
+                    if (coupon != null) {
+                        Integer hours = hoursBetween(coupon.getAddTime(), new Date());
+                        //如果上一次领取到的消费返利优惠券距今的小时数<当前优惠券所设置的每隔多少小时领取
+                        if (hours.compareTo(newCustomCoupon.getNextHour()) < 0) {
+                            //退出当前循环不执行发放操作
+                            continue;
+                        }
+                    }
+                    if (order.getOrderMoney().compareTo(newCustomCoupon.getMinimumAmount()) < 0){
+                        //订单不满足优惠券最低订单金额条件不执行发放操作
+                        continue;
+                    }
+                    //发放
+                    couponService.addCoupon(newCustomCoupon, customer);
+                    //微信推送文案
+                    String pushMsg = "${brandName}衷心感谢您的光临，特赠予您价值${couponValue}元的${couponName}${couponCount}张，欢迎您下次再来~  <a href='${url}'>前往查看</a>";
+                    //封装推送的文案信息
+                    Map<String, Object> pushMsgMap = new HashMap<>();
+                    pushMsgMap.put("brandName", brand.getBrandName());
+                    pushMsgMap.put("couponValue", newCustomCoupon.getCouponValue());
+                    pushMsgMap.put("couponName", newCustomCoupon.getCouponName());
+                    pushMsgMap.put("couponCount", newCustomCoupon.getCouponNumber());
+                    pushMsgMap.put("url", newCustomCoupon.getIsBrand().equals(Common.YES) ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my"
+                            : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + "");
+                    StrSubstitutor substitutor = new StrSubstitutor(pushMsgMap);
+                    pushMsg = substitutor.replace(pushMsg);
+                    WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
+                    //如果用户注册添加短信推送
+                    if (StringUtils.isNotBlank(customer.getTelephone())) {
+                        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+                        filter.getExcludes().add("couponCount");
+                        filter.getExcludes().add("url");
+                        com.alibaba.fastjson.JSONObject object = JSON.parseObject(JSON.toJSONString(pushMsgMap, filter));
+                        smsLogService.sendMessage(brand.getId(), shopDetail.getId(), SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_CONSUMPTION_REBATE, customer.getTelephone(), object);
+                    }
+                }
+            }
+        }
         return order;
     }
 
@@ -9370,12 +9598,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<ShopIncomeDto> callProcDayAllOrderItem(Map<String, Object> selectMap) {
-        return orderMapper.callProcDayAllOrderItem(selectMap);
+        return orderMapperReport.callProcDayAllOrderItem(selectMap);
     }
 
     @Override
     public List<ShopIncomeDto> callProcDayAllOrderPayMent(Map<String, Object> selectMap) {
-        return orderMapper.callProcDayAllOrderPayMent(selectMap);
+        return orderMapperReport.callProcDayAllOrderPayMent(selectMap);
     }
 
     @Override
@@ -9385,8 +9613,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate) {
-        return orderMapper.addRefundArticleDto(beginDate, endDate);
+    public List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate, String shopId) {
+        return orderMapperReport.addRefundArticleDto(beginDate, endDate, shopId);
     }
 
 	@Override
@@ -9572,7 +9800,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap) {
-        return orderMapper.selectMealServiceSales(selectMap);
+        return orderMapperReport.selectMealServiceSales(selectMap);
     }
 
     @Override
@@ -9904,7 +10132,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
      * @return
      */
     @Override
-    public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type) {
+    public Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type, BigDecimal orderPosDiscountMoney) {
         Order order = orderMapper.selectByPrimaryKey(orderId);
         if(order.getPosDiscount().compareTo(new BigDecimal(1)) == 0
                 && order.getEraseMoney().compareTo(new BigDecimal(0)) == 0
@@ -9925,7 +10153,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             map.put("orderId", orderId);
             map.put("count", "1=1");
             List<OrderItem> oItems = orderItemService.selectOrderItemByOrderId(map);
-            order = posDiscountAction(oItems, discount, posDiscount, order, eraseMoney, noDiscountMoney, shijiMoney, flag);
+            order = posDiscountAction(oItems, discount, posDiscount, order, eraseMoney, noDiscountMoney, shijiMoney, flag, orderPosDiscountMoney);
             shijiMoney = shijiMoney.subtract(order.getOrderMoney());
             if(flag){
                 BigDecimal sum = new BigDecimal(0);
@@ -9935,17 +10163,77 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     map.put("orderId", oP.getId());
                     map.put("count", "1=1");
                     if((i + 1) == pOrder.size()){
-                        oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, posDiscount, oP, eraseMoney, noDiscountMoney, shijiMoney, false);
+                        oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, posDiscount, oP, eraseMoney, noDiscountMoney, shijiMoney, false, orderPosDiscountMoney);
                     }else{
-                        oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, posDiscount, oP, eraseMoney, noDiscountMoney, shijiMoney, true);
+                        oP = posDiscountAction(orderItemService.selectOrderItemByOrderId(map), discount, posDiscount, oP, eraseMoney, noDiscountMoney, shijiMoney, true, orderPosDiscountMoney);
                     }
                     shijiMoney = shijiMoney.subtract(oP.getOrderMoney());
                     sum = sum.add(oP.getOrderMoney());
                 }
                 //修改主订单
                 order.setAmountWithChildren(order.getOrderMoney().add(sum));
+                order.setOrderPosDiscountMoney(order.getBaseOrderMoney().subtract(order.getAmountWithChildren()));
+                if(order.getOrderPosDiscountMoney().doubleValue() <= 0 && orderPosDiscountMoney.doubleValue() > 0){
+                    order.setOrderPosDiscountMoney(orderPosDiscountMoney);
+                }
                 orderMapper.updateByPrimaryKeySelective(order);
             }
+        }
+        return order;
+    }
+
+    public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, BigDecimal posDiscount, Order order, BigDecimal eraseMoney,
+                                   BigDecimal noDiscountMoney, BigDecimal shijiMoney, boolean flag, BigDecimal orderPosDiscountMoney){
+        ShopDetail shop = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+        BigDecimal sum = new BigDecimal(0);
+        //修改菜品项
+        for(OrderItem oItem : orderItems){
+            oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(posDiscount).setScale(2,BigDecimal.ROUND_HALF_UP));
+            oItem.setPosDiscount(posDiscount.multiply(new BigDecimal(100)) + "%");
+            oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
+            sum = sum.add(oItem.getFinalPrice());
+            orderItemService.update(oItem);
+        }
+        //修改子订单
+        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
+            if(flag){
+                order.setOrderMoney(sum);
+                order.setPaymentAmount(sum);
+            }else{
+                order.setOrderMoney(shijiMoney);
+                order.setPaymentAmount(shijiMoney);
+            }
+            order.setPosDiscount(discount);
+            orderMapper.updateByPrimaryKeySelective(order);
+        }
+        //修改主订单
+        if(order.getParentOrderId() == null || "".equals(order.getParentOrderId())){
+            if(shop.getServicePrice().doubleValue() > 0 && shop.getIsUseServicePrice() == 1 && brandSetting.getIsUseServicePrice() == 1 && order.getCustomerCount() > 0){
+                order.setServicePrice(posDiscount.multiply(shop.getServicePrice()).multiply(new BigDecimal(order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
+            if(order.getMealFeePrice().doubleValue() > 0){
+                order.setMealFeePrice(posDiscount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
+            }
+            if(flag){
+                order.setOrderMoney((shijiMoney.compareTo(sum) >= 0 ? sum : shijiMoney).add(order.getServicePrice()).add(order.getMealFeePrice()));
+                order.setPaymentAmount((shijiMoney.compareTo(sum) >= 0 ? sum : shijiMoney).add(order.getServicePrice()).add(order.getMealFeePrice()));
+            }else{
+                order.setOrderMoney(shijiMoney);
+                order.setPaymentAmount(shijiMoney);
+            }
+            order.setEraseMoney(eraseMoney);
+            order.setNoDiscountMoney(noDiscountMoney);
+            BigDecimal value = orderMapper.selectPayBefore(order.getId());
+            if(value != null && value.doubleValue() > 0){
+                order.setPaymentAmount(sum.subtract(value));
+            }
+            order.setPosDiscount(discount);
+            order.setOrderPosDiscountMoney(order.getBaseOrderMoney().subtract(order.getOrderMoney()));
+            if(order.getOrderPosDiscountMoney().doubleValue() <= 0 && orderPosDiscountMoney.doubleValue() > 0){
+                order.setOrderPosDiscountMoney(orderPosDiscountMoney);
+            }
+            orderMapper.updateByPrimaryKeySelective(order);
         }
         return order;
     }
@@ -10072,63 +10360,19 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public List<OrderNumDto> selectOrderNumByTimeAndBrandId(String brandId, String begin, String end) {
         Date beginDate = DateUtil.getformatBeginDate(begin);
         Date endDate = DateUtil.getformatEndDate(end);
-        return orderMapper.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
-    }
-
-    public Order posDiscountAction(List<OrderItem> orderItems, BigDecimal discount, BigDecimal posDiscount, Order order, BigDecimal eraseMoney,
-                                   BigDecimal noDiscountMoney, BigDecimal shijiMoney, boolean flag){
-        ShopDetail shop = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
-        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
-        BigDecimal sum = new BigDecimal(0);
-        //修改菜品项
-        for(OrderItem oItem : orderItems){
-            oItem.setUnitPrice(oItem.getBaseUnitPrice().multiply(posDiscount).setScale(2,BigDecimal.ROUND_HALF_UP));
-            oItem.setPosDiscount(posDiscount.multiply(new BigDecimal(100)) + "%");
-            oItem.setFinalPrice(oItem.getUnitPrice().multiply(new BigDecimal(oItem.getCount())));
-            sum = sum.add(oItem.getFinalPrice());
-            orderItemService.update(oItem);
-        }
-        //修改子订单
-        if(order.getParentOrderId() != null && !"".equals(order.getParentOrderId())){
-            if(flag){
-                order.setOrderMoney(sum);
-                order.setPaymentAmount(sum);
-            }else{
-                order.setOrderMoney(shijiMoney);
-                order.setPaymentAmount(shijiMoney);
-            }
-            order.setPosDiscount(discount);
-            orderMapper.updateByPrimaryKeySelective(order);
-        }
-        //修改主订单
-        if(order.getParentOrderId() == null || "".equals(order.getParentOrderId())){
-            if(shop.getServicePrice().doubleValue() > 0 && shop.getIsUseServicePrice() == 1 && brandSetting.getIsUseServicePrice() == 1 && order.getCustomerCount() > 0){
-                order.setServicePrice(posDiscount.multiply(shop.getServicePrice()).multiply(new BigDecimal(order.getCustomerCount())).setScale(2,BigDecimal.ROUND_HALF_UP));
-            }
-            if(order.getMealFeePrice().doubleValue() > 0){
-                order.setMealFeePrice(posDiscount.multiply(shop.getMealFeePrice()).multiply(new BigDecimal(order.getMealAllNumber())).setScale(2,BigDecimal.ROUND_HALF_UP));
-            }
-            if(flag){
-                order.setOrderMoney((shijiMoney.compareTo(sum) >= 0 ? sum : shijiMoney).add(order.getServicePrice()).add(order.getMealFeePrice()));
-                order.setPaymentAmount((shijiMoney.compareTo(sum) >= 0 ? sum : shijiMoney).add(order.getServicePrice()).add(order.getMealFeePrice()));
-            }else{
-                order.setOrderMoney(shijiMoney);
-                order.setPaymentAmount(shijiMoney);
-            }
-            order.setEraseMoney(eraseMoney);
-            order.setNoDiscountMoney(noDiscountMoney);
-            BigDecimal value = orderMapper.selectPayBefore(order.getId());
-            if(value != null && value.doubleValue() > 0){
-                order.setPaymentAmount(sum.subtract(value));
-            }
-            order.setPosDiscount(discount);
-            orderMapper.updateByPrimaryKeySelective(order);
-        }
-        return order;
+        return orderMapperReport.selectOrderNumByTimeAndBrandId(brandId,beginDate,endDate);
     }
 
     @Override
     public Order afterPayShareBenefits(String orderId) {
         return orderMapper.selectByPrimaryKey(orderId);
+    }
+
+    @Override
+    public void sendPosNewOrder(ShopDetail shopDetail, Order order) {
+        log.info("\n\nsendPosNewOrder   ----------\n");
+        if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
+            MQMessageProducer.sendCreateOrderMessage(order);
+        }
     }
 }

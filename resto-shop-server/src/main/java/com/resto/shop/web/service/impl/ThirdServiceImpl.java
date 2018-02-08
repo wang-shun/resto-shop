@@ -1912,7 +1912,7 @@ public class ThirdServiceImpl implements ThirdService {
     }
 
 
-    public Map<String, Object> printReceipt(String orderId, Integer selectPrinterId) {
+    public Map<String, Object> printReceipt(String orderId, Integer selectPrinterId, String type) {
 
 
         PlatformOrder order = platformOrderService.selectById(orderId);
@@ -1945,16 +1945,18 @@ public class ThirdServiceImpl implements ThirdService {
 
             }
         }
-        if(order.getProductionStatus() == 1){
+        if(order.getProductionStatus() == 1 && !"shoudong".equals(type)){
             return null;
         }
         List<PlatformOrderDetail> orderDetailList = platformOrderDetailService.selectByPlatformOrderId(order.getPlatformOrderId());
         List<PlatformOrderExtra> orderExtraList = platformOrderExtraService.selectByPlatformOrderId(order.getPlatformOrderId());
 
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(order.getShopDetailId());
+        if(order.getProductionStatus() != 1){
+            order.setProductionStatus(1);
+            platformOrderService.update(order);
+        }
 
-        order.setProductionStatus(1);
-        platformOrderService.update(order);
         if (selectPrinterId == null) {
             List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
             if (printer.size() > 0) {

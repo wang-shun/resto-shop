@@ -2,9 +2,6 @@ package com.resto.shop.web.aspect;
 
 import javax.annotation.Resource;
 
-import com.resto.brand.core.util.WeChatUtils;
-import com.resto.brand.web.model.WechatConfig;
-import com.resto.shop.web.model.Customer;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
@@ -13,14 +10,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.resto.brand.web.model.ShareSetting;
-import com.resto.brand.web.service.BrandSettingService;
 import com.resto.brand.web.service.ShareSettingService;
-import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.datasource.DataSourceContextHolder;
 import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.producer.MQMessageProducer;
-import com.resto.shop.web.service.AppraiseService;
-import com.resto.shop.web.service.CustomerService;
 
 /**
  * 分享功能切面
@@ -34,17 +27,6 @@ public class ShareAspect {
 	@Resource
 	ShareSettingService shareSettingService;
 	
-	@Resource
-	WechatConfigService wechatConfigService;
-	@Resource
-	BrandSettingService brandSettingService;
-	
-	@Resource
-	CustomerService customerService;
-	
-	@Resource
-	AppraiseService appraiseService;
-	
 	Logger log = LoggerFactory.getLogger(getClass());
 	
 	@Pointcut("execution(* com.resto.shop.web.service.AppraiseService.saveAppraise(..))")
@@ -52,8 +34,6 @@ public class ShareAspect {
 	
 	@AfterReturning(value="saveAppraise()",returning="appraise")
 	public void saveAppraiseSuccess(Appraise appraise) throws InterruptedException {
-
-
 		log.info("保存评论成功,触发分享判定:"+appraise.getId());
 		if(appraise!=null){
 			ShareSetting setting = shareSettingService.selectValidSettingByBrandId(DataSourceContextHolder.getDataSourceName());
@@ -71,8 +51,6 @@ public class ShareAspect {
 		}
 		
 	}
-
-
 
 	private boolean isCanShare(ShareSetting setting, Appraise appraise) {
 		log.info("Setting,minLevel:"+setting.getMinLevel());
