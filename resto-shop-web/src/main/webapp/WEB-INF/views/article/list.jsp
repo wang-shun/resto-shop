@@ -237,6 +237,12 @@
                                     <label class="radio-inline">
                                         <input type="radio" name="photoType" v-model="m.photoType" value="3"> 无图
                                     </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="photoType" v-model="m.photoType" value="4"> 超大图
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="photoType" v-model="m.photoType" value="5"> 正方形图
+                                    </label>
                                 </div>
                             </div>
 
