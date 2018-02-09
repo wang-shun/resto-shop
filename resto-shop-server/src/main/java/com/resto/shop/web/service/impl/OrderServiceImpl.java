@@ -416,6 +416,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String orderId = ApplicationUtils.randomUUID();
         order.setId(orderId);
         order.setPosDiscount(new BigDecimal(1));
+        if (order.getMemberDiscount() == null) {
+            order.setMemberDiscount(new BigDecimal(1));
+        }
         Customer customer = customerService.selectById(order.getCustomerId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         Boolean loginFlag = (Boolean) RedisUtil.get(order.getShopDetailId() + "loginStatus");
