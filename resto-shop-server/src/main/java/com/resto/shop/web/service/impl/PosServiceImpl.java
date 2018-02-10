@@ -976,7 +976,7 @@ public class PosServiceImpl implements PosService {
                 if (Boolean.valueOf(map.get("success"))){
                     //支付成功，退出轮询插入支付信息修改订单信息
                     returnParam.put("isPolling", false);
-                    List<OrderPaymentItem> orderPaymentItems = new ArrayList<>();
+                    JSONArray orderPaymentItems = new JSONArray();
                     OrderPaymentItem paymentItem = new OrderPaymentItem();
                     JSONObject resultInfo = new JSONObject(map.get("data"));
                     paymentItem.setId(resultInfo.get("transaction_id").toString());
@@ -991,7 +991,10 @@ public class PosServiceImpl implements PosService {
                     for (OrderItem orderItem : order.getOrderItems()){
                         orderItemService.update(orderItem);
                     }
-                    orderPaymentItems.add(paymentItem);
+                    JSONObject returnPayment = new JSONObject(paymentItem);
+                    returnPayment.put("resultData", "微信支付");
+                    returnPayment.put("payTime", paymentItem.getPayTime().getTime());
+                    orderPaymentItems.put(returnPayment);
                     returnParam.put("payMentInfo", orderPaymentItems);
                 }else{
                     //如果正在支付中，则轮询继续去查。 反之则支付失败退出轮询
