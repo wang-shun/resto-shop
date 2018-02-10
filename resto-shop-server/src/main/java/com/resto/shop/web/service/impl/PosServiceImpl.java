@@ -957,7 +957,7 @@ public class PosServiceImpl implements PosService {
         //商户系统内部订单号
         String outTradeNo = object.getString("outTradeNo");
         //要修改的订单信息
-        Order order = JSON.parseObject(object.getString("order"), Order.class);
+        Order order = JSON.parseObject(object.get("order").toString(), Order.class);
         Map<String, String> map = new HashMap<>();
         //返回的信息
         JSONObject returnParam = new JSONObject();
