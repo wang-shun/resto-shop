@@ -416,6 +416,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String orderId = ApplicationUtils.randomUUID();
         order.setId(orderId);
         order.setPosDiscount(new BigDecimal(1));
+        if (order.getMemberDiscount() == null) {
+            order.setMemberDiscount(new BigDecimal(1));
+        }
         Customer customer = customerService.selectById(order.getCustomerId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         Boolean loginFlag = (Boolean) RedisUtil.get(order.getShopDetailId() + "loginStatus");
@@ -8391,7 +8394,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         //排除掉子订单，在支付时给用户发放消费返利优惠券
-        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())
+                && !order.getPayMode().equals(OrderPayMode.XJ_PAY) && !order.getPayMode().equals(OrderPayMode.YL_PAY)) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
@@ -9411,35 +9415,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMapper.confirmOrderPos(orderId);
         }
 
-        //日志记录
-        Map map = new HashMap(4);
-        map.put("brandName", brand.getBrandName());
-        map.put("fileName", order.getCustomerId());
-        map.put("type", "UserAction");
-        StringBuffer msg = new StringBuffer("用户:"+order.getCustomerId()+"订单在pos端被结算，结算方式为:");
-        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
-        for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
-            msg.append(orderPaymentItem.getRemark() + "\n");
-        }
-        msg.append("请求服务器地址为:"+MQSetting.getLocalIP());
-        map.put("content", msg.toString());
-        doPostAnsc(url, map);
-
         //yz 计费系统 后付款 pos端 结算时计费
-		BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
-		//yz 2017/07/29计费系统
-		//判断是否已经记录过该订单
-		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
-
-		//--
-		if(brandAccountLog!=null){
-			return order;
-		}
-
-		if(brandSetting.getOpenBrandAccount()==1){//说明开启了品牌账户
-			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-			updateBrandAccount(order,true,accountSetting);
-		}
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
         if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
@@ -9486,6 +9463,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
+
+        //日志记录
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", order.getCustomerId());
+        map.put("type", "UserAction");
+        StringBuffer msg = new StringBuffer("用户:"+order.getCustomerId()+"订单在pos端被结算，结算方式为:");
+        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+        for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
+            msg.append(orderPaymentItem.getRemark() + "\n");
+        }
+        msg.append("请求服务器地址为:"+MQSetting.getLocalIP());
+        map.put("content", msg.toString());
+        doPostAnsc(url, map);
+		//yz 2017/07/29计费系统
+		//判断是否已经记录过该订单
+		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
+
+		//--
+		if(brandAccountLog!=null){
+			return order;
+		}
+
+		if(brandSetting.getOpenBrandAccount()==1){//说明开启了品牌账户
+			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+			updateBrandAccount(order,true,accountSetting);
+		}
         return order;
     }
 
