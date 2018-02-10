@@ -998,8 +998,6 @@ public class PosServiceImpl implements PosService {
                     if (!"USERPAYING".equalsIgnoreCase(map.get("errCode"))){
                         returnParam.put("isPolling", false);
                         returnParam.put("message", map.get("msg"));
-                    }else{
-                        returnParam.put("outTradeNo", outTradeNo);
                     }
                     returnParam.put("success", false);
                 }
