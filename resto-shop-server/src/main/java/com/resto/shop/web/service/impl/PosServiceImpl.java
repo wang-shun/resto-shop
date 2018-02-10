@@ -908,7 +908,7 @@ public class PosServiceImpl implements PosService {
                 Map<String, String> map = new HashMap<>();
                 String terminalIp = InetAddress.getLocalHost().getHostAddress();  //终端IP String(16)
                 //微信支付的金额已分为单位
-                int total = object.getInt("paymentAmount ") * 100;
+                int total = object.getInt("paymentAmount") * 100;
                 if (shopDetail.getWxServerId() == null) {
                     //普通商户
                     map = crashPay(wechatConfig.getAppid(), wechatConfig.getMchid(), "", outTradeNo , total, authCode,
