@@ -888,6 +888,7 @@ public class PosServiceImpl implements PosService {
 
     @Override
     public String scanCodePayment(String data) {
+        log.info("开始构建支付请求，请求信息：" + data);
         JSONObject object = new JSONObject(data);
         //此次扫码的支付类型
         int payType = object.getInt("payType");
@@ -936,6 +937,7 @@ public class PosServiceImpl implements PosService {
             }
         } catch (Exception e) {
             e.printStackTrace();
+            log.error(e.getMessage());
             //如果在构建支付请求时报错，将不进行下一步查询订单的操作
             returnParam.put("success", false);
             returnParam.put("isPolling", false);
