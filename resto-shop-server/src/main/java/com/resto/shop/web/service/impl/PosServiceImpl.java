@@ -3,6 +3,8 @@ package com.resto.shop.web.service.impl;
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.core.util.WeChatUtils;
@@ -27,10 +29,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.net.InetAddress;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.resto.brand.core.util.WeChatPayUtils.crashPay;
 import static com.resto.shop.web.service.impl.OrderServiceImpl.generateString;
 
 /**
@@ -106,6 +110,9 @@ public class PosServiceImpl implements PosService {
 
     @Autowired
     SmsLogService smsLogService;
+
+    @Autowired
+    private WxServerConfigService wxServerConfigService;
 
     @Override
     public String syncArticleStock(String shopId) {
@@ -877,5 +884,63 @@ public class PosServiceImpl implements PosService {
                 orderRefundRemarkService.insert(orderRefundRemark);
             }
         }
+    }
+
+    @Override
+    public String scanCodePayment(String data) {
+        JSONObject object = new JSONObject(data);
+        //此次扫码的支付类型
+        int payType = object.getInt("payType");
+        ShopDetail shopDetail = shopDetailService.selectById(object.getString("shopId"));
+        Brand brand = brandService.selectById(object.getString("brandId"));
+        WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());
+        //用作商户系统内部订单号，只用用来查询订单在第三方平台的支付状态
+        String outTradeNo  = ApplicationUtils.randomUUID();
+        //此次扫码的扫描结果
+        String authCode = object.getString("authCode");
+        //返回的信息
+        JSONObject returnParam = new JSONObject();
+        returnParam.put("success", true);
+        returnParam.put("isPolling", true);
+        try {
+            if (payType == 1){ //微信支付
+                Map<String, String> map = new HashMap<>();
+                String terminalIp = InetAddress.getLocalHost().getHostAddress();  //终端IP String(16)
+                //微信支付的金额已分为单位
+                int total = object.getInt("paymentAmount ") * 100;
+                if (shopDetail.getWxServerId() == null) {
+                    //普通商户
+                    map = crashPay(wechatConfig.getAppid(), wechatConfig.getMchid(), "", outTradeNo , total, authCode,
+                            shopDetail.getName().concat("消费"), terminalIp, wechatConfig.getMchkey());
+                } else {
+                    //服务商模式下的特约商户
+                    WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+                    map = crashPay(wxServerConfig.getAppid(), wxServerConfig.getMchid(), shopDetail.getMchid(), outTradeNo , total, authCode,
+                            shopDetail.getName().concat("消费"), terminalIp, wxServerConfig.getMchkey());
+                }
+                if (Boolean.valueOf(map.get("success"))){
+                    //构建微信支付请求成功
+                    returnParam.put("outTradeNo", outTradeNo);
+                }else{
+                    //如果构建微信请求失败时的错误原因是系统级别导致的，调用查询API查询订单状态
+                    if (!"SYSTEMERROR".equalsIgnoreCase(map.get("errCode")) &&
+                        !"BANKERROR".equalsIgnoreCase(map.get("errCode")) &&
+                        !"USERPAYING".equalsIgnoreCase(map.get("errCode"))){
+                        returnParam.put("isPolling", false);
+                        returnParam.put("message", map.get("msg"));
+                    }else{
+                        returnParam.put("outTradeNo", outTradeNo);
+                    }
+                    returnParam.put("success", false);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            //如果在构建支付请求时报错，将不进行下一步查询订单的操作
+            returnParam.put("success", false);
+            returnParam.put("isPolling", false);
+            returnParam.put("message", "构建支付请求失败，请更换支付方式");
+        }
+        return returnParam.toString();
     }
 }
