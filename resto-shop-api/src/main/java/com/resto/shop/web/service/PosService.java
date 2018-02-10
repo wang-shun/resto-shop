@@ -203,4 +203,11 @@ public interface PosService {
      * @return
      */
     String scanCodePayment(String data);
+
+    /**
+     * 查询扫码支付订单的情况
+     * @param data
+     * @return
+     */
+    String confirmPayment(String data);
 }

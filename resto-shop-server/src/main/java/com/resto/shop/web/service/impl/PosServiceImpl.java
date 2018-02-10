@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.resto.brand.core.util.WeChatPayUtils.crashPay;
+import static com.resto.brand.core.util.WeChatPayUtils.queryPay;
 import static com.resto.shop.web.service.impl.OrderServiceImpl.generateString;
 
 /**
@@ -903,9 +904,9 @@ public class PosServiceImpl implements PosService {
         JSONObject returnParam = new JSONObject();
         returnParam.put("success", true);
         returnParam.put("isPolling", true);
+        Map<String, String> map = new HashMap<>();
         try {
             if (payType == 1){ //微信支付
-                Map<String, String> map = new HashMap<>();
                 String terminalIp = InetAddress.getLocalHost().getHostAddress();  //终端IP String(16)
                 //微信支付的金额已分为单位
                 int total = object.getBigDecimal("paymentAmount").multiply(new BigDecimal(100)).intValue();
@@ -942,6 +943,70 @@ public class PosServiceImpl implements PosService {
             returnParam.put("success", false);
             returnParam.put("isPolling", false);
             returnParam.put("message", "构建支付请求失败，请更换支付方式");
+        }
+        return returnParam.toString();
+    }
+
+    @Override
+    public String confirmPayment(String data) {
+        log.info("开始构查询订单支付信息，请求信息：" + data);
+        JSONObject object = new JSONObject(data);
+        ShopDetail shopDetail = shopDetailService.selectById(object.getString("shopId"));
+        Brand brand = brandService.selectById(object.getString("brandId"));
+        WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());
+        //商户系统内部订单号
+        String outTradeNo = object.getString("outTradeNo");
+        //要修改的订单信息
+        Order order = JSON.parseObject(object.getString("order"), Order.class);
+        Map<String, String> map = new HashMap<>();
+        //返回的信息
+        JSONObject returnParam = new JSONObject();
+        returnParam.put("success", true);
+        returnParam.put("isPolling", true);
+        try{
+            if (order.getPayMode().equals(PayMode.WEIXIN_PAY)){
+                if (shopDetail.getWxServerId() == null){
+                    //普通商户
+                    map = queryPay(wechatConfig.getAppid(), wechatConfig.getMchid(), "", outTradeNo,wechatConfig.getMchkey());
+                }else{
+                    //服务商模式下的特约商户
+                    WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+                    map = queryPay(wxServerConfig.getAppid(), wxServerConfig.getMchid(), shopDetail.getMchid(), outTradeNo, wxServerConfig.getMchkey());
+                }
+                if (Boolean.valueOf(map.get("success"))){
+                    //支付成功，退出轮询插入支付信息修改订单信息
+                    returnParam.put("isPolling", false);
+                    OrderPaymentItem paymentItem = new OrderPaymentItem();
+                    JSONObject resultInfo = new JSONObject(map.get("data"));
+                    paymentItem.setId(resultInfo.get("transaction_id").toString());
+                    paymentItem.setPaymentModeId(PayMode.WEIXIN_PAY);
+                    paymentItem.setRemark("微信支付：" + resultInfo.getBigDecimal("total_fee").divide(new BigDecimal(100)));
+                    paymentItem.setOrderId(order.getId());
+                    paymentItem.setPayTime(new Date());
+                    paymentItem.setResultData(map.get("data"));
+                    paymentItem.setPayValue(resultInfo.getBigDecimal("total_fee").divide(new BigDecimal(100)));
+                    orderPaymentItemService.insert(paymentItem);
+                    orderService.update(order);
+                    for (OrderItem orderItem : order.getOrderItems()){
+                        orderItemService.update(orderItem);
+                    }
+                }else{
+                    //如果正在支付中，则轮询继续去查。 反之则支付失败退出轮询
+                    if (!"USERPAYING".equalsIgnoreCase(map.get("errCode"))){
+                        returnParam.put("isPolling", false);
+                        returnParam.put("message", map.get("msg"));
+                    }else{
+                        returnParam.put("outTradeNo", outTradeNo);
+                    }
+                    returnParam.put("success", false);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            e.printStackTrace();
+            log.error(e.getMessage());
+            //如果在构建支付请求时报错，将不进行下一步查询订单的操作
+            returnParam.put("success", false);
         }
         return returnParam.toString();
     }
