@@ -998,7 +998,10 @@ public class PosServiceImpl implements PosService {
                     returnParam.put("payMentInfo", orderPaymentItems);
                 }else{
                     //如果正在支付中，则轮询继续去查。 反之则支付失败退出轮询
-                    if (!"USERPAYING".equalsIgnoreCase(map.get("errCode"))){
+                    if (!"USERPAYING".equalsIgnoreCase(map.get("trade_state"))){
+                        returnParam.put("isPolling", false);
+                        returnParam.put("message", map.get("msg"));
+                    }else if (!"SYSTEMERROR".equalsIgnoreCase(map.get("errCode"))){
                         returnParam.put("isPolling", false);
                         returnParam.put("message", map.get("msg"));
                     }
