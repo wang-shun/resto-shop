@@ -431,13 +431,13 @@ public class PosServiceImpl implements PosService {
             RedisUtil.set(order.getShopDetailId()+order.getTableNumber()+"status",true);
             orderService.confirmBossOrder(order);
 
-            if (org.apache.commons.lang3.StringUtils.isBlank(order.getParentOrderId()) && org.apache.commons.lang3.StringUtils.isNotBlank(order.getCustomerId())) {
+            Customer customer = customerService.selectById(order.getCustomerId());
+            if (org.apache.commons.lang3.StringUtils.isBlank(order.getParentOrderId()) && customer != null) {
                 //查询出所有消费返利优惠券
                 List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
                 if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
                     //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
                     Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
-                    Customer customer = customerService.selectById(order.getCustomerId());
                     Brand brand = brandService.selectById(order.getBrandId());
                     ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
                     BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());

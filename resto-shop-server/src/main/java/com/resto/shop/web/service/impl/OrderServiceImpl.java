@@ -1380,14 +1380,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 changePushOrder(order);
             }
         }
+        Customer customer = customerService.selectById(order.getCustomerId());
         //排除掉子订单，在支付时给用户发放消费返利优惠券
-        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+        if (StringUtils.isBlank(order.getParentOrderId()) && customer != null) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
                 //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
                 Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
-                Customer customer = customerService.selectById(order.getCustomerId());
                 Brand brand = brandService.selectById(order.getBrandId());
                 ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
                 BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -8394,8 +8394,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         //排除掉子订单，在支付时给用户发放消费返利优惠券
-        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())
-                && !order.getPayMode().equals(OrderPayMode.XJ_PAY) && !order.getPayMode().equals(OrderPayMode.YL_PAY)) {
+        if (StringUtils.isBlank(order.getParentOrderId()) && !order.getPayMode().equals(OrderPayMode.XJ_PAY)
+                && !order.getPayMode().equals(OrderPayMode.YL_PAY)
+                && customer != null) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
@@ -9117,13 +9118,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map1.put("content", "用户:"+order.getCustomerId()+"的订单："+order.getId()+"在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map1);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
-        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+        Customer customer = customerService.selectById(order.getCustomerId());
+        if (StringUtils.isBlank(order.getParentOrderId()) && customer != null) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
                 //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
                 Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
-                Customer customer = customerService.selectById(order.getCustomerId());
                 BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
                 WechatConfig wechatConfig = wechatConfigService.selectByBrandId(order.getBrandId());
                 for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
@@ -9417,7 +9418,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
         //yz 计费系统 后付款 pos端 结算时计费
         BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
-        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+        if (StringUtils.isBlank(order.getParentOrderId()) && customer != null) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
