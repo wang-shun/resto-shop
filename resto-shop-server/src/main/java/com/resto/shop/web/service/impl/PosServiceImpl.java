@@ -1042,11 +1042,12 @@ public class PosServiceImpl implements PosService {
                     map = reverseOrder(wxServerConfig.getAppid(),wxServerConfig.getMchid(),shopDetail.getMchid(), wxServerConfig.getMchkey(),outTradeNo,wxServerConfig.getPayCertPath());
                 }
                 if (!Boolean.valueOf(map.get("success"))){
-                    //撤销失败,判断是否继续撤销
-                    if ("Y".equalsIgnoreCase(map.get("recall"))){
-                        returnObject.put("continue", true);
+                    //撤销失败
+                    String message = map.get("msg");
+                    if (StringUtils.isNotBlank(message)){
+                        returnObject.put("message", message);
                     }else{
-                        returnObject.put("message", map.get("msg"));
+                        returnObject.put("message", "撤销支付订单失败，请线下处理");
                     }
                     returnObject.put("success", false);
                 }
@@ -1054,7 +1055,7 @@ public class PosServiceImpl implements PosService {
         }catch (Exception e){
             e.printStackTrace();
             returnObject.put("success", false);
-            returnObject.put("message","撤销失败，请检查配置重试或线下处理");
+            returnObject.put("message","撤销支付订单出错，请线下处理");
         }
         return returnObject.toString();
     }
