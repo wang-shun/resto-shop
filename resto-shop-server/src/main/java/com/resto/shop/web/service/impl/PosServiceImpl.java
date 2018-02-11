@@ -1035,8 +1035,14 @@ public class PosServiceImpl implements PosService {
             if (payTyoe == 1){
                 //撤销微信订单
                 if (shopDetail.getWxServerId() == null){
-                    //普通商户
-                    map = reverseOrder(wechatConfig.getAppid(),wechatConfig.getMchid(),"",wechatConfig.getMchkey(),outTradeNo,wechatConfig.getPayCertPath());
+                    if (StringUtils.isNotBlank(wechatConfig.getPayCertPath())) {
+                        //普通商户
+                        map = reverseOrder(wechatConfig.getAppid(), wechatConfig.getMchid(), "", wechatConfig.getMchkey(), outTradeNo, wechatConfig.getPayCertPath());
+                    }else{
+                        returnObject.put("success", false);
+                        returnObject.put("message", "撤销订单失败，无退款证书请线下处理");
+                        return returnObject.toString();
+                    }
                 }else{
                     WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
                     map = reverseOrder(wxServerConfig.getAppid(),wxServerConfig.getMchid(),shopDetail.getMchid(), wxServerConfig.getMchkey(),outTradeNo,wxServerConfig.getPayCertPath());
