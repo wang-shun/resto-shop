@@ -210,4 +210,11 @@ public interface PosService {
      * @return
      */
     String confirmPayment(String data);
+
+    /**
+     * 撤销扫码支付的订单
+     * @param data
+     * @return
+     */
+    String revocationOfOrder(String data);
 }

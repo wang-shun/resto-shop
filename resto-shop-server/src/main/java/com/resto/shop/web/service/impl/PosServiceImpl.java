@@ -36,6 +36,7 @@ import java.util.*;
 
 import static com.resto.brand.core.util.WeChatPayUtils.crashPay;
 import static com.resto.brand.core.util.WeChatPayUtils.queryPay;
+import static com.resto.brand.core.util.WeChatPayUtils.reverseOrder;
 import static com.resto.shop.web.service.impl.OrderServiceImpl.generateString;
 
 /**
@@ -1008,11 +1009,53 @@ public class PosServiceImpl implements PosService {
             }
         }catch (Exception e){
             e.printStackTrace();
-            e.printStackTrace();
             log.error(e.getMessage());
             //如果在构建支付请求时报错，将不进行下一步查询订单的操作
             returnParam.put("success", false);
         }
         return returnParam.toString();
+    }
+
+    @Override
+    public String revocationOfOrder(String data) {
+        log.info("开始撤销订单，请求信息：" + data);
+        //转换所需参数
+        JSONObject paramObject = new JSONObject(data);
+        //商户订单号
+        String outTradeNo = paramObject.getString("outTradeNo");
+        Brand brand = brandService.selectById(paramObject.getString("brandId"));
+        ShopDetail shopDetail = shopDetailService.selectById(paramObject.getString("shopId"));
+        WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());
+        int payTyoe = paramObject.getInt("payType");
+        //定义返回参数
+        JSONObject returnObject = new JSONObject();
+        returnObject.put("success", true);
+        Map<String, String> map = new HashMap<>();
+        try{
+            if (payTyoe == 1){
+                //撤销微信订单
+                if (shopDetail.getWxServerId() == null){
+                    //普通商户
+                    map = reverseOrder(wechatConfig.getAppid(),wechatConfig.getMchid(),"",wechatConfig.getMchkey(),outTradeNo,wechatConfig.getPayCertPath());
+                }else{
+                    WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+                    map = reverseOrder(wxServerConfig.getAppid(),wxServerConfig.getMchid(),shopDetail.getMchid(), wxServerConfig.getMchkey(),outTradeNo,wxServerConfig.getPayCertPath());
+                }
+                if (!Boolean.valueOf(map.get("success"))){
+                    //撤销失败,判断是否继续撤销
+                    if ("Y".equalsIgnoreCase(map.get("recall"))){
+                        returnObject.put("continue", true);
+                    }else{
+                        returnObject.put("message", map.get("err_code_des"));
+                    }
+                    returnObject.put("success", false);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            returnObject.put("success", false);
+            returnObject.put("message","撤销失败，请检查配置重试或线下处理");
+        }
+        return returnObject.toString();
     }
 }
