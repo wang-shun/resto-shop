@@ -10374,8 +10374,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void sendPosNewOrder(ShopDetail shopDetail, Order order) {
-        log.info("\n\nsendPosNewOrder   ----------\n");
+    public void sendPosNewOrder(String shopId, Order order) {
+        //  查询最新的店铺设置，防止缓存作怪
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
+        log.info("\n\n  【sendPosNewOrder】" + shopDetail.getName() + "\n     PosVersion：" + shopDetail.getPosVersion() + "\n    " + order.getId());
         if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
             MQMessageProducer.sendCreateOrderMessage(order);
         }

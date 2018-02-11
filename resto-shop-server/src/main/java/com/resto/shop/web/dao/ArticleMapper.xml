@@ -644,6 +644,7 @@
         a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,a.virtual_id,
         a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock,
         a.photo_type,a.photo_little,a.open_catty,a.catty_money,a.need_remind,a.gif_url,
+        a.photo_super,a.photo_square_original,
         (select  count(1) from tb_article_unit_new where article_id = a.id) as newUnit,
         if(a.recommend_id is not null,1,0) as recommendCount
         FROM tb_article a,tb_article_family f
