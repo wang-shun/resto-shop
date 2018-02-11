@@ -161,7 +161,7 @@
                             </div>
 
                             <div class="form-group col-md-4" v-if="m.photoType == 1">
-                                <label class="col-md-5 control-label">餐品图片</label>
+                                <label class="col-md-5 control-label">餐品图片(大图)</label>
                                 <div class="col-md-7">
                                     <input type="hidden" name="photoSmall" v-model="m.photoSmall">
                                     <img-file-upload class="form-control" @success="uploadSuccess"
@@ -171,7 +171,7 @@
                             </div>
 
                             <div class="form-group col-md-4" v-if="m.photoType == 2">
-                                <label class="col-md-5 control-label">餐品图片</label>
+                                <label class="col-md-5 control-label">餐品图片(小图)</label>
                                 <div class="col-md-7">
                                     <input type="hidden" name="photoLittle" v-model="m.photoLittle">
                                     <img-file-upload class="form-control" @success="uploadSuccessLittle"
@@ -181,8 +181,28 @@
                             </div>
 
                             <div class="form-group col-md-4" v-if="m.photoType == 3">
-                                <label class="col-md-5 control-label">餐品图片</label>
+                                <label class="col-md-5 control-label">餐品图片(无图)</label>
                                 <div class="col-md-7">无图</div>
+                            </div>
+
+                            <div class="form-group col-md-4" v-if="m.photoType == 4">
+                                <label class="col-md-5 control-label">餐品图片(超大图)</label>
+                                <div class="col-md-7">
+                                    <input type="hidden" name="photoSuper" v-model="m.photoSuper">
+                                    <img-file-upload class="form-control" @success="uploadSuccessSuper"
+                                                     @error="uploadError"></img-file-upload>
+                                    <img v-if="m.photoSuper" :src="m.photoSuper" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4" v-if="m.photoType == 5">
+                                <label class="col-md-5 control-label">餐品图片(正方形图)</label>
+                                <div class="col-md-7">
+                                    <input type="hidden" name="photoSquareOriginal" v-model="m.photoSquareOriginal">
+                                    <img-file-upload class="form-control" @success="uploadSuccessSquareOriginal"
+                                                     @error="uploadError"></img-file-upload>
+                                    <img v-if="m.photoSquareOriginal" :src="m.photoSquareOriginal" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
+                                </div>
                             </div>
 
                             <div class="form-group col-md-4">
@@ -216,6 +236,12 @@
                                     </label>
                                     <label class="radio-inline">
                                         <input type="radio" name="photoType" v-model="m.photoType" value="3"> 无图
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="photoType" v-model="m.photoType" value="4"> 超大图
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="photoType" v-model="m.photoType" value="5"> 正方形图
                                     </label>
                                 </div>
                             </div>
@@ -1120,6 +1146,20 @@
                             $("[name='photoLittle']").val(url).trigger("change");
                             C.simpleMsg("上传成功");
                             $("#photoLittle").attr("src", "/" + url);
+                        }
+                        ,
+                        uploadSuccessSuper: function (url) {
+                            console.log(url);
+                            $("[name='photoSuper']").val(url).trigger("change");
+                            C.simpleMsg("上传成功");
+                            $("#photoSuper").attr("src", "/" + url);
+                        }
+                        ,
+                        uploadSuccessSquareOriginal: function (url) {
+                            console.log(url);
+                            $("[name='photoSquareOriginal']").val(url).trigger("change");
+                            C.simpleMsg("上传成功");
+                            $("#photoSquareOriginal").attr("src", "/" + url);
                         }
                         ,
                         uploadSuccessGif: function (url) {
