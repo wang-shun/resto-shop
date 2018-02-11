@@ -1046,7 +1046,7 @@ public class PosServiceImpl implements PosService {
                     if ("Y".equalsIgnoreCase(map.get("recall"))){
                         returnObject.put("continue", true);
                     }else{
-                        returnObject.put("message", map.get("err_code_des"));
+                        returnObject.put("message", map.get("msg"));
                     }
                     returnObject.put("success", false);
                 }
