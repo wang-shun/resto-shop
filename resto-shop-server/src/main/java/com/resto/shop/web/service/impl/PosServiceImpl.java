@@ -3,6 +3,8 @@ package com.resto.shop.web.service.impl;
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
+import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
 import com.resto.brand.core.util.WeChatUtils;
@@ -27,10 +29,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.net.InetAddress;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.resto.brand.core.util.WeChatPayUtils.crashPay;
+import static com.resto.brand.core.util.WeChatPayUtils.queryPay;
 import static com.resto.shop.web.service.impl.OrderServiceImpl.generateString;
 
 /**
@@ -106,6 +111,9 @@ public class PosServiceImpl implements PosService {
 
     @Autowired
     SmsLogService smsLogService;
+
+    @Autowired
+    private WxServerConfigService wxServerConfigService;
 
     @Override
     public String syncArticleStock(String shopId) {
@@ -431,13 +439,13 @@ public class PosServiceImpl implements PosService {
             RedisUtil.set(order.getShopDetailId()+order.getTableNumber()+"status",true);
             orderService.confirmBossOrder(order);
 
-            if (org.apache.commons.lang3.StringUtils.isBlank(order.getParentOrderId()) && org.apache.commons.lang3.StringUtils.isNotBlank(order.getCustomerId())) {
+            Customer customer = customerService.selectById(order.getCustomerId());
+            if (org.apache.commons.lang3.StringUtils.isBlank(order.getParentOrderId()) && customer != null) {
                 //查询出所有消费返利优惠券
                 List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
                 if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
                     //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
                     Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
-                    Customer customer = customerService.selectById(order.getCustomerId());
                     Brand brand = brandService.selectById(order.getBrandId());
                     ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
                     BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -877,5 +885,134 @@ public class PosServiceImpl implements PosService {
                 orderRefundRemarkService.insert(orderRefundRemark);
             }
         }
+    }
+
+    @Override
+    public String scanCodePayment(String data) {
+        log.info("开始构建支付请求，请求信息：" + data);
+        JSONObject object = new JSONObject(data);
+        //此次扫码的支付类型
+        int payType = object.getInt("payType");
+        ShopDetail shopDetail = shopDetailService.selectById(object.getString("shopId"));
+        Brand brand = brandService.selectById(object.getString("brandId"));
+        WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());
+        //用作商户系统内部订单号，只用用来查询订单在第三方平台的支付状态
+        String outTradeNo  = ApplicationUtils.randomUUID();
+        //此次扫码的扫描结果
+        String authCode = object.getString("authCode");
+        //返回的信息
+        JSONObject returnParam = new JSONObject();
+        returnParam.put("success", true);
+        returnParam.put("isPolling", true);
+        Map<String, String> map = new HashMap<>();
+        try {
+            if (payType == 1){ //微信支付
+                String terminalIp = InetAddress.getLocalHost().getHostAddress();  //终端IP String(16)
+                //微信支付的金额已分为单位
+                int total = object.getBigDecimal("paymentAmount").multiply(new BigDecimal(100)).intValue();
+                if (shopDetail.getWxServerId() == null) {
+                    //普通商户
+                    map = crashPay(wechatConfig.getAppid(), wechatConfig.getMchid(), "", outTradeNo , total, authCode,
+                            shopDetail.getName().concat("消费"), terminalIp, wechatConfig.getMchkey());
+                } else {
+                    //服务商模式下的特约商户
+                    WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+                    map = crashPay(wxServerConfig.getAppid(), wxServerConfig.getMchid(), shopDetail.getMchid(), outTradeNo , total, authCode,
+                            shopDetail.getName().concat("消费"), terminalIp, wxServerConfig.getMchkey());
+                }
+                if (Boolean.valueOf(map.get("success"))){
+                    //构建微信支付请求成功
+                    returnParam.put("outTradeNo", outTradeNo);
+                }else{
+                    //如果构建微信请求失败时的错误原因是系统级别导致的，调用查询API查询订单状态
+                    if (!"SYSTEMERROR".equalsIgnoreCase(map.get("errCode")) &&
+                        !"BANKERROR".equalsIgnoreCase(map.get("errCode")) &&
+                        !"USERPAYING".equalsIgnoreCase(map.get("errCode"))){
+                        returnParam.put("isPolling", false);
+                        returnParam.put("message", map.get("msg"));
+                    }else{
+                        returnParam.put("outTradeNo", outTradeNo);
+                    }
+                    returnParam.put("success", false);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            //如果在构建支付请求时报错，将不进行下一步查询订单的操作
+            returnParam.put("success", false);
+            returnParam.put("isPolling", false);
+            returnParam.put("message", "构建支付请求失败，请更换支付方式");
+        }
+        return returnParam.toString();
+    }
+
+    @Override
+    public String confirmPayment(String data) {
+        log.info("开始构查询订单支付信息，请求信息：" + data);
+        JSONObject object = new JSONObject(data);
+        ShopDetail shopDetail = shopDetailService.selectById(object.getString("shopId"));
+        Brand brand = brandService.selectById(object.getString("brandId"));
+        WechatConfig wechatConfig = wechatConfigService.selectByBrandId(brand.getId());
+        //商户系统内部订单号
+        String outTradeNo = object.getString("outTradeNo");
+        //要修改的订单信息
+        Order order = JSON.parseObject(object.get("order").toString(), Order.class);
+        Map<String, String> map = new HashMap<>();
+        //返回的信息
+        JSONObject returnParam = new JSONObject();
+        returnParam.put("success", true);
+        returnParam.put("isPolling", true);
+        try{
+            if (order.getPayMode().equals(PayMode.WEIXIN_PAY)){
+                if (shopDetail.getWxServerId() == null){
+                    //普通商户
+                    map = queryPay(wechatConfig.getAppid(), wechatConfig.getMchid(), "", outTradeNo,wechatConfig.getMchkey());
+                }else{
+                    //服务商模式下的特约商户
+                    WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+                    map = queryPay(wxServerConfig.getAppid(), wxServerConfig.getMchid(), shopDetail.getMchid(), outTradeNo, wxServerConfig.getMchkey());
+                }
+                if (Boolean.valueOf(map.get("success"))){
+                    //支付成功，退出轮询插入支付信息修改订单信息
+                    returnParam.put("isPolling", false);
+                    JSONArray orderPaymentItems = new JSONArray();
+                    OrderPaymentItem paymentItem = new OrderPaymentItem();
+                    JSONObject resultInfo = new JSONObject(map.get("data"));
+                    paymentItem.setId(resultInfo.get("transaction_id").toString());
+                    paymentItem.setPaymentModeId(PayMode.WEIXIN_PAY);
+                    paymentItem.setRemark("微信支付：" + resultInfo.getBigDecimal("total_fee").divide(new BigDecimal(100)));
+                    paymentItem.setOrderId(order.getId());
+                    paymentItem.setPayTime(new Date());
+                    paymentItem.setResultData(map.get("data"));
+                    paymentItem.setPayValue(resultInfo.getBigDecimal("total_fee").divide(new BigDecimal(100)));
+                    orderPaymentItemService.insert(paymentItem);
+                    orderService.update(order);
+                    for (OrderItem orderItem : order.getOrderItems()){
+                        orderItemService.update(orderItem);
+                    }
+                    JSONObject returnPayment = new JSONObject(paymentItem);
+                    returnPayment.put("resultData", "微信支付");
+                    returnPayment.put("payTime", paymentItem.getPayTime().getTime());
+                    orderPaymentItems.put(returnPayment);
+                    returnParam.put("payMentInfo", orderPaymentItems);
+                }else{
+                    //如果正在支付中，则轮询继续去查。 反之则支付失败退出轮询
+                    if ((map.containsKey("trade_state") && !"USERPAYING".equalsIgnoreCase(map.get("trade_state")))
+                            || (map.containsKey("errCode") && !"SYSTEMERROR".equalsIgnoreCase(map.get("errCode")))){
+                        returnParam.put("isPolling", false);
+                        returnParam.put("message", map.get("msg"));
+                    }
+                    returnParam.put("success", false);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+            e.printStackTrace();
+            log.error(e.getMessage());
+            //如果在构建支付请求时报错，将不进行下一步查询订单的操作
+            returnParam.put("success", false);
+        }
+        return returnParam.toString();
     }
 }

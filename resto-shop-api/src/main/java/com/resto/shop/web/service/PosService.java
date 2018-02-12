@@ -1,5 +1,6 @@
 package com.resto.shop.web.service;
 
+import com.alibaba.fastjson.JSONObject;
 import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.posDto.ArticleSupport;
 import org.json.JSONArray;
@@ -195,4 +196,18 @@ public interface PosService {
     JSONArray serverExceptionOrderList(String shopId);
 
     void test();
+
+    /**
+     * 扫码支付构建微信请求支付接口
+     * @param data
+     * @return
+     */
+    String scanCodePayment(String data);
+
+    /**
+     * 查询扫码支付订单的情况
+     * @param data
+     * @return
+     */
+    String confirmPayment(String data);
 }
