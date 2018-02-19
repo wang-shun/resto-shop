@@ -300,60 +300,64 @@ public class GetNumberAspect {
                     GetNumber gn = getNumberList.get(shop.getWaitRemindNumber());
                     Customer c = customerService.selectById(gn.getCustomerId());
                     StringBuffer msg = new StringBuffer();
-                    if(setting.getTemplateEdition()==0){
-                        msg.append(shop.getWaitRemindText());
-                        WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());
-                    }else{
-                        List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
-                        if(templateFlowList!=null&&templateFlowList.size()!=0){
-                            String templateId = templateFlowList.get(0).getTemplateId();
-                            String jumpUrl ="";
-                            Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
-                            Map<String, Object> first = new HashMap<String, Object>();
-                            first.put("value", "你好！请前往就餐！");
-                            first.put("color", "#00DB00");
-                            Map<String, Object> keyword1 = new HashMap<String, Object>();
-                            keyword1.put("value", shop.getName());
-                            keyword1.put("color", "#000000");
-                            Map<String, Object> keyword2 = new HashMap<String, Object>();
-                            keyword2.put("value", gn.getCodeValue());
-                            keyword2.put("color", "#000000");
-                            //获取此getNumber取号单前方还有多少位等位桌数
-                            //List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(shop.getId(), getNumber.getCodeId(), getNumber.getCreateTime());
-                            Map<String, Object> keyword3 = new HashMap<String, Object>();
-                            keyword3.put("value", getNumberList.size() - 1);
-                            keyword3.put("color", "#000000");
-                            Map<String, Object> keyword4 = new HashMap<String, Object>();
-                            keyword4.put("value", "--");
-                            keyword4.put("color", "#000000");
-                            Map<String, Object> keyword5 = new HashMap<String, Object>();
-                            keyword5.put("value", "排队中");
-                            keyword5.put("color", "#000000");
-                            Map<String, Object> remark = new HashMap<String, Object>();
-                            remark.put("value", shop.getWaitRemindText());
-                            remark.put("color", "#173177");
-                            content.put("first", first);
-                            content.put("keyword1", keyword1);
-                            content.put("keyword2", keyword2);
-                            content.put("keyword3", keyword3);
-                            content.put("keyword4", keyword4);
-                            content.put("keyword5", keyword5);
-                            content.put("remark", remark);
-                            String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
-                            //发送短信
-                            if(setting.getMessageSwitch()==1){
-                                com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
-                                com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(c.getTelephone(),smsParam,"餐加","SMS_109365264");
-                            }
+                    try {
+                        if(setting.getTemplateEdition()==0){
+                            msg.append(shop.getWaitRemindText());
+                            WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());
                         }else{
-                            Brand brand = brandService.selectById(customer.getBrandId());
-                            Map map = new HashMap(4);
-                            map.put("brandName", brand.getBrandName());
-                            map.put("fileName", customer.getId());
-                            map.put("type", "UserAction");
-                            map.put("content", "系统数据库表tb_template_flow不存在模板消息的template_id,请求服务器地址为:" + MQSetting.getLocalIP());
-                            doPostAnsc(LogUtils.url, map);
+                            List<TemplateFlow> templateFlowList=templateService.selectTemplateId(config.getAppid(),"OPENTM206094658");
+                            if(templateFlowList!=null&&templateFlowList.size()!=0){
+                                String templateId = templateFlowList.get(0).getTemplateId();
+                                String jumpUrl ="";
+                                Map<String, Map<String, Object>> content = new HashMap<String, Map<String, Object>>();
+                                Map<String, Object> first = new HashMap<String, Object>();
+                                first.put("value", "你好！请前往就餐！");
+                                first.put("color", "#00DB00");
+                                Map<String, Object> keyword1 = new HashMap<String, Object>();
+                                keyword1.put("value", shop.getName());
+                                keyword1.put("color", "#000000");
+                                Map<String, Object> keyword2 = new HashMap<String, Object>();
+                                keyword2.put("value", gn.getCodeValue());
+                                keyword2.put("color", "#000000");
+                                //获取此getNumber取号单前方还有多少位等位桌数
+                                //List<GetNumber> getNumberList = getNumberService.selectBeforeNumberByCodeId(shop.getId(), getNumber.getCodeId(), getNumber.getCreateTime());
+                                Map<String, Object> keyword3 = new HashMap<String, Object>();
+                                keyword3.put("value", getNumberList.size() - 1);
+                                keyword3.put("color", "#000000");
+                                Map<String, Object> keyword4 = new HashMap<String, Object>();
+                                keyword4.put("value", "--");
+                                keyword4.put("color", "#000000");
+                                Map<String, Object> keyword5 = new HashMap<String, Object>();
+                                keyword5.put("value", "排队中");
+                                keyword5.put("color", "#000000");
+                                Map<String, Object> remark = new HashMap<String, Object>();
+                                remark.put("value", shop.getWaitRemindText());
+                                remark.put("color", "#173177");
+                                content.put("first", first);
+                                content.put("keyword1", keyword1);
+                                content.put("keyword2", keyword2);
+                                content.put("keyword3", keyword3);
+                                content.put("keyword4", keyword4);
+                                content.put("keyword5", keyword5);
+                                content.put("remark", remark);
+                                String result = WeChatUtils.sendTemplate(c.getWechatId(), templateId, jumpUrl, content, config.getAppid(), config.getAppsecret());
+                                //发送短信
+                                if(setting.getMessageSwitch()==1){
+                                    com.alibaba.fastjson.JSONObject smsParam = new com.alibaba.fastjson.JSONObject();
+                                    com.alibaba.fastjson.JSONObject jsonObject = SMSUtils.sendMessage(c.getTelephone(),smsParam,"餐加","SMS_109365264");
+                                }
+                            }else{
+                                Brand brand = brandService.selectById(customer.getBrandId());
+                                Map map = new HashMap(4);
+                                map.put("brandName", brand.getBrandName());
+                                map.put("fileName", customer.getId());
+                                map.put("type", "UserAction");
+                                map.put("content", "系统数据库表tb_template_flow不存在模板消息的template_id,请求服务器地址为:" + MQSetting.getLocalIP());
+                                doPostAnsc(LogUtils.url, map);
+                            }
                         }
+                    }catch (Exception e){
+                        log.error(e.getMessage());
                     }
                 }
             }
