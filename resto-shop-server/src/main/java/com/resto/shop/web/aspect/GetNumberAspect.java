@@ -297,10 +297,10 @@ public class GetNumberAspect {
                     (getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_ONE) || getNumber.getState().equals(WaitModerState.WAIT_MODEL_NUMBER_TWO))){
                 List<GetNumber> getNumberList = getNumberService.selectAfterNumberByCodeId(getNumber.getShopDetailId(), getNumber.getCodeId(), getNumber.getCreateTime());
                 if(getNumberList.size() > (shop.getWaitRemindNumber() - 1) && (getNumberList.size() + 1) >= shop.getWaitRemindNumber()){
-                    GetNumber gn = getNumberList.get(shop.getWaitRemindNumber());
-                    Customer c = customerService.selectById(gn.getCustomerId());
-                    StringBuffer msg = new StringBuffer();
                     try {
+                        GetNumber gn = getNumberList.get(shop.getWaitRemindNumber());
+                        Customer c = customerService.selectById(gn.getCustomerId());
+                        StringBuffer msg = new StringBuffer();
                         if(setting.getTemplateEdition()==0){
                             msg.append(shop.getWaitRemindText());
                             WeChatUtils.sendCustomerMsg(msg.toString(), c.getWechatId(), config.getAppid(), config.getAppsecret());
