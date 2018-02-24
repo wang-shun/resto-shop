@@ -1,4 +1,4 @@
- package com.resto.shop.web.controller.business;
+package com.resto.shop.web.controller.business;
 
 import java.util.List;
 
@@ -11,7 +11,6 @@ import com.resto.shop.web.service.ERoleService;
 import com.resto.shop.web.service.PermissionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.resto.shop.web.controller.GenericController;
@@ -20,7 +19,7 @@ import com.resto.shop.web.model.RolePermission;
 import com.resto.shop.web.service.RolePermissionService;
 import org.springframework.web.servlet.ModelAndView;
 
- @Controller
+@Controller
 @RequestMapping("rolepermission")
 public class RolePermissionController extends GenericController{
 

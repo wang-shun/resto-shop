@@ -1,10 +1,9 @@
- package com.resto.shop.web.controller.business;
+package com.resto.shop.web.controller.business;
 
 import java.util.List;
 
 import javax.annotation.Resource;
 
-import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.service.BrandService;
 import com.resto.shop.web.util.LogTemplateUtils;

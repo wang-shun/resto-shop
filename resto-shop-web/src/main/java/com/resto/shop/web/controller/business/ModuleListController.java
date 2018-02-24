@@ -1,4 +1,4 @@
- package com.resto.shop.web.controller.business;
+package com.resto.shop.web.controller.business;
 
 import java.util.ArrayList;
 import java.util.List;

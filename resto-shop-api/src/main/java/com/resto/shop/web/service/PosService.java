@@ -1,6 +1,5 @@
 package com.resto.shop.web.service;
 
-import com.alibaba.fastjson.JSONObject;
 import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.posDto.ArticleSupport;
 import org.json.JSONArray;

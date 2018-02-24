@@ -1,12 +1,10 @@
 package com.resto.shop.web.controller.business;
 
-import com.resto.brand.core.entity.JSONResult;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.service.ArticleRecommendService;
 import com.resto.shop.web.service.ArticleService;

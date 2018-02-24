@@ -1,9 +1,6 @@
 package com.resto.shop.web.controller.business;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -24,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.zxing.WriterException;
 import com.resto.brand.core.alipay.util.AlipaySubmit;
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.QRCodeUtil;
 import com.resto.brand.core.util.WeChatPayUtils;
 import com.resto.brand.web.model.SmsChargeOrder;
 import com.resto.brand.web.service.SmsAcountService;

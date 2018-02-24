@@ -8,7 +8,6 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.AppendToExcelUtil;
 import com.resto.brand.core.util.ExcelUtil;
 import com.resto.brand.web.dto.AllPlatformReportDto;
-import com.resto.brand.web.dto.AppraiseShopDto;
 import com.resto.brand.web.dto.PlatformReportDto;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;

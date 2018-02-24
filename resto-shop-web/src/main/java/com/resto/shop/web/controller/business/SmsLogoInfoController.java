@@ -1,37 +1,24 @@
- package com.resto.shop.web.controller.business;
+package com.resto.shop.web.controller.business;
 
 import java.util.List;
 
 import javax.annotation.Resource;
 
-import com.alibaba.fastjson.JSONObject;
-import com.resto.shop.web.model.Customer;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.model.SmsAcount;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.SmsAcountService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.SmsLog;
-import com.resto.shop.web.service.OrderItemService;
-import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.SmsLogService;
 
 @Controller
 @RequestMapping("smsloginfo")
 public class SmsLogoInfoController extends GenericController{
-	
-	@Resource
-	OrderPaymentItemService orderPaymentItemService;
-	
-	@Resource
-	OrderItemService orderItemService;
 	
 	@Resource
 	ShopDetailService shopDetailService;

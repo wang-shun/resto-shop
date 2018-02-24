@@ -2,7 +2,6 @@ package com.resto.shop.web.service;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.TvMode;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 

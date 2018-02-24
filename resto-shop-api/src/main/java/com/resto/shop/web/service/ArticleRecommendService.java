@@ -3,7 +3,6 @@ package com.resto.shop.web.service;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.model.ArticleRecommendPrice;
-import org.apache.ibatis.annotations.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
