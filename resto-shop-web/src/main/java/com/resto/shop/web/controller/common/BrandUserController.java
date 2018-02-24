@@ -50,18 +50,13 @@ public class BrandUserController extends GenericController{
     private BrandService brandService;
 
     @Resource
-    private RoleService roleService;
-
-    @Resource
     private WetherService wetherService;
 
     @Resource
     private PosService posService;
 
-
     @Resource
 	BrandSettingService brandSettingService;
-
 
     @Resource
 	AccountNoticeService accountNoticeService;

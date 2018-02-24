@@ -3,8 +3,6 @@ package com.resto.shop.web.controller.common;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Date;
-
 /**
  * 视图控制器,返回jsp视图给前端
  *
