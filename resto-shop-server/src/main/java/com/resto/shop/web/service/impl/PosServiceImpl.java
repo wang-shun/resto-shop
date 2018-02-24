@@ -3,7 +3,6 @@ package com.resto.shop.web.service.impl;
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;

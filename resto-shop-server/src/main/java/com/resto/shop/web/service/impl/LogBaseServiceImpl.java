@@ -12,8 +12,6 @@ import com.resto.shop.web.service.LogBaseService;
 
 import javax.annotation.Resource;
 import java.util.Date;
-import org.json.JSONObject;
-import org.springframework.util.StringUtils;
 
 /**
  * Created by carl on 2016/11/14.

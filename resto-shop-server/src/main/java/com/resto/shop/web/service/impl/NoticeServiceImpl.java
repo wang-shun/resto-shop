@@ -9,7 +9,6 @@ import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
 import com.resto.brand.core.util.DateUtil;
-import com.resto.shop.web.dao.FreeDayMapper;
 import com.resto.shop.web.dao.NoticeMapper;
 import com.resto.shop.web.dao.SupportTimeMapper;
 import com.resto.shop.web.model.Notice;

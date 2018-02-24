@@ -1,7 +1,6 @@
 package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
-import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
@@ -17,9 +16,7 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.brand.web.service.WechatConfigService;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.dao.CouponMapper;
-import com.resto.shop.web.dao.NewCustomCouponMapper;
 import com.resto.shop.web.dao.OrderMapper;
-import com.resto.shop.web.datasource.DynamicDataSource;
 import com.resto.shop.web.exception.AppException;
 import com.resto.shop.web.model.*;
 import com.resto.shop.web.report.CouponMapperReport;
@@ -29,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -54,12 +50,6 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     }
 
     @Autowired
-    private OrderService orderService;
-
-    @Autowired
-    private NewCustomCouponMapper newCustomCouponMapper;
-
-    @Autowired
     OrderMapper orderMapper;
 
     @Autowired
@@ -71,13 +61,11 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
     @Autowired
     private ShopDetailService shopDetailService;
 
-
     @Autowired
     private WechatConfigService wechatConfigService;
 
     @Autowired
     private BrandService brandService;
-
 
     @Autowired
     SmsLogService smsLogService;

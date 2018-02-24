@@ -165,23 +165,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ArticleFamilyMapper articleFamilyMapper;
 
-    @Resource
-    private LogBaseService logBaseService;
-
     @Autowired
     private GetNumberService getNumberService;
-
-    @Resource
-    private  WetherService wetherService;
 
     @Autowired
     private CustomerDetailMapper customerDetailMapper;
 
     @Resource
     private OrderRefundRemarkMapper orderRefundRemarkMapper;
-
-    @Autowired
-    private DayDataMessageService dayDataMessageService;
 
     @Resource
 	private BrandAccountLogService brandAccountLogService;
@@ -206,9 +197,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     VirtualProductsService virtualProductsService;
 
-    @Resource
-    ArticleTopService articleTopService;
-
     @Autowired
     private TableQrcodeService tableQrcodeService;
 
@@ -217,9 +205,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Autowired
     private SmsLogService smsLogService;
-
-    @Autowired
-    private DayAppraiseMessageService dayAppraiseMessageService;
 
     @Resource
 	private  AccountSettingService accountSettingService;

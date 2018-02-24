@@ -7,12 +7,12 @@ import java.util.Map;
 import javax.annotation.Resource;
 
 import com.alibaba.fastjson.JSONObject;
-import com.resto.brand.web.service.*;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
+import com.resto.brand.web.service.BrandService;
 import com.resto.shop.web.constant.SmsLogType;
 import com.resto.shop.web.dao.SmsLogMapper;
 import com.resto.shop.web.model.SmsLog;
@@ -30,29 +30,7 @@ public class SmsLogServiceImpl extends GenericServiceImpl<SmsLog, Long> implemen
     private SmsLogMapper smslogMapper;
     
     @Resource
-    BrandService brandService;
-    
-    @Resource
-    BrandUserService brandUserService;
-    
-    @Resource
-    BrandSettingService brandSettingService;
-    
-    @Resource
-    SmsAcountService smsAcountService;
-
-
-    @Resource
-	BrandAccountLogService brandAccountLogService;
-
-    @Resource
-	AccountSettingService accountSettingService;
-
-    @Resource
-	BrandAccountService brandAccountService;
-
-    @Resource
-	AccountNoticeService accountNoticeService;
+	BrandService brandService;
 
     
     @Override

@@ -15,7 +15,6 @@ import com.resto.shop.web.service.PlatformOrderExtraService;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 /**

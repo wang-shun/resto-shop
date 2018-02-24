@@ -2,7 +2,6 @@ package com.resto.shop.web.service.impl;
 
 import javax.annotation.Resource;
 
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.RolePermissionMapper;

@@ -28,7 +28,6 @@ import com.resto.shop.web.service.*;
 
 import cn.restoplus.rpc.server.RpcService;
 import com.resto.shop.web.util.LogTemplateUtils;
-import org.json.JSONObject;
 
 import static com.resto.brand.core.util.HttpClient.doPostAnsc;
 import static com.resto.brand.core.util.LogUtils.url;
