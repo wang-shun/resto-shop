@@ -4,7 +4,6 @@ import com.resto.shop.web.model.WeItem;
 import com.resto.brand.core.generic.GenericDao;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
 public interface WeItemMapper  extends GenericDao<WeItem,Long> {

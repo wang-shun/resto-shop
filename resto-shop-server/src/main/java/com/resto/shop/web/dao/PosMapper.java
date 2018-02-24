@@ -1,6 +1,5 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.model.Article;
 import com.resto.shop.web.posDto.ArticleSupport;
 import org.apache.ibatis.annotations.Param;
 

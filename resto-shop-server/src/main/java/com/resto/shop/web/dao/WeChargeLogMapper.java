@@ -4,7 +4,6 @@ import com.resto.shop.web.model.WeChargeLog;
 import com.resto.brand.core.generic.GenericDao;
 import org.apache.ibatis.annotations.Param;
 
-import java.util.Date;
 import java.util.List;
 
 public interface WeChargeLogMapper  extends GenericDao<WeChargeLog,Long> {
