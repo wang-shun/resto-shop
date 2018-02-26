@@ -666,9 +666,22 @@
                         state:model.state,//状态 0-未启用 1-启用
                         printName:model.printName,//原料别名
                     };
-                    this.provinceNameList=model.provinceName+','+model.provinceId;//绑定省
-                    this.cityNameList=model.cityName+','+model.cityId;//绑定市
-                    this.districtNameList=model.districtName+','+model.districtId;//绑定区
+                    debugger
+					if(model.provinceId==null){
+						this.provinceNameList=''
+					}else{
+						this.provinceNameList=model.provinceName+','+model.provinceId;//绑定省
+					}
+					if(model.cityId==null){
+						this.cityNameList=''
+					}else{
+						this.cityNameList=model.cityName+','+model.cityId;//绑定市
+					}
+					if(model.districtId==null){
+						this.districtNameList=''
+					}else{
+						this.districtNameList=model.districtName+','+model.districtId;//绑定区
+					}
                     this.specList=model.specName+','+model.specId;//规格
                     this.unitList=model.unitName+','+model.unitId;//标准单位
                     this.convertUnitList=model.convertUnitName+','+model.convertUnitId;//转换单位
