@@ -7749,6 +7749,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setPayTime(new Date());
             item.setPaymentModeId(PayMode.REFUND_CRASH);
             item.setOrderId(o.getId());
+            item.setRemark("线下现金退款:" + order.getRefundMoney());
+            item.setResultData("线下现金退款" + order.getRefundMoney());
             orderPaymentItemService.insert(item);
             return;
         }
