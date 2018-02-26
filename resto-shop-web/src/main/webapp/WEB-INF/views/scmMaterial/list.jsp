@@ -614,11 +614,11 @@
                         convertUnitId :'',//转换单位
                         convertUnitName:'',//转换单位
                         minConvertUnitId  :'',
-                        provinceId :null,//省id
+                        provinceId :'',//省id
                         provinceName :'',//省名
-                        cityId:null,//市id
+                        cityId:'',//市id
                         cityName:'',//市id
-                        districtId :null,
+                        districtId :'',
                         description :'',
                         minMeasureUnit:'',
                         coefficient:'',
@@ -652,11 +652,11 @@
 						convertUnitId :model.convertUnitId,//转换单位
 						convertUnitName:model.convertUnitName,//转换单位
 						minConvertUnitId:model.minConvertUnitId,
-						provinceId :model.provinceId?model.provinceId:null,//省id
+						provinceId :model.provinceId?model.provinceId:'',//省id
 						provinceName:model.provinceName,//省名
-						cityId:model.cityId?model.cityId:null,//市id
+						cityId:model.cityId?model.cityId:'',//市id
 						cityName:model.cityName,//市id
-						districtId :model.districtId?model.districtId:null,//市id
+						districtId :model.districtId?model.districtId:'',//市id
                         districtName:model.districtName,//区
 						description :model.description,
 						minMeasureUnit:model.minMeasureUnit,
