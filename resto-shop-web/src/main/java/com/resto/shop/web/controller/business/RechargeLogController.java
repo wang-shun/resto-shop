@@ -31,17 +31,12 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.ChargeOrder;
 import com.resto.shop.web.service.ChargeOrderService;
-import com.resto.shop.web.service.ChargePaymentService;
-import com.resto.shop.web.service.CustomerService;
-
 
 
 @Controller
 @RequestMapping("recharge")
 
 public class RechargeLogController extends GenericController{
-	@Resource
-	ChargePaymentService chargepaymentService;
 
 	@Resource
 	BrandService brandService;
@@ -53,8 +48,6 @@ public class RechargeLogController extends GenericController{
 	@Resource
 	ChargeOrderService chargeorderService;
 
-	@Resource
-	private CustomerService customerService;
 
 	@RequestMapping("/list")
 	public String  list(){

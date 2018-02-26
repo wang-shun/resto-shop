@@ -7,7 +7,6 @@ import java.util.UUID;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.shop.web.util.RedisUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

@@ -2,7 +2,6 @@ package com.resto.shop.web.controller.business;
 
 import com.alibaba.fastjson.JSONObject;
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.model.ShopDetail;
@@ -20,8 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServlet;
-import javax.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 

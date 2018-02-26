@@ -8,14 +8,11 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.dao.RecommendCategoryArticleMapper;
 import com.resto.shop.web.dao.RecommendCategoryMapper;
-import com.resto.shop.web.model.ArticleAttr;
-import com.resto.shop.web.model.ArticleUnit;
 import com.resto.shop.web.model.RecommendCategory;
 import com.resto.shop.web.model.RecommendCategoryArticle;
 import com.resto.shop.web.service.RecommendCategoryService;
 
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.List;
 
 /**

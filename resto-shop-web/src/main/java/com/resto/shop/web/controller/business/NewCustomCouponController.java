@@ -54,11 +54,6 @@ public class NewCustomCouponController extends GenericController {
     @Resource
     BrandSettingService brandSettingService;
 
-    @Resource
-    WechatConfigService wechatConfigService;
-
-    @Resource
-    SmsLogService smsLogService;
 
     @RequestMapping("/list")
     public void list() {

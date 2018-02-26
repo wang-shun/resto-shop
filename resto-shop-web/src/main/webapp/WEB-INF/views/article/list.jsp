@@ -189,7 +189,7 @@
                                 <label class="col-md-5 control-label">餐品图片(超大图)</label>
                                 <div class="col-md-7">
                                     <input type="hidden" name="photoSuper" v-model="m.photoSuper">
-                                    <img-file-upload class="form-control" @success="uploadSuccessSuper"
+                                    <img-file-upload cut="false" class="form-control" @success="uploadSuccessSuper"
                                                      @error="uploadError"></img-file-upload>
                                     <img v-if="m.photoSuper" :src="m.photoSuper" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
                                 </div>
@@ -199,7 +199,7 @@
                                 <label class="col-md-5 control-label">餐品图片(正方形图)</label>
                                 <div class="col-md-7">
                                     <input type="hidden" name="photoSquareOriginal" v-model="m.photoSquareOriginal">
-                                    <img-file-upload class="form-control" @success="uploadSuccessSquareOriginal"
+                                    <img-file-upload cut="false" class="form-control" @success="uploadSuccessSquareOriginal"
                                                      @error="uploadError"></img-file-upload>
                                     <img v-if="m.photoSquareOriginal" :src="m.photoSquareOriginal" :alt="m.name" onerror="this.src='assets/pages/img/defaultImg.png'" width="80px" height="40px" class="img-rounded">
                                 </div>
@@ -236,6 +236,12 @@
                                     </label>
                                     <label class="radio-inline">
                                         <input type="radio" name="photoType" v-model="m.photoType" value="3"> 无图
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="photoType" v-model="m.photoType" value="4"> 超大图
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="photoType" v-model="m.photoType" value="5"> 正方形图
                                     </label>
                                 </div>
                             </div>

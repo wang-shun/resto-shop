@@ -23,7 +23,6 @@ import com.resto.shop.web.constant.OfflineOrderSource;
 import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.model.Order;
-import com.resto.shop.web.service.ChargeOrderService;
 import com.resto.shop.web.service.OffLineOrderService;
 import com.resto.shop.web.service.OrderService;
 import org.springframework.stereotype.Controller;
@@ -37,7 +36,6 @@ import com.resto.brand.web.model.ShopDetail;
 import com.resto.brand.web.service.BrandService;
 import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.service.OrderPaymentItemService;
 
 @Controller
 @RequestMapping("totalIncome")
@@ -48,12 +46,6 @@ public class TotalIncomeController extends GenericController {
 
     @Resource
     ShopDetailService shopDetailService;
-
-    @Resource
-    OrderPaymentItemService orderpaymentitemService;
-
-    @Resource
-    ChargeOrderService chargeOrderService;
 
     @Resource
     OrderService orderService;

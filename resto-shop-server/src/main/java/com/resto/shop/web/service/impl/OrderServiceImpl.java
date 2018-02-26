@@ -165,23 +165,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ArticleFamilyMapper articleFamilyMapper;
 
-    @Resource
-    private LogBaseService logBaseService;
-
     @Autowired
     private GetNumberService getNumberService;
-
-    @Resource
-    private  WetherService wetherService;
 
     @Autowired
     private CustomerDetailMapper customerDetailMapper;
 
     @Resource
     private OrderRefundRemarkMapper orderRefundRemarkMapper;
-
-    @Autowired
-    private DayDataMessageService dayDataMessageService;
 
     @Resource
 	private BrandAccountLogService brandAccountLogService;
@@ -206,9 +197,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     VirtualProductsService virtualProductsService;
 
-    @Resource
-    ArticleTopService articleTopService;
-
     @Autowired
     private TableQrcodeService tableQrcodeService;
 
@@ -217,9 +205,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Autowired
     private SmsLogService smsLogService;
-
-    @Autowired
-    private DayAppraiseMessageService dayAppraiseMessageService;
 
     @Resource
 	private  AccountSettingService accountSettingService;
@@ -416,6 +401,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         String orderId = ApplicationUtils.randomUUID();
         order.setId(orderId);
         order.setPosDiscount(new BigDecimal(1));
+        if (order.getMemberDiscount() == null) {
+            order.setMemberDiscount(new BigDecimal(1));
+        }
         Customer customer = customerService.selectById(order.getCustomerId());
         ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
         Boolean loginFlag = (Boolean) RedisUtil.get(order.getShopDetailId() + "loginStatus");
@@ -1377,14 +1365,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 changePushOrder(order);
             }
         }
+        Customer customer = customerService.selectById(order.getCustomerId());
         //排除掉子订单，在支付时给用户发放消费返利优惠券
-        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+        if (StringUtils.isBlank(order.getParentOrderId()) && customer != null) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
                 //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
                 Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
-                Customer customer = customerService.selectById(order.getCustomerId());
                 Brand brand = brandService.selectById(order.getBrandId());
                 ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
                 BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -6461,9 +6449,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
                 //result = endMin>= count;
-                result = endMin >= count && current >= count;
+                result = endMin >= count;
                 msg = endMin == 0 ? orderItem.getArticleName() + "套餐单品已售罄,请取消订单后重新下单" :
-                        endMin >= count && current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + endMin + "个,请重新选购餐品";
+                        endMin >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + endMin + "个,请重新选购餐品";
                 // 中单品库存不足,最大购买"+endMin+",个,请取消订单后重新下单
                 break;
             case OrderItemType.MEALS_CHILDREN:
@@ -8391,7 +8379,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         //排除掉子订单，在支付时给用户发放消费返利优惠券
-        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+        if (StringUtils.isBlank(order.getParentOrderId()) && !order.getPayMode().equals(OrderPayMode.XJ_PAY)
+                && !order.getPayMode().equals(OrderPayMode.YL_PAY)
+                && customer != null) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
@@ -9113,13 +9103,13 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         map1.put("content", "用户:"+order.getCustomerId()+"的订单："+order.getId()+"在pos端已确认收款订单状态更改为10,请求服务器地址为:" + MQSetting.getLocalIP());
         doPostAnsc(url, map1);
         LogTemplateUtils.getConfirmOrderPosByOrderType(brand.getBrandName(), order, originState);
-        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+        Customer customer = customerService.selectById(order.getCustomerId());
+        if (StringUtils.isBlank(order.getParentOrderId()) && customer != null) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
                 //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
                 Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
-                Customer customer = customerService.selectById(order.getCustomerId());
                 BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
                 WechatConfig wechatConfig = wechatConfigService.selectByBrandId(order.getBrandId());
                 for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
@@ -9411,36 +9401,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             orderMapper.confirmOrderPos(orderId);
         }
 
-        //日志记录
-        Map map = new HashMap(4);
-        map.put("brandName", brand.getBrandName());
-        map.put("fileName", order.getCustomerId());
-        map.put("type", "UserAction");
-        StringBuffer msg = new StringBuffer("用户:"+order.getCustomerId()+"订单在pos端被结算，结算方式为:");
-        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
-        for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
-            msg.append(orderPaymentItem.getRemark() + "\n");
-        }
-        msg.append("请求服务器地址为:"+MQSetting.getLocalIP());
-        map.put("content", msg.toString());
-        doPostAnsc(url, map);
-
         //yz 计费系统 后付款 pos端 结算时计费
-		BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
-		//yz 2017/07/29计费系统
-		//判断是否已经记录过该订单
-		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
-
-		//--
-		if(brandAccountLog!=null){
-			return order;
-		}
-
-		if(brandSetting.getOpenBrandAccount()==1){//说明开启了品牌账户
-			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-			updateBrandAccount(order,true,accountSetting);
-		}
-        if (StringUtils.isBlank(order.getParentOrderId()) && StringUtils.isNotBlank(order.getCustomerId())) {
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
+        if (StringUtils.isBlank(order.getParentOrderId()) && customer != null) {
             //查询出所有消费返利优惠券
             List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
             if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
@@ -9486,6 +9449,33 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
+
+        //日志记录
+        Map map = new HashMap(4);
+        map.put("brandName", brand.getBrandName());
+        map.put("fileName", order.getCustomerId());
+        map.put("type", "UserAction");
+        StringBuffer msg = new StringBuffer("用户:"+order.getCustomerId()+"订单在pos端被结算，结算方式为:");
+        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(order.getId());
+        for(OrderPaymentItem orderPaymentItem : orderPaymentItems){
+            msg.append(orderPaymentItem.getRemark() + "\n");
+        }
+        msg.append("请求服务器地址为:"+MQSetting.getLocalIP());
+        map.put("content", msg.toString());
+        doPostAnsc(url, map);
+		//yz 2017/07/29计费系统
+		//判断是否已经记录过该订单
+		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
+
+		//--
+		if(brandAccountLog!=null){
+			return order;
+		}
+
+		if(brandSetting.getOpenBrandAccount()==1){//说明开启了品牌账户
+			AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+			updateBrandAccount(order,true,accountSetting);
+		}
         return order;
     }
 
@@ -10369,8 +10359,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     @Override
-    public void sendPosNewOrder(ShopDetail shopDetail, Order order) {
-        log.info("\n\nsendPosNewOrder   ----------\n");
+    public void sendPosNewOrder(String shopId, Order order) {
+        //  查询最新的店铺设置，防止缓存作怪
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
+        log.info("\n\n  【sendPosNewOrder】" + shopDetail.getName() + "\n     PosVersion：" + shopDetail.getPosVersion() + "\n    " + order.getId());
         if(shopDetail.getPosVersion() == PosVersion.VERSION_2_0){
             MQMessageProducer.sendCreateOrderMessage(order);
         }

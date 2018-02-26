@@ -3,13 +3,11 @@ package com.resto.shop.web.service.impl;
 import javax.annotation.Resource;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
-import com.resto.brand.core.util.DateUtil;
 import com.resto.shop.web.dao.WeItemMapper;
 import com.resto.shop.web.model.WeItem;
 import com.resto.shop.web.service.WeItemService;
 import cn.restoplus.rpc.server.RpcService;
 
-import java.util.Date;
 import java.util.List;
 
 /**

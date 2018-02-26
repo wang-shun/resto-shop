@@ -195,4 +195,18 @@ public interface PosService {
     JSONArray serverExceptionOrderList(String shopId);
 
     void test();
+
+    /**
+     * 扫码支付构建微信请求支付接口
+     * @param data
+     * @return
+     */
+    String scanCodePayment(String data);
+
+    /**
+     * 查询扫码支付订单的情况
+     * @param data
+     * @return
+     */
+    String confirmPayment(String data);
 }

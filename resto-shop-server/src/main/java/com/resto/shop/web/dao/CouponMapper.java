@@ -3,7 +3,6 @@ package com.resto.shop.web.dao;
 import java.util.List;
 import java.util.Map;
 
-import com.resto.brand.web.dto.CouponDto;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;

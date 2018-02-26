@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import com.resto.brand.web.dto.AppraiseShopDto;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;

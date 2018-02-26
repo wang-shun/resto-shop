@@ -1,6 +1,5 @@
 package com.resto.shop.web.dao;
 
-import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.UnderLineOrderDto;
 import com.resto.shop.web.model.OffLineOrder;
 import com.resto.brand.core.generic.GenericDao;

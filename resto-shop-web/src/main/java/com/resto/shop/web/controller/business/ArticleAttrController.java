@@ -5,7 +5,6 @@ import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.ArticleAttr;
 import com.resto.shop.web.service.ArticleAttrService;
-import com.resto.shop.web.util.RedisUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;

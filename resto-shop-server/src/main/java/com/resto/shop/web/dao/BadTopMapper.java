@@ -2,7 +2,6 @@ package com.resto.shop.web.dao;
 
 import com.resto.shop.web.model.BadTop;
 import com.resto.brand.core.generic.GenericDao;
-import com.resto.brand.core.generic.GenericDao;
 
 public interface BadTopMapper  extends GenericDao<BadTop,Long> {
     int deleteByPrimaryKey(Long id);

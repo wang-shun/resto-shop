@@ -2,11 +2,8 @@ package com.resto.shop.web.service;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.RedPacketDto;
-import com.resto.brand.web.model.WechatConfig;
-import com.resto.shop.web.model.Customer;
 import com.resto.shop.web.model.GetNumber;
 import com.resto.shop.web.model.Order;
-import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;

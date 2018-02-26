@@ -5,8 +5,6 @@ import java.util.Map;
 
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.ShopArticleReportDto;
-import com.resto.brand.web.model.BrandSetting;
 import com.resto.shop.web.dto.ArticleSellCountDto;
 import com.resto.shop.web.model.Article;
 import com.resto.shop.web.model.ArticleStock;

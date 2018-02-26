@@ -21,7 +21,6 @@ import com.resto.shop.web.service.CouponService;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.NewCustomCouponService;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;

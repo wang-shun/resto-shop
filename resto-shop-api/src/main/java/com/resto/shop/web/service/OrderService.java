@@ -808,5 +808,5 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	Order selectBySerialNumber(String serialNumber);
 
-	void sendPosNewOrder(ShopDetail shopDetail, Order order);
+	void sendPosNewOrder(String shopId, Order order);
 }

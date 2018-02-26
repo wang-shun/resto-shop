@@ -3,7 +3,6 @@ package com.resto.shop.web.service;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
@@ -40,7 +39,6 @@ public interface AccountService extends GenericService<Account, String> {
 	 * pos端账户充值时,修改用户额度 新增充值记录
 	 * @param operationPhone
 	 * @param customerPhone
-	 * @param chargeMoney
 	 * @return
 	 */
 	void updateCustomerAccount(String operationPhone,String customerPhone,ChargeSetting chargeSetting,String customerId,String accountId,Brand brand,ShopDetail shopDetail);

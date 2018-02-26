@@ -5,15 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.jws.Oneway;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.web.dto.IncomeReportDto;
-import com.resto.brand.web.dto.ShopIncomeDto;
 import com.resto.shop.web.constant.PayMode;
-import com.resto.shop.web.dao.ChargeOrderMapper;
 import com.resto.shop.web.dao.OrderPaymentItemMapper;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderPaymentItem;
@@ -29,9 +26,6 @@ public class OrderPaymentItemServiceImpl extends GenericServiceImpl<OrderPayment
 
     @Resource
     private OrderPaymentItemMapper orderpaymentitemMapper;
-
-    @Resource
-    private ChargeOrderMapper chargeOrderMapper;
 
     @Override
     public GenericDao<OrderPaymentItem, String> getDao() {

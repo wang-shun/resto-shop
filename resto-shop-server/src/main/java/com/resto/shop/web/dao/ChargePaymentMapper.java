@@ -1,7 +1,6 @@
 package com.resto.shop.web.dao;
 
 import java.util.Date;
-import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 

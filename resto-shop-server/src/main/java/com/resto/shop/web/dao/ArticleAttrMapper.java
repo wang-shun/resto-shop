@@ -2,7 +2,6 @@ package com.resto.shop.web.dao;
 
 import java.util.List;
 
-import com.resto.shop.web.model.Article;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;

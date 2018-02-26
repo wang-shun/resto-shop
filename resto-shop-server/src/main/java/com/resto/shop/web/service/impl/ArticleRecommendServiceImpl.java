@@ -7,7 +7,6 @@ import com.resto.shop.web.dao.ArticleRecommendMapper;
 import com.resto.shop.web.model.ArticleRecommend;
 import com.resto.shop.web.model.ArticleRecommendPrice;
 import com.resto.shop.web.service.ArticleRecommendService;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
