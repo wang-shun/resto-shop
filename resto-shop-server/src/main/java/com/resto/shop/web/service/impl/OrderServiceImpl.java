@@ -7747,7 +7747,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setId(ApplicationUtils.randomUUID());
             item.setPayValue(new BigDecimal(-1).multiply(order.getRefundMoney()));
             item.setPayTime(new Date());
-            item.setPaymentModeId(PayMode.CRASH_PAY);
+            item.setPaymentModeId(PayMode.REFUND_CRASH);
             item.setOrderId(o.getId());
             orderPaymentItemService.insert(item);
             return;
