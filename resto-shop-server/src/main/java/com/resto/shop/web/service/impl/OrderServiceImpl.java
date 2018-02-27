@@ -165,23 +165,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Resource
     private ArticleFamilyMapper articleFamilyMapper;
 
-    @Resource
-    private LogBaseService logBaseService;
-
     @Autowired
     private GetNumberService getNumberService;
-
-    @Resource
-    private  WetherService wetherService;
 
     @Autowired
     private CustomerDetailMapper customerDetailMapper;
 
     @Resource
     private OrderRefundRemarkMapper orderRefundRemarkMapper;
-
-    @Autowired
-    private DayDataMessageService dayDataMessageService;
 
     @Resource
 	private BrandAccountLogService brandAccountLogService;
@@ -206,9 +197,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Autowired
     VirtualProductsService virtualProductsService;
 
-    @Resource
-    ArticleTopService articleTopService;
-
     @Autowired
     private TableQrcodeService tableQrcodeService;
 
@@ -217,9 +205,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Autowired
     private SmsLogService smsLogService;
-
-    @Autowired
-    private DayAppraiseMessageService dayAppraiseMessageService;
 
     @Resource
 	private  AccountSettingService accountSettingService;
@@ -6473,9 +6458,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     }
                 }
                 //result = endMin>= count;
-                result = endMin >= count && current >= count;
+                result = endMin >= count;
                 msg = endMin == 0 ? orderItem.getArticleName() + "套餐单品已售罄,请取消订单后重新下单" :
-                        endMin >= count && current >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + endMin + "个,请重新选购餐品";
+                        endMin >= count ? "库存足够" : orderItem.getArticleName() + "中单品库存不足,最大购买" + endMin + "个,请重新选购餐品";
                 // 中单品库存不足,最大购买"+endMin+",个,请取消订单后重新下单
                 break;
             case OrderItemType.MEALS_CHILDREN:
@@ -7779,8 +7764,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setId(ApplicationUtils.randomUUID());
             item.setPayValue(new BigDecimal(-1).multiply(order.getRefundMoney()));
             item.setPayTime(new Date());
-            item.setPaymentModeId(PayMode.CRASH_PAY);
+            item.setPaymentModeId(PayMode.REFUND_CRASH);
             item.setOrderId(o.getId());
+            item.setRemark("线下现金退款:" + order.getRefundMoney());
+            item.setResultData("线下现金退款" + order.getRefundMoney());
             orderPaymentItemService.insert(item);
             return;
         }

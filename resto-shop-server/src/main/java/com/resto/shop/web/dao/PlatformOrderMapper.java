@@ -1,10 +1,8 @@
 package com.resto.shop.web.dao;
 
 import com.resto.brand.web.dto.PlatformReportDto;
-import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.PlatformOrder;
 import com.resto.brand.core.generic.GenericDao;
-import com.resto.shop.web.model.RecommendCategory;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;

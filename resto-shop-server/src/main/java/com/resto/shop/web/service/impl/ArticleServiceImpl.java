@@ -19,10 +19,8 @@ import com.resto.shop.web.constant.ArticleType;
 import com.resto.shop.web.constant.Common;
 import com.resto.shop.web.dao.ArticleMapper;
 import com.resto.shop.web.dao.FreeDayMapper;
-import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.dto.ArticleSellCountDto;
 import com.resto.shop.web.model.*;
-import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.report.ArticleMapperReport;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
@@ -52,9 +50,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     private ArticleMapperReport articleMapperReport;
 
     @Resource
-    private OrderMapper orderMapper;
-
-    @Resource
     private BrandService brandService;
 
     @Resource
@@ -65,7 +60,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Resource
     private KitchenService kitchenService;
-
 
     @Resource
     private BrandSettingService brandSettingService;
@@ -82,7 +76,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
     @Autowired
     private MealItemService mealItemService;
 
-
     @Autowired
     private ArticleAttrService articleAttrService;
 
@@ -97,7 +90,6 @@ public class ArticleServiceImpl extends GenericServiceImpl<Article, String> impl
 
     @Autowired
     private OrderService orderService;
-
 
     @Autowired
     private TableGroupService tableGroupService;

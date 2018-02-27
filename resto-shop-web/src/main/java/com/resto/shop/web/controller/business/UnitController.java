@@ -2,7 +2,6 @@ package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.MemcachedUtils;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.Unit;
 import com.resto.shop.web.service.PosService;

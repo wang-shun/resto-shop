@@ -58,10 +58,6 @@ public class SyncDataController extends GenericController {
     WeOrderDetailService weOrderDetailService;
 
 
-    @Resource
-    WeShopService weShopService;
-
-
     // 品牌总收入，旗下所有店铺收入总和
     @RequestMapping("syncBrandIncome")
     @ResponseBody

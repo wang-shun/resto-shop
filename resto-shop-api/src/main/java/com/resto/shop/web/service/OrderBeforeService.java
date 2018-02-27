@@ -1,8 +1,6 @@
 package com.resto.shop.web.service;
 
 import com.resto.brand.core.generic.GenericService;
-import com.resto.shop.web.model.Article;
-import com.resto.shop.web.model.Notice;
 import com.resto.shop.web.model.OrderBefore;
 import com.resto.shop.web.model.OrderItem;
 

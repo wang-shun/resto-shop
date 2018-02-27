@@ -7,7 +7,6 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Param;
 
 import com.resto.brand.core.generic.GenericDao;
-import com.resto.brand.web.dto.MemberUserDto;
 import com.resto.shop.web.model.Customer;
 
 public interface CustomerMapper extends GenericDao<Customer, String>{

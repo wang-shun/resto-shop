@@ -1,4 +1,4 @@
- package com.resto.shop.web.controller.business;
+package com.resto.shop.web.controller.business;
 
 import java.io.FileOutputStream;
 import java.io.OutputStream;
@@ -28,7 +28,6 @@ import com.resto.brand.web.service.ShopDetailService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.OrderPaymentItem;
 import com.resto.shop.web.service.ArticleFamilyService;
-import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.OrderPaymentItemService;
 import com.resto.shop.web.service.OrderService;
 
@@ -38,9 +37,6 @@ public class ReportController extends GenericController{
 	
 	@Resource
 	OrderPaymentItemService orderPaymentItemService;
-	
-	@Resource
-	OrderItemService orderItemService;
 	
 	@Resource
 	OrderService orderService;

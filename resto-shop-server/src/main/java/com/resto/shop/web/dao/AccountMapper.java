@@ -1,6 +1,5 @@
 package com.resto.shop.web.dao;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.apache.ibatis.annotations.Param;

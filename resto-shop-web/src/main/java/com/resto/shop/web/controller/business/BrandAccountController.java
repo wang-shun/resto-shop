@@ -3,7 +3,6 @@
  import com.alibaba.fastjson.JSONObject;
  import com.resto.brand.core.entity.Result;
  import com.resto.brand.core.enums.DetailType;
- import com.resto.brand.core.util.DateUtil;
  import com.resto.brand.web.model.*;
  import com.resto.brand.web.service.*;
  import com.resto.shop.web.controller.GenericController;
@@ -16,7 +15,6 @@
 
  import javax.annotation.Resource;
  import java.math.BigDecimal;
- import java.util.Date;
  import java.util.List;
 
  @Controller
@@ -25,12 +23,6 @@
 
 	 @Resource
 	 BrandAccountService brandAccountService;
-
-	 @Resource
-	 CustomerService customerService;
-
-	 @Resource
-	 SmsLogService smsLogService;
 
 	 @Resource
 	 BrandAccountLogService brandAccountLogService;

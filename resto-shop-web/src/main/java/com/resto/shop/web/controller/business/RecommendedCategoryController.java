@@ -5,7 +5,6 @@ import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.RecommendCategory;
-import com.resto.shop.web.model.RecommendCategoryArticle;
 import com.resto.shop.web.service.RecommendCategoryService;
 import com.resto.shop.web.util.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;

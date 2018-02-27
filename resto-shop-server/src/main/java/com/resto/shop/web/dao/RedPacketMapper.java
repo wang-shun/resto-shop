@@ -1,9 +1,7 @@
 package com.resto.shop.web.dao;
 
 import com.resto.brand.core.generic.GenericDao;
-import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.shop.web.dto.ShareMoneyDto;
-import com.resto.shop.web.model.AccountLog;
 import com.resto.shop.web.model.RedPacket;
 import org.apache.ibatis.annotations.Param;
 

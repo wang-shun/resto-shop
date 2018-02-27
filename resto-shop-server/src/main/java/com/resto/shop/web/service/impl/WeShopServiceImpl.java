@@ -8,9 +8,7 @@ import com.resto.shop.web.dao.WeShopMapper;
 import com.resto.shop.web.model.WeShop;
 import com.resto.shop.web.service.WeShopService;
 import cn.restoplus.rpc.server.RpcService;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.Date;
 import java.util.List;
 
 /**

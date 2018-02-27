@@ -1,13 +1,11 @@
 package com.resto.shop.web.dao;
 
 import com.resto.brand.core.generic.GenericDao;
-import com.resto.brand.web.dto.RedPacketDto;
 import com.resto.shop.web.model.GetNumber;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by carl on 2016/10/14.

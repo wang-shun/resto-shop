@@ -7,8 +7,6 @@ import com.resto.shop.web.dto.ArticleSellCountDto;
 import com.resto.shop.web.model.ArticleStock;
 import org.apache.ibatis.annotations.Param;
 import com.resto.brand.core.generic.GenericDao;
-import com.resto.brand.web.dto.ArticleSellDto;
-import com.resto.brand.web.dto.ShopArticleReportDto;
 import com.resto.shop.web.model.Article;
 
 public interface ArticleMapper extends GenericDao<Article, String>{

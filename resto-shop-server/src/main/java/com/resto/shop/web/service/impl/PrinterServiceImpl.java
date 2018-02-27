@@ -14,7 +14,6 @@ import com.resto.shop.web.model.Printer;
 import com.resto.shop.web.service.PrinterService;
 
 import cn.restoplus.rpc.server.RpcService;
-import sun.security.provider.SHA;
 
 /**
  *

@@ -4,7 +4,6 @@ import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.shop.web.dao.VirtualProductsMapper;
-import com.resto.shop.web.model.Kitchen;
 import com.resto.shop.web.model.VirtualProducts;
 import com.resto.shop.web.model.VirtualProductsAndKitchen;
 import com.resto.shop.web.service.VirtualProductsService;

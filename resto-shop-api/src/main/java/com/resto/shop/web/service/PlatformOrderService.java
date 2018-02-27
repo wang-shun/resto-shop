@@ -3,7 +3,6 @@ package com.resto.shop.web.service;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.MeiTuanOrderDto;
 import com.resto.brand.web.dto.PlatformReportDto;
-import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.PlatformOrder;
 
 import java.util.Date;

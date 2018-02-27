@@ -1,7 +1,6 @@
  package com.resto.shop.web.controller.business;
 
  import com.resto.brand.core.entity.Result;
- import com.resto.brand.core.util.ApplicationUtils;
  import com.resto.brand.web.model.AccountTicket;
  import com.resto.brand.web.service.AccountTicketService;
  import com.resto.brand.web.service.BrandAccountService;
