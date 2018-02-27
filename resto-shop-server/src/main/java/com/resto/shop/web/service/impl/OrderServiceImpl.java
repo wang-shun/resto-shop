@@ -8125,6 +8125,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
+        //存在父订单与子订单一起退菜的情况,此时orders的长度大于1
+        List<OrderPaymentItem> refundPaymentList = new ArrayList<>();
         for (String id : orders.keySet()) {
             Order o = new Order();
             o.setId(id);
@@ -8137,7 +8139,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             if (refundOrder.getPosRefundArticleType() != null){
                 //pos2.0退菜
-                List<OrderPaymentItem> refundPaymentList = refundPosTwoArticle(o);
+                List<OrderPaymentItem> refundPayment = refundPosTwoArticle(o);
+                refundPaymentList.addAll(refundPayment);
                 refundOrder.setRefundPaymentList(refundPaymentList);
             }else{
                 //老版pos退菜
