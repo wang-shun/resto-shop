@@ -954,7 +954,7 @@ public class PosServiceImpl implements PosService {
                         && !resultMap.get("sub_code").toString().equalsIgnoreCase("ACQ.SYSTEM_ERROR"))
                         || resultMap.get("sub_code") == null){
                         returnParam.put("isPolling", false);
-                        returnParam.put("message", map.get("msg"));
+                        returnParam.put("message", resultMap.get("msg"));
                     }
                     returnParam.put("success", false);
                 }
@@ -981,13 +981,13 @@ public class PosServiceImpl implements PosService {
         String outTradeNo = object.getString("outTradeNo");
         //要修改的订单信息
         Order order = JSON.parseObject(object.get("order").toString(), Order.class);
-        Map<String, String> map = new HashMap<>();
         //返回的信息
         JSONObject returnParam = new JSONObject();
         returnParam.put("success", true);
         returnParam.put("isPolling", true);
         try{
             if (order.getPayMode().equals(OrderPayMode.WX_PAY)){
+                Map<String, String> map = new HashMap<>();
                 if (shopDetail.getWxServerId() == null){
                     //普通商户
                     map = queryPay(wechatConfig.getAppid(), wechatConfig.getMchid(), "", outTradeNo,wechatConfig.getMchkey());
@@ -1035,13 +1035,44 @@ public class PosServiceImpl implements PosService {
                 Map<String, Object> returnMap = AliPayUtils.tradeQuery(jsonObject);
                 //查询订单成功
                 if (Boolean.valueOf(returnMap.get("success").toString())){
-
+                    String trade_status = returnMap.get("trade_status").toString();
+                    if ("TRADE_SUCCESS".equalsIgnoreCase(trade_status) || "TRADE_FINISHED".equalsIgnoreCase(trade_status)){
+                        //已支付完成
+                        returnParam.put("isPolling", false);
+                        JSONArray orderPaymentItems = new JSONArray();
+                        OrderPaymentItem paymentItem = new OrderPaymentItem();
+                        JSONObject resultInfo = new JSONObject(returnMap.get("msg"));
+                        paymentItem.setId(resultInfo.get("trade_no").toString());
+                        paymentItem.setPaymentModeId(PayMode.ALI_PAY);
+                        paymentItem.setRemark("支付宝支付：" + resultInfo.getBigDecimal("total_amount"));
+                        paymentItem.setOrderId(order.getId());
+                        paymentItem.setPayTime(new Date());
+                        paymentItem.setResultData(resultInfo.toString());
+                        paymentItem.setPayValue(resultInfo.getBigDecimal("total_amount"));
+                        orderPaymentItemService.insert(paymentItem);
+                        orderService.update(order);
+                        for (OrderItem orderItem : order.getOrderItems()){
+                            orderItemService.update(orderItem);
+                        }
+                        JSONObject returnPayment = new JSONObject(paymentItem);
+                        returnPayment.put("resultData", "支付宝支付");
+                        returnPayment.put("payTime", paymentItem.getPayTime().getTime());
+                        orderPaymentItems.put(returnPayment);
+                        returnParam.put("payMentInfo", orderPaymentItems);
+                    }else {
+                        if ("TRADE_CLOSED".equalsIgnoreCase(trade_status)) {
+                            //未付款交易超时关闭，或支付完成后全额退款
+                            returnParam.put("isPolling", false);
+                            returnParam.put("message", "未付款交易超时关闭");
+                        }
+                        returnParam.put("success", false);
+                    }
                 }else{
                     if ((returnMap.get("sub_code") != null
                             && !returnMap.get("sub_code").toString().equalsIgnoreCase("ACQ.SYSTEM_ERROR"))
                             || returnMap.get("sub_code") == null){
                         returnParam.put("isPolling", false);
-                        returnParam.put("message", map.get("msg"));
+                        returnParam.put("message", returnMap.get("msg"));
                     }
                     returnParam.put("success", false);
                 }
@@ -1049,7 +1080,7 @@ public class PosServiceImpl implements PosService {
         }catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage());
-            //如果在构建支付请求时报错，将不进行下一步查询订单的操作
+            //如果在构建查询支付进度请求时报错，将不进行下一步查询订单的操作
             returnParam.put("success", false);
         }
         return returnParam.toString();
@@ -1069,9 +1100,9 @@ public class PosServiceImpl implements PosService {
         //定义返回参数
         JSONObject returnObject = new JSONObject();
         returnObject.put("success", true);
-        Map<String, String> map = new HashMap<>();
         try{
             if (payTyoe == 1){
+                Map<String, String> map = new HashMap<>();
                 //撤销微信订单
                 if (shopDetail.getWxServerId() == null){
                     if (StringUtils.isNotBlank(wechatConfig.getPayCertPath())) {
@@ -1089,6 +1120,22 @@ public class PosServiceImpl implements PosService {
                 if (!Boolean.valueOf(map.get("success"))){
                     //撤销失败
                     String message = map.get("msg");
+                    if (StringUtils.isNotBlank(message)){
+                        returnObject.put("message", message);
+                    }else{
+                        returnObject.put("message", "撤销支付订单失败，请线下处理");
+                    }
+                    returnObject.put("success", false);
+                }
+            }else if (payTyoe == 2){
+                //撤销支付宝订单
+                com.alibaba.fastjson.JSONObject object = new com.alibaba.fastjson.JSONObject();
+                object.put("out_trade_no", outTradeNo);
+                Map<String, Object>  returnMap = AliPayUtils.tradeCancel(object);
+                //撤销失败
+                if (!Boolean.valueOf(returnMap.get("success").toString())){
+                    //撤销失败
+                    String message = returnMap.get("msg").toString();
                     if (StringUtils.isNotBlank(message)){
                         returnObject.put("message", message);
                     }else{
