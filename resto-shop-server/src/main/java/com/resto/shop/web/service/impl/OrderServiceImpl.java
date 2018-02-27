@@ -2001,13 +2001,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order pushOrder(String orderId) throws AppException {
         String time = DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
         Order order = selectById(orderId);
+        //可能存在不满足pushorder条件的订单  --order = null  或者已经打印的订单
+        if(order == null || order.getProductionStatus() == ProductionStatus.PRINTED){
+            return order;
+        }
+
         //如果是后付款模式 不验证直接进行修改模式
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             log.info("后付款模式：pushOrder修改生产状态：" + ProductionStatus.HAS_ORDER + "订单id为：" + orderId + "当前时间为：" + time);
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
-//        }
         } else if (validOrderCanPush(order)) {
             log.info("pushOrder时候支付宝支付修改状态：" + ProductionStatus.HAS_ORDER + "订单id为：" + orderId + "当前时间为：" + time);
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
