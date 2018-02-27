@@ -156,9 +156,13 @@ public class Article implements Serializable{
 
     private Integer monthlySales;          //菜品月销售量
 
-    private Integer photoType;             //菜品图片显示   1大图  2小图  3无图
+    private Integer photoType;             //菜品图片显示   1大图  2小图  3无图 4超大图  5正方形图
 
-    private String photoLittle;            //菜品类型2  小图存放地址
+    private String photoLittle;            //菜品图片类型2  小图存放地址
+
+    private String photoSuper;             //菜品图片类型4  超大图存放地址
+
+    private String photoSquareOriginal;    //菜品图片类型5  正方形图存放地址
 
     private Integer openCatty;             //是否开启称斤买卖菜品
 
@@ -167,6 +171,22 @@ public class Article implements Serializable{
     private Integer needRemind;            //是否需要优先提醒添加此菜品
 
     private String gifUrl;                 //gif图片路径
+
+    public String getPhotoSuper() {
+        return photoSuper;
+    }
+
+    public void setPhotoSuper(String photoSuper) {
+        this.photoSuper = photoSuper;
+    }
+
+    public String getPhotoSquareOriginal() {
+        return photoSquareOriginal;
+    }
+
+    public void setPhotoSquareOriginal(String photoSquareOriginal) {
+        this.photoSquareOriginal = photoSquareOriginal;
+    }
 
     public Integer getNeedRemind() {
         return needRemind;

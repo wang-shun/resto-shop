@@ -1,18 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
 <div id="controlShop">
-    <c:if test="${empty type}">
-        <a class="btn btn-info ajaxify" href="platformReport/list">
-            <span class="glyphicon glyphicon-circle-arrow-left"></span>
-            返回
-        </a>
-    </c:if>
-    <c:if test="${!empty type}">
-        <a class="btn btn-info ajaxify" href="platformReport/shop/list">
-            <span class="glyphicon glyphicon-circle-arrow-left"></span>
-            返回
-        </a>
-    </c:if>
+    <a class="btn btn-info ajaxify" href="platformReport/list">
+        <span class="glyphicon glyphicon-circle-arrow-left"></span>
+        返回
+    </a>
     <h2 class="text-center">
         <strong>${shopName}店铺外卖订单表</strong>
     </h2>
@@ -116,6 +108,7 @@
         language:"zh-CN"
     });
 
+    var brandUnitAPI = null;
     var beginDate = "${beginDate}";
 	var endDate = "${endDate}";
 	var shopId = "${shopId}";
@@ -159,17 +152,19 @@
                         {
                             title : "外卖平台",
                             data : "type",
+                            orderable : false,
                             createdCell:function(td,tdData){
                                 var str = "未知"
                                 if(tdData == "1"){
                                     str = "饿了么"
                                 }else if(tdData == "2"){
-                                    str = "美团外卖"
+                                    str = "美团"
                                 }else if(tdData == "3"){
-                                    str = "百度外卖"
+                                    str = "百度"
                                 }
                                 $(td).html(str);
-                            }
+                            },
+                            s_filter: true
                         },
                         {
                             title:'下单时间',
@@ -225,7 +220,11 @@
                                 $(td).html(button);
                             }
                         }
-                    ]
+                    ],
+                    initComplete: function () {
+                        brandUnitAPI = this.api();
+                        that.brandUnitTable();
+                    }
                 });
 	        },
 	        searchInfo : function() {
@@ -235,11 +234,11 @@
                     toastr.clear();
                     toastr.error("开始时间应该少于结束时间！");
                     return false;
-                }/*else if(timeCha > 2678400000){
+                }else if(timeCha > 2678400000){
                     toastr.clear();
                     toastr.error("暂时未开放大于一月以内的查询！");
                     return false;
-                }*/
+                }
                 toastr.clear();
                 toastr.success("查询中...");
 	        	try{
@@ -248,8 +247,12 @@
                             toastr.clear();
                             toastr.success("查询成功");
                             that.appraiseShopDtos = result.data.platformOrders;
+                            brandUnitAPI.search('');
+                            var column1 = brandUnitAPI.column(1);
+                            column1.search('', true, false);
                             that.shopAppraiseTable.clear();
                             that.shopAppraiseTable.rows.add(result.data.platformOrders).draw();
+                            that.brandUnitTable();
                         }else {
                             toastr.clear();
                             toastr.error("查询出错");
@@ -354,6 +357,29 @@
                     toastr.clear();
                     toastr.error("系统异常，请刷新重试");
                 }
+            },
+            brandUnitTable : function(){
+                var api = brandUnitAPI;
+                var columnsSetting = api.settings()[0].oInit.columns;
+                $(columnsSetting).each(function (i) {
+                    if (this.s_filter) {
+                        var column = api.column(i);
+                        var select = $('<select id=""><option value="">' + this.title + '(全部)</option></select>');
+                        column.data().unique().each(function (d) {;
+                            var str = "美团";
+                            if (d == "1"){
+                                str = "饿了么"
+                            }
+                            select.append('<option value="' + d + '">' + str + '</option>')
+                        });
+                        select.appendTo($(column.header()).empty()).on('change', function () {
+                            var val = $.fn.dataTable.util.escapeRegex(
+                                $(this).val()
+                            );
+                            column.search(val ? '^' + val + '$' : '', true, false).draw();
+                        });
+                    }
+                });
             },
             download : function(){
                 window.location.href = "platformReport/downloadShopExcel?path="+this.object.path+"";

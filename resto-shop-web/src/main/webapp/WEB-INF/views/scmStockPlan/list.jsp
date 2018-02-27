@@ -3,7 +3,7 @@
 <%@taglib prefix="s" uri="http://shiro.apache.org/tags" %>
 <div id="control">
     <!--查看详情-->
-    <div class="row form-div" v-show="details">
+    <div class="row form-div" v-show="details" @click="detailsCli">
         <div class="col-md-offset-3 col-md-6" style="background: #FFF;">
             <div class="text-center" style="padding: 20px 0">
                 <span class="caption-subject bold font-blue-hoki">查看详情</span>
@@ -23,7 +23,7 @@
                     <div class="form-group row">
                         <label class="col-md-2 control-label">类型</label>
                         <div class="col-md-4">
-                            {{detailsArr.materialType}}
+                            {{detailsArr.materialTypes}}
                         </div>
                         <label class="col-md-2 control-label">供应商</label>
                         <div class="col-md-4">
@@ -43,14 +43,14 @@
                     <div class="form-group row">
                         <label class="col-md-2 control-label">入库人</label>
                         <div class="col-md-4">
-                            {{detailsArr.createrName}}
+                            {{detailsArr.publishedName}}
                         </div>
                         <label class="col-md-2 control-label">审核人</label>
                         <div class="col-md-4">
                             {{detailsArr.auditName}}
                         </div>
                     </div>
-                    <div class="form-group row">
+                    <div class="form-group row" style="max-height: 400px;overflow-y: scroll;">
                         <table class="table table-bordered" >
                             <thead>
                             <tr>
@@ -63,6 +63,7 @@
                                 <th>规格</th>
                                 <th>产地</th>
                                 <th>数量</th>
+                                <th>报价</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -76,6 +77,7 @@
                                 <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                 <td>{{item.provinceName+item.cityName+item.districtName}}</td>
                                 <td>{{item.actQty}}</td>
+                                <td>{{item.purchaseMoney}}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -125,10 +127,13 @@
                 {
                     title: "入库日期",
                     data: "gmtCreate",
+                    createdCell:function (td,tdData) {//td中的数据
+                        $(td).html(new Date(tdData).format("yyyy-MM-dd hh:mm:ss"));
+                    }
                 },
                 {
                     title : "入库人",
-                    data : "createrName",
+                    data : "publishedName",
                 },
                 {
                     title : "审核人",
@@ -153,6 +158,16 @@
                 {
                     title : "状态",
                     data : "orderStatus",
+                    createdCell:function(td,tdData,rowData){
+                        switch(tdData){
+                            case '11':tdData='待审核';break;
+                            case '12':tdData='审核通过';break;
+                            case '13':tdData='已驳回';break;
+                            case '14':tdData='审核失败';break;
+                            case '15':tdData='已失效';break;
+                        }
+                        $(td).html(tdData);
+                    }
                 },
                 {
                     title : "操作",
@@ -209,6 +224,15 @@
                 showDetails:function (data) { //查看详情
                     this.details=true;
                     this.detailsArr=data;
+//                    for(var i=0;i<this.detailsArr.docStkInPlanDetailDoList.length;i++){
+//                        switch(this.detailsArr.docStkInPlanDetailDoList[i].materialType){
+//                            case 'INGREDIENTS':this.detailsArr.docStkInPlanDetailDoList[i].materialType='主料';break;
+//                            case 'ACCESSORIES':this.detailsArr.docStkInPlanDetailDoList[i].materialType='辅料';break;
+//                            case 'SEASONING':this.detailsArr.docStkInPlanDetailDoList[i].materialType='配料';break;
+//                            case 'MATERIEL':this.detailsArr.docStkInPlanDetailDoList[i].materialType='物料';break;
+//                        }
+//                    }
+
                     this.detailsBtn=true;
                 },
                 detailsCli:function () { //关闭查看详情

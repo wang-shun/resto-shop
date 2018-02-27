@@ -16,6 +16,8 @@ public class OrderPaymentItem implements Serializable {
         this.orderId = orderPaymentItem.getOrderId() == null ? "" : orderPaymentItem.getOrderId();
         this.paymentModeId = orderPaymentItem.getPaymentModeId() == null ? 0 : orderPaymentItem.getPaymentModeId();
         this.resultData = orderPaymentItem.getResultData() == null ? "" : orderPaymentItem.getResultData();
+        this.isUseBonus = orderPaymentItem.getIsUseBonus() == null ? 0 : orderPaymentItem.getIsUseBonus();
+        this.toPayId = orderPaymentItem.getToPayId() == null ? "" : orderPaymentItem.getToPayId();
     }
 
 

@@ -137,7 +137,7 @@
         <result column="customer_id" property="customerId"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <result column="payment_mode_id" property="paymentModeId"/>
-			<result column="pay_value" property="payValue"/>
+            <result column="pay_value" property="payValue"/>
         </collection>
 
     </resultMap>
@@ -3335,19 +3335,27 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 
     <select id="posSelectNotCancelledOrdersIdByDate" parameterType="java.lang.String" resultType="java.lang.String">
         SELECT id from tb_order where shop_detail_id = #{shopId} and parent_order_id is null and order_state != 9
-        and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time
+        and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time ASC
     </select>
 
     <select id="selectBySerialNumber" parameterType="java.lang.String" resultType="Order">
         SELECT * from tb_order where serial_number = #{serialNumber}
     </select>
 
+    <select id="serverExceptionOrderList" resultType="java.lang.String">
+        SELECT id from tb_order where shop_detail_id = #{shopId}
+        <if test="isFirstPay == true or isFirstPay == 'true'">
+            and order_state in (2, 10, 11)
+        </if>
+        and production_status = 1
+        and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time ASC
+    </select>
 
     <select id="selectSurplusAmountByPayMode" resultType="java.math.BigDecimal">
         SELECT
-            IFNULL(SUM(top.pay_value),0) payValue
+        IFNULL(SUM(top.pay_value),0) payValue
         FROM
-            tb_order td
+        tb_order td
         INNER JOIN tb_order_payment_item top ON td.id = top.order_id
         WHERE
         (td.id = #{orderId}

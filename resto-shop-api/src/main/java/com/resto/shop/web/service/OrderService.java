@@ -6,13 +6,10 @@ import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.generic.GenericService;
 import com.resto.brand.web.dto.*;
 import com.resto.brand.web.model.AccountSetting;
-import com.resto.brand.web.model.Brand;
 import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.model.WechatConfig;
 import com.resto.shop.web.dto.OrderNumDto;
 import com.resto.shop.web.dto.Summarry;
 import com.resto.shop.web.exception.AppException;
-import com.resto.shop.web.model.OffLineOrder;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
@@ -333,7 +330,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	public List<ArticleSellDto> selectArticleFamilyByBrandAndFamilyName(String currentBrandId, String beginDate,
 			String endDate, String selectValue);
-	
+
 	//查询品牌所有已消费的订单
 	public List<Order> selectListBybrandId(String beginDate, String endDate, String currentBrandId, Integer type);
 
@@ -688,6 +685,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	void fixErrorGroup();
 
 	Order customerByOrderForMyPage(String customerId, String shopId);
+
 	List<RefundArticleOrder> addRefundArticleDto(String beginDate, String endDate, String shopId);
 
 	List<Map<String, Object>> selectMealServiceSales(Map<String, Object> selectMap);
@@ -769,7 +767,7 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 	 */
 	Order selectAfterValidOrderByCustomerId(String customerId);
 
-	Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type);
+	Order posDiscount(String orderId, BigDecimal discount, List<OrderItem> orderItems, BigDecimal eraseMoney, BigDecimal noDiscountMoney, Integer type, BigDecimal orderPosDiscountMoney);
 
 	/**
 	 * 查询每个店铺的交易笔数
@@ -810,5 +808,5 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	Order selectBySerialNumber(String serialNumber);
 
-	List<ShopOrderReportDto> getBossAppOrderReport(String brandId, List<ShopDetail> shopDetailList, String beginDate, String endDate);
+	void sendPosNewOrder(String shopId, Order order);
 }

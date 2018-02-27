@@ -51,7 +51,6 @@
   <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.ChargePayment">update tb_charge_payment set payment_money = #{paymentMoney,jdbcType=DECIMAL}, create_time = #{createTime,jdbcType=TIMESTAMP}, charge_order_id = #{chargeOrderId,jdbcType=VARCHAR} where id = #{id,jdbcType=VARCHAR}</update>
   <select id="selectList" resultType="ChargePayment">select * from tb_charge_payment</select>
 
-
 	<!-- 所有品牌充值记录 -->
 	<select id="selectRechargeLog" resultType="com.resto.brand.web.dto.RechargeLogDto">
 		SELECT

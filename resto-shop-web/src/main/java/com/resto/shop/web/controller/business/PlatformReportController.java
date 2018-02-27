@@ -72,9 +72,9 @@ public class PlatformReportController extends GenericController {
         BigDecimal allElmPrice=new BigDecimal("0.00");
         int allMtCount=0;
         BigDecimal allMtPrice=new BigDecimal("0.00");
-        int allBdCount=0;
-        BigDecimal allBdPrice=new BigDecimal("0.00");
-
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        BigDecimal elmTotalPrice = BigDecimal.ZERO;
+        BigDecimal mtTotalPrice = BigDecimal.ZERO;
         List<PlatformReportDto> platformlist= new ArrayList<PlatformReportDto>();//第三方外卖店铺数据list
         long startTime=System.currentTimeMillis();
         /*for (ShopDetail shopDetail : shoplist) {*/
@@ -94,11 +94,6 @@ public class PlatformReportController extends GenericController {
             if(platformReportDto.getMtPrice()!=null){
                 allMtPrice=allMtPrice.add(platformReportDto.getMtPrice());
             }
-            allBdCount+=platformReportDto.getBdCount();
-            if(platformReportDto.getBdPrice()!=null){
-                allBdPrice=allBdPrice.add(platformReportDto.getBdPrice());
-            }
-
             //第三方外卖店铺数据
             platformReportDto.setShopId(shopDetail.getId());
             platformReportDto.setShopName(shopDetail.getName());
@@ -112,9 +107,9 @@ public class PlatformReportController extends GenericController {
             if(platformReportDto.getMtPrice()==null){
                 platformReportDto.setMtPrice(v);
             }
-            if(platformReportDto.getBdPrice()==null){
-                platformReportDto.setBdPrice(v);
-            }
+            totalPrice.add(platformReportDto.getTotalPrice());
+            elmTotalPrice.add(platformReportDto.getElmTotalPrice());
+            mtTotalPrice.add(platformReportDto.getMtTotalPrice());
             platformlist.add(platformReportDto);
         }
         long endTime=System.currentTimeMillis();
@@ -126,9 +121,9 @@ public class PlatformReportController extends GenericController {
         allPlatformReportDto.setAllElmPrice(allElmPrice);
         allPlatformReportDto.setAllMtCount(allMtCount);
         allPlatformReportDto.setAllMtPrice(allMtPrice);
-        allPlatformReportDto.setAllBdCount(allBdCount);
-        allPlatformReportDto.setAllBdPrice(allBdPrice);
-
+        allPlatformReportDto.setTotalPrice(totalPrice);
+        allPlatformReportDto.setElmTotalPrice(elmTotalPrice);
+        allPlatformReportDto.setMtTotalPrice(mtTotalPrice);
         //把三方外卖品牌和店铺的数据封装成map返回给前台
         Map<String,Object> map = new HashMap<>();
         map.put("allPlatformReportDto", allPlatformReportDto);
@@ -146,7 +141,7 @@ public class PlatformReportController extends GenericController {
         //定义读取文件的路径
         String path = request.getSession().getServletContext().getRealPath(fileName);
         //定义列
-        String[]columns={"shopName","allCount","elmCount","mtCount","allPrice","elmPrice","mtPrice"};
+        String[]columns={"shopName","allCount","elmCount","mtCount","allPrice","totalPrice","elmPrice","elmTotalPrice","mtPrice","mtTotalPrice"};
         //定义数据
 
         //定义一个map用来存数据表格的前四项,1.报表类型,2.品牌名称3,.店铺名称4.日期
@@ -165,7 +160,7 @@ public class PlatformReportController extends GenericController {
         map.put("beginDate", beginDate);
         map.put("reportType", "第三方外卖报表");//表的头，第一行内容
         map.put("endDate", endDate);
-        map.put("num", "6");//显示的位置
+        map.put("num", "9");//显示的位置
         map.put("reportTitle", "外卖表");//表的名字
         map.put("timeType", "yyyy-MM-dd");
         List<PlatformReportDto> result = new LinkedList<>();
@@ -180,17 +175,18 @@ public class PlatformReportController extends GenericController {
             brandPlatformReportDto.setAllCount(allPlatformReportDto.getCount());
             brandPlatformReportDto.setElmCount(allPlatformReportDto.getAllElmCount());
             brandPlatformReportDto.setMtCount(allPlatformReportDto.getAllMtCount());
-            brandPlatformReportDto.setBdCount(allPlatformReportDto.getAllBdCount());
             brandPlatformReportDto.setAllPrice(allPlatformReportDto.getPrice());
             brandPlatformReportDto.setElmPrice(allPlatformReportDto.getAllElmPrice());
             brandPlatformReportDto.setMtPrice(allPlatformReportDto.getAllMtPrice());
-            brandPlatformReportDto.setBdPrice(allPlatformReportDto.getAllBdPrice());
+            brandPlatformReportDto.setTotalPrice(allPlatformReportDto.getTotalPrice());
+            brandPlatformReportDto.setElmTotalPrice(allPlatformReportDto.getElmTotalPrice());
+            brandPlatformReportDto.setMtTotalPrice(allPlatformReportDto.getMtTotalPrice());
             result.add(brandPlatformReportDto);
         }
         String shopJson = JSON.toJSONString(platformReportDto.getShopAppraises(), filter);
         List<PlatformReportDto> platformReportDtos = JSON.parseObject(shopJson, new TypeReference<List<PlatformReportDto>>(){});
         result.addAll(platformReportDtos);
-        String[][] headers = {{"品牌/店铺","25"},{"外卖订单数","25"},{"饿了吗订单数","25"},{"美团外卖订单数","25"},{"外卖订单额","25"},{"饿了吗订单额","25"},{"美团外卖订单额","25"}};
+        String[][] headers = {{"品牌/店铺","25"},{"外卖订单数","25"},{"饿了吗订单数","25"},{"美团外卖订单数","25"},{"外卖订单额","25"},{"外卖订单实收额","25"},{"饿了吗订单额","25"},{"饿了吗订单实收额","25"},{"美团外卖订单额","25"},{"美团外卖订单实收额","25"}};
         //定义excel工具类对象
         ExcelUtil<PlatformReportDto> excelUtil=new ExcelUtil<PlatformReportDto>();
         OutputStream out  = null;

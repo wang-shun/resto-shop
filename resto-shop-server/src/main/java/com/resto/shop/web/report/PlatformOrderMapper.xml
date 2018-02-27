@@ -61,10 +61,15 @@
   <sql id="Blob_Column_List">source_text</sql>
 
     <select id="proc_shopdetailId" resultMap="countMap">
-        SELECT COUNT(p.shop_detail_id) allcount,SUM(p.total_price) allprice,
-        COUNT(CASE WHEN p.type=1 THEN p.shop_detail_id ELSE null END) elmcount,SUM(CASE WHEN p.type=1 THEN p.total_price ELSE null END) elmprice,
-        COUNT(CASE WHEN p.type=2 THEN p.shop_detail_id ELSE null END) mtcount,SUM(CASE WHEN p.type=2 THEN p.total_price ELSE null END) mtprice,
-        COUNT(CASE WHEN p.type=3 THEN p.shop_detail_id ELSE null END) bdcount,SUM(CASE WHEN p.type=3 THEN p.total_price ELSE null END) bdprice
+        SELECT  COUNT(p.shop_detail_id) allcount,
+                SUM(p.original_price) allprice,
+				IFNULL(SUM(p.total_price), 0) totalPrice,
+                COUNT(CASE WHEN p.type=1 THEN p.shop_detail_id ELSE null END) elmcount,
+				SUM(CASE WHEN p.type=1 THEN p.original_price ELSE null END) elmprice,
+				IFNULL(SUM(IF(p.type = 1,p.total_price,0)),0) elmTotalPrice,
+                COUNT(CASE WHEN p.type=2 THEN p.shop_detail_id ELSE null END) mtcount,
+				SUM(CASE WHEN p.type=2 THEN p.original_price ELSE null END) mtprice,
+				IFNULL(SUM(IF(p.type = 2, p.total_price, 0)),0) mtTotalPrice
         FROM tb_platform_order p WHERE p.shop_detail_id = #{2} AND  p.create_time >= #{0} AND #{1} >= p.create_time;
     </select>
 

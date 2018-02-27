@@ -35,7 +35,7 @@
                                     <select name="supplierId" v-model="parameter.supplierId" class="bs-select form-control">
                                         <option disabled="" selected="" value="">请选择</option>
                                         <option  v-for="supName in supNames" value="{{supName.id}}">
-                                            {{supName.supAliasName}}
+                                            {{supName.supName}}
                                         </option>
                                     </select>
                                 </div>
@@ -102,7 +102,7 @@
                                     <%--<td>{{item.materialCode}}</td>--%>
                                     <td>{{item.measureUnit+item.unitName+"/"+item.specName}}</td>
                                     <td>{{item.provinceName+item.cityName+item.districtName}}</td>
-                                    <td><input style="width: 50px;" type="number" v-model="item.purchasePrice" value="1"></td>
+                                    <td><input style="width: 50px;" type="number"  step="0.01" v-model="item.purchasePrice" value="1"></td>
                                     <td><button class="btn btn-xs red" @click="removeArticleItem(item)">移除</button></td>
                                 </tr>
                                 </tbody>

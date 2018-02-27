@@ -2,16 +2,12 @@ package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.DateUtil;
 import com.resto.brand.core.util.SMSUtils;
-import com.resto.brand.web.model.AccountSetting;
-import com.resto.brand.web.model.Brand;
-import com.resto.brand.web.model.BrandSetting;
-import com.resto.brand.web.model.ShopDetail;
-import com.resto.brand.web.service.AccountSettingService;
-import com.resto.brand.web.service.BrandService;
-import com.resto.brand.web.service.BrandSettingService;
-import com.resto.brand.web.service.ShopDetailService;
+import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.web.model.*;
+import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
 import com.resto.shop.web.dao.OrderMapper;
 import com.resto.shop.web.dao.PosMapper;
@@ -22,6 +18,8 @@ import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.text.StrSubstitutor;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -96,6 +95,18 @@ public class PosServiceImpl implements PosService {
     @Autowired
     private CloseShopService closeShopService;
 
+    @Autowired
+    private NewCustomCouponService newCustomCouponService;
+
+    @Autowired
+    private CouponService couponService;
+
+    @Autowired
+    WechatConfigService wechatConfigService;
+
+    @Autowired
+    SmsLogService smsLogService;
+
     @Override
     public String syncArticleStock(String shopId) {
         Map<String, Object> result = new HashMap<>();
@@ -121,10 +132,24 @@ public class PosServiceImpl implements PosService {
     }
 
     @Override
-    public String syncOrderCreated(String orderId) {
+    public String syncOrderCreated(String orderId){
         Order order = orderService.selectById(orderId);
         if(order == null){
             log.error("syncOrderCreated     未查到订单信息：" + orderId);
+            if(RedisUtil.get(orderId+"orderCreated") != null && (Integer)RedisUtil.get(orderId+"orderCreated") >= 5){
+                return "";
+            }
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if(RedisUtil.get(orderId+"orderCreated") == null){
+                RedisUtil.set(orderId+"orderCreated",1);
+            }else{
+                RedisUtil.set(orderId+"orderCreated",((Integer) RedisUtil.get(orderId+"orderCreated")) + 1);
+            }
+            syncOrderCreated(orderId);
             return "";
         }
         OrderDto orderDto = new OrderDto(order);
@@ -140,10 +165,12 @@ public class PosServiceImpl implements PosService {
             orderItemDtos.add(orderItemDto);
         }
         Customer customer = customerService.selectById(order.getCustomerId());
-        jsonObject.put("customer", new JSONObject(new CustomerDto(customer)));
+        if(customer != null){
+            jsonObject.put("customer", new JSONObject(new CustomerDto(customer)));
+        }
         jsonObject.put("orderItem", orderItemDtos);
-        if(order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
-                || order.getPayMode() == OrderPayMode.YL_PAY){
+        if(order.getPayMode() != null && (order.getPayMode() == OrderPayMode.YUE_PAY || order.getPayMode() == OrderPayMode.XJ_PAY
+                || order.getPayMode() == OrderPayMode.YL_PAY)){
             List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
             if(!CollectionUtils.isEmpty(payItemsList)){
                 List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
@@ -302,7 +329,7 @@ public class PosServiceImpl implements PosService {
                 e.printStackTrace();
             }
         }else {
-            log.error("Pos2.0 打印失败：为找到响应订单；orderId：" + orderId);
+            log.error("Pos2.0 打印失败：为找到相应订单；orderId：" + orderId);
         }
     }
 
@@ -326,6 +353,10 @@ public class PosServiceImpl implements PosService {
         order.setReductionAmount(BigDecimal.valueOf(0));
         order.setBrandId(json.getString("brandId"));
         order.setDataOrigin(orderDto.getDataOrigin());
+        //  电视叫号，下单会走 pushOrder 切面。需要先设置一个值。
+        if(order.getPayMode() == null){
+            order.setPayMode(0);
+        }
         //  订单项
         List<OrderItemDto> orderItemDtos =  orderDto.getOrderItem();
         List<OrderItem> orderItems = new ArrayList<>();
@@ -400,7 +431,75 @@ public class PosServiceImpl implements PosService {
 
             RedisUtil.set(order.getShopDetailId()+order.getTableNumber()+"status",true);
             orderService.confirmBossOrder(order);
+
+            Customer customer = customerService.selectById(order.getCustomerId());
+            if (org.apache.commons.lang3.StringUtils.isBlank(order.getParentOrderId()) && customer != null) {
+                //查询出所有消费返利优惠券
+                List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
+                if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
+                    //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
+                    Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
+                    Brand brand = brandService.selectById(order.getBrandId());
+                    ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+                    BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                    WechatConfig wechatConfig = wechatConfigService.selectByBrandId(order.getBrandId());
+                    for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
+                        if (coupon != null) {
+                            Integer hours = hoursBetween(coupon.getAddTime(), new Date());
+                            //如果上一次领取到的消费返利优惠券距今的小时数<当前优惠券所设置的每隔多少小时领取
+                            if (hours.compareTo(newCustomCoupon.getNextHour()) < 0) {
+                                //退出当前循环不执行发放操作
+                                continue;
+                            }
+                        }
+                        if (order.getOrderMoney().compareTo(newCustomCoupon.getMinimumAmount()) < 0){
+                            //订单不满足优惠券最低订单金额条件不执行发放操作
+                            continue;
+                        }
+                        //发放
+                        couponService.addCoupon(newCustomCoupon, customer);
+                        //微信推送文案
+                        String pushMsg = "${brandName}衷心感谢您的光临，特赠予您价值${couponValue}元的${couponName}${couponCount}张，欢迎您下次再来~  <a href='${url}'>前往查看</a>";
+                        //封装推送的文案信息
+                        Map<String, Object> pushMsgMap = new HashMap<>();
+                        pushMsgMap.put("brandName", brand.getBrandName());
+                        pushMsgMap.put("couponValue", newCustomCoupon.getCouponValue());
+                        pushMsgMap.put("couponName", newCustomCoupon.getCouponName());
+                        pushMsgMap.put("couponCount", newCustomCoupon.getCouponNumber());
+                        pushMsgMap.put("url", newCustomCoupon.getIsBrand().equals(Common.YES) ? brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my"
+                                : brandSetting.getWechatWelcomeUrl() + "?dialog=myCoupon&qiehuan=qiehuan&subpage=my&shopId=" + shopDetail.getId() + "");
+                        StrSubstitutor substitutor = new StrSubstitutor(pushMsgMap);
+                        pushMsg = substitutor.replace(pushMsg);
+                        WeChatUtils.sendCustomerMsg(pushMsg, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
+                        //如果用户注册添加短信推送
+                        if (org.apache.commons.lang3.StringUtils.isNotBlank(customer.getTelephone())) {
+                            SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
+                            filter.getExcludes().add("couponCount");
+                            filter.getExcludes().add("url");
+                            com.alibaba.fastjson.JSONObject object = JSON.parseObject(JSON.toJSONString(pushMsgMap, filter));
+                            smsLogService.sendMessage(brand.getId(), shopDetail.getId(), SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_CONSUMPTION_REBATE, customer.getTelephone(), object);
+                        }
+                    }
+                }
+            }
         }
+    }
+
+    /**
+     * 得到两个日期相差的小时数
+     * @param beginDate
+     * @param endDate
+     * @return
+     * @throws ParseException
+     */
+    public static Integer hoursBetween(Date beginDate,Date endDate){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(beginDate);
+        long time1 = cal.getTimeInMillis();
+        cal.setTime(endDate);
+        long time2 = cal.getTimeInMillis();
+        long between_days=(time2-time1)/(1000*3600);
+        return Integer.valueOf(String.valueOf(between_days));
     }
 
     private void updateParent(Order order){
@@ -561,10 +660,13 @@ public class PosServiceImpl implements PosService {
         JSONObject json = new JSONObject(data);
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(orderDto.getShopDetailId());
-        syncPosLocalOrder(orderDto, shopDetail);
-        for(OrderDto childrenOrderDto : orderDto.getChildrenOrders()){
-            syncPosLocalOrder(childrenOrderDto, shopDetail);
-        }
+//        syncPosLocalOrder(orderDto, shopDetail);
+//        for(OrderDto childrenOrderDto : orderDto.getChildrenOrders()){
+//            syncPosLocalOrder(childrenOrderDto, shopDetail);
+//        }
+        log.info("\n\n 【" + shopDetail.getName() + "】 本地 POS 同步订单信息 ：" + orderDto.getId() + "\n");
+        log.info(data);
+        log.info("\n\n本地 POS 同步订单信息 ");
         return true;
     }
 
@@ -678,6 +780,50 @@ public class PosServiceImpl implements PosService {
     @Override
     public void posCallNumber(String orderId) {
         orderService.callNumber(orderId);
+    }
+
+    @Override
+    public void posPrintOrder(String orderId) {
+        Order order = orderService.selectById(orderId);
+        if(order == null && order.getPayType() != null){
+            return;
+        }
+        if(order.getPayType() == 0){    //  先付
+            //  如果已付款，并且已下单了
+            if(order.getOrderState() == OrderState.PAYMENT && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+                printSuccess(orderId);
+            }
+            //  如果用户出现 待下单状态，但是POS接收到订单
+            if(order.getOrderState() == OrderState.CONFIRM && order.getProductionStatus() == ProductionStatus.NOT_ORDER){
+                printSuccess(orderId);
+            }
+        }else if(order.getPayType() == 1){  //  后付
+            //  如果已付款，并且已下单了
+            if(order.getOrderState() == OrderState.SUBMIT && order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+                printSuccess(orderId);
+            }
+        }
+    }
+
+    @Override
+    public JSONArray serverExceptionOrderList(String shopId) {
+        JSONArray orderList = new JSONArray();
+        Date today = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String beginDate = format.format(DateUtil.getDateBegin(today));
+        String endDate = format.format(DateUtil.getDateEnd(today));
+        Boolean isFirstPay = true;
+        ShopDetail shopDetail = shopDetailService.selectById(shopId);
+        //  如果是 Boss 模式的后付
+        if(shopDetail.getShopMode() == ShopMode.BOSS_ORDER && shopDetail.getAllowAfterPay() == 0){
+            isFirstPay = false;
+        }
+        log.info( "\n\n" + shopDetail.getName() + "  isFirstPay：" + isFirstPay + "\n\n" );
+        List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, isFirstPay, beginDate, endDate);
+        for(String orderId : orderIds){
+            orderList.put(syncOrderCreated(orderId));
+        }
+        return orderList;
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){

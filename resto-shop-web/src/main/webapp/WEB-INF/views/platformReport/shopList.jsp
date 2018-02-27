@@ -123,26 +123,30 @@
                             title : "美团外卖订单数",
                             data : "mtCount"
                         },
-                        /*{
-                            title : "百度外卖订单数",
-                            data : "bdCount"
-                        },*/
                         {
                             title : "外卖订单额",
                             data : "allPrice"
+                        },
+                        {
+                            title : "外卖订单实收额",
+                            data : "totalPrice"
                         },
                         {
                             title : "饿了么订单额",
                             data : "elmPrice"
                         },
                         {
+                            title : "饿了么订单实收额",
+                            data : "elmTotalPrice"
+                        },
+                        {
                             title : "美团外卖订单额",
                             data : "mtPrice"
                         },
-                        /*{
-                            title : "百度外卖订单额",
-                            data : "bdPrice"
-                        },*/
+                        {
+                            title : "美团外卖订单实收额",
+                            data : "mtTotalPrice"
+                        },
                         {
                             title: "查看详情",
                             data: "shopId",

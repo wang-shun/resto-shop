@@ -22,9 +22,11 @@
         <result column="real_time_coupon_begin_time" property="realTimeCouponBeginTime"/>
         <result column="real_time_coupon_end_time" property="realTimeCouponEndTime"/>
         <result column="is_brand" property="isBrand"/>
+        <result column="minimum_amount" property="minimumAmount"/>
+        <result column="next_hour" property="nextHour"/>
     </resultMap>
     <sql id="Base_Column_List">id, name, coupon_value, coupon_validay, coupon_number, create_time, use_with_account, coupon_name, coupon_min_money, begin_time, end_time, is_activty, brand_id, distribution_mode_id
-,recommend_delay_time,distance_birthday_day,real_time_coupon_begin_time,real_time_coupon_end_time,is_brand</sql>
+,recommend_delay_time,distance_birthday_day,real_time_coupon_begin_time,real_time_coupon_end_time,is_brand,minimum_amount,next_hour</sql>
     <select id="selectByPrimaryKey" resultType="com.resto.shop.web.model.NewCustomCoupon" parameterType="java.lang.Long">
        select  * from tb_new_custom_coupon where id = #{id,jdbcType=BIGINT}
     </select>
@@ -56,6 +58,8 @@
             <if test="distanceBirthdayDay != null">distance_birthday_day,</if>
             <if test="realTimeCouponBeginTime != null">real_time_coupon_begin_time,</if>
             <if test="realTimeCouponEndTime != null">real_time_coupon_end_time,</if>
+            <if test="minimumAmount != null">minimum_amount,</if>
+            <if test="nextHour != null">next_hour,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=BIGINT},</if>
@@ -82,6 +86,8 @@
             <if test="distanceBirthdayDay != null">#{distanceBirthdayDay},</if>
             <if test="realTimeCouponBeginTime != null">#{realTimeCouponBeginTime},</if>
             <if test="realTimeCouponEndTime != null">#{realTimeCouponEndTime},</if>
+            <if test="minimumAmount != null">#{minimumAmount},</if>
+            <if test="nextHour != null">#{nextHour},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.NewCustomCoupon">update tb_new_custom_coupon
@@ -108,6 +114,8 @@
             <if test="distanceBirthdayDay != null">distance_birthday_day = #{distanceBirthdayDay},</if>
             <if test="realTimeCouponBeginTime != null">real_time_coupon_begin_time = #{realTimeCouponBeginTime},</if>
             <if test="realTimeCouponEndTime != null">real_time_coupon_end_time = #{realTimeCouponEndTime},</if>
+            <if test="minimumAmount != null">minimum_amount = #{minimumAmount},</if>
+            <if test="nextHour != null">next_hour = #{nextHour},</if>
             shop_detail_id = #{shopDetailId}
 
         </set> where id = #{id,jdbcType=BIGINT}
@@ -127,7 +135,7 @@
         select id,name,coupon_value,coupon_validay,coupon_number,create_time,coupon_type,shop_detail_id,is_brand,
         use_with_account,coupon_name,coupon_min_money,begin_time,end_time,is_activty,brand_id,distribution_mode_id,time_cons_type,begin_date_time,end_date_time,
         recommend_delay_time,distance_birthday_day,DATE_FORMAT(real_time_coupon_begin_time,'%Y-%m-%d %H:%i:%s') realTimeCouponBeginTimeString,
-        DATE_FORMAT(real_time_coupon_end_time,'%Y-%m-%d %H:%i:%s') realTimeCouponEndTimeString
+        DATE_FORMAT(real_time_coupon_end_time,'%Y-%m-%d %H:%i:%s') realTimeCouponEndTimeString,minimum_amount,next_hour
         from tb_new_custom_coupon where (brand_id=#{brandId}
         and is_brand = 1 ) or ( is_brand = 0 and shop_detail_id = #{shopId} )
     </select>
@@ -177,5 +185,10 @@
         <if test="realTimeCouponIds != null">
             and id not in (${realTimeCouponIds})
         </if>
+    </select>
+
+    <select id="selectConsumptionRebateCoupon" resultType="NewCustomCoupon">
+        select * from tb_new_custom_coupon where coupon_type = 6 and is_activty = 1
+        and (is_brand = 1 or shop_detail_id = #{shopId})
     </select>
 </mapper>

@@ -275,7 +275,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Order selectOrderDetails(String orderId);
 
-
 	int setOrderPrintFail(String orderId);
 
 	List<ArticleSellDto> selectArticleFamilyByBrandAndFamilyName(@Param("brandId")String brandId,@Param("beginDate") Date begin, @Param("endDate")Date end,
@@ -674,7 +673,7 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 
 	Order customerByOrderForMyPage(@Param("customerId") String customerId, @Param("shopId") String shopId);
 
-    void colseOrder(String orderId);
+	void colseOrder(String orderId);
 
 	/**
 	 * yz 2017/07/28
@@ -752,4 +751,6 @@ public interface OrderMapper  extends GenericDao<Order,String> {
 	Order selectBySerialNumber(String serialNumber);
 
 	BigDecimal selectSurplusAmountByPayMode(@Param("orderId") String orderId,@Param("payMode") Integer payMode);
+
+    List<String> serverExceptionOrderList( @Param("shopId") String shopId, @Param("isFirstPay") boolean isFirstPay, @Param("beginDate") String beginDate, @Param("endDate") String endDate);
 }
