@@ -4,10 +4,7 @@ import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.entity.Result;
-import com.resto.brand.core.util.ApplicationUtils;
-import com.resto.brand.core.util.DateUtil;
-import com.resto.brand.core.util.SMSUtils;
-import com.resto.brand.core.util.WeChatUtils;
+import com.resto.brand.core.util.*;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
 import com.resto.shop.web.constant.*;
@@ -19,6 +16,7 @@ import com.resto.shop.web.posDto.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.json.JSONArray;
@@ -936,6 +934,30 @@ public class PosServiceImpl implements PosService {
                     }
                     returnParam.put("success", false);
                 }
+            }else if (payType == 2){ //支付宝支付
+                BrandSetting brandSetting = brandSettingService.selectByBrandId(brand.getId());
+                AliPayUtils.connection(brandSetting.getTradeAppid().trim(),
+                        brandSetting.getTradePrivateKey().trim(),
+                        brandSetting.getTradePublicKey().trim(), shopDetail.getAliEncrypt());
+                com.alibaba.fastjson.JSONObject json = new com.alibaba.fastjson.JSONObject();
+                json.put("out_trade_no", ApplicationUtils.randomUUID());
+                json.put("subject", shopDetail.getName() + "---消费");
+                json.put("total_amount", object.getBigDecimal("paymentAmount") + "");
+                json.put("auth_code", authCode);
+                json.put("scene", "bar_code");
+                Map<String, Object> resultMap = AliPayUtils.tradePay(json);
+                if (Boolean.valueOf(resultMap.get("success").toString())){
+                    //构建支付宝支付请求成功
+                    returnParam.put("outTradeNo", outTradeNo);
+                }else{
+                    if ((resultMap.get("sub_code") != null
+                        && !resultMap.get("sub_code").toString().equalsIgnoreCase("ACQ.SYSTEM_ERROR"))
+                        || resultMap.get("sub_code") == null){
+                        returnParam.put("isPolling", false);
+                        returnParam.put("message", map.get("msg"));
+                    }
+                    returnParam.put("success", false);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -965,7 +987,7 @@ public class PosServiceImpl implements PosService {
         returnParam.put("success", true);
         returnParam.put("isPolling", true);
         try{
-            if (order.getPayMode().equals(PayMode.WEIXIN_PAY)){
+            if (order.getPayMode().equals(OrderPayMode.WX_PAY)){
                 if (shopDetail.getWxServerId() == null){
                     //普通商户
                     map = queryPay(wechatConfig.getAppid(), wechatConfig.getMchid(), "", outTradeNo,wechatConfig.getMchkey());
@@ -1001,6 +1023,23 @@ public class PosServiceImpl implements PosService {
                     //如果正在支付中，则轮询继续去查。 反之则支付失败退出轮询
                     if ((map.containsKey("trade_state") && !"USERPAYING".equalsIgnoreCase(map.get("trade_state")))
                             || (map.containsKey("errCode") && !"SYSTEMERROR".equalsIgnoreCase(map.get("errCode")))){
+                        returnParam.put("isPolling", false);
+                        returnParam.put("message", map.get("msg"));
+                    }
+                    returnParam.put("success", false);
+                }
+            }else if (order.getPayMode().equals(OrderPayMode.ALI_PAY)){
+                com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
+                jsonObject.put("out_trade_no", outTradeNo);
+                //查询支付宝订单的支付进度
+                Map<String, Object> returnMap = AliPayUtils.tradeQuery(jsonObject);
+                //查询订单成功
+                if (Boolean.valueOf(returnMap.get("success").toString())){
+
+                }else{
+                    if ((returnMap.get("sub_code") != null
+                            && !returnMap.get("sub_code").toString().equalsIgnoreCase("ACQ.SYSTEM_ERROR"))
+                            || returnMap.get("sub_code") == null){
                         returnParam.put("isPolling", false);
                         returnParam.put("message", map.get("msg"));
                     }
