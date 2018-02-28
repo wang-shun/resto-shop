@@ -20,6 +20,8 @@ public class OrderPaymentDto implements Serializable {
         this.orderId = orderPaymentItem.getOrderId() == null ? "" : orderPaymentItem.getOrderId();
         this.paymentModeId = orderPaymentItem.getPaymentModeId() == null ? 0 : orderPaymentItem.getPaymentModeId();
         this.resultData = orderPaymentItem.getResultData() == null ? "" : orderPaymentItem.getResultData();
+        this.isUseBonus = orderPaymentItem.getIsUseBonus() == null ? 0 : orderPaymentItem.getIsUseBonus();
+        this.toPayId = orderPaymentItem.getToPayId() == null ? "" : orderPaymentItem.getToPayId();
     }
 
     //主键
@@ -34,8 +36,12 @@ public class OrderPaymentDto implements Serializable {
     private String orderId;
     //付款类型
     private Integer paymentModeId;
-
+    //微信、支付宝的支付回调
     private String resultData;
+    //是否用于分红
+    private Integer isUseBonus;
+    //用来存放余额优惠券支实时Id
+    private String toPayId;
 
     public String getResultData() {
         return resultData;
@@ -91,5 +97,21 @@ public class OrderPaymentDto implements Serializable {
 
     public void setPaymentModeId(Integer paymentModeId) {
         this.paymentModeId = paymentModeId;
+    }
+
+    public Integer getIsUseBonus() {
+        return isUseBonus;
+    }
+
+    public void setIsUseBonus(Integer isUseBonus) {
+        this.isUseBonus = isUseBonus;
+    }
+
+    public String getToPayId() {
+        return toPayId;
+    }
+
+    public void setToPayId(String toPayId) {
+        this.toPayId = toPayId;
     }
 }

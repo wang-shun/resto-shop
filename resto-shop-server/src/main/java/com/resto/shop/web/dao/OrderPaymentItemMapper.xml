@@ -264,8 +264,8 @@
             keyProperty="id">insert into tb_order_payment_item
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
-            <if test="payTime != null">pay_time,</if>
-            pay_value,
+            pay_time
+            <if test="payValue != null">pay_value,</if>
             <if test="remark != null">remark,</if>
             <if test="paymentModeId != null">payment_mode_id,</if>
             <if test="orderId != null">order_id,</if>
@@ -305,5 +305,25 @@
 
     <select id="posSyncListByOrderId" parameterType="java.lang.String" resultMap="BaseResultMap">
       SELECT * from tb_order_payment_item where order_id = #{orderId}
+    </select>
+
+    <select id="selectPayMentByPayMode" resultType="com.resto.shop.web.model.OrderPaymentItem">
+        SELECT
+            top.*
+        FROM
+            tb_order td
+        INNER JOIN tb_order_payment_item top ON td.id = top.order_id
+        WHERE
+        (td.id = #{orderId}
+        OR td.parent_order_id = #{orderId})
+        AND top.payment_mode_id = ${payMode}
+        <if test="type == 1">
+          AND top.pay_value > 0
+        </if>
+        <if test="type == 0">
+            AND top.pay_value &lt; 0
+        </if>
+        AND top.result_data IS NOT NULL
+        AND top.result_data != ''
     </select>
 </mapper>

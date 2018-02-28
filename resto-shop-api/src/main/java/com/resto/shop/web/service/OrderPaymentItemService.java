@@ -102,4 +102,6 @@ public interface OrderPaymentItemService extends GenericService<OrderPaymentItem
      * @param orderPaymentItems
      */
     void insertItems(List<OrderPaymentItem> orderPaymentItems);
+
+    List<OrderPaymentItem> selectPayMentByPayMode(String orderId, Integer payMode, Integer type);
 }

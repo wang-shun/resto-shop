@@ -1174,8 +1174,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (order.getPaymentAmount().doubleValue() == 0) {
                 payOrderSuccess(order);
             }
-
             jsonResult.setData(order);
+
             if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
                 if (order.getParentOrderId() != null) {  //子订单
                     Order parent = selectById(order.getParentOrderId());
@@ -1986,13 +1986,17 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public Order pushOrder(String orderId) throws AppException {
         String time = DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
         Order order = selectById(orderId);
+        //可能存在不满足pushorder条件的订单  --order = null  或者已经打印的订单
+        if(order == null || order.getProductionStatus() == ProductionStatus.PRINTED){
+            return order;
+        }
+
         //如果是后付款模式 不验证直接进行修改模式
         if (order.getOrderMode() == ShopMode.HOUFU_ORDER) {
             log.info("后付款模式：pushOrder修改生产状态：" + ProductionStatus.HAS_ORDER + "订单id为：" + orderId + "当前时间为：" + time);
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
             order.setPushOrderTime(new Date());
             update(order);
-//        }
         } else if (validOrderCanPush(order)) {
             log.info("pushOrder时候支付宝支付修改状态：" + ProductionStatus.HAS_ORDER + "订单id为：" + orderId + "当前时间为：" + time);
             order.setProductionStatus(ProductionStatus.HAS_ORDER);
@@ -2123,6 +2127,11 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }
 		update(order);
+
+
+        log.info("\n\n\n    【printSuccess】打印成功：" + orderId + "\n\n\n\n");
+
+
         //判断是否已经记录过该订单
 		BrandAccountLog brandAccountLog = brandAccountLogService.selectOneBySerialNumAndBrandId(order.getId(),order.getBrandId());
 		if(brandAccountLog!=null){
@@ -4589,6 +4598,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer orginState = order.getOrderState();//订单开始确认的状体
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
+            if(order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+                order.setProductionStatus(ProductionStatus.PRINTED);
+            }
             order.setConfirmTime(new Date());
             order.setAllowCancel(false);
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -4666,6 +4678,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         log.info("开始确认订单:" + order.getId());
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
+            if(order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+                order.setProductionStatus(ProductionStatus.PRINTED);
+            }
             order.setConfirmTime(new Date());
             order.setAllowCancel(false);
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -7443,29 +7458,36 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if (count > orderItem.getCount()) {
                 result.setSuccess(false);
                 result.setMessage("餐品修改数量有误");
+                map.put("content", shopDetail.getName() + "修改菜品失败：餐品修改数量有误。 itemId："+ orderItemId +"" +",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(url, map);
                 return result;
             }
             BigDecimal baseArticleCount = new BigDecimal(orderItem.getCount());
             if (orderItem.getType() == OrderItemType.MEALS_CHILDREN) {
                 result.setSuccess(false);
                 result.setMessage("套餐子品暂不支持修改");
+                map.put("content", shopDetail.getName() + "修改菜品失败：套餐子品暂不支持修改。 itemId："+ orderItemId +"" +",请求服务器地址为:" + MQSetting.getLocalIP());
+                doPostAnsc(url, map);
                 return result;
             }
-            order.setArticleCount(order.getArticleCount() - orderItem.getCount());
 
             if (order.getParentOrderId() == null) {
                 if (order.getArticleCount() == 0 && count == 0) {
                     result.setSuccess(false);
                     result.setMessage("菜品数量不可为空");
+                    map.put("content", shopDetail.getName() + "修改菜品失败：菜品数量不可为空。 itemId："+ orderItemId +"" +",请求服务器地址为:" + MQSetting.getLocalIP());
+                    doPostAnsc(url, map);
                     return result;
                 }
             }
 
+            order.setArticleCount(order.getArticleCount() - orderItem.getCount());
             order.setOrderMoney(order.getOrderMoney().subtract(orderItem.getFinalPrice()));
             order.setOriginalAmount(order.getOriginalAmount().subtract(new BigDecimal(orderItem.getCount()).multiply(orderItem.getOriginalPrice())));
             order.setPaymentAmount(order.getPaymentAmount().subtract(orderItem.getFinalPrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().subtract(orderItem.getFinalPrice()));
+                order.setCountWithChild(order.getCountWithChild() - orderItem.getCount());
             }
 
             orderItem.setCount(count);
@@ -7484,6 +7506,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             order.setPaymentAmount(order.getPaymentAmount().add(orderItem.getFinalPrice()));
             if (order.getAmountWithChildren().doubleValue() > 0) {
                 order.setAmountWithChildren(order.getAmountWithChildren().add(orderItem.getFinalPrice()));
+                order.setCountWithChild(order.getCountWithChild() + orderItem.getCount());
             }
 
             if (orderItem.getCount() == 0) {
@@ -8200,17 +8223,208 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 }
             }
         }
+        //存在父订单与子订单一起退菜的情况,此时orders的长度大于1
+        List<OrderPaymentItem> refundPaymentList = new ArrayList<>();
         for (String id : orders.keySet()) {
             Order o = new Order();
             o.setId(id);
             o.setRefundMoney(orders.get(id)); //退掉的金额
             o.setOrderItems(refundOrder.getOrderItems()); //退菜明细
             o.setRefundType(refundOrder.getRefundType()); //退款方式
-            refundArticle(o); //去退款
+            if (!refundOrder.getId().equalsIgnoreCase(id)){
+                //退的是子订单的菜
+                o.setParentOrderId(refundOrder.getId());
+            }
+            if (refundOrder.getPosRefundArticleType() != null){
+                //pos2.0退菜
+                List<OrderPaymentItem> refundPayment = refundPosTwoArticle(o);
+                refundPaymentList.addAll(refundPayment);
+                refundOrder.setRefundPaymentList(refundPaymentList);
+            }else{
+                //老版pos退菜
+                refundArticle(o); //去退款
+            }
             updateArticle(o); //去修改订单项
         }
 
     }
+
+    /**
+     *
+     * @param refundOrder
+     * @return
+     */
+    public List<OrderPaymentItem> refundPosTwoArticle(Order refundOrder){
+        //查找到主订单的订单信息
+        Order order = selectById(StringUtils.isNotBlank(refundOrder.getParentOrderId()) ? refundOrder.getParentOrderId() : refundOrder.getId());
+        //存储当前还需要退多少金额
+        BigDecimal surplusRefundMoney = refundOrder.getRefundMoney();
+        //存放退菜是的退款记录
+        List<OrderPaymentItem> refundPaymentList = new ArrayList<>();
+        //得到实际支付已到账的父子订单的微信支付金额总和
+        BigDecimal wxPayTotal = orderMapper.selectSurplusAmountByPayMode(order.getId(), PayMode.WEIXIN_PAY);
+        //得到实际支付已到账的父子订单的支付宝支付金额总和
+        BigDecimal aliPayTotal = orderMapper.selectSurplusAmountByPayMode(order.getId(), PayMode.ALI_PAY);
+        //得到实际支付未到账的父子订单的金额总和
+        BigDecimal otherPayTotal = orderMapper.selectSurplusAmountByPayMode(order.getId(), 3);
+        //此次微信退款金额
+        BigDecimal wxRefundValue = wxPayTotal.compareTo(surplusRefundMoney) >= 0 ? surplusRefundMoney : wxPayTotal;
+        surplusRefundMoney = surplusRefundMoney.subtract(wxRefundValue);
+        //此次支付宝退款金额
+        BigDecimal aliRefundValue = aliPayTotal.compareTo(surplusRefundMoney) >= 0 ? surplusRefundMoney : aliPayTotal;
+        surplusRefundMoney = surplusRefundMoney.subtract(aliRefundValue);
+        //此次现金退款的金额
+        BigDecimal cashRefundValue = otherPayTotal.compareTo(surplusRefundMoney) >= 0 ? surplusRefundMoney : otherPayTotal;
+        //如果剩余还有可退金额已退菜红包的形式返还
+        surplusRefundMoney = surplusRefundMoney.subtract(cashRefundValue);
+        //有微信可退的
+        if (wxRefundValue.compareTo(BigDecimal.ZERO) > 0){
+            refundActualByMode(order, wxRefundValue, PayMode.WEIXIN_PAY, refundPaymentList);
+        }
+        //有支付宝可退的
+        if (aliRefundValue.compareTo(BigDecimal.ZERO) > 0){
+            refundActualByMode(order, aliRefundValue, PayMode.ALI_PAY, refundPaymentList);
+        }
+        //线下退还现金
+        if (cashRefundValue.compareTo(BigDecimal.ZERO) > 0){
+            OrderPaymentItem refundPaymentItem = new OrderPaymentItem();
+            refundPaymentItem.setId(ApplicationUtils.randomUUID());
+            refundPaymentItem.setPayValue(cashRefundValue.multiply(new BigDecimal(-1)));
+            refundPaymentItem.setRemark("线下退还现金：" + refundPaymentItem.getPayValue());
+            refundPaymentItem.setPaymentModeId(PayMode.REFUND_CRASH);
+            refundPaymentItem.setOrderId(order.getId());
+            refundPaymentItem.setPayTime(new Date());
+            orderPaymentItemService.insert(refundPaymentItem);
+            refundPaymentList.add(refundPaymentItem);
+        }
+        //退菜红包返还
+        if (surplusRefundMoney.compareTo(BigDecimal.ZERO) > 0){
+            OrderPaymentItem refundPaymentItem = new OrderPaymentItem();
+            refundPaymentItem.setId(ApplicationUtils.randomUUID());
+            refundPaymentItem.setPayValue(surplusRefundMoney.multiply(new BigDecimal(-1)));
+            refundPaymentItem.setRemark("退菜红包返还：" + refundPaymentItem.getPayValue());
+            refundPaymentItem.setPaymentModeId(PayMode.ARTICLE_BACK_PAY);
+            refundPaymentItem.setPayTime(new Date());
+            refundPaymentItem.setOrderId(order.getId());
+            orderPaymentItemService.insert(refundPaymentItem);
+            refundPaymentList.add(refundPaymentItem);
+            Customer customer = customerService.selectById(order.getCustomerId());
+            accountService.addAccount(surplusRefundMoney, customer.getAccountId(), "退菜红包", AccountLog.REFUND_ARTICLE_RED_PACKAGE, order.getShopDetailId());
+            RedPacket redPacket = new RedPacket();
+            redPacket.setId(ApplicationUtils.randomUUID());
+            redPacket.setRedMoney(order.getRefundMoney());
+            redPacket.setCreateTime(new Date());
+            redPacket.setCustomerId(customer.getId());
+            redPacket.setBrandId(order.getBrandId());
+            redPacket.setShopDetailId(order.getShopDetailId());
+            redPacket.setRedRemainderMoney(order.getRefundMoney());
+            redPacket.setRedType(RedType.REFUND_ARTICLE_RED);
+            redPacket.setOrderId(order.getId());
+            redPacketService.insert(redPacket);
+        }
+        return refundPaymentList;
+    }
+
+    public void refundActualByMode(Order order, BigDecimal refundValue, Integer payMode, List<OrderPaymentItem> refundPaymentList){
+        //得到所有父子订单实际支付的记录
+        List<OrderPaymentItem> payList = orderPaymentItemService.selectPayMentByPayMode(order.getId(), payMode, Common.YES);
+        //得到所有父子订单实际支付的退款记录
+        List<OrderPaymentItem> refundList  = orderPaymentItemService.selectPayMentByPayMode(order.getId(), payMode, Common.NO);
+        //退款的实体
+        OrderPaymentItem refundPayment;
+        //循环支付记录
+        for (OrderPaymentItem paymentItem : payList) {
+            //还有未退款金额，继续退款
+            if (refundValue.compareTo(BigDecimal.ZERO) > 0) {
+                JSONObject payInfo = new JSONObject(paymentItem.getResultData());
+                //记录当前支付记录可退款金额
+                BigDecimal remainPayMent = paymentItem.getPayValue();
+                //循环退款记录
+                for (OrderPaymentItem refundPayMentItem : refundList) {
+                    //得到当前退款的回调信息
+                    JSONObject refundInfo = new JSONObject(refundPayMentItem.getResultData());
+                    if (payMode.equals(PayMode.WEIXIN_PAY)) {
+                        //微信支付
+                        if (paymentItem.getId().equalsIgnoreCase(refundInfo.getString("transaction_id"))) {
+                            //减去此次退款的金额
+                            remainPayMent = remainPayMent.add(refundPayMentItem.getPayValue());
+                        }
+                    } else {
+                        //支付宝支付
+                        JSONObject aliPayRefundInfo = refundInfo.getJSONObject("alipay_trade_refund_response");
+                        if (paymentItem.getId().equalsIgnoreCase(aliPayRefundInfo.getString("trade_no"))) {
+                            //减去此次退款的金额
+                            remainPayMent = remainPayMent.add(refundPayMentItem.getPayValue());
+                        }
+                    }
+                }
+                //发现该笔支付还有可退金额
+                if (remainPayMent.compareTo(BigDecimal.ZERO) > 0) {
+                    //当前可退款金额
+                    BigDecimal refund = refundValue.compareTo(remainPayMent) >= 0 ? remainPayMent : refundValue;
+                    ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+                    refundPayment = new OrderPaymentItem();
+                    refundPayment.setId(ApplicationUtils.randomUUID());
+                    refundPayment.setPayValue(refund.multiply(new BigDecimal(-1)));
+                    refundPayment.setPaymentModeId(payMode);
+                    refundPayment.setOrderId(order.getId());
+                    refundPayment.setPayTime(new Date());
+                    if (payMode.equals(PayMode.WEIXIN_PAY)) {
+                        WechatConfig config = wechatConfigService.selectByBrandId(DataSourceContextHolder.getDataSourceName());
+                        Map<String, String> result;
+                        //微信支付
+                        if (shopDetail.getWxServerId() == null) {
+                            //独立商户模式
+                            result = WeChatPayUtils.refund(refundPayment.getId(), payInfo.getString("transaction_id"), payInfo.getInt("total_fee")
+                                    , refund.multiply(new BigDecimal(100)).intValue(), StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
+                                    StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(),
+                                    StringUtils.isEmpty(shopDetail.getMchkey()) ? config.getMchkey() : shopDetail.getMchkey(),
+                                    StringUtils.isEmpty(shopDetail.getPayCertPath()) ? config.getPayCertPath() : shopDetail.getPayCertPath());
+                        } else {
+                            //服务商模式
+                            WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
+                            result = WeChatPayUtils.refundNew(refundPayment.getId(), payInfo.getString("transaction_id"),
+                                    payInfo.getInt("total_fee"), refund.multiply(new BigDecimal(100)).intValue(), wxServerConfig.getAppid(), wxServerConfig.getMchid(),
+                                    StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(), wxServerConfig.getMchkey(), wxServerConfig.getPayCertPath());
+                        }
+                        if (result.containsKey("ERROR")) {
+                            log.error("微信退款失败！失败信息：" + new JSONObject(result).toString());
+                            refundPayment.setRemark("微信退还金额：" + refund + "失败，以线下退还现金的形式返还");
+                            refundPayment.setPaymentModeId(PayMode.REFUND_CRASH);
+                        }else{
+                            refundPayment.setResultData(JSON.toJSONString(result));
+                            refundPayment.setRemark("微信退款：" + refundPayment.getPayValue());
+                        }
+                    } else {
+                        BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
+                        //支付宝支付
+                        AliPayUtils.connection(StringUtils.isEmpty(shopDetail.getAliAppId()) ? brandSetting.getAliAppId() : shopDetail.getAliAppId().trim(),
+                                StringUtils.isEmpty(shopDetail.getAliPrivateKey()) ? brandSetting.getAliPrivateKey().trim() : shopDetail.getAliPrivateKey().trim(),
+                                StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim(),
+                                shopDetail.getAliEncrypt());
+                        Map map = new HashMap();
+                        map.put("trade_no", paymentItem.getId());
+                        map.put("refund_amount", refund);
+                        map.put("out_request_no", refundPayment.getId());
+                        String resultJson = AliPayUtils.refundPay(map);
+                        if (resultJson.indexOf("ERROR") != -1) {
+                            log.error("支付宝退款失败！失败信息：" + resultJson);
+                            refundPayment.setPaymentModeId(PayMode.REFUND_CRASH);
+                            refundPayment.setRemark("支付宝退还金额：" + refund + "失败，以线下退还现金的形式返还");
+                        }else {
+                            refundPayment.setResultData(new JSONObject(resultJson).toString());
+                            refundPayment.setRemark("支付宝退款：" + refundPayment.getPayValue());
+                        }
+                    }
+                    orderPaymentItemService.insert(refundPayment);
+                    refundPaymentList.add(refundPayment);
+                    refundValue = refundValue.subtract(refund);
+                }
+            }
+        }
+    }
+
+
 
     @Override
     public Order afterPay(String orderId, String couponId, BigDecimal price, BigDecimal pay, BigDecimal waitMoney, Integer payMode) {
@@ -8501,9 +8715,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         o.setMealFeePrice(mealTotalPrice);
         o.setMealAllNumber(mealCount);
         o.setArticleCount(o.getArticleCount() - Integer.parseInt(RedisUtil.get(o.getId() + "ItemCount").toString()));
-//        o.setPaymentAmount(total.add(o.getServicePrice()));
-        //这里不知道为什么会怎么写， 正常情况下 o.getServicePrice() = shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount()))
-//        o.setOriginalAmount(origin.add(shopDetail.getServicePrice().multiply(new BigDecimal(o.getCustomerCount() != null ? o.getCustomerCount() : 0))));
         o.setOriginalAmount(origin.add(o.getServicePrice()));
         o.setOrderMoney(total.add(o.getServicePrice()));
         if (o.getAmountWithChildren() != null && o.getAmountWithChildren().doubleValue() != 0.0) {

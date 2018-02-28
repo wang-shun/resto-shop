@@ -125,4 +125,6 @@ public interface OrderPaymentItemMapper  extends GenericDao<OrderPaymentItem,Str
     void posSyncDeleteByOrderId(String orderId);
 
     List<OrderPaymentItem> posSyncListByOrderId(@Param("orderId") String orderId);
+
+    List<OrderPaymentItem> selectPayMentByPayMode(@Param("orderId") String orderId, @Param("payMode") Integer payMode, @Param("type") Integer type);
 }
