@@ -1134,6 +1134,34 @@ public class PosServiceImpl implements PosService {
                 paymentItem.setRemark("余额支付:" + payValue);
                 paymentItem.setOrderId(order.getId());
                 paymentItem.setToPayId(account.getId());
+                orderPaymentItemService.insert(paymentItem);
+                //返回的支付信息
+                JSONObject returnPayment = new JSONObject(paymentItem);
+                returnPayment.put("payTime", paymentItem.getPayTime().getTime());
+                orderPaymentItems.put(returnPayment);
+                if (coupon != null){
+                    //使用优惠券
+                    paymentItem = new OrderPaymentItem();
+                    paymentItem.setId(ApplicationUtils.randomUUID());
+                    paymentItem.setPayTime(new Date());
+                    paymentItem.setPayValue(couponPayValue);
+                    paymentItem.setPaymentModeId(PayMode.COUPON_PAY);
+                    paymentItem.setRemark("优惠券支付:" + payValue);
+                    paymentItem.setOrderId(order.getId());
+                    paymentItem.setToPayId(coupon.getId());
+                    orderPaymentItemService.insert(paymentItem);
+                    returnPayment = new JSONObject(paymentItem);
+                    returnPayment.put("payTime", paymentItem.getPayTime().getTime());
+                    orderPaymentItems.put(returnPayment);
+                }
+                orderService.update(order);
+                for (OrderItem orderItem : order.getOrderItems()){
+                    orderItemService.update(orderItem);
+                }
+                returnParam.put("payMentInfo", orderPaymentItems);
+                //使用余额明细
+                Order newOrderInfo = orderService.selectById(order.getId());
+                accountService.payOrder(newOrderInfo, payValue, customer, brand, shopDetail);
             }
         }catch (Exception e){
             e.printStackTrace();
