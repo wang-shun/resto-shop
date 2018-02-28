@@ -1072,7 +1072,7 @@ public class PosServiceImpl implements PosService {
                         paymentItem.setRemark("支付宝支付：" + returnMap.get("total_amount"));
                         paymentItem.setOrderId(order.getId());
                         paymentItem.setPayTime(new Date());
-                        paymentItem.setResultData(resultInfo.getString("alipay_trade_query_response"));
+                        paymentItem.setResultData(resultInfo.get("alipay_trade_query_response").toString());
                         paymentItem.setPayValue(new BigDecimal(returnMap.get("total_amount").toString()));
                         orderPaymentItemService.insert(paymentItem);
                         orderService.update(order);
