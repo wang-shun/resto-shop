@@ -1067,13 +1067,13 @@ public class PosServiceImpl implements PosService {
                         returnParam.put("isPolling", false);
                         OrderPaymentItem paymentItem = new OrderPaymentItem();
                         JSONObject resultInfo = new JSONObject(returnMap.get("msg"));
-                        paymentItem.setId(resultInfo.get("trade_no").toString());
+                        paymentItem.setId(returnMap.get("trade_no").toString());
                         paymentItem.setPaymentModeId(PayMode.ALI_PAY);
-                        paymentItem.setRemark("支付宝支付：" + resultInfo.getBigDecimal("total_amount"));
+                        paymentItem.setRemark("支付宝支付：" + returnMap.get("total_amount"));
                         paymentItem.setOrderId(order.getId());
                         paymentItem.setPayTime(new Date());
-                        paymentItem.setResultData(resultInfo.toString());
-                        paymentItem.setPayValue(resultInfo.getBigDecimal("total_amount"));
+                        paymentItem.setResultData(resultInfo.getString("alipay_trade_query_response"));
+                        paymentItem.setPayValue(new BigDecimal(returnMap.get("total_amount").toString()));
                         orderPaymentItemService.insert(paymentItem);
                         orderService.update(order);
                         for (OrderItem orderItem : order.getOrderItems()){
