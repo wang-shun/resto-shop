@@ -939,7 +939,7 @@ public class PosServiceImpl implements PosService {
                         brandSetting.getTradePrivateKey().trim(),
                         brandSetting.getTradePublicKey().trim(), shopDetail.getAliEncrypt());
                 com.alibaba.fastjson.JSONObject json = new com.alibaba.fastjson.JSONObject();
-                json.put("out_trade_no", ApplicationUtils.randomUUID());
+                json.put("out_trade_no", outTradeNo);
                 json.put("subject", shopDetail.getName() + "---消费");
                 json.put("total_amount", object.getBigDecimal("paymentAmount") + "");
                 json.put("auth_code", authCode);
