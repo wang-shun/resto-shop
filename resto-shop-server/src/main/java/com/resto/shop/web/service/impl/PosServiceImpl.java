@@ -112,6 +112,9 @@ public class PosServiceImpl implements PosService {
     SmsLogService smsLogService;
 
     @Autowired
+    AccountService accountService;
+
+    @Autowired
     private WxServerConfigService wxServerConfigService;
 
     @Override
@@ -958,6 +961,32 @@ public class PosServiceImpl implements PosService {
                     }
                     returnParam.put("success", false);
                 }
+            }else{ //R+扫码支付
+                BigDecimal payValue = object.getBigDecimal("paymentAmount");
+                Customer customer = customerService.selectByTelePhone(authCode);
+                //查询出该笔订单的账户信息
+                Account account = accountService.selectById(customer.getAccountId());
+                //查询出该笔订单的优惠券信息
+                Map<String, Object> selectMap = new HashMap<>();
+                selectMap.put("customerId", customer.getId());
+                selectMap.put("shopId", shopDetail.getId());
+                selectMap.put("orderMoney", payValue);
+                if (account.getRemain().compareTo(BigDecimal.ZERO) > 0) {
+                    selectMap.put("useWithAccount", 1);
+                }
+                Coupon coupon = couponService.selectPosPayOrderCanUseCoupon(selectMap);
+                //有优惠券则待支付金额减去优惠券的金额
+                if (coupon != null) {
+                    payValue = payValue.subtract(coupon.getValue());
+                }
+                //判断待支付金额跟账户余额大小
+                if (payValue.compareTo(account.getRemain()) > 0){
+                    returnParam.put("success", false);
+                    returnParam.put("isPolling", false);
+                    returnParam.put("message", "账户余额不足，请更换支付方式");
+                } else{
+                    returnParam.put("outTradeNo", authCode);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -985,6 +1014,8 @@ public class PosServiceImpl implements PosService {
         JSONObject returnParam = new JSONObject();
         returnParam.put("success", true);
         returnParam.put("isPolling", true);
+        //存储返回的支付信息
+        JSONArray orderPaymentItems = new JSONArray();
         try{
             if (order.getPayMode().equals(OrderPayMode.WX_PAY)){
                 Map<String, String> map = new HashMap<>();
@@ -999,7 +1030,6 @@ public class PosServiceImpl implements PosService {
                 if (Boolean.valueOf(map.get("success"))){
                     //支付成功，退出轮询插入支付信息修改订单信息
                     returnParam.put("isPolling", false);
-                    JSONArray orderPaymentItems = new JSONArray();
                     OrderPaymentItem paymentItem = new OrderPaymentItem();
                     JSONObject resultInfo = new JSONObject(map.get("data"));
                     paymentItem.setId(resultInfo.get("transaction_id").toString());
@@ -1028,7 +1058,7 @@ public class PosServiceImpl implements PosService {
                     }
                     returnParam.put("success", false);
                 }
-            }else if (order.getPayMode().equals(OrderPayMode.ALI_PAY)){
+            }else if (order.getPayMode().equals(OrderPayMode.ALI_PAY)){ //支付宝支付
                 com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
                 jsonObject.put("out_trade_no", outTradeNo);
                 //查询支付宝订单的支付进度
@@ -1039,7 +1069,6 @@ public class PosServiceImpl implements PosService {
                     if ("TRADE_SUCCESS".equalsIgnoreCase(trade_status) || "TRADE_FINISHED".equalsIgnoreCase(trade_status)){
                         //已支付完成
                         returnParam.put("isPolling", false);
-                        JSONArray orderPaymentItems = new JSONArray();
                         OrderPaymentItem paymentItem = new OrderPaymentItem();
                         JSONObject resultInfo = new JSONObject(returnMap.get("msg"));
                         paymentItem.setId(resultInfo.get("trade_no").toString());
@@ -1076,6 +1105,35 @@ public class PosServiceImpl implements PosService {
                     }
                     returnParam.put("success", false);
                 }
+            }else{ //余额支付
+                BigDecimal payValue = object.getBigDecimal("paymentAmount");
+                Customer customer = customerService.selectByTelePhone(outTradeNo);
+                //查询出该笔订单的账户信息
+                Account account = accountService.selectById(customer.getAccountId());
+                //查询出该笔订单的优惠券信息
+                Map<String, Object> selectMap = new HashMap<>();
+                selectMap.put("customerId", customer.getId());
+                selectMap.put("shopId", shopDetail.getId());
+                selectMap.put("orderMoney", payValue);
+                if (account.getRemain().compareTo(BigDecimal.ZERO) > 0) {
+                    selectMap.put("useWithAccount", 1);
+                }
+                Coupon coupon = couponService.selectPosPayOrderCanUseCoupon(selectMap);
+                //优惠券支付金额
+                BigDecimal couponPayValue = BigDecimal.ZERO;
+                //有优惠券则待支付金额减去优惠券的金额
+                if (coupon != null) {
+                    payValue = payValue.subtract(coupon.getValue());
+                    couponPayValue = coupon.getValue();
+                }
+                OrderPaymentItem paymentItem = new OrderPaymentItem();
+                paymentItem.setId(ApplicationUtils.randomUUID());
+                paymentItem.setPayTime(new Date());
+                paymentItem.setPayValue(payValue);
+                paymentItem.setPaymentModeId(PayMode.ACCOUNT_PAY);
+                paymentItem.setRemark("余额支付:" + payValue);
+                paymentItem.setOrderId(order.getId());
+                paymentItem.setToPayId(account.getId());
             }
         }catch (Exception e){
             e.printStackTrace();
