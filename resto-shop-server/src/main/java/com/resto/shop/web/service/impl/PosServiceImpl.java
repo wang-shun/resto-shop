@@ -1066,7 +1066,7 @@ public class PosServiceImpl implements PosService {
                         //已支付完成
                         returnParam.put("isPolling", false);
                         OrderPaymentItem paymentItem = new OrderPaymentItem();
-                        JSONObject resultInfo = new JSONObject(returnMap.get("msg"));
+                        JSONObject resultInfo = new JSONObject(returnMap.get("msg").toString());
                         paymentItem.setId(returnMap.get("trade_no").toString());
                         paymentItem.setPaymentModeId(PayMode.ALI_PAY);
                         paymentItem.setRemark("支付宝支付：" + returnMap.get("total_amount"));
