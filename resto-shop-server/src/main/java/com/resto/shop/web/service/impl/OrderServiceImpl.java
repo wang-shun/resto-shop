@@ -8691,7 +8691,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal mealTotalPrice = BigDecimal.valueOf(0);
         for (OrderItem item : o.getOrderItems()) {
             origin = origin.add(item.getOriginalPrice().multiply(new BigDecimal(item.getCount())));
-            total = total.add(item.getFinalPrice());
+            if(item.getCount() > 0){
+                total = total.add(item.getFinalPrice());
+            }
             if (o.getDistributionModeId() == DistributionType.TAKE_IT_SELF && brandSetting.getIsMealFee().equals(Common.YES) && shopDetail.getIsMealFee().equals(Common.YES)) {
                 mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);
                 mealTotalPrice = mealTotalPrice.add(mealPrice);
