@@ -785,7 +785,7 @@ public class PosServiceImpl implements PosService {
     @Override
     public void posPrintOrder(String orderId) {
         Order order = orderService.selectById(orderId);
-        if(order == null && order.getPayType() != null){
+        if(order == null || order.getPayType() != null){
             return;
         }
         if(order.getPayType() == 0){    //  先付
