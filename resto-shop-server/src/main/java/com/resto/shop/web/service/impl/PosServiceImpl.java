@@ -3,7 +3,6 @@ package com.resto.shop.web.service.impl;
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
-import com.resto.brand.core.entity.Result;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.model.*;
 import com.resto.brand.web.service.*;
@@ -16,7 +15,6 @@ import com.resto.shop.web.posDto.*;
 import com.resto.shop.web.producer.MQMessageProducer;
 import com.resto.shop.web.service.*;
 import com.resto.shop.web.util.RedisUtil;
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.text.StrSubstitutor;
 import org.json.JSONArray;
@@ -32,9 +30,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.resto.brand.core.util.WeChatPayUtils.crashPay;
-import static com.resto.brand.core.util.WeChatPayUtils.queryPay;
-import static com.resto.brand.core.util.WeChatPayUtils.reverseOrder;
+import static com.resto.brand.core.util.WeChatPayUtils.*;
 import static com.resto.shop.web.service.impl.OrderServiceImpl.generateString;
 
 /**
