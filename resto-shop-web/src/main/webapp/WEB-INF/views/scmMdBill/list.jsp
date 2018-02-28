@@ -66,6 +66,7 @@
         <div class="col-md-offset-3 col-md-6" style="background: #FFF;">
             <div class="text-center" style="padding: 20px 0">
                 <span class="caption-subject bold font-blue-hoki">查看详情</span>
+                <button type="button" class="close" @click="closeThis"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -472,6 +473,9 @@
                 detailsCli:function () { //关闭查看详情
                     this.details=false;
                     this.detailsBtn=false;
+                },
+                closeThis:function () {//关闭
+                    this.details=false;
                 },
 //                save: function () {//提交
 //                    var _this = this;
