@@ -8403,7 +8403,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 StringUtils.isEmpty(shopDetail.getAliPublicKey()) ? brandSetting.getAliPublicKey().trim() : shopDetail.getAliPublicKey().trim(),
                                 shopDetail.getAliEncrypt());
                         Map map = new HashMap();
-                        map.put("out_trade_no", paymentItem.getOrderId());
+                        map.put("trade_no", paymentItem.getId());
                         map.put("refund_amount", refund);
                         map.put("out_request_no", refundPayment.getId());
                         String resultJson = AliPayUtils.refundPay(map);
