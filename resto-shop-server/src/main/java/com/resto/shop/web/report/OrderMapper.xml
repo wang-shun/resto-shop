@@ -418,7 +418,7 @@
         select
             td.id orderId, td.shop_detail_id shopId, td.table_number, IFNULL(tc.telephone,'--') telephone
             ,tc.nickname nickName, IFNULL(SUM(toi.refund_count),0) refund_count, IFNULL(SUM(toi.refund_count * toi.unit_price),0) refundMoney
-            ,DATE_FORMAT(td.create_time,'%Y-%m-%d %H:%I:%s') pushOrderTime
+            ,DATE_FORMAT(td.create_time,'%Y-%m-%d %H:%i:%s') pushOrderTime
         from tb_order td
         left join tb_order_item toi
         on td.id = toi.order_id

@@ -36,7 +36,7 @@
             <result column="refund_remark" property="refundRemark" jdbcType="VARCHAR"/>
             <result column="remark_supply" property="remarkSupply" jdbcType="VARCHAR"/>
             <result column="refund_count" property="refundCount" jdbcType="INTEGER"/>
-            <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+            <result column="create_time1" property="createTime" jdbcType="TIMESTAMP"/>
             <result column="shop_id" property="shopId" jdbcType="VARCHAR"/>
             <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
         </association>
