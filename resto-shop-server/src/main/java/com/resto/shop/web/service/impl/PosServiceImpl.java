@@ -1109,6 +1109,8 @@ public class PosServiceImpl implements PosService {
                     returnParam.put("success", false);
                 }
             }else{ //余额支付
+                //已支付完成
+                returnParam.put("isPolling", false);
                 BigDecimal payValue = object.getBigDecimal("paymentAmount");
                 Customer customer = customerService.selectByTelePhone(outTradeNo);
                 //查询出该笔订单的账户信息
