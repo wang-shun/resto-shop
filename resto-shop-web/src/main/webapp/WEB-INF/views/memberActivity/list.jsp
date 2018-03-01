@@ -230,6 +230,8 @@
 				    that.id = id;
 					$.post("memberActivity/selectCustomer",{id : id}, function (result) {
 						if (result.success){
+						    //清空之前的手机号
+							that.telephones = "";
                             customerTable.clear();
                             customerTable.rows.add(result.data).draw();
                             for (index in result.data){
@@ -240,6 +242,8 @@
 					$("#orderDetail").modal();
                 },
                 inputCustomer : function () {
+				    console.log("所有手机号记录：" + this.telephones);
+				    console.log("当前手机号：" + this.telephone);
 				    var that = this;
 				    //验证手机号是否正确
                     var reg = /^((13[\d])|(15[0-35-9])|(18[\d])|(145)|(147)|(17[0135678]))\d{8}$/;
