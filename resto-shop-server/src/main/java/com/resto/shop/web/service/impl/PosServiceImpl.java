@@ -1166,7 +1166,7 @@ public class PosServiceImpl implements PosService {
                 returnParam.put("payMentInfo", orderPaymentItems);
                 //使用余额明细
                 Order newOrderInfo = orderService.selectById(order.getId());
-//                accountService.payOrder(newOrderInfo, payValue, customer, brand, shopDetail);
+                accountService.payOrder(newOrderInfo, payValue, customer, brand, shopDetail);
             }
         }catch (Exception e){
             e.printStackTrace();
