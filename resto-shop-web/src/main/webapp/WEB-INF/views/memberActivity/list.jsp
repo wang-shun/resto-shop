@@ -27,7 +27,7 @@
 									<input type="radio" name="type" v-model="m.type" value="0"> 不开启
 								</label>
 								<label class="radio-inline">
-									<input type="radio" name="type" v-model="m.type" value="1" checked> 开启
+									<input type="radio" name="type" v-model="m.type" value="1"> 开启
 								</label>
 							</div>
 						</div>
@@ -220,6 +220,9 @@
                 },
 				create : function(){
                      this.showform = true;
+                     this.m = {
+                         type : 1
+					 };
 				},
                 edit : function (model) {
                     this.showform = true;
