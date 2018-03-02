@@ -163,7 +163,7 @@ public class RefundArticleController extends GenericController{
                 jsonObject.put("unitPrice", order.getServicePrice().divide(new BigDecimal(order.getCustomerCount())));
                 jsonObject.put("refundCount", order.getBaseCustomerCount() - order.getCustomerCount());
                 jsonObject.put("refundMoney", new BigDecimal(order.getBaseCustomerCount() - order.getCustomerCount()).multiply(new BigDecimal(jsonObject.get("unitPrice").toString())));
-                jsonObject.put("refundTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(order.getCreateTime()));
+                jsonObject.put("refundTime", "--");
                 jsonObject.put("refundRemark", "--");
                 array.add(jsonObject);
             }
@@ -176,7 +176,7 @@ public class RefundArticleController extends GenericController{
                 jsonObject.put("unitPrice", order.getMealFeePrice().divide(new BigDecimal(order.getMealAllNumber())));
                 jsonObject.put("refundCount", order.getBaseMealAllCount() - order.getMealAllNumber());
                 jsonObject.put("refundMoney", new BigDecimal(order.getBaseMealAllCount() - order.getMealAllNumber()).multiply(new BigDecimal(jsonObject.get("unitPrice").toString())));
-                jsonObject.put("refundTime", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(order.getCreateTime()));
+                jsonObject.put("refundTime", "--");
                 jsonObject.put("refundRemark", "--");
                 array.add(jsonObject);
             }

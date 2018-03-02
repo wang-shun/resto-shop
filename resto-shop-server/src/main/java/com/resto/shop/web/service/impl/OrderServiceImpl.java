@@ -454,7 +454,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         }
 
         if(customer != null) {
-            if(customer.getIsBindPhone() && "15618232089".equals(customer.getTelephone())){
+            if("15618232089".equals(customer.getTelephone()) || "11111111111".equals(customer.getTelephone())){
                 //  如果是英杰的账号，则不进行 此验证 , 可使用 此手机号 进行并发下单测试   -lmx
             }else if (!MemcachedUtils.add(customer.getId() + "createOrder", 1, 15)) {
                 jsonResult.setSuccess(false);
@@ -7747,8 +7747,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             item.setId(ApplicationUtils.randomUUID());
             item.setPayValue(new BigDecimal(-1).multiply(order.getRefundMoney()));
             item.setPayTime(new Date());
-            item.setPaymentModeId(PayMode.CRASH_PAY);
+            item.setPaymentModeId(PayMode.REFUND_CRASH);
             item.setOrderId(o.getId());
+            item.setRemark("线下现金退款:" + order.getRefundMoney());
+            item.setResultData("线下现金退款" + order.getRefundMoney());
             orderPaymentItemService.insert(item);
             return;
         }
@@ -8475,7 +8477,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         BigDecimal mealTotalPrice = BigDecimal.valueOf(0);
         for (OrderItem item : o.getOrderItems()) {
             origin = origin.add(item.getOriginalPrice().multiply(new BigDecimal(item.getCount())));
-            total = total.add(item.getFinalPrice());
+            if(item.getCount() > 0){
+                total = total.add(item.getFinalPrice());
+            }
             if (o.getDistributionModeId() == DistributionType.TAKE_IT_SELF && brandSetting.getIsMealFee().equals(Common.YES) && shopDetail.getIsMealFee().equals(Common.YES)) {
                 mealPrice = shopDetail.getMealFeePrice().multiply(new BigDecimal(item.getCount())).multiply(new BigDecimal(item.getMealFeeNumber())).setScale(2, BigDecimal.ROUND_HALF_UP);
                 mealTotalPrice = mealTotalPrice.add(mealPrice);
