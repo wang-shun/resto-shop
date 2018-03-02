@@ -47,6 +47,13 @@ public class MaterialStockController extends GenericController {
         List<MaterialStockDo> list = materialstockService.queryJoin4Page(shopDetailId,startTime,endTime);
         for(MaterialStockDo materialStockDo:list){
             materialStockDo.setInitials(PinyinUtil.getPinYinHeadChar(materialStockDo.getMaterialName()));
+            String s=materialStockDo.getMeasureUnit();
+            if(s.indexOf(".") > 0){
+                //正则表达
+                s = s.replaceAll("0+?$", "");//去掉后面无用的零
+                s = s.replaceAll("[.]$", "");//如小数点后面全是零则去掉小数点
+            }
+            materialStockDo.setMeasureUnit(s);
         }
         return getSuccessResult(list);
 
