@@ -98,7 +98,7 @@ public class OrderController extends GenericController{
 		//定义读取文件的路径
 		String path = request.getSession().getServletContext().getRealPath(fileName);
 		//定义列
-		String[]columns={"shopName","shop_orderCount","shop_orderPrice","shop_singlePrice","shop_peopleCount","shop_perPersonPrice","shop_tangshiCount","shop_tangshiPrice","shop_waidaiCount","shop_waidaiPrice","shop_waimaiCount","shop_waimaiPrice"};
+		String[]columns={"shopName","shop_orderCount","shop_wechatOrderCount","shop_posOrderCount","shop_orderPrice","shop_singlePrice","shop_peopleCount","shop_perPersonPrice","shop_tangshiCount","shop_tangshiPrice","shop_waidaiCount","shop_waidaiPrice","shop_waimaiCount","shop_waimaiPrice"};
 		//定义数据
 		//List<OrderPayDto>  result = new ArrayList<>();
 		List<ShopOrderReportDto>  result = new ArrayList<>();
@@ -111,6 +111,8 @@ public class OrderController extends GenericController{
 			ShopOrderReportDto b_shopOrderReportDto = new ShopOrderReportDto();
 			b_shopOrderReportDto.setShopName(bandOrderReportDto.getBrandName());
 			b_shopOrderReportDto.setShop_orderCount(bandOrderReportDto.getOrderCount());
+			b_shopOrderReportDto.setShop_wechatOrderCount(bandOrderReportDto.getWechatOrderCount());
+			b_shopOrderReportDto.setShop_posOrderCount(bandOrderReportDto.getPosOrderCount());
 			b_shopOrderReportDto.setShop_orderPrice(bandOrderReportDto.getOrderPrice());
 			b_shopOrderReportDto.setShop_singlePrice(bandOrderReportDto.getSinglePrice());
 			b_shopOrderReportDto.setShop_peopleCount(bandOrderReportDto.getPeopleCount());
@@ -141,7 +143,7 @@ public class OrderController extends GenericController{
 		map.put("reportTitle", "品牌订单");//表的名字
 		map.put("timeType", "yyyy-MM-dd");
 
-		String[][] headers = {{"品牌/店铺","25"},{"订单总数","25"},{"订单总额","25"},{"单均","25"},{"就餐人数","25"},{"人均","25"},{"堂吃订单数","25"},{"堂吃订单额","25"},{"外带订单数","25"},{"外带订单额","25"},{"R+外卖订单数","25"},{"R+外卖订单额","25"}};
+		String[][] headers = {{"品牌/店铺","25"},{"订单总数","25"},{"微信端订单总数","25"},{"pos端订单总数","25"},{"订单总额","25"},{"单均","25"},{"就餐人数","25"},{"人均","25"},{"堂吃订单数","25"},{"堂吃订单额","25"},{"外带订单数","25"},{"外带订单额","25"},{"R+外卖订单数","25"},{"R+外卖订单额","25"}};
 		//定义excel工具类对象
 		ExcelUtil<ShopOrderReportDto> excelUtil=new ExcelUtil<ShopOrderReportDto>();
 		try{
@@ -623,6 +625,12 @@ public class OrderController extends GenericController{
 											orderReportDto.setWaimaiCount(orderReportDto.getWaimaiCount() + 1);
 										}
 									}
+									//判断订单来源
+									if (order.getDataOrigin().equals(Common.YES) && !"0".equalsIgnoreCase(order.getCustomerId())){
+										orderReportDto.setWechatOrderCount(orderReportDto.getWechatOrderCount() + 1);
+									}else{
+										orderReportDto.setPosOrderCount(orderReportDto.getPosOrderCount() + 1);
+									}
 									if (order.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){ //就餐模式为堂食
 										//堂食订单总额累加
 										orderReportDto.setTangshiPrice(orderReportDto.getTangshiPrice().add(order.getOrderMoney()));
@@ -696,6 +704,12 @@ public class OrderController extends GenericController{
 										orderReportDto.setWaimaiCount(orderReportDto.getWaimaiCount() + 1);
 									}
 								}
+								//判断订单来源
+								if (order.getDataOrigin().equals(Common.YES) && !"0".equalsIgnoreCase(order.getCustomerId())){
+									orderReportDto.setWechatOrderCount(orderReportDto.getWechatOrderCount() + 1);
+								}else{
+									orderReportDto.setPosOrderCount(orderReportDto.getPosOrderCount() + 1);
+								}
 								if (order.getDistributionModeId().equals(DistributionType.RESTAURANT_MODE_ID)){ //就餐模式为堂食
 									//堂食订单总额累加
 									orderReportDto.setTangshiPrice(orderReportDto.getTangshiPrice().add(order.getOrderMoney()));
@@ -729,11 +743,11 @@ public class OrderController extends GenericController{
 			map.put("beginDate", year.concat("-").concat(month).concat("-01"));
 			map.put("reportType", typeName);// 表的头，第一行内容
 			map.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
-			map.put("num", "11");// 显示的位置
+			map.put("num", "13");// 显示的位置
 			map.put("timeType", "yyyy-MM-dd");
 			map.put("reportTitle", shopNames);// 表的名字
-			String[][] headers = {{"日期","25"},{"订单总数","25"},{"订单总额","25"},{"单均","25"},{"就餐人数","25"},{"人均","25"},{"堂吃订单数","25"},{"堂吃订单额","25"},{"外带订单数","25"},{"外带订单额","25"},{"R+外卖订单数","25"},{"R+外卖订单额","25"}};
-			String[] columns = {"brandName","orderCount","orderPrice","singlePrice","peopleCount","perPersonPrice","tangshiCount","tangshiPrice","waidaiCount","waidaiPrice","waimaiCount","waimaiPrice"};
+			String[][] headers = {{"日期","25"},{"订单总数","25"},{"微信端订单总数","25"},{"pos端订单总数","25"},{"订单总额","25"},{"单均","25"},{"就餐人数","25"},{"人均","25"},{"堂吃订单数","25"},{"堂吃订单额","25"},{"外带订单数","25"},{"外带订单额","25"},{"R+外卖订单数","25"},{"R+外卖订单额","25"}};
+			String[] columns = {"brandName","orderCount","wechatOrderCount","posOrderCount","orderPrice","singlePrice","peopleCount","perPersonPrice","tangshiCount","tangshiPrice","waidaiCount","waidaiPrice","waimaiCount","waimaiPrice"};
 			ExcelUtil<BrandOrderReportDto> excelUtil = new ExcelUtil<>();
 			OutputStream out = new FileOutputStream(path);
 			excelUtil.createMonthDtoExcel(headers, columns, result, out, map);

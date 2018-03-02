@@ -133,6 +133,8 @@
 
     <resultMap id="shopMap" type="com.resto.brand.web.dto.ShopOrderReportDto">
         <result column="orderCount" property="shop_orderCount" jdbcType="INTEGER"/>
+        <result column="wechatOrderCount" property="shop_wechatOrderCount" jdbcType="INTEGER"/>
+        <result column="posOrderCount" property="shop_posOrderCount" jdbcType="INTEGER"/>
         <result column="orderPrice" property="shop_orderPrice" jdbcType="DECIMAL"/>
         <result column="peopleCount" property="shop_peopleCount" jdbcType="INTEGER"/>
         <result column="tangshiCount" property="shop_tangshiCount" jdbcType="INTEGER"/>
@@ -178,6 +180,8 @@
         <result column="customer_count" property="customerCount"/>
         <result column="distribution_mode_id" property="distributionModeId"/>
         <result column="parent_order_id" property="parentOrderId"/>
+        <result column="customer_id" property="customerId"/>
+        <result column="data_origin" property="dataOrigin"/>
         <association property="appraise" javaType="com.resto.shop.web.model.Appraise">
             <id column="appraise_id" property="id"/>
             <result column="level" property="level"/>
@@ -269,8 +273,8 @@
 			 SUM(r.waimaiCount) waimaiCount, SUM(r.waimaiPrice) waimaiPrice from (
 		SELECT
 			IF(ISNULL(parent_order_id), 1, 0)  orderCount,
-			IF(ISNULL(parent_order_id) AND o.data_origin = 1 AND o.customer_id IS NOT NULL, 1, 0) wechatOrderCount,
-			IF(ISNULL(parent_order_id) AND (o.data_origin = 2 OR (o.data_origin = 2 and o.customer_id = 0)), 1, 0) posOrderCount,
+			IF(ISNULL(parent_order_id) AND o.data_origin = 1 AND o.customer_id != '0', 1, 0) wechatOrderCount,
+			IF(ISNULL(parent_order_id) AND (o.data_origin = 2 OR (o.data_origin = 1 and o.customer_id = '0')), 1, 0) posOrderCount,
 			IF(ISNULL(parent_order_id), O.customer_count, 0) peopleCount,
 			IF(o.distribution_mode_id = 1 AND ISNULL(o.parent_order_id), 1, 0) tangshiCount,
 			IF(o.distribution_mode_id = 3 AND ISNULL(o.parent_order_id), 1, 0) waidaiCount,
@@ -347,32 +351,32 @@
     </select>
 
     <select id="procDayAllOrderItemShop" resultMap="shopMap">
-        SELECT orderCount,SUM(t2.orderPrice) orderPrice,peopleCount,tangshiCount,SUM(t2.tangshiPrice) tangshiPrice,waidaiCount,SUM(t2.waidaiPrice) waidaiPrice,waimaiCount,SUM(t2.waimaiPrice) waimaiPrice FROM
-        (SELECT
-        COUNT(CASE WHEN ISNULL(o.parent_order_id) THEN o.id ELSE null END)  orderCount,
-        SUM(CASE WHEN ISNULL(o.parent_order_id) THEN o.customer_count ELSE null END) peopleCount,
-        COUNT(CASE WHEN o.distribution_mode_id=1 AND ISNULL(o.parent_order_id) THEN o.id ELSE null END) tangshiCount,
-        COUNT(CASE WHEN o.distribution_mode_id=3 AND ISNULL(o.parent_order_id) THEN o.id ELSE null END) waidaiCount,
-        COUNT(CASE WHEN o.distribution_mode_id=2 AND ISNULL(o.parent_order_id) THEN o.id ELSE null END) waimaiCount
-        FROM tb_order o
-        WHERE o.production_status IN (2,3,4)
-        AND	o.order_state IN (2,10,11,12)
-        AND o.create_time >= CONCAT(#{0},' 00:00:00')
-        AND CONCAT(#{1},' 23:59:59') >= o.create_time
-        AND o.shop_detail_id=#{2}) t1,
-        (SELECT
-        SUM(i.unit_price * i.count) + o.service_price + o.meal_fee_price orderPrice,
-        SUM(CASE WHEN o.distribution_mode_id=1 THEN i.unit_price * i.count ELSE null END)+ o.service_price + o.meal_fee_price tangshiPrice,
-        SUM(CASE WHEN o.distribution_mode_id=3 THEN i.unit_price * i.count ELSE null END)+ o.service_price + o.meal_fee_price waidaiPrice,
-        SUM(CASE WHEN o.distribution_mode_id=2 THEN i.unit_price * i.count ELSE null END)+ o.service_price + o.meal_fee_price waimaiPrice
-        FROM tb_order o ,tb_order_item i
-        WHERE o.id=i.order_id
-        AND o.production_status IN (2,3,4)
-        AND	o.order_state IN (2,10,11,12)
-        AND o.create_time >= CONCAT(#{0},' 00:00:00')
-        AND CONCAT(#{1},' 23:59:59') >= o.create_time
-        AND o.shop_detail_id=#{2}
-        GROUP BY o.id) t2
+        select SUM(r.orderCount) orderCount, SUM(r.wechatOrderCount) wechatOrderCount, SUM(r.posOrderCount) posOrderCount,
+			 SUM(r.orderPrice) orderPrice, SUM(r.peopleCount) peopleCount, SUM(r.tangshiCount) tangshiCount,
+			 SUM(r.tangshiPrice) tangshiPrice,SUM(r.waidaiCount) waidaiCount, SUM(r.waidaiPrice) waidaiPrice,
+			 SUM(r.waimaiCount) waimaiCount, SUM(r.waimaiPrice) waimaiPrice from (
+		SELECT
+			IF(ISNULL(parent_order_id), 1, 0)  orderCount,
+			IF(ISNULL(parent_order_id) AND o.data_origin = 1 AND o.customer_id != '0', 1, 0) wechatOrderCount,
+			IF(ISNULL(parent_order_id) AND (o.data_origin = 2 OR (o.data_origin = 1 and o.customer_id = '0')), 1, 0) posOrderCount,
+			IF(ISNULL(parent_order_id), O.customer_count, 0) peopleCount,
+			IF(o.distribution_mode_id = 1 AND ISNULL(o.parent_order_id), 1, 0) tangshiCount,
+			IF(o.distribution_mode_id = 3 AND ISNULL(o.parent_order_id), 1, 0) waidaiCount,
+			IF(o.distribution_mode_id = 2 AND ISNULL(o.parent_order_id), 1, 0) waimaiCount,
+			SUM(toi.unit_price * toi.count) + o.service_price + o.meal_fee_price orderPrice,
+			SUM(IF(o.distribution_mode_id=1, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price tangshiPrice,
+			SUM(IF(o.distribution_mode_id=3, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price waidaiPrice,
+			SUM(IF(o.distribution_mode_id=2, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price waimaiPrice
+		FROM tb_order o
+		INNER JOIN tb_order_item toi
+		on o.id = toi.order_id
+		WHERE o.production_status IN (2,3,4)
+		AND	o.order_state IN (2,10,11)
+		AND o.create_time >= #{0}
+		AND CONCAT(#{1},' 23:59:59') >= o.create_time
+		AND o.shop_detail_id=#{2}
+		GROUP BY o.id
+        ) r
     </select>
 
     <select id="selectListByShopId" resultMap="consumedOrderByshopId">
@@ -390,7 +394,7 @@
     <select id="selectListBybrandId" resultMap="selectListBybrandIdmap">
         SELECT
             o.id , o.order_money ,a.level,o.shop_detail_id,a.red_money,o.customer_count,
-            o.distribution_mode_id,o.parent_order_id
+            o.distribution_mode_id,o.parent_order_id,o.customer_id,o.data_origin
             <if test="type == 1">
                 ,o.create_time
             </if>
