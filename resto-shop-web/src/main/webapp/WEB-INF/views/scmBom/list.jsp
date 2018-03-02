@@ -548,7 +548,7 @@
                     }
                     if(url =="scmBom/modify"){
                         $.get("scmBom/effectiveBomHead"+'?articleId='+_this.parameter.articleId,function (result) {
-                            C.confirmDialog((result.message != null && _this.parameter.state=='1') ? result.message:+ "你确定要启用改bom吗?" + ",你确定要启用改bom吗?", "提醒", function () {
+                            C.confirmDialog((result.message != null && _this.parameter.state=='1') ? result.message:+ "你确定要启用该bom吗?" + ",你确定要启用该bom吗?", "提醒", function () {
                                 if(submit){
                                     $.ajax({
                                         type:"POST",
@@ -588,7 +588,7 @@
                     }else{
                         $.get("scmBom/effectiveBomHead"+'?articleId='+_this.parameter.articleId,function (result) {
                            debugger
-                          C.confirmDialog((result.message != "" && _this.parameter.state=='1') ? result.message:+ "你确定要启用改bom吗?," + "你确定要启用改bom吗?", "提醒", function () {
+                          C.confirmDialog((result.message != "" && _this.parameter.state=='1') ? result.message:+ "你确定要启用该bom吗?," + "你确定要启用该bom吗?", "提醒", function () {
                                    if(submit){
                                         $.ajax({
                                             type:"POST",
