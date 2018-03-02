@@ -7,6 +7,7 @@
         <div class="col-md-offset-3 col-md-6" style="background: #FFF;">
             <div class="text-center" style="padding: 20px 0">
                 <span class="caption-subject bold font-blue-hoki">查看详情</span>
+                <button type="button" class="close" @click="closeThis"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="row">
                 <div class="col-md-12">
@@ -17,7 +18,7 @@
                         </div>
                         <label class="col-md-2 control-label">入库时间</label>
                         <div class="col-md-4">
-                            {{detailsArr.gmtCreate}}
+                            {{detailsArr.gmtCreate | moment}}
                         </div>
                     </div>
                     <div class="form-group row">
@@ -239,7 +240,14 @@
                     this.details=false;
                     this.detailsBtn=false;
                 },
+                closeThis:function () {//关闭
+                    this.details=false;
+                },
             },
+        });
+        Vue.filter('moment', function (value, formatString) {
+            formatString = formatString || 'YYYY-MM-DD HH:mm:ss';
+            return moment(value).format(formatString);
         });
         C.vue=vueObj;
     }());
