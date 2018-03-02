@@ -10314,37 +10314,39 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Date end = DateUtil.getformatEndDate(endDate);
             shopOrderReportDto=orderMapperReport.procDayAllOrderItemShop(begin,end,shopDetail.getId());
             BigDecimal initial_=new BigDecimal("0.00");
-            if(shopOrderReportDto.getShop_orderCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
-                BigDecimal ssinglePrice= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_orderCount());
-                shopOrderReportDto.setShop_singlePrice(new BigDecimal(ssinglePrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
-            }else{
-                shopOrderReportDto.setShop_singlePrice(initial_);
-            }
+            if (shopOrderReportDto != null) {
+                if (shopOrderReportDto.getShop_orderCount() != 0 && shopOrderReportDto.getShop_orderPrice() != null) {
+                    BigDecimal ssinglePrice = new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue() / shopOrderReportDto.getShop_orderCount());
+                    shopOrderReportDto.setShop_singlePrice(new BigDecimal(ssinglePrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+                } else {
+                    shopOrderReportDto.setShop_singlePrice(initial_);
+                }
 
-            if(shopOrderReportDto.getShop_peopleCount()!=null&&shopOrderReportDto.getShop_peopleCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
-                BigDecimal speopleCount= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_peopleCount());
-                shopOrderReportDto.setShop_perPersonPrice(new BigDecimal(speopleCount.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
-            }else{
-                shopOrderReportDto.setShop_perPersonPrice(initial_);
+                if (shopOrderReportDto.getShop_peopleCount() != null && shopOrderReportDto.getShop_peopleCount() != 0 && shopOrderReportDto.getShop_orderPrice() != null) {
+                    BigDecimal speopleCount = new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue() / shopOrderReportDto.getShop_peopleCount());
+                    shopOrderReportDto.setShop_perPersonPrice(new BigDecimal(speopleCount.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+                } else {
+                    shopOrderReportDto.setShop_perPersonPrice(initial_);
+                }
+                if (shopOrderReportDto.getShop_peopleCount() == null) {
+                    shopOrderReportDto.setShop_peopleCount(0);
+                }
+                if (shopOrderReportDto.getShop_orderPrice() == null) {
+                    shopOrderReportDto.setShop_orderPrice(initial_);
+                }
+                if (shopOrderReportDto.getShop_tangshiPrice() == null) {
+                    shopOrderReportDto.setShop_tangshiPrice(initial_);
+                }
+                if (shopOrderReportDto.getShop_waidaiPrice() == null) {
+                    shopOrderReportDto.setShop_waidaiPrice(initial_);
+                }
+                if (shopOrderReportDto.getShop_waimaiPrice() == null) {
+                    shopOrderReportDto.setShop_waimaiPrice(initial_);
+                }
+                shopOrderReportDto.setShopDetailId(shopDetail.getId());
+                shopOrderReportDto.setShopName(shopDetail.getName());
+                shopOrderReportDtoLists.add(shopOrderReportDto);
             }
-            if(shopOrderReportDto.getShop_peopleCount()==null){
-                shopOrderReportDto.setShop_peopleCount(0);
-            }
-            if(shopOrderReportDto.getShop_orderPrice()==null){
-                shopOrderReportDto.setShop_orderPrice(initial_);
-            }
-            if(shopOrderReportDto.getShop_tangshiPrice()==null){
-                shopOrderReportDto.setShop_tangshiPrice(initial_);
-            }
-            if(shopOrderReportDto.getShop_waidaiPrice()==null){
-                shopOrderReportDto.setShop_waidaiPrice(initial_);
-            }
-            if(shopOrderReportDto.getShop_waimaiPrice()==null){
-                shopOrderReportDto.setShop_waimaiPrice(initial_);
-            }
-            shopOrderReportDto.setShopDetailId(shopDetail.getId());
-            shopOrderReportDto.setShopName(shopDetail.getName());
-            shopOrderReportDtoLists.add(shopOrderReportDto);
         }
         return shopOrderReportDtoLists;
 
