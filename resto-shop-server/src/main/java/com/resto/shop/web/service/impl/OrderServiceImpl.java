@@ -1985,7 +1985,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order pushOrder(String orderId) throws AppException {
         String time = DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
-        Order order = selectById(orderId);
+        Order order = orderMapper.selectByPrimaryKey(orderId);
         //可能存在不满足pushorder条件的订单  --order = null  或者已经打印的订单
         if(order == null || order.getProductionStatus() == ProductionStatus.PRINTED){
             return order;
@@ -2023,7 +2023,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             case ShopMode.BOSS_ORDER:
                 if (order.getPayType() == PayType.PAY) {
                     if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
-                        log.error("立即下单失败: " + order.getId());
+                        log.error("立即下单失败: " + order.getId() +"\n" + "orderStarte:" + order.getOrderState() +"\n" + "productionStatus:" + order.getProductionStatus());
                         throw new AppException(AppException.ORDER_STATE_ERR);
                     }
                 } else if (order.getPayType() == PayType.NOPAY) {
