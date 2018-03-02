@@ -1,5 +1,6 @@
 package com.resto.shop.web.controller.scm;
 import com.resto.brand.core.entity.Result;
+import com.resto.brand.core.util.PinyinUtil;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.service.BrandSettingService;
 import com.resto.scm.web.dto.MaterialStockDo;
@@ -44,6 +45,9 @@ public class MaterialStockController extends GenericController {
     public Result listData(String shopId,String startTime,String endTime) {
         String shopDetailId =StringUtils.isEmpty(shopId)?this.getCurrentShopId():shopId;
         List<MaterialStockDo> list = materialstockService.queryJoin4Page(shopDetailId,startTime,endTime);
+        for(MaterialStockDo materialStockDo:list){
+            materialStockDo.setInitials(PinyinUtil.getPinYinHeadChar(materialStockDo.getMaterialName()));
+        }
         return getSuccessResult(list);
 
     }
