@@ -5431,6 +5431,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         selectBrandMap.put("endDate", endDate);
         selectBrandMap.put("brandId", brandId);
         brandOrderReportDto=orderMapperReport.procDayAllOrderItemBrand(selectBrandMap);
+        if(brandOrderReportDto == null){
+            return null;
+        }
         brandOrderReportDto.setBrandName(brandName);
         if(brandOrderReportDto.getOrderCount()!=0&&brandOrderReportDto.getOrderPrice()!=null){
             BigDecimal singlePrice = new BigDecimal(brandOrderReportDto.getOrderPrice().doubleValue()/brandOrderReportDto.getOrderCount());
