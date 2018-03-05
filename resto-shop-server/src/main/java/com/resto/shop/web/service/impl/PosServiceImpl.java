@@ -1159,6 +1159,8 @@ public class PosServiceImpl implements PosService {
                     returnPayment.put("payTime", paymentItem.getPayTime().getTime());
                     orderPaymentItems.put(returnPayment);
                 }
+                //扫R+码支付时，将订单关联到对应的用户
+                order.setCustomerId(customer.getId());
                 orderService.update(order);
                 for (OrderItem orderItem : order.getOrderItems()){
                     orderItemService.update(orderItem);
