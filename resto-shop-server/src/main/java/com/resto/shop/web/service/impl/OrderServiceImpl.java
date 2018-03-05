@@ -1985,7 +1985,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     @Override
     public Order pushOrder(String orderId) throws AppException {
         String time = DateUtil.formatDate(new Date(), "yyyy-MM-dd hh:mm:ss");
-        Order order = selectById(orderId);
+        Order order = orderMapper.selectByPrimaryKey(orderId);
         //可能存在不满足pushorder条件的订单  --order = null  或者已经打印的订单
         if(order == null || order.getProductionStatus() == ProductionStatus.PRINTED){
             return order;
@@ -2021,9 +2021,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                }
 //                break;
             case ShopMode.BOSS_ORDER:
+                log.error("【BOSS_ORDER】立即下单失败: " + order.getId() +"\n" + "orderStarte:" + order.getOrderState() +"\n" + "productionStatus:" + order.getProductionStatus());
                 if (order.getPayType() == PayType.PAY) {
                     if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
-                        log.error("立即下单失败: " + order.getId());
+                        log.error("立即下单失败: " + order.getId() +"\n" + "orderStarte:" + order.getOrderState() +"\n" + "productionStatus:" + order.getProductionStatus());
                         throw new AppException(AppException.ORDER_STATE_ERR);
                     }
                 } else if (order.getPayType() == PayType.NOPAY) {
@@ -4598,7 +4599,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer orginState = order.getOrderState();//订单开始确认的状体
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
-            if(order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+            if(order.getProductionStatus() == ProductionStatus.HAS_ORDER || order.getPrintOrderTime() != null){
                 order.setProductionStatus(ProductionStatus.PRINTED);
             }
             order.setConfirmTime(new Date());
@@ -4678,7 +4679,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         log.info("开始确认订单:" + order.getId());
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
-            if(order.getProductionStatus() == ProductionStatus.HAS_ORDER){
+            if(order.getProductionStatus() == ProductionStatus.HAS_ORDER || order.getPrintOrderTime() != null){
                 order.setProductionStatus(ProductionStatus.PRINTED);
             }
             order.setConfirmTime(new Date());
