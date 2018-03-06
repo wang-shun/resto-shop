@@ -1052,18 +1052,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     if (lastOrder != null && lastOrder.getParentOrderId() != null) {
                         Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
                         if (parent != null && parent.getAllowContinueOrder()) {
-                            order.setParentOrderId(parent.getId());
-                            order.setTableNumber(parent.getTableNumber());
-                            order.setVerCode(parent.getVerCode());
-                            order.setCustomerCount(parent.getCustomerCount());
+                            if(parent.getGroupId() != null && !"".equals(parent.getGroupId())
+                                    && order.getGroupId() != null && !"".equals(order.getGroupId())
+                                    && !order.getGroupId().equals(parent.getGroupId())){
+
+                            }else{
+                                order.setParentOrderId(parent.getId());
+                                order.setTableNumber(parent.getTableNumber());
+                                order.setVerCode(parent.getVerCode());
+                                order.setCustomerCount(parent.getCustomerCount());
+                            }
                         }
                     } else {
                         if (lastOrder != null && lastOrder.getAllowContinueOrder()) {
-                            order.setParentOrderId(lastOrder.getId());
-                            Order parentOrder = selectById(order.getParentOrderId());
-                            order.setTableNumber(parentOrder.getTableNumber());
-                            order.setVerCode(parentOrder.getVerCode());
-                            order.setCustomerCount(parentOrder.getCustomerCount());
+                            if(lastOrder.getGroupId() != null && !"".equals(lastOrder.getGroupId())
+                                    && order.getGroupId() != null && !"".equals(order.getGroupId())
+                                    && !order.getGroupId().equals(lastOrder.getGroupId())){
+
+                            }else{
+                                order.setParentOrderId(lastOrder.getId());
+                                Order parentOrder = selectById(order.getParentOrderId());
+                                order.setTableNumber(parentOrder.getTableNumber());
+                                order.setVerCode(parentOrder.getVerCode());
+                                order.setCustomerCount(parentOrder.getCustomerCount());
+                            }
                         }
                     }
                 }
@@ -5447,6 +5459,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         selectBrandMap.put("endDate", endDate);
         selectBrandMap.put("brandId", brandId);
         brandOrderReportDto=orderMapperReport.procDayAllOrderItemBrand(selectBrandMap);
+        if(brandOrderReportDto == null){
+            return null;
+        }
         brandOrderReportDto.setBrandName(brandName);
         if(brandOrderReportDto.getOrderCount()!=0&&brandOrderReportDto.getOrderPrice()!=null){
             BigDecimal singlePrice = new BigDecimal(brandOrderReportDto.getOrderPrice().doubleValue()/brandOrderReportDto.getOrderCount());
@@ -10526,37 +10541,39 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             Date end = DateUtil.getformatEndDate(endDate);
             shopOrderReportDto=orderMapperReport.procDayAllOrderItemShop(begin,end,shopDetail.getId());
             BigDecimal initial_=new BigDecimal("0.00");
-            if(shopOrderReportDto.getShop_orderCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
-                BigDecimal ssinglePrice= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_orderCount());
-                shopOrderReportDto.setShop_singlePrice(new BigDecimal(ssinglePrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
-            }else{
-                shopOrderReportDto.setShop_singlePrice(initial_);
-            }
+            if (shopOrderReportDto != null) {
+                if (shopOrderReportDto.getShop_orderCount() != 0 && shopOrderReportDto.getShop_orderPrice() != null) {
+                    BigDecimal ssinglePrice = new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue() / shopOrderReportDto.getShop_orderCount());
+                    shopOrderReportDto.setShop_singlePrice(new BigDecimal(ssinglePrice.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+                } else {
+                    shopOrderReportDto.setShop_singlePrice(initial_);
+                }
 
-            if(shopOrderReportDto.getShop_peopleCount()!=null&&shopOrderReportDto.getShop_peopleCount()!=0&&shopOrderReportDto.getShop_orderPrice()!=null){
-                BigDecimal speopleCount= new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue()/shopOrderReportDto.getShop_peopleCount());
-                shopOrderReportDto.setShop_perPersonPrice(new BigDecimal(speopleCount.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
-            }else{
-                shopOrderReportDto.setShop_perPersonPrice(initial_);
+                if (shopOrderReportDto.getShop_peopleCount() != null && shopOrderReportDto.getShop_peopleCount() != 0 && shopOrderReportDto.getShop_orderPrice() != null) {
+                    BigDecimal speopleCount = new BigDecimal(shopOrderReportDto.getShop_orderPrice().doubleValue() / shopOrderReportDto.getShop_peopleCount());
+                    shopOrderReportDto.setShop_perPersonPrice(new BigDecimal(speopleCount.setScale(2, BigDecimal.ROUND_HALF_UP).doubleValue()));
+                } else {
+                    shopOrderReportDto.setShop_perPersonPrice(initial_);
+                }
+                if (shopOrderReportDto.getShop_peopleCount() == null) {
+                    shopOrderReportDto.setShop_peopleCount(0);
+                }
+                if (shopOrderReportDto.getShop_orderPrice() == null) {
+                    shopOrderReportDto.setShop_orderPrice(initial_);
+                }
+                if (shopOrderReportDto.getShop_tangshiPrice() == null) {
+                    shopOrderReportDto.setShop_tangshiPrice(initial_);
+                }
+                if (shopOrderReportDto.getShop_waidaiPrice() == null) {
+                    shopOrderReportDto.setShop_waidaiPrice(initial_);
+                }
+                if (shopOrderReportDto.getShop_waimaiPrice() == null) {
+                    shopOrderReportDto.setShop_waimaiPrice(initial_);
+                }
+                shopOrderReportDto.setShopDetailId(shopDetail.getId());
+                shopOrderReportDto.setShopName(shopDetail.getName());
+                shopOrderReportDtoLists.add(shopOrderReportDto);
             }
-            if(shopOrderReportDto.getShop_peopleCount()==null){
-                shopOrderReportDto.setShop_peopleCount(0);
-            }
-            if(shopOrderReportDto.getShop_orderPrice()==null){
-                shopOrderReportDto.setShop_orderPrice(initial_);
-            }
-            if(shopOrderReportDto.getShop_tangshiPrice()==null){
-                shopOrderReportDto.setShop_tangshiPrice(initial_);
-            }
-            if(shopOrderReportDto.getShop_waidaiPrice()==null){
-                shopOrderReportDto.setShop_waidaiPrice(initial_);
-            }
-            if(shopOrderReportDto.getShop_waimaiPrice()==null){
-                shopOrderReportDto.setShop_waimaiPrice(initial_);
-            }
-            shopOrderReportDto.setShopDetailId(shopDetail.getId());
-            shopOrderReportDto.setShopName(shopDetail.getName());
-            shopOrderReportDtoLists.add(shopOrderReportDto);
         }
         return shopOrderReportDtoLists;
 

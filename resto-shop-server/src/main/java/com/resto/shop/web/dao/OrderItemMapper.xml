@@ -36,7 +36,7 @@
             <result column="refund_remark" property="refundRemark" jdbcType="VARCHAR"/>
             <result column="remark_supply" property="remarkSupply" jdbcType="VARCHAR"/>
             <result column="refund_count" property="refundCount" jdbcType="INTEGER"/>
-            <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+            <result column="refund_time" property="createTime" jdbcType="TIMESTAMP"/>
             <result column="shop_id" property="shopId" jdbcType="VARCHAR"/>
             <result column="brand_id" property="brandId" jdbcType="VARCHAR"/>
         </association>
@@ -450,7 +450,7 @@ order by t.print_sort asc
     </select>
 
     <select id="selectRefundArticleItem" resultMap="BaseResultMap">
-        select * from tb_order_item toi
+        select *,tor.create_time refund_time from tb_order_item toi
         inner join tb_order_refund_remark  tor
         on toi.article_id = tor.article_id and toi.order_id = tor.order_id
         where toi.order_id = #{orderId} and toi.refund_count != 0

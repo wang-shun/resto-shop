@@ -27,7 +27,7 @@
 									<input type="radio" name="type" v-model="m.type" value="0"> 不开启
 								</label>
 								<label class="radio-inline">
-									<input type="radio" name="type" v-model="m.type" value="1" checked> 开启
+									<input type="radio" name="type" v-model="m.type" value="1"> 开启
 								</label>
 							</div>
 						</div>
@@ -189,7 +189,7 @@
                 showform: false,
                 telephone : null,
 				id : null,
-				telephones : "",
+				telephones : {},
 				m : {
                     type : 1
 				}
@@ -220,6 +220,9 @@
                 },
 				create : function(){
                      this.showform = true;
+                     this.m = {
+                         type : 1
+					 };
 				},
                 edit : function (model) {
                     this.showform = true;
@@ -230,26 +233,38 @@
 				    that.id = id;
 					$.post("memberActivity/selectCustomer",{id : id}, function (result) {
 						if (result.success){
+						    //清空当前id在telephones对应的属性的值
+						    that.telephones[id] = "";
                             customerTable.clear();
                             customerTable.rows.add(result.data).draw();
                             for (index in result.data){
-                                that.telephones = that.telephones + result.data[index].telephone + ",";
+                                that.telephones[id] = that.telephones[id] + result.data[index].telephone + ",";
 							}
 						}
                     });
 					$("#orderDetail").modal();
                 },
                 inputCustomer : function () {
+				    console.log("所有手机号记录：" + JSON.stringify(this.telephones));
+				    console.log("当前手机号：" + this.telephone);
 				    var that = this;
+				    var flg = false;
+				    //查看当前添加的手机号是否存在
+				    for (tele in that.telephones){
+				        var str = that.telephones[tele];
+				        if (str.indexOf(that.telephone) != -1){
+                            flg = true;
+						}
+					}
 				    //验证手机号是否正确
                     var reg = /^((13[\d])|(15[0-35-9])|(18[\d])|(145)|(147)|(17[0135678]))\d{8}$/;
                     if (!reg.test(that.telephone)){
                         toastr.clear();
                         toastr.error("手机号格式错误，请输入正确格式的手机号");
                         return;
-					}else if (that.telephones.indexOf(that.telephone) != -1){
+					}else if (flg){
                         toastr.clear();
-                        toastr.error("该手机号已存在，请勿重复添加");
+                        toastr.error("该手机号已存在于折扣活动当中，请勿重复添加");
                         return;
 					}
 					$.post("memberActivity/inputCustomer", {telephone : that.telephone, activityId : that.id}, function (result) {
@@ -274,7 +289,6 @@
                             if (result.success){
                                 toastr.clear();
                                 toastr.success("删除成功");
-                                that.telephones = that.telephones.replace(telephone, "");
                                 that.showModel(that.id);
                             }else{
                                 toastr.clear();

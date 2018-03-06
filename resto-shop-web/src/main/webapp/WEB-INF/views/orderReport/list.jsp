@@ -42,6 +42,8 @@
                         <thead>
                         <tr><th>品牌</th>
                             <th>订单总数</th>
+                            <th>微信端订单总数</th>
+                            <th>pos端订单总数</th>
                             <th>订单总额</th>
                             <th>单均</th>
                             <th>就餐人数</th>
@@ -59,6 +61,8 @@
                             <tr>
                                 <td><strong>{{brandOrder.brandName}}</strong></td>
                                 <td>{{brandOrder.orderCount}}</td>
+                                <td>{{brandOrder.wechatOrderCount}}</td>
+                                <td>{{brandOrder.posOrderCount}}</td>
                                 <td>{{brandOrder.orderPrice}}</td>
                                 <td>{{brandOrder.singlePrice}}</td>
                                 <td>{{brandOrder.peopleCount}}</td>
@@ -195,6 +199,14 @@
                         {
                             title : "订单总数",
                             data : "shop_orderCount"
+                        },
+                        {
+                            title : "微信端订单总数",
+                            data : "shop_wechatOrderCount"
+                        },
+                        {
+                            title : "pos端订单总数",
+                            data : "shop_posOrderCount"
                         },
                         {
                             title : "订单总额",

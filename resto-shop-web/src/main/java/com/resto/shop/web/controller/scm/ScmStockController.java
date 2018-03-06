@@ -3,6 +3,7 @@ package com.resto.shop.web.controller.scm;
 import com.resto.brand.core.entity.Result;
 import com.resto.brand.web.model.BrandSetting;
 import com.resto.brand.web.service.BrandSettingService;
+import com.resto.scm.web.dto.DocStockCountDetailDo;
 import com.resto.scm.web.dto.DocStockCountHeaderDo;
 import com.resto.scm.web.dto.DocStockInput;
 import com.resto.scm.web.dto.MaterialStockDo;
@@ -55,6 +56,17 @@ public class ScmStockController extends GenericController{
     public Result listData(String shopId){
         String shopDetailId = StringUtils.isEmpty(shopId)?getCurrentShopId():shopId;
         List<DocStockCountHeaderDo> list = stockCountCheckService.findStockList(shopDetailId);
+        for(DocStockCountHeaderDo docStockCountHeaderDo:list){
+            for(DocStockCountDetailDo dcStockCountDetailDo:docStockCountHeaderDo.getStockCountDetailList()){
+                String s=dcStockCountDetailDo.getMeasureUnit();
+                if(s.indexOf(".") > 0){
+                    //正则表达
+                    s = s.replaceAll("0+?$", "");//去掉后面无用的零
+                    s = s.replaceAll("[.]$", "");//如小数点后面全是零则去掉小数点
+                }
+                dcStockCountDetailDo.setMeasureUnit(s);
+            }
+        }
         return getSuccessResult(list);
     }
 
