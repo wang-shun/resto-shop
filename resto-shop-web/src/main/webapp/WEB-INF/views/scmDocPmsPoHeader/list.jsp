@@ -240,12 +240,30 @@
                 approveCli2:function () { //批准审核
                     this.details=false;
                     this.approveBtn=false;
-                    debugger
                     C.systemButton('scmDocPmsPoHeader/approve',{id:this.detailsArr.id,orderStatus:'12'},['审核成功','审核失败']);
                 },
                 showDetails:function (data) { //查看详情
-                    this.details=true;
-                    this.detailsArr=data;
+                    var that=this;
+                    that.details=true;
+                    that.detailsArr=data;
+                    if(that.detailsArr.docPmsPoDetailDos.length==0){
+                        $.ajax({
+                            url : "scmDocPmsPoHeader/docPmsPoDetailDos",
+                            type:"post",
+                            data:{scmDocPmsPoHeaderId:that.detailsArr.id},
+                            success : function(result) {
+                                that.detailsArr.docPmsPoDetailDos=result.data;
+                                for(var i=0;i<that.detailsArr.docPmsPoDetailDos.length;i++){
+                                    switch(that.detailsArr.docPmsPoDetailDos[i].materialType){
+                                        case 'INGREDIENTS':that.detailsArr.docPmsPoDetailDos[i].materialType='主料';break;
+                                        case 'ACCESSORIES':that.detailsArr.docPmsPoDetailDos[i].materialType='辅料';break;
+                                        case 'SEASONING':that.detailsArr.docPmsPoDetailDos[i].materialType='配料';break;
+                                        case 'MATERIEL':that.detailsArr.docPmsPoDetailDos[i].materialType='物料';break;
+                                    }
+                                }
+                            }
+                        });
+                    }
 
                     for(var i=0;i<this.detailsArr.docPmsPoDetailDos.length;i++){
                         switch(this.detailsArr.docPmsPoDetailDos[i].materialType){
