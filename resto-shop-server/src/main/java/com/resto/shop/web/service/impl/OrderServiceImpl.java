@@ -1052,18 +1052,30 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     if (lastOrder != null && lastOrder.getParentOrderId() != null) {
                         Order parent = orderMapper.selectByPrimaryKey(lastOrder.getParentOrderId());
                         if (parent != null && parent.getAllowContinueOrder()) {
-                            order.setParentOrderId(parent.getId());
-                            order.setTableNumber(parent.getTableNumber());
-                            order.setVerCode(parent.getVerCode());
-                            order.setCustomerCount(parent.getCustomerCount());
+                            if(parent.getGroupId() != null && !"".equals(parent.getGroupId())
+                                    && order.getGroupId() != null && !"".equals(order.getGroupId())
+                                    && !order.getGroupId().equals(parent.getGroupId())){
+
+                            }else{
+                                order.setParentOrderId(parent.getId());
+                                order.setTableNumber(parent.getTableNumber());
+                                order.setVerCode(parent.getVerCode());
+                                order.setCustomerCount(parent.getCustomerCount());
+                            }
                         }
                     } else {
                         if (lastOrder != null && lastOrder.getAllowContinueOrder()) {
-                            order.setParentOrderId(lastOrder.getId());
-                            Order parentOrder = selectById(order.getParentOrderId());
-                            order.setTableNumber(parentOrder.getTableNumber());
-                            order.setVerCode(parentOrder.getVerCode());
-                            order.setCustomerCount(parentOrder.getCustomerCount());
+                            if(lastOrder.getGroupId() != null && !"".equals(lastOrder.getGroupId())
+                                    && order.getGroupId() != null && !"".equals(order.getGroupId())
+                                    && !order.getGroupId().equals(lastOrder.getGroupId())){
+
+                            }else{
+                                order.setParentOrderId(lastOrder.getId());
+                                Order parentOrder = selectById(order.getParentOrderId());
+                                order.setTableNumber(parentOrder.getTableNumber());
+                                order.setVerCode(parentOrder.getVerCode());
+                                order.setCustomerCount(parentOrder.getCustomerCount());
+                            }
                         }
                     }
                 }
