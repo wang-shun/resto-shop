@@ -1060,7 +1060,7 @@ GROUP BY article_id
         INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
         INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
         INNER JOIN tb_article t4 on t4.id = t3.article_id
-        where t.article_type in(2,3) and t.shop_detail_id = #{shopId} and t.state = 1
+        where t.article_type in (2,3,4) and t.shop_detail_id = #{shopId} and t.state = 1
         GROUP BY t2.id
         ) as r
         GROUP BY article_name
@@ -1077,7 +1077,7 @@ GROUP BY article_id
         INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
         INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
         INNER JOIN tb_article t4 on t4.id = t3.article_id
-        where t.article_type in(2,3) and t.shop_detail_id = #{shopId} and t.state = 1
+        where t.article_type in (2,3,4) and t.shop_detail_id = #{shopId} and t.state = 1
         GROUP BY t2.id
         ) as r
         GROUP BY article_name

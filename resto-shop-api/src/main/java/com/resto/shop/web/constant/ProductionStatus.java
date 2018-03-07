@@ -22,7 +22,7 @@ public class ProductionStatus {
 	public final static int HAS_CALL=3;
 	
 	/**
-	 * 已取餐
+	 * 已取餐(R+外卖、计费系统要用)
 	 */
 	public final static int GET_IT=4;
 

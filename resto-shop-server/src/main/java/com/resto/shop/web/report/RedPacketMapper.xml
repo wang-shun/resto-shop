@@ -63,7 +63,7 @@
         INNER JOIN tb_order_payment_item top ON td.id = top.order_id
         WHERE
         td.order_state IN (2, 10, 11, 12)
-        AND td.production_status IN (2, 3)
+        AND td.production_status in (2,3,4)
         AND top.pay_time &gt;= CONCAT(#{useBeginDate},' 00:00:00')
         AND top.pay_time &lt;= CONCAT(#{useEndDate},' 23:59:59')
         AND top.to_pay_id in (

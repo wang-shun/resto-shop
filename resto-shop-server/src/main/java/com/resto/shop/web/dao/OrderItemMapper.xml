@@ -366,7 +366,7 @@ order by t.print_sort asc
   	SELECT o.id order_id,o.shop_detail_id shop_id,i.article_name,i.article_id,i.count article_num,date_format(o.create_time,'%Y-%m-%d %H:%i:%s') order_time,c.telephone from tb_order_item i LEFT JOIN
   	 tb_order o on i.order_id = o.id LEFT JOIN tb_customer c on o.customer_id = c.id
 		where <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]> and o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3) 
+        AND o.production_status in (2,3,4)
   </select>
 
     <select id="listByParentId" resultType="OrderItem">

@@ -713,7 +713,7 @@
 
 select t.id,wechat_id,telephone,t2.id as orderId,t2.shop_detail_id as shopDetailId from tb_customer t
 left join tb_order t2 on t2.customer_id = t.id
-where order_state in (2,10) and production_status in (2,3) and allow_appraise = 1
+where order_state in (2,10) and production_status in (2,3,4) and allow_appraise = 1
 
 and (UNIX_TIMESTAMP(now()) - UNIX_TIMESTAMP(t2.create_time))/(60*60*24) > #{time}
 and t2.create_time >= CONCAT(#{startTime},'00:00:00')
@@ -733,7 +733,7 @@ and wechat_id != '0'
     <select id="selectBySelectMap" parameterType="java.util.Map" resultMap="BaseResultMap">
         select *
         <if test="customerIds == null">
-            ,IF((select COUNT(1) from tb_order where customer_id = tc.id and order_state IN (2, 10, 11, 12) and production_status IN (2, 3)) > 0, TRUE, FALSE) useOrder
+            ,IF((select COUNT(1) from tb_order where customer_id = tc.id and order_state IN (2, 10, 11, 12) and production_status in (2,3,4)) > 0, TRUE, FALSE) useOrder
             ,IF((select COUNT(1) from tb_charge_order where customer_id = tc.id and order_state = 1) > 0, TRUE, FALSE) chargeOrder
         </if>
         from tb_customer tc

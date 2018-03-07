@@ -82,7 +82,7 @@
     <select id="selectpaymentByPaymentMode" resultType="OrderPaymentItem">
         SELECT SUM(pay_value) payValue, payment_mode_id  FROM tb_order_payment_item
         WHERE order_id IN (
-        SELECT id FROM tb_order o WHERE o.production_status in (2,3) AND o.shop_detail_id = #{shopId}
+        SELECT id FROM tb_order o WHERE o.production_status in (2,3,4) AND o.shop_detail_id = #{shopId}
         AND <![CDATA[ o.create_time>#{beginDate} AND o.create_time<#{endDate}]]>
         )
         GROUP BY payment_mode_id
@@ -108,7 +108,7 @@
 			o.brand_id = #{brandId} and
 			oi.pay_time>#{begin} and
 			oi.pay_time <#{end} and
-			o.production_status in(2,3)
+			o.production_status in (2,3,4)
 			 ORDER BY o.shop_detail_id , oi.payment_mode_id
 		) as ap
 		WHERE ap.payment_mode_id IS NOT NULL
@@ -130,7 +130,7 @@
         <![CDATA[
             oi.pay_time>#{begin} and
             oi.pay_time <#{end} and
-            o.production_status in(2,3)
+            o.production_status in (2,3,4)
         ]]>
         ORDER BY oi.payment_mode_id
         ) as ap
@@ -189,13 +189,13 @@
             on tr.id = top.order_id where tr.shop_detail_id = td.shop_detail_id and top.payment_mode_id =
             ${payMode.payMode}
             and tr.order_state in (2,10,11,12)
-            and IF(tr.is_pos_pay = 1,tr.is_pos_pay = 1,tr.production_status in (2,3))
+            and IF(tr.is_pos_pay = 1,tr.is_pos_pay = 1,tr.production_status in (2,3,4))
             and top.pay_time &gt;= CONCAT(#{beginDate},' 00:00:00')
             and top.pay_time &lt;= CONCAT(#{endDate},' 23:59:59')),0) ${payMode.payName}
         </foreach>
         from tb_order td
         where IF(td.production_status = 6, td.production_status = 6, td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3)))
+        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3,4)))
         and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
         and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
         GROUP BY td.shop_detail_id
@@ -213,7 +213,7 @@
         INNER JOIN tb_order o ON o.id = oi.order_id
         WHERE
         o.order_state IN (10, 11, 2, 12)
-        AND IF(o.is_pos_pay = 1,o.is_pos_pay = 1,o.production_status in (2,3))
+        AND IF(o.is_pos_pay = 1,o.is_pos_pay = 1,o.production_status in (2,3,4))
         AND
         <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         AND o.shop_detail_id =  #{shopId}

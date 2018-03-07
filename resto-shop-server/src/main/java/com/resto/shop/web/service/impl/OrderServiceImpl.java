@@ -2368,10 +2368,12 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     public int printUpdate(String orderId) {
 		Order o = new Order();
 		o.setId(orderId);
+		//说明外卖已取餐
 		o.setProductionStatus(ProductionStatus.GET_IT);
 		int count = orderMapper.updateByPrimaryKeySelective(o);
 		//yz 2017/08/03 计费系统 添加账户设置(简单版) ---resto+外卖订单
         try {
+            o = orderMapper.selectByPrimaryKey(orderId);
             Brand brand = brandService.selectByPrimaryKey(o.getBrandId());
             BrandSetting brandSetting = brandSettingService.selectById(brand.getBrandSettingId());
 //			BrandSetting brandSetting = brandSettingService.selectByBrandId(o.getBrandId());

@@ -1219,7 +1219,7 @@
         AND
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and order_state in (2,10,11,12)
-        and IF(is_pos_pay = 1,is_pos_pay = 1,production_status in (2,3))
+        and IF(is_pos_pay = 1,is_pos_pay = 1,production_status in (2,3,4))
         and order_money != 0
         and parent_order_id is null
         <if test="shopMode == 6">
@@ -1524,7 +1524,7 @@
     <!--tb_order o-->
     <!--INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id-->
     <!--WHERE-->
-    <!--o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND-->
+    <!--o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3,4) AND-->
     <!--<![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId}-->
     <!--)-->
     <!--</select>-->
@@ -1540,7 +1540,7 @@
         tb_order o
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
-        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
+        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3,4) AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> AND  o.brand_id=#{brandId})
         ) as t
     </select>
@@ -1555,7 +1555,7 @@
         LEFT JOIN tb_article_price tap on ta.id = tap.article_id
         INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
         INNER JOIN  tb_order o ON o.id=oi.order_id
-        WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3) AND oi.type != 4 AND
+        WHERE o.order_state IN (10,2,11, 12) AND  o.production_status in (2,3,4) AND oi.type != 4 AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.brand_id =#{brandId}
         GROUP BY o.id
     </select>
@@ -1633,7 +1633,7 @@
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
         t2.order_state IN (2, 10, 11, 12)
-        AND t2.production_status IN (2, 3) AND
+        AND t2.production_status in (2,3,4) AND
         <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.shop_detail_id =#{shopId}
         GROUP BY t.article_name,t4.article_type
     </select>
@@ -1698,7 +1698,7 @@
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
         t2.order_state IN (2, 10, 11, 12)
-        AND IF(t2.is_pos_pay = 1,t2.is_pos_pay = 1,t2.production_status in (2,3)) AND
+        AND IF(t2.is_pos_pay = 1,t2.is_pos_pay = 1,t2.production_status in (2,3,4)) AND
         <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.shop_detail_id =#{shopId}
         GROUP BY t.article_name,t4.article_type
         ORDER BY ${sort}
@@ -1774,7 +1774,7 @@
         WHERE
         t2.brand_id = #{brandId}
         AND t2.order_state IN (2, 10, 11, 12)
-        AND IF(t2.is_pos_pay = 1,t2.is_pos_pay = 1,t2.production_status in (2,3))
+        AND IF(t2.is_pos_pay = 1,t2.is_pos_pay = 1,t2.production_status in (2,3,4))
         AND t.type != 3
         AND <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>
         ) as r
@@ -1882,7 +1882,7 @@
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
         t2.order_state IN (2, 10, 11, 12)
-        AND t2.production_status IN (2, 3) AND
+        AND t2.production_status in (2,3,4) AND
         <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]> and t2.brand_id =#{brandId}
         GROUP BY t.article_name,t4.article_type
         ORDER BY ${sort}
@@ -1934,7 +1934,7 @@
         tb_order o
         LEFT JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
-        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
+        o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3,4) AND
         <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>  and brand_id=#{brandId}
     </select>
 
@@ -2048,7 +2048,7 @@
 		INNER JOIN tb_order_payment_item t2 on t2.order_id = t.id
 		where
 		shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
-		DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.production_status in(2,3)
+		DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')and t.production_status in (2,3,4)
 		GROUP BY t.id
 		) as r
     </select>
@@ -2065,7 +2065,7 @@
         where
         shop_detail_id = #{shopId} and t.order_state in (2,10,11,12,13) and
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
-        and t.production_status in (2,3)
+        and t.production_status in (2,3,4)
         GROUP BY t.id
         ) as r
     </select>
@@ -2084,7 +2084,7 @@
         where
         shop_detail_id = #{shopId} and  t.order_state in (2,10,11,12,13) and
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')
-        and t.production_status in(2,3)
+        and t.production_status in (2,3,4)
         GROUP BY t.id
         ) as r
     </select>
@@ -2102,7 +2102,7 @@
         where
         shop_detail_id = #{shopId}
         and IF(t.production_status = 6,t.production_status = 6,t.order_state in (2,10,11,12)
-        and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3)))
+        and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3,4)))
         and t.create_time &gt;= CONCAT(#{beginDate}, ' 00:00:00')
         and t.create_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
         GROUP BY t.id
@@ -2120,7 +2120,7 @@
         on o.id = a.order_id
         LEFT JOIN tb_customer c
         on o.customer_id = c.id
-        WHERE o.order_state in (10,11,12) and o.production_status in (2,3)
+        WHERE o.order_state in (10,11,12) and o.production_status in (2,3,4)
         and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         and o.shop_detail_id = #{shopId} and a.level in(1,2,3,4,5)
         GROUP BY o.id
@@ -2165,7 +2165,7 @@
         and t.create_time &lt;= CONCAT(#{endDate}, ' 23:59:59')
         and t2.payment_mode_id = #{type}
         and t.shop_detail_id = #{shopId}
-        and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3))
+        and IF(t.is_pos_pay = 1,t.is_pos_pay = 1,t.production_status in (2,3,4))
         and t.order_state in (2,10,11,12)
     </select>
 
@@ -2191,7 +2191,7 @@
         INNER JOIN tb_article t4 ON t4.id = LEFT (t.article_id, 32)
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
-        t2.production_status in (2,3)
+        t2.production_status in (2,3,4)
         and
         DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(t.create_time,'%d %b %y')   and t2.shop_detail_id= #{shopId}
         ) as r
@@ -2218,7 +2218,7 @@
         INNER JOIN tb_customer c ON o.customer_id = c.id
         WHERE
         o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3)
+        AND o.production_status in (2,3,4)
         AND
         <![CDATA[ o.create_time >= #{beginTime} and o.create_time <= #{endTime}]]>
         AND o.brand_id = #{brandId}
@@ -2244,7 +2244,7 @@
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
         t2.order_state in (2,10,11,12)
-        and t2.production_status in (2,3)
+        and t2.production_status in (2,3,4)
         and
         <![CDATA[ t2.create_time >= #{beginDate} and t2.create_time <= #{endDate}]]>   and t2.brand_id= #{brandId}
         ) as r
@@ -2295,7 +2295,7 @@
         INNER JOIN tb_article_family t5 ON t5.id = t4.article_family_id
         WHERE
         t2.order_state in (2,10,11,12)
-        and t2.production_status in (2,3)
+        and t2.production_status in (2,3,4)
         and
         <![CDATA[ t2.create_time >= #{beginDate} and  t2.create_time <= #{endDate}]]> and t2.shop_detail_id=#{shopId}
         ) as r
@@ -2307,7 +2307,7 @@
          select r.* from (select tb_order.id,table_number,article_count,create_time,person_count
  from tb_order
 left join tb_order_payment_item on tb_order_payment_item.order_id = tb_order.id
-where table_number is not null and table_number != '' and payment_mode_id is not null and tb_order.production_status in (2,3)
+where table_number is not null and table_number != '' and payment_mode_id is not null and tb_order.production_status in (2,3,4)
 and (tb_order.order_mode = 1 or tb_order.table_no != null ) and tb_order.shop_detail_id =  #{shopId}
 GROUP BY tb_order.id
 order by create_time desc ) as r
@@ -2480,7 +2480,7 @@ on o.id = oi.order_id
         o.brand_id=#{brandId}
         AND
         <![CDATA[o. create_time >#{beginDate} AND o.create_time  <#{endDate}]]>
-        AND o.order_state IN(2,10,11,12) AND o.production_status NOT  in (2,3)
+        AND o.order_state IN(2,10,11,12) AND o.production_status NOT  in (2,3,4)
     </select>
 
     <select id="selectHasPayListOrderByBrandId" resultType="Order">
@@ -2489,7 +2489,7 @@ on o.id = oi.order_id
         brand_id=#{brandId}
         AND
         <![CDATA[ create_time >#{beginDate} AND create_time  <#{endDate}]]>
-        and order_state in(2,10,11,12) and production_status in (2,3)
+        and order_state in(2,10,11,12) and production_status in (2,3,4)
     </select>
 
 
@@ -2548,7 +2548,7 @@ FROM
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 WHERE
 	o.order_state IN (2, 10, 11, 12)
-AND o.production_status IN (2, 3)
+AND o.production_status in (2,3,4)
     and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         AND  o.brand_id = #{brandId}
     </select>
@@ -2558,7 +2558,7 @@ AND o.production_status IN (2, 3)
         select sum(customer_count) from tb_order where shop_detail_id = #{shopId}
         and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
         and parent_order_id is null
-        and order_state in (2,10,11,12) and production_status in (2,3)
+        and order_state in (2,10,11,12) and production_status in (2,3,4)
     </select>
     <update id="refundServicePrice">
         update tb_order
@@ -2570,13 +2570,13 @@ AND o.production_status IN (2, 3)
     <select id="getMealALLNumber" resultType="java.lang.Integer">
         select sum(meal_all_number) from tb_order where shop_detail_id = #{shopId}
         and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
-        and order_state in (2,10,11,12) and production_status in (2,3)
+        and order_state in (2,10,11,12) and production_status in (2,3,4)
     </select>
 
     <select id="getCustomerPerson" resultType="java.lang.Integer">
         select sum(customer_count) from tb_order where shop_detail_id = #{shopId}
         and   DATE_FORMAT(NOW(),'%d %b %y') = DATE_FORMAT(create_time,'%d %b %y')
-        and order_state in (2,10,11,12) and production_status in (2,3)
+        and order_state in (2,10,11,12) and production_status in (2,3,4)
     </select>
 
     <select id="getRefundSumByOrderId" resultType="java.math.BigDecimal">
@@ -2631,7 +2631,7 @@ AND o.production_status IN (2, 3)
     <select id="selectByCustomerCount" resultType="java.lang.Integer">
         select count(1) from tb_order where customer_id = #{customerId}
         and parent_order_id is null
-        and order_state in (2,10,11) and production_status in (2,3)
+        and order_state in (2,10,11) and production_status in (2,3,4)
         <if test="consumeConfineTime != null and consumeConfineTime !=0">
             and #{consumeConfineTime} > TIMESTAMPDIFF(day,create_time,now())
         </if>
@@ -2667,7 +2667,7 @@ INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
 LEFT JOIN tb_customer c ON c.id = o.customer_id
 WHERE  o.shop_detail_id =#{shopId}
 and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-    AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3) ANd o.parent_order_id is null
+    AND  o.order_state in(2,10,11,12) AND  o.production_status in (2,3,4) ANd o.parent_order_id is null
 </select>
 
 
@@ -2697,7 +2697,7 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         LEFT JOIN tb_customer c ON c.id = o.customer_id
         WHERE  o.shop_detail_id =#{shopId}
         and  <![CDATA[ o.create_time <= #{endDate} ]]>
-        AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3)
+        AND  o.order_state in(2,10,11,12) AND  o.production_status in (2,3,4)
         and o.parent_order_id is NULL
     </select>
 
@@ -2712,7 +2712,7 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE  o.shop_detail_id =#{shopId}
         and  <![CDATA[ o.create_time <= #{endDate} ]]>
-        AND  o.order_state in(2,10,11,12) AND  o.production_status not in(2,3)
+        AND  o.order_state in(2,10,11,12) AND  o.production_status not in (2,3,4)
     </select>
     <select id="selectOrderByOrderIds" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
         select * from tb_order where id in
@@ -2751,7 +2751,7 @@ and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE  o.brand_id =#{brandId}
         and  <![CDATA[ o.create_time <= #{endDate} ]]>
-        AND  o.order_state in(2,10,11,12) AND  o.production_status not in(2,3)
+        AND  o.order_state in(2,10,11,12) AND  o.production_status not in (2,3,4)
     </select>
 
     <!--2017-01-21 查询品牌分数-->
@@ -2764,7 +2764,7 @@ FROM
 INNER JOIN tb_appraise a ON o.id = a.order_id
 WHERE
 	o.order_state IN (2, 10, 11, 12)
-AND o.production_status IN (2, 3)
+AND o.production_status in (2,3,4)
 AND o.brand_id = #{brandId}
  and  <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate}
         ]]>
@@ -2782,7 +2782,7 @@ AND o.brand_id = #{brandId}
     INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
     WHERE
     o.shop_detail_id = #{shopId} AND
-    o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3) AND
+    o.order_state IN (2,10, 11, 12) AND  o.production_status in (2,3,4) AND
     <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate} ]]> )as b
 </select>
 
@@ -2795,7 +2795,7 @@ AND o.brand_id = #{brandId}
     INNER JOIN tb_appraise a ON o.id = a.order_id
     WHERE
     o.order_state IN (2, 10, 11, 12)
-    AND o.production_status IN (2, 3)
+    AND o.production_status in (2,3,4)
     AND o.shop_detail_id = #{shopId}
     and  <![CDATA[ o.create_time <= #{endDate} and o.create_time>=#{beginDate}
         ]]>
@@ -2808,13 +2808,13 @@ AND o.brand_id = #{brandId}
 
     <select id="getPayHoufu" resultType="java.math.BigDecimal">
         select sum(pay_value) from tb_order_payment_item
-        where order_id = #{orderId} and payment_mode_id in (2,3)
+        where order_id = #{orderId} and payment_mode_id in (2,3,4)
     </select>
 
 
     <select id="getTodayFinishOrder" resultType="Order">
         select * from tb_order where shop_detail_id = #{shopId}
-        and order_state in (2,10,11,12,13) and production_status in (2,3)
+        and order_state in (2,10,11,12,13) and production_status in (2,3,4)
         and  <![CDATA[ create_time <= #{endDate} and create_time>=#{beginDate}
         ]]>
         order by create_time asc
@@ -2832,7 +2832,7 @@ FROM
 	tb_order o
 INNER JOIN tb_order_item oi ON o.id = oi.order_id
 INNER JOIN tb_customer c on  c.id = o.customer_id
-WHERE o.order_state in(2,10,11,12) AND o.production_status in(2,3)
+WHERE o.order_state in(2,10,11,12) AND o.production_status in (2,3,4)
 AND  o.shop_detail_id = #{shopId} AND
 <![CDATA[ o.create_time >= #{beginTime} and o.create_time<=#{endTime}
         ]]>
@@ -2853,7 +2853,7 @@ GROUP BY oi.article_name
         tb_order o
         INNER JOIN tb_order_item oi ON o.id = oi.order_id
         INNER JOIN tb_customer c on  c.id = o.customer_id
-        WHERE o.order_state in(2,10,11,12) AND o.production_status in(2,3)
+        WHERE o.order_state in(2,10,11,12) AND o.production_status in (2,3,4)
         AND oi.refund_count>0
         AND  o.shop_detail_id = #{shopId} AND
         <![CDATA[ o.create_time >= #{beginTime} and o.create_time<=#{endTime}
@@ -2879,7 +2879,7 @@ GROUP BY oi.article_name
         ON o.customer_id = c.id
         WHERE
         o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3)
+        AND o.production_status in (2,3,4)
         AND o.shop_detail_id = #{shopId}
         <![CDATA[
           AND o.create_time>#{beginDate}
@@ -2892,7 +2892,7 @@ GROUP BY oi.article_name
         tb_order
         WHERE
         order_state IN (2, 10, 11, 12)
-        AND production_status IN (2, 3)
+        AND production_status in (2,3,4)
         AND shop_detail_id = #{shopId}
         AND
         <![CDATA[
@@ -2909,7 +2909,7 @@ GROUP BY oi.article_name
         tb_order o
         WHERE
         o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3)
+        AND o.production_status in (2,3,4)
         AND
         <![CDATA[
         o.create_time <#{beginDate}
@@ -2918,7 +2918,7 @@ GROUP BY oi.article_name
         AND o.customer_id in (
         SELECT customer_id FROM tb_order
         WHERE order_state in(2,10,11,12)
-        AND production_status in(2,3)
+        AND production_status in (2,3,4)
         AND
         <![CDATA[
             create_time>#{beginDate} AND create_time<#{endDate}
@@ -2946,7 +2946,7 @@ GROUP BY oi.article_name
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         WHERE o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3)
+        AND o.production_status in (2,3,4)
         AND o.shop_detail_id = #{shopId}
         AND
         <![CDATA[
@@ -3092,7 +3092,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         left join tb_order_payment_item top
         on td.id = top.order_id
         where IF(td.production_status = 6, td.production_status = 6
-        , td.order_state in (2,10,11,12) and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3)))
+        , td.order_state in (2,10,11,12) and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3,4)))
         and td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
         and td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
         <if test="shopId != null">
@@ -3143,7 +3143,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
     </update>
 
     <select id="getAllowAppraise" resultType="Order">
-        select * from tb_order where order_state = 2  and production_status in (2,3)
+        select * from tb_order where order_state = 2  and production_status in (2,3,4)
         and create_time >= '2017-06-29'
     </select>
 
@@ -3166,7 +3166,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         ON o.customer_id = c.id
         WHERE
         o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3)
+        AND o.production_status in (2,3,4)
         AND o.brand_id = #{brandId}
         <![CDATA[
           AND o.create_time>#{beginDate}
@@ -3179,7 +3179,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         tb_order
         WHERE
         order_state IN (2, 10, 11, 12)
-        AND production_status IN (2, 3)
+        AND production_status in (2,3,4)
         AND brand_id = #{brandId}
         AND
         <![CDATA[
@@ -3197,7 +3197,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 			tb_order o
 			WHERE
 			o.order_state IN (2, 10, 11, 12)
-			AND o.production_status IN (2, 3)
+			AND o.production_status in (2,3,4)
 			AND
 			<![CDATA[
         o.create_time <#{beginDate}
@@ -3206,7 +3206,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 			AND o.customer_id in (
 			SELECT customer_id FROM tb_order
 			WHERE order_state in(2,10,11,12)
-			AND production_status in(2,3)
+			AND production_status in (2,3,4)
 			AND
 			<![CDATA[
             create_time>#{beginDate} AND create_time<#{endDate}
@@ -3233,7 +3233,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         WHERE o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3)
+        AND o.production_status in (2,3,4)
         AND o.brand_id = #{brandId}
         AND
         <![CDATA[
@@ -3272,7 +3272,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 			LEFT JOIN tb_customer c ON c.id = o.customer_id
 			WHERE  o.brand_id =#{brandId}
 			and  <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
-			AND  o.order_state in(2,10,11,12) AND  o.production_status in(2,3) ANd o.parent_order_id is null
+			AND  o.order_state in(2,10,11,12) AND  o.production_status in (2,3,4) ANd o.parent_order_id is null
 		</select>
 
 	<select id="selectOrderListByCustomerIdAndShopId" resultType="Order">
@@ -3291,7 +3291,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         INNER JOIN tb_order_payment_item oi
         on o.id = oi.order_id
         WHERE o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3)
+        AND o.production_status in (2,3,4)
         AND o.shop_detail_id = #{shopId}
         AND o.customer_id = #{customerId}
     </select>
@@ -3308,7 +3308,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
             tb_order td
         WHERE
             td.order_state IN (2, 10, 11, 12)
-        AND td.production_status IN (2, 3)
+        AND td.production_status in (2,3,4)
         <if test="list != null and list.size() > 0">
             AND td.customer_id in
             <foreach collection="list" item="customerId" open="(" separator="," close=")">

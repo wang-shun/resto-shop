@@ -88,10 +88,10 @@
         IFNULL((select SUM(reward_balance) from tb_charge_order where order_state = 1 and customer_id = c.id),'0.00') presentRemain,
         IFNULL((a.remain - (select SUM(charge_balance) from tb_charge_order where order_state = 1 and customer_id = c.id)
         -(select SUM(reward_balance) from tb_charge_order where order_state = 1 and customer_id = c.id)),'0.00') redRemain,
-        IFNULL((select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11,12) and production_status in (2,3)),'0.00') sumMoney,
-        IFNULL((select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11,12) and production_status in (2,3) and parent_order_id is null),'0') amount,
-        IFNULL(ROUND(((select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11,12) and production_status in (2,3))/
-        (select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11,12) and production_status in (2,3) and parent_order_id is null)
+        IFNULL((select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11,12) and production_status in (2,3,4)),'0.00') sumMoney,
+        IFNULL((select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11,12) and production_status in (2,3,4) and parent_order_id is null),'0') amount,
+        IFNULL(ROUND(((select SUM(order_money) from tb_order where customer_id = c.id  and order_state in (2,10,11,12) and production_status in (2,3,4))/
+        (select count(1) from tb_order where customer_id = c.id and order_state in (2,10,11,12) and production_status in (2,3,4) and parent_order_id is null)
         ),2),'0.00') money
         from
         tb_customer c
