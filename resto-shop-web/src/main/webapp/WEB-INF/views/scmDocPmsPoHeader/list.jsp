@@ -264,15 +264,6 @@
                             }
                         });
                     }
-
-                    for(var i=0;i<this.detailsArr.docPmsPoDetailDos.length;i++){
-                        switch(this.detailsArr.docPmsPoDetailDos[i].materialType){
-                            case 'INGREDIENTS':this.detailsArr.docPmsPoDetailDos[i].materialType='主料';break;
-                            case 'ACCESSORIES':this.detailsArr.docPmsPoDetailDos[i].materialType='辅料';break;
-                            case 'SEASONING':this.detailsArr.docPmsPoDetailDos[i].materialType='配料';break;
-                            case 'MATERIEL':this.detailsArr.docPmsPoDetailDos[i].materialType='物料';break;
-                        }
-                    }
                     this.detailsBtn=true;
 
                 },
