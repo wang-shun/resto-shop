@@ -90,9 +90,9 @@
                     </div>
                 </div>
             </div>
-            <div class="text-center" style="padding: 20px 0">
+            <%--<div class="text-center" style="padding: 20px 0">
                 <a class="btn default" @click="detailsCli" v-if="detailsBtn">取消</a>
-            </div>
+            </div>--%>
             <div class="text-center" style="padding: 20px 0" v-if="approveBtn">
                 <a class="btn default" @click="approveCli1" >驳回</a>
                 <a class="btn blue pull-center" @click="approveCli2" >批准</a>
@@ -240,20 +240,29 @@
                 approveCli2:function () { //批准审核
                     this.details=false;
                     this.approveBtn=false;
-                    debugger
                     C.systemButton('scmDocPmsPoHeader/approve',{id:this.detailsArr.id,orderStatus:'12'},['审核成功','审核失败']);
                 },
                 showDetails:function (data) { //查看详情
-                    this.details=true;
-                    this.detailsArr=data;
-
-                    for(var i=0;i<this.detailsArr.docPmsPoDetailDos.length;i++){
-                        switch(this.detailsArr.docPmsPoDetailDos[i].materialType){
-                            case 'INGREDIENTS':this.detailsArr.docPmsPoDetailDos[i].materialType='主料';break;
-                            case 'ACCESSORIES':this.detailsArr.docPmsPoDetailDos[i].materialType='辅料';break;
-                            case 'SEASONING':this.detailsArr.docPmsPoDetailDos[i].materialType='配料';break;
-                            case 'MATERIEL':this.detailsArr.docPmsPoDetailDos[i].materialType='物料';break;
-                        }
+                    var that=this;
+                    that.details=true;
+                    that.detailsArr=data;
+                    if(that.detailsArr.docPmsPoDetailDos.length==0){
+                        $.ajax({
+                            url : "scmDocPmsPoHeader/docPmsPoDetailDos",
+                            type:"post",
+                            data:{scmDocPmsPoHeaderId:that.detailsArr.id},
+                            success : function(result) {
+                                that.detailsArr.docPmsPoDetailDos=result.data;
+                                for(var i=0;i<that.detailsArr.docPmsPoDetailDos.length;i++){
+                                    switch(that.detailsArr.docPmsPoDetailDos[i].materialType){
+                                        case 'INGREDIENTS':that.detailsArr.docPmsPoDetailDos[i].materialType='主料';break;
+                                        case 'ACCESSORIES':that.detailsArr.docPmsPoDetailDos[i].materialType='辅料';break;
+                                        case 'SEASONING':that.detailsArr.docPmsPoDetailDos[i].materialType='配料';break;
+                                        case 'MATERIEL':that.detailsArr.docPmsPoDetailDos[i].materialType='物料';break;
+                                    }
+                                }
+                            }
+                        });
                     }
                     this.detailsBtn=true;
 

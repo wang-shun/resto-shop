@@ -85,9 +85,9 @@
                     </div>
                 </div>
             </div>
-            <div class="text-center" style="padding: 20px 0">
+            <%--<div class="text-center" style="padding: 20px 0">
                 <a class="btn default" @click="detailsCli" v-if="detailsBtn">取消</a>
-            </div>
+            </div>--%>
             <div class="text-center" style="padding: 20px 0" v-if="approveBtn">
                 <a class="btn default" @click="approveCli1" >驳回</a>
                 <a class="btn blue pull-center" @click="approveCli2" >批准</a>
