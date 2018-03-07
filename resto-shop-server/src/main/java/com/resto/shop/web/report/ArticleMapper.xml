@@ -96,7 +96,7 @@
         inner join tb_order td
         on toi.order_id = td.id
         and IF(td.production_status = 6,td.production_status = 6,td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3)))
+        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3,4)))
         and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
         and CONCAT(#{endDate},' 23:59:59') >= td.create_time
         where ta.article_type = ${type}
@@ -131,7 +131,7 @@
         inner join tb_order td
         on toi.order_id = td.id
         and IF(td.production_status = 6,td.production_status = 6,td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3)))
+        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3,4)))
         and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
         and CONCAT(#{endDate},' 23:59:59') >= td.create_time
         where ta.article_type = ${type}
@@ -165,7 +165,7 @@
         inner join tb_order td
         on toi.order_id = td.id
         and IF(td.production_status = 6,td.production_status = 6,td.order_state in (2,10,11,12)
-        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3)))
+        and IF(td.is_pos_pay = 1,td.is_pos_pay = 1,td.production_status in (2,3,4)))
         and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
         and CONCAT(#{endDate},' 23:59:59') >= td.create_time
         <if test="shopDetailId != null">

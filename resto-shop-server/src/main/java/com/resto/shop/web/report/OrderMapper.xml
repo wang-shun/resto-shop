@@ -260,7 +260,7 @@
         WHERE
         <![CDATA[ o.create_time >= #{beginDate} and o.create_time <= #{endDate}]]>
         AND o.order_state IN (2, 10, 11, 12)
-        AND o.production_status IN (2, 3)
+        AND o.production_status in (2,3,4)
         AND o.brand_id = #{brandId}
         GROUP BY
         o.shop_detail_id;
@@ -338,7 +338,7 @@
             left join tb_order_payment_item top
             on td.id = top.order_id
             where td.order_state in (2,10,11,12)
-            and td.production_status in (2,3)
+            and td.production_status in (2,3,4)
             and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
             and CONCAT(#{endDate},' 23:59:59') >= td.create_time
             and top.payment_mode_id not in (13,14,15)
@@ -387,7 +387,7 @@
         INNER JOIN tb_order_payment_item oi ON o.id = oi.order_id
         WHERE
         o.order_state IN (2, 10, 11, 12)
-        and o.production_status in (2,3) AND
+        and o.production_status in (2,3,4) AND
         <![CDATA[ o.create_time >= #{beginDate} and  o.create_time <= #{endDate}]]> and o.shop_detail_id=#{shopId}
     </select>
 
@@ -428,7 +428,7 @@
         left join tb_customer tc
         on td.customer_id = tc.id
         where td.order_state in (2,10,11,12)
-        and IF(td.production_status = 6, td.production_status = 6, td.production_status in (2,3))
+        and IF(td.production_status = 6, td.production_status = 6, td.production_status in (2,3,4))
         and td.create_time >= CONCAT(#{beginDate},' 00:00:00')
         and CONCAT(#{endDate},' 23:59:59') >= td.create_time
         and toi.refund_count != 0
@@ -454,7 +454,7 @@
         IF (
         o.is_pos_pay = 1,
         o.is_pos_pay = 1,
-        o.production_status IN (2, 3)
+        o.production_status in (2,3,4)
         )
         and o.create_time >= CONCAT(#{beginDate},' 00:00:00')
         and CONCAT(#{endDate},' 23:59:59') >= o.create_time
@@ -474,7 +474,7 @@
         INNER JOIN tb_order o on o.id = oi.order_id
         WHERE
         o.order_state IN (10, 2, 11, 12)
-        AND IF(o.production_status = 6,o.production_status = 6,o.production_status IN (2, 3))
+        AND IF(o.production_status = 6,o.production_status = 6,o.production_status in (2,3,4))
         AND o.create_time >= CONCAT(#{beginDate},' 00:00:00') AND CONCAT(#{endDate},' 23:59:59') >= o.create_time
         GROUP BY o.id
     </select>
@@ -494,7 +494,7 @@
         tb_order td
         WHERE
         td.order_state IN (2, 10, 11, 12)
-        AND td.production_status IN (2, 3)
+        AND td.production_status in (2,3,4)
         AND td.create_time &gt;= CONCAT(#{beginDate},' 00:00:00')
         AND td.create_time &lt;= CONCAT(#{endDate},' 23:59:59')
         <if test="shopDetailId != null">
@@ -522,7 +522,7 @@
         INNER JOIN tb_order_item oi on oi.article_id = ta.id or oi.article_id = tap.id
         INNER JOIN  tb_order o ON o.id=oi.order_id
         WHERE
-        o.order_state IN (10,2, 11, 12) AND  IF(o.production_status = 6,o.production_status = 6,o.production_status in (2,3))
+        o.order_state IN (10,2, 11, 12) AND  IF(o.production_status = 6,o.production_status = 6,o.production_status in (2,3,4))
         AND
         o.create_time >= #{beginDate} and  #{endDate} >= o.create_time
         GROUP BY o.id

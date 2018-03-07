@@ -52,7 +52,7 @@
             SUM(IF(tc.is_used = 1 and using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59'),tc.value,0)) useCouponMoney,
             SUM(IF(tc.is_used = 1 and using_time &gt;= CONCAT(#{useBeginDate},' 00:00:00') and using_time &lt;= CONCAT(#{useEndDate},' 23:59:59'),
             (select td.order_money from tb_order td inner join tb_order_payment_item top on td.id = top.order_id
-            where td.order_state in (2,10,11,12) and td.production_status in (2,3)
+            where td.order_state in (2,10,11,12) and td.production_status in (2,3,4)
             and top.to_pay_id = tc.id and top.payment_mode_id not in (13,14,15,20,21) GROUP BY td.id),0)) useCouponOrderMoney
         from tb_coupon tc
         where tc.add_time &gt;= CONCAT(#{grantBeginDate},' 00:00:00')

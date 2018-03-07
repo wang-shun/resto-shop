@@ -155,9 +155,9 @@
                     </div>
                 </div>
             </div>
-            <div class="text-center" style="padding: 20px 0">
+            <%--<div class="text-center" style="padding: 20px 0">
                 <a class="btn default" @click="detailsCli" v-if="detailsBtn">取消</a>
-            </div>
+            </div>--%>
         </div>
     </div>
     <!--查看详情结束-->

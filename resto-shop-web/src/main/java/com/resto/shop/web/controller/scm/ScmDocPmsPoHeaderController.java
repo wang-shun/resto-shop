@@ -46,6 +46,12 @@ public class ScmDocPmsPoHeaderController extends GenericController{
 
 		return getSuccessResult(docPmsPoHeaderService.queryJoin4Page(shopDetailId,currentShopName));
 	}
+
+    @RequestMapping("/docPmsPoDetailDos")
+    @ResponseBody
+    public Result docPmsPoDetailDos(String scmDocPmsPoHeaderId){
+        return getSuccessResult(docPmsPoHeaderService.queryDocPmsPoDetailDos(scmDocPmsPoHeaderId));
+    }
 	
 	@RequestMapping("list_one")
 	@ResponseBody

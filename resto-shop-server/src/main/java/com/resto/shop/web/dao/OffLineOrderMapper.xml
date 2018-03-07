@@ -99,7 +99,7 @@
 INNER JOIN tb_order on tb_order.id = tb_order_payment_item.order_id
 where payment_mode_id in (1,10)
 and shop_detail_id = #{shopId}
-and production_status in (2,3)
+and production_status in (2,3,4)
 and order_state in (2,10,11,12,13)
 and
  <![CDATA[
@@ -109,7 +109,7 @@ and
 
     <select id="selectTotalMoney" resultType="java.math.BigDecimal">
         select sum(order_money) from tb_order
-where production_status in (2,3)
+where production_status in (2,3,4)
 and order_state in (2,10,11,12,13)
 and shop_detail_id = #{shopId}
 and
