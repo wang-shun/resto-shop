@@ -2035,7 +2035,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             case ShopMode.BOSS_ORDER:
                 log.error("【BOSS_ORDER】立即下单失败: " + order.getId() +"\n" + "orderStarte:" + order.getOrderState() +"\n" + "productionStatus:" + order.getProductionStatus());
                 if (order.getPayType() == PayType.PAY) {
-                    if (order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
+                    if (order.getOrderState() != OrderState.CONFIRM || order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
                         log.error("立即下单失败: " + order.getId() +"\n" + "orderStarte:" + order.getOrderState() +"\n" + "productionStatus:" + order.getProductionStatus());
                         throw new AppException(AppException.ORDER_STATE_ERR);
                     }
@@ -2139,7 +2139,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
             }
         }
-		update(order);
+		orderMapper.updateByPrimaryKeySelective(order);
 
 
         log.info("\n\n\n    【printSuccess】打印成功：" + orderId + "\n\n\n\n");
@@ -4613,7 +4613,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         Integer orginState = order.getOrderState();//订单开始确认的状体
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
-            if(order.getProductionStatus() == ProductionStatus.HAS_ORDER || order.getPrintOrderTime() != null){
+            if((order.getProductionStatus() == ProductionStatus.HAS_ORDER || order.getPrintOrderTime() != null) && order.getProductionStatus() != ProductionStatus.HAS_CALL){
                 order.setProductionStatus(ProductionStatus.PRINTED);
             }
             order.setConfirmTime(new Date());
@@ -4693,7 +4693,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         log.info("开始确认订单:" + order.getId());
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
-            if(order.getProductionStatus() == ProductionStatus.HAS_ORDER || order.getPrintOrderTime() != null){
+            if((order.getProductionStatus() == ProductionStatus.HAS_ORDER || order.getPrintOrderTime() != null) && order.getProductionStatus() != ProductionStatus.HAS_CALL){
                 order.setProductionStatus(ProductionStatus.PRINTED);
             }
             order.setConfirmTime(new Date());
