@@ -195,87 +195,84 @@ public class SendMessageAspect {
 		log.info("短信发送结果:"+ JSONObject.toJSONString(aliResult));
 
 		//后置通知
-		if(aliResult.getBoolean("success")){
-			//如果发短发送成功
-			smsLog.setIsSuccess(true);
-			//成功时记录一条记录
-			smsLogService.insert(smsLog);
-			BrandSetting brandSetting = brandSettingService.selectByBrandId(brandId);
-			//如果开启了
-			if (brandSetting != null && brandSetting.getOpenBrandAccount() == 1) {
-				//获取品牌账户设置
-				AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
-				//品牌账户
-				BrandAccount brandAccount = brandAccountService.selectByBrandSettingId(brandSetting.getId());
-				Brand brand = brandService.selectByPrimaryKey(brandId);
+		try {
+			if(aliResult.getBoolean("success")){
+				//如果发短发送成功
+				smsLog.setIsSuccess(true);
+				//成功时记录一条记录
+				smsLogService.insert(smsLog);
+				BrandSetting brandSetting = brandSettingService.selectByBrandId(brandId);
+				//如果开启了
+				if (brandSetting != null && brandSetting.getOpenBrandAccount() == 1) {
+					//获取品牌账户设置
+					AccountSetting accountSetting = accountSettingService.selectByBrandSettingId(brandSetting.getId());
+					//品牌账户
+					BrandAccount brandAccount = brandAccountService.selectByBrandSettingId(brandSetting.getId());
+					Brand brand = brandService.selectByPrimaryKey(brandId);
 
-				//定义每条短信的单价
-				BigDecimal sms_unit = BigDecimal.ZERO;
-				if(accountSetting.getOpenSendSms()==1){
-					sms_unit = accountSetting.getSendSmsValue();
-				}
-				//剩余账户余额 在sql中控制 以防在扣费的时候 有其它的已经扣费 导致数据不准
-				//BigDecimal remain = brandAccount.getAccountBalance().subtract(sms_unit);
-				BrandAccountLog blog = new BrandAccountLog();
-				blog.setCreateTime(new Date());
-				blog.setGroupName(brand.getBrandName());
-				blog.setBehavior(BehaviorType.SMS);
-				//负数
-				blog.setFoundChange(sms_unit.negate());
-				//blog.setRemain(remain);//剩余账户余额
-				int detailType = 0;
-				//如果是验证码
-				if(smsType== SmsLogType.AUTO_CODE){
-					detailType = DetailType.SMS_CODE;
-				}else if(smsType==SmsLogType.DAYMESSGAGE){
-					detailType = DetailType.SMS_DAY_MESSAGE;
-				}
-				blog.setDetail(detailType);
-				blog.setAccountId(brandAccount.getId());
-				blog.setBrandId(brandId);
-				blog.setShopId(shopId);
-				//这个流水号目前使用当前时间搓+4位随机字符串
-				blog.setSerialNumber(DateUtil.getRandomSerialNumber());
+					//定义每条短信的单价
+					BigDecimal sms_unit = BigDecimal.ZERO;
+					if(accountSetting.getOpenSendSms()==1){
+						sms_unit = accountSetting.getSendSmsValue();
+					}
+					//剩余账户余额 在sql中控制 以防在扣费的时候 有其它的已经扣费 导致数据不准
+					//BigDecimal remain = brandAccount.getAccountBalance().subtract(sms_unit);
+					BrandAccountLog blog = new BrandAccountLog();
+					blog.setCreateTime(new Date());
+					blog.setGroupName(brand.getBrandName());
+					blog.setBehavior(BehaviorType.SMS);
+					//负数
+					blog.setFoundChange(sms_unit.negate());
+					//blog.setRemain(remain);//剩余账户余额
+					int detailType = 0;
+					//如果是验证码
+					if(smsType== SmsLogType.AUTO_CODE){
+						detailType = DetailType.SMS_CODE;
+					}else if(smsType==SmsLogType.DAYMESSGAGE){
+						detailType = DetailType.SMS_DAY_MESSAGE;
+					}
+					blog.setDetail(detailType);
+					blog.setAccountId(brandAccount.getId());
+					blog.setBrandId(brandId);
+					blog.setShopId(shopId);
+					//这个流水号目前使用当前时间搓+4位随机字符串
+					blog.setSerialNumber(DateUtil.getRandomSerialNumber());
 //				Integer accountId = brandAccount.getId();
 //				brandAccount = new BrandAccount();
 //				brandAccount.setId(accountId);
 //				brandAccount.setAccountBalance(remain);
-				//记录品牌账户的更新日志 + 更新账户
-				brandAccountLogService.updateBrandAccountAndLog(blog,brandAccount.getId(),sms_unit);
-			}else {
+					//记录品牌账户的更新日志 + 更新账户
+					brandAccountLogService.updateBrandAccountAndLog(blog,brandAccount.getId(),sms_unit);
+				}else {
 
-				//判断短信账户的余额是否充足
-				SmsAcount smsAcount = smsAcountService.selectByBrandId(brandId);
-				//获取剩余短信条数
-				int remindNum = smsAcount.getRemainderNum();
-				String [] arrs = smsAcount.getSmsRemind().split(",");
-				BrandUser brandUser = brandUserService.selectOneByBrandId(brandId);
-				//判断剩余短信条数是否大于设定的最小可发短信值
-				if(remindNum<this.getMinStr(arrs)) {
-					//我们提醒商家充值
-					JSONObject jsonObject2 = new JSONObject();
-					jsonObject2.put("num",smsAcount.getRemainderNum());
-					jsonObject2.put("name",brandUser.getBrandName());
-					SMSUtils.sendNoticeToBrand(jsonObject2,brandUser.getPhone());
+					//判断短信账户的余额是否充足
+					SmsAcount smsAcount = smsAcountService.selectByBrandId(brandId);
+					//获取剩余短信条数
+					int remindNum = smsAcount.getRemainderNum();
+					String [] arrs = smsAcount.getSmsRemind().split(",");
+					BrandUser brandUser = brandUserService.selectOneByBrandId(brandId);
+					//判断剩余短信条数是否大于设定的最小可发短信值
+					if(remindNum<this.getMinStr(arrs)) {
+						//我们提醒商家充值
+						JSONObject jsonObject2 = new JSONObject();
+						jsonObject2.put("num",smsAcount.getRemainderNum());
+						jsonObject2.put("name",brandUser.getBrandName());
+						SMSUtils.sendNoticeToBrand(jsonObject2,brandUser.getPhone());
 
+					}
+					//更新短信账户的信息
+					smsAcountService.updateByBrandId(brandId);
 				}
-				//更新短信账户的信息
-				smsAcountService.updateByBrandId(brandId);
+
+			}else {
+				//失败时记录一条记录
+				smsLogService.insert(smsLog);
+
 			}
-
-		}else {
-			//失败时记录一条记录
-			smsLogService.insert(smsLog);
-
+		} catch (Exception e) {
+			log.error(e.getMessage());
 		}
-
-
-
 	}
-
-
-
-
 }
 
 
