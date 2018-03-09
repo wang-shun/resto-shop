@@ -1109,6 +1109,8 @@ public class PosServiceImpl implements PosService {
                     returnParam.put("success", false);
                 }
             }else{ //余额支付
+                OrderPaymentItem paymentItem = new OrderPaymentItem();
+                JSONObject returnPayment;
                 //已支付完成
                 returnParam.put("isPolling", false);
                 BigDecimal payValue = object.getBigDecimal("paymentAmount");
@@ -1124,34 +1126,15 @@ public class PosServiceImpl implements PosService {
                     selectMap.put("useWithAccount", 1);
                 }
                 Coupon coupon = couponService.selectPosPayOrderCanUseCoupon(selectMap);
-                //优惠券支付金额
-                BigDecimal couponPayValue = BigDecimal.ZERO;
                 //有优惠券则待支付金额减去优惠券的金额
                 if (coupon != null) {
                     payValue = payValue.subtract(coupon.getValue());
-                    couponPayValue = coupon.getValue();
-                }
-                OrderPaymentItem paymentItem = new OrderPaymentItem();
-                paymentItem.setId(ApplicationUtils.randomUUID());
-                paymentItem.setPayTime(new Date());
-                paymentItem.setPayValue(payValue);
-                paymentItem.setPaymentModeId(PayMode.ACCOUNT_PAY);
-                paymentItem.setRemark("余额支付:" + payValue);
-                paymentItem.setOrderId(order.getId());
-                paymentItem.setToPayId(account.getId());
-                orderPaymentItemService.insert(paymentItem);
-                //返回的支付信息
-                JSONObject returnPayment = new JSONObject(paymentItem);
-                returnPayment.put("payTime", paymentItem.getPayTime().getTime());
-                orderPaymentItems.put(returnPayment);
-                if (coupon != null){
                     //使用优惠券
-                    paymentItem = new OrderPaymentItem();
                     paymentItem.setId(ApplicationUtils.randomUUID());
                     paymentItem.setPayTime(new Date());
-                    paymentItem.setPayValue(couponPayValue);
+                    paymentItem.setPayValue(coupon.getValue());
                     paymentItem.setPaymentModeId(PayMode.COUPON_PAY);
-                    paymentItem.setRemark("优惠券支付:" + payValue);
+                    paymentItem.setRemark("优惠券支付:" + coupon.getValue());
                     paymentItem.setOrderId(order.getId());
                     paymentItem.setToPayId(coupon.getId());
                     orderPaymentItemService.insert(paymentItem);
@@ -1165,10 +1148,25 @@ public class PosServiceImpl implements PosService {
                 for (OrderItem orderItem : order.getOrderItems()){
                     orderItemService.update(orderItem);
                 }
+                if (payValue.compareTo(BigDecimal.ZERO) > 0){
+                    paymentItem = new OrderPaymentItem();
+                    paymentItem.setId(ApplicationUtils.randomUUID());
+                    paymentItem.setPayTime(new Date());
+                    paymentItem.setPayValue(payValue);
+                    paymentItem.setPaymentModeId(PayMode.ACCOUNT_PAY);
+                    paymentItem.setRemark("余额支付:" + payValue);
+                    paymentItem.setOrderId(order.getId());
+                    paymentItem.setToPayId(account.getId());
+                    orderPaymentItemService.insert(paymentItem);
+                    //返回的支付信息
+                    returnPayment = new JSONObject(paymentItem);
+                    returnPayment.put("payTime", paymentItem.getPayTime().getTime());
+                    orderPaymentItems.put(returnPayment);
+                    //使用余额明细
+                    Order newOrderInfo = orderService.selectById(order.getId());
+                    accountService.payOrder(newOrderInfo, payValue, customer, brand, shopDetail);
+                }
                 returnParam.put("payMentInfo", orderPaymentItems);
-                //使用余额明细
-                Order newOrderInfo = orderService.selectById(order.getId());
-                accountService.payOrder(newOrderInfo, payValue, customer, brand, shopDetail);
             }
         }catch (Exception e){
             e.printStackTrace();
