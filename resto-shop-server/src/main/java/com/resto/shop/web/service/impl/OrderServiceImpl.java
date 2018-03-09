@@ -4616,6 +4616,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             if((order.getProductionStatus() == ProductionStatus.HAS_ORDER || order.getPrintOrderTime() != null) && order.getProductionStatus() != ProductionStatus.HAS_CALL){
                 order.setProductionStatus(ProductionStatus.PRINTED);
             }
+            if(order.getDataOrigin() == 1 && order.getProductionStatus() != ProductionStatus.HAS_CALL && order.getProductionStatus() != ProductionStatus.PRINTED){
+                order.setProductionStatus(ProductionStatus.PRINTED);
+            }
             order.setConfirmTime(new Date());
             order.setAllowCancel(false);
             BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
@@ -4694,6 +4697,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         if (order.getConfirmTime() == null && !order.getClosed()) {
             order.setOrderState(OrderState.CONFIRM);
             if((order.getProductionStatus() == ProductionStatus.HAS_ORDER || order.getPrintOrderTime() != null) && order.getProductionStatus() != ProductionStatus.HAS_CALL){
+                order.setProductionStatus(ProductionStatus.PRINTED);
+            }
+            if(order.getDataOrigin() == 1 && order.getProductionStatus() != ProductionStatus.HAS_CALL && order.getProductionStatus() != ProductionStatus.PRINTED){
                 order.setProductionStatus(ProductionStatus.PRINTED);
             }
             order.setConfirmTime(new Date());
