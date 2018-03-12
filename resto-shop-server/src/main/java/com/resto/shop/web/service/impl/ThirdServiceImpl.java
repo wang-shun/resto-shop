@@ -450,7 +450,7 @@ public class ThirdServiceImpl implements ThirdService {
      * @param printer
      * @return
      */
-    private Map<String, Object> printPlatformOrderTicketNo(Order order, List<OrderItem> orderDetailList, ShopDetail shopDetail, Printer printer) {
+    private Map<String, Object> printPlatformOrderTicketNo(Order order, List<OrderItem> orderDetailList, ShopDetail shopDetail, Printer printer, String type) {
         if (printer == null) {
             return null;
         }
@@ -570,7 +570,11 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        if("shoudong".equals(type)){
+            map.put("content", "外卖订单:" + order.getSerialNumber() + "返回手动打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        }else{
+            map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        }
         doPostAnsc(url, map);
         RedisUtil.set(print_id, print);
         List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
@@ -590,7 +594,7 @@ public class ThirdServiceImpl implements ThirdService {
      * @param printer
      * @return
      */
-    private Map<String, Object> printPlatformOrderTicketNewNo(Order order, List<OrderItem> orderDetailList,ShopDetail shopDetail, Printer printer) {
+    private Map<String, Object> printPlatformOrderTicketNewNo(Order order, List<OrderItem> orderDetailList,ShopDetail shopDetail, Printer printer, String type) {
         if (printer == null) {
             return null;
         }
@@ -708,7 +712,11 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        if("shoudong".equals(type)){
+            map.put("content", "外卖订单:" + order.getSerialNumber() + "返回手动打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        }else{
+            map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖总单模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        }
         doPostAnsc(url, map);
         RedisUtil.set(print_id, print);
         List<String> printList = (List<String>) RedisUtil.get(shopDetail.getId() + "printList");
@@ -1001,7 +1009,7 @@ public class ThirdServiceImpl implements ThirdService {
         return printTask;
     }
 
-    public List<Map<String, Object>> printPlatformOrderKitchenNo(Order order, List<OrderItem> orderDetailList, ShopDetail shopDetail) {
+    public List<Map<String, Object>> printPlatformOrderKitchenNo(Order order, List<OrderItem> orderDetailList, ShopDetail shopDetail, String type) {
         //每个厨房 所需制作的   菜品信息
         Map<String, List<OrderItem>> kitchenArticleMap = new HashMap<String, List<OrderItem>>();
         //厨房信息
@@ -1133,13 +1141,17 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        if("shoudong".equals(type)){
+            map.put("content", "外卖订单:" + order.getSerialNumber() + "返回手动打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        }else{
+            map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        }
         doPostAnsc(url, map);
         return printTask;
     }
 
 
-    public List<Map<String, Object>> printPlatformOrderKitchenNewNo(Order order, List<OrderItem> orderDetailList, ShopDetail shopDetail) {
+    public List<Map<String, Object>> printPlatformOrderKitchenNewNo(Order order, List<OrderItem> orderDetailList, ShopDetail shopDetail, String type) {
         //每个厨房 所需制作的   菜品信息
         Map<String, List<OrderItem>> kitchenArticleMap = new HashMap<String, List<OrderItem>>();
         //厨房信息
@@ -1273,7 +1285,11 @@ public class ThirdServiceImpl implements ThirdService {
         map.put("brandName", brand.getBrandName());
         map.put("fileName", shopDetail.getName());
         map.put("type", "posAction");
-        map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        if("shoudong".equals(type)){
+            map.put("content", "外卖订单:" + order.getSerialNumber() + "返回手动打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        }else{
+            map.put("content", "外卖订单:" + order.getSerialNumber() + "返回打印外卖厨打模版" + json.toString() + ",请求服务器地址为:" + MQSetting.getLocalIP());
+        }
         doPostAnsc(url, map);
         return printTask;
     }
@@ -1949,18 +1965,18 @@ public class ThirdServiceImpl implements ThirdService {
                 List<Printer> printer = printerService.selectByShopAndType(shopDetail.getId(), PrinterType.RECEPTION);
                 if (printer.size() > 0) {
                     if (shopDetail.getIsPosNew() == Common.YES) {
-                        return printPlatformOrderTicketNewNo(oder, orderItems, shopDetail, printer.get(0));
+                        return printPlatformOrderTicketNewNo(oder, orderItems, shopDetail, printer.get(0), "shoudong");
                     } else {
-                        return printPlatformOrderTicketNo(oder, orderItems, shopDetail, printer.get(0));
+                        return printPlatformOrderTicketNo(oder, orderItems, shopDetail, printer.get(0), "shoudong");
                     }
 
                 }
             } else {
                 Printer p = printerService.selectById(selectPrinterId);
                 if (shopDetail.getIsPosNew() == Common.YES) {
-                    return printPlatformOrderTicketNewNo(oder, orderItems, shopDetail, p);
+                    return printPlatformOrderTicketNewNo(oder, orderItems, shopDetail, p, "shoudong");
                 } else {
-                    return printPlatformOrderTicketNo(oder, orderItems, shopDetail, p);
+                    return printPlatformOrderTicketNo(oder, orderItems, shopDetail, p, "shoudong");
                 }
 
             }
@@ -2015,9 +2031,9 @@ public class ThirdServiceImpl implements ThirdService {
 
             List<Map<String, Object>> kitchenTicket = new ArrayList<>();
             if (shopDetail.getIsPosNew() == Common.YES) {
-                kitchenTicket = printPlatformOrderKitchenNewNo(oder, orderItems, shopDetail);
+                kitchenTicket = printPlatformOrderKitchenNewNo(oder, orderItems, shopDetail, "shoudong");
             } else {
-                kitchenTicket = printPlatformOrderKitchenNo(oder, orderItems, shopDetail);
+                kitchenTicket = printPlatformOrderKitchenNo(oder, orderItems, shopDetail, "shoudong");
             }
 
             if (!kitchenTicket.isEmpty()) {
