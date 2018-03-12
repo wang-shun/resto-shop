@@ -1921,7 +1921,7 @@ public class ThirdServiceImpl implements ThirdService {
             return s;*/
             Order oder = orderService.selectById(orderId);
             Map<String, String> param = new HashMap<>();
-            param.put("orderId", order.getId());
+            param.put("orderId", oder.getId());
             List<OrderItem> orderItems = orderItemService.listByOrderId(param);
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(oder.getShopDetailId());
 
@@ -1989,7 +1989,7 @@ public class ThirdServiceImpl implements ThirdService {
             return list;*/
             Order oder = orderService.selectById(oid);
             Map<String, String> param = new HashMap<>();
-            param.put("orderId", order.getId());
+            param.put("orderId", oder.getId());
             List<OrderItem> orderItems = orderItemService.listByOrderId(param);
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(oder.getShopDetailId());
 
