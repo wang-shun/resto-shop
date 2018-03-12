@@ -424,7 +424,7 @@ public class CouponServiceImpl extends GenericServiceImpl<Coupon, String> implem
                 JSONObject smsParam = new JSONObject();
                 smsParam.put("name", valueMap.get("name").toString());
                 smsParam.put("value", valueMap.get("value").toString());
-                JSONObject jsonObject = smsLogService.sendMessage(brandId, customer.getLastOrderShop() == null ? shopDetail.getId() : customer.getLastOrderShop(),
+                JSONObject jsonObject = smsLogService.sendMessage(brandId, customer.getLastOrderShop() == null ? "" : customer.getLastOrderShop(),
                         SmsLogType.WAKELOSS, SMSUtils.SIGN, SMSUtils.SMS_WAKE_LOSS, customer.getTelephone(), smsParam);
                 log.info("短信发送结果：" + jsonObject.toJSONString());
             }
