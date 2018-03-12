@@ -4860,6 +4860,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Map<String, Object>> printTask = new ArrayList<>();
         log.info("打印订单全部:" + orderId);
         Order order = selectById(orderId);
+        if(order.getDistributionModeId() == DistributionType.DELIVERY_MODE_ID){
+            return printTask;
+        }
         if (order.getPrintTimes() != 1) {
             if(!MemcachedUtils.add(orderId,1)){
                 return printTask;
