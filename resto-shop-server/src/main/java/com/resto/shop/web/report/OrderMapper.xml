@@ -274,7 +274,7 @@
 		SELECT
 			IF(ISNULL(parent_order_id), 1, 0)  orderCount,
 			IF(ISNULL(parent_order_id) AND o.data_origin = 1 AND o.customer_id != '0', 1, 0) wechatOrderCount,
-			IF(ISNULL(parent_order_id) AND (o.data_origin = 2 OR (o.data_origin = 1 and o.customer_id = '0')), 1, 0) posOrderCount,
+			IF(ISNULL(parent_order_id) AND (o.data_origin = 0 OR (o.data_origin = 1 and o.customer_id = '0')), 1, 0) posOrderCount,
 			IF(ISNULL(parent_order_id), O.customer_count, 0) peopleCount,
 			IF(o.distribution_mode_id = 1 AND ISNULL(o.parent_order_id), 1, 0) tangshiCount,
 			IF(o.distribution_mode_id = 3 AND ISNULL(o.parent_order_id), 1, 0) waidaiCount,
@@ -358,7 +358,7 @@
 		SELECT
 			IF(ISNULL(parent_order_id), 1, 0)  orderCount,
 			IF(ISNULL(parent_order_id) AND o.data_origin = 1 AND o.customer_id != '0', 1, 0) wechatOrderCount,
-			IF(ISNULL(parent_order_id) AND (o.data_origin = 2 OR (o.data_origin = 1 and o.customer_id = '0')), 1, 0) posOrderCount,
+			IF(ISNULL(parent_order_id) AND (o.data_origin = 0 OR (o.data_origin = 1 and o.customer_id = '0')), 1, 0) posOrderCount,
 			IF(ISNULL(parent_order_id), O.customer_count, 0) peopleCount,
 			IF(o.distribution_mode_id = 1 AND ISNULL(o.parent_order_id), 1, 0) tangshiCount,
 			IF(o.distribution_mode_id = 3 AND ISNULL(o.parent_order_id), 1, 0) waidaiCount,
