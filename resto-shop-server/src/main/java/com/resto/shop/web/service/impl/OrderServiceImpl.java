@@ -2034,7 +2034,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 //                break;
             case ShopMode.BOSS_ORDER:
                 log.error("【BOSS_ORDER】立即下单失败: " + order.getId() +"\n" + "orderStarte:" + order.getOrderState() +"\n" + "productionStatus:" + order.getProductionStatus());
-                if (order.getPayType() == PayType.PAY) {
+                if (order.getPayType() == PayType.PAY && order.getDistributionModeId() != DistributionType.DELIVERY_MODE_ID) {
                     if (order.getOrderState() != OrderState.CONFIRM && order.getOrderState() != OrderState.PAYMENT || ProductionStatus.NOT_ORDER != order.getProductionStatus()) {
                         log.error("立即下单失败: " + order.getId() +"\n" + "orderStarte:" + order.getOrderState() +"\n" + "productionStatus:" + order.getProductionStatus());
                         throw new AppException(AppException.ORDER_STATE_ERR);
