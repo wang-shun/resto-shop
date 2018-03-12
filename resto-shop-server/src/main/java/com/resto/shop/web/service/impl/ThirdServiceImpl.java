@@ -161,9 +161,6 @@ public class ThirdServiceImpl implements ThirdService {
         if(order==null){
             //R+外卖打印总单
             Order oder = orderService.selectById(platformOrderId);
-            if(order.getProductionStatus() >= ProductionStatus.PRINTED){
-                return printTask;
-            }
             Map<String, String> param = new HashMap<>();
             param.put("orderId", platformOrderId);
             List<OrderItem> orderItems = orderItemService.listByOrderId(param);
