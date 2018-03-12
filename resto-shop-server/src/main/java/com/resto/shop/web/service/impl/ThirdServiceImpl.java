@@ -173,9 +173,9 @@ public class ThirdServiceImpl implements ThirdService {
             for (Printer printer : ticketPrinter) {
                 Map<String, Object> ticket = new HashMap<>();
                 if (shopDetail.getIsPosNew() == Common.YES) {
-                    ticket = printPlatformOrderTicketNewNo(oder, orderItems, shopDetail, printer);
+                    ticket = printPlatformOrderTicketNewNo(oder, orderItems, shopDetail, printer, "zidong");
                 } else {
-                    ticket = printPlatformOrderTicketNo(oder, orderItems,shopDetail, printer);
+                    ticket = printPlatformOrderTicketNo(oder, orderItems,shopDetail, printer, "zidong");
                 }
 
                 if (ticket != null) {
@@ -185,9 +185,9 @@ public class ThirdServiceImpl implements ThirdService {
             //R+外卖厨打
             List<Map<String, Object>> kitchenTicket = new ArrayList<Map<String, Object>>();
             if (shopDetail.getIsPosNew() == Common.YES) {
-                kitchenTicket = printPlatformOrderKitchenNewNo(oder, orderItems, shopDetail);
+                kitchenTicket = printPlatformOrderKitchenNewNo(oder, orderItems, shopDetail, "zidong");
             } else {
-                kitchenTicket = printPlatformOrderKitchenNo(oder, orderItems, shopDetail);
+                kitchenTicket = printPlatformOrderKitchenNo(oder, orderItems, shopDetail, "zidong");
             }
             if (!kitchenTicket.isEmpty()) {
                 printTask.addAll(kitchenTicket);
