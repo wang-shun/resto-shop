@@ -145,7 +145,7 @@ public class appraiseReportController extends GenericController{
 		brandAppraise.setFivestar(fiveStart);
 		//店铺数据
 		List<ShopDetail> shoplist = getCurrentShopDetails();
-        if(!shoplist.isEmpty()){
+        if(shoplist.isEmpty()){
             shoplist = shopDetailService.selectByBrandId(getCurrentBrandId());
         }
 		List<AppraiseDto> shopAppraiseList = new ArrayList<>();
