@@ -1,6 +1,7 @@
 package com.resto.shop.web.controller.common;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -103,7 +104,13 @@ public class BrandUserController extends GenericController{
             session.setAttribute(SessionKey.CURRENT_BRAND_ID,authUserInfo.getBrandId());
             session.setAttribute(SessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());
             session.setAttribute(SessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());
-            List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
+            List<ShopDetail> shopDetailList = new ArrayList<>();
+            if (brandUser.getRoleId() == 9){
+                ShopDetail shopDetail = shopDetailService.selectById(brandUser.getShopDetailId());
+                shopDetailList.add(shopDetail);
+            }else {
+                shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
+            }
             session.setAttribute(SessionKey.CURRENT_SHOP_NAMES,shopDetailList);
             Wether wether = wetherService.selectDateAndShopId(authUserInfo.getShopDetailId(), DateUtil.formatDate(new Date(),"yyyy-MM-dd"));
 
@@ -129,15 +136,6 @@ public class BrandUserController extends GenericController{
 			}
 			session.setAttribute(SessionKey.OPEN_BRAND_ACCOUNT,flag);
             session.setAttribute(SessionKey.WETHERINFO,wether);
-
-//            HttpSession session = request.getSession();
-//            session.setAttribute(RedisSessionKey.USER_INFO, JsonUtils.objectToJson(authUserInfo));//存用户的信息
-//            session.setAttribute(RedisSessionKey.CURRENT_USER_NAME,authUserInfo.getUsername());//存用户的名字
-//            session.setAttribute(RedisSessionKey.CURRENT_BRAND_ID,authUserInfo.getBrandId());//存当前品牌的id
-//            session.setAttribute(RedisSessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());//存当前店铺的id
-//            session.setAttribute(RedisSessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());//存当前店铺的名字
-//            List<ShopDetail> shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
-//            session.setAttribute(RedisSessionKey.CURRENT_SHOP_NAMES, JsonUtils.objectToJson(shopDetailList));//存当前品牌所有的店铺
 
             Brand brand = brandService.selectByPrimaryKey(authUserInfo.getBrandId());
             ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(authUserInfo.getShopDetailId());
