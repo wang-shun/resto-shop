@@ -61,7 +61,7 @@ public class PlatformReportController extends GenericController {
         Result result = new Result();
         //第三方外卖品牌数据
         List<ShopDetail> shoplist = getCurrentShopDetails();
-        if(shoplist!=null&&!shoplist.isEmpty()){
+        if(shoplist==null){
             shoplist = shopDetailService.selectByBrandId(getCurrentBrandId());
         }
         AllPlatformReportDto allPlatformReportDto = new AllPlatformReportDto();

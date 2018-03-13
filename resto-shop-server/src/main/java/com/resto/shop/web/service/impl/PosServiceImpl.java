@@ -666,10 +666,10 @@ public class PosServiceImpl implements PosService {
         JSONObject json = new JSONObject(data);
         OrderDto orderDto = JSON.parseObject(json.get("order").toString(), OrderDto.class);
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(orderDto.getShopDetailId());
-//        syncPosLocalOrder(orderDto, shopDetail);
-//        for(OrderDto childrenOrderDto : orderDto.getChildrenOrders()){
-//            syncPosLocalOrder(childrenOrderDto, shopDetail);
-//        }
+        syncPosLocalOrder(orderDto, shopDetail);
+        for(OrderDto childrenOrderDto : orderDto.getChildrenOrders()){
+            syncPosLocalOrder(childrenOrderDto, shopDetail);
+        }
         log.info("\n\n 【" + shopDetail.getName() + "】 本地 POS 同步订单信息 ：" + orderDto.getId() + "\n");
         log.info(data);
         log.info("\n\n本地 POS 同步订单信息 ");

@@ -261,7 +261,7 @@ public class RechargeLogController extends GenericController{
 		List<RechargeLogDto> shopRrchargeLogs=new ArrayList<>();
 		
 		List<ShopDetail> shoplist = getCurrentShopDetails();
-        if(!shoplist.isEmpty()){
+        if(shoplist.isEmpty()){
             shoplist = shopDetailService.selectByBrandId(getCurrentBrandId());
         }
         for (ShopDetail shopDetail : shoplist) {
