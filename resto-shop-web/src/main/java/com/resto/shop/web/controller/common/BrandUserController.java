@@ -105,8 +105,8 @@ public class BrandUserController extends GenericController{
             session.setAttribute(SessionKey.CURRENT_SHOP_ID,authUserInfo.getShopDetailId());
             session.setAttribute(SessionKey.CURRENT_SHOP_NAME, authUserInfo.getShopName());
             List<ShopDetail> shopDetailList = new ArrayList<>();
-            if (brandUser.getRoleId() == 9){
-                ShopDetail shopDetail = shopDetailService.selectById(brandUser.getShopDetailId());
+            if (authUserInfo.getRoleId() == 9){
+                ShopDetail shopDetail = shopDetailService.selectById(authUserInfo.getShopDetailId());
                 shopDetailList.add(shopDetail);
             }else {
                 shopDetailList = shopDetailService.selectByBrandId(authUserInfo.getBrandId());
