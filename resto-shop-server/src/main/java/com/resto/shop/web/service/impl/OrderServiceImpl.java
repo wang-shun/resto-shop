@@ -4776,6 +4776,61 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         return order;
     }
 
+    @Override
+    public Order getOrderInfoPos(String orderId) {
+        Order order = orderMapper.selectByPrimaryKey(orderId);
+        if (order == null) {
+            return null;
+        }
+        if (order.getBaseCustomerCount() != null && order.getBaseCustomerCount() > 0){//订单有原始就餐人数
+            List<com.alibaba.fastjson.JSONObject> objectList = new ArrayList<>();
+            com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());//查询出该笔订单所在店铺
+            if (order.getIsUseNewService().equals(Common.YES)){ //如果该笔订单产生的是新版服务费
+                if (shopDetail.getIsOpenSauceFee().equals(Common.YES)){ //开通了餐具费
+                    jsonObject.put("id", shopDetail.getId() + "10");
+                    jsonObject.put("type", 10);
+                    jsonObject.put("name", shopDetail.getSauceFeeName());
+                    jsonObject.put("count", order.getSauceFeeCount() == null ? 0 : order.getSauceFeeCount());//产生数量
+                    jsonObject.put("unitPrice", Integer.valueOf(jsonObject.get("count").toString()) > 0 ? order.getSauceFeePrice().divide(new BigDecimal(jsonObject.get("count").toString())) : 0);//单价
+                    objectList.add(jsonObject);
+                }
+                if (shopDetail.getIsOpenTowelFee().equals(Common.YES)){ //开通了纸巾费
+                    jsonObject = new com.alibaba.fastjson.JSONObject();
+                    jsonObject.put("id", shopDetail.getId() + "11");
+                    jsonObject.put("type", 11);
+                    jsonObject.put("name", shopDetail.getTowelFeeName());
+                    jsonObject.put("count", order.getTowelFeeCount() == null ? 0 : order.getTowelFeeCount());//产生数量
+                    jsonObject.put("unitPrice", Integer.valueOf(jsonObject.get("count").toString()) > 0 ? order.getTowelFeePrice().divide(new BigDecimal(jsonObject.get("count").toString())) : 0);//单价
+                    objectList.add(jsonObject);
+                }
+                if (shopDetail.getIsOpenTablewareFee().equals(Common.YES)){ //开通了酱料费
+                    jsonObject = new com.alibaba.fastjson.JSONObject();
+                    jsonObject.put("id", shopDetail.getId() + "12");
+                    jsonObject.put("type", 12);
+                    jsonObject.put("name", shopDetail.getTablewareFeeName());
+                    jsonObject.put("count", order.getTablewareFeeCount() == null ? 0 : order.getTablewareFeeCount());//产生数量
+                    jsonObject.put("unitPrice", Integer.valueOf(jsonObject.get("count").toString()) > 0 ? order.getTablewareFeePrice().divide(new BigDecimal(jsonObject.get("count").toString())) : 0);//单价
+                    objectList.add(jsonObject);
+                }
+            }else{ //旧版服务费
+                jsonObject.put("id", shopDetail.getId());
+                jsonObject.put("type", 0);
+                jsonObject.put("name", shopDetail.getServiceName());
+                jsonObject.put("count", order.getCustomerCount());//产生数量
+                jsonObject.put("unitPrice", shopDetail.getServicePrice());//单价
+                objectList.add(jsonObject);
+            }
+            order.setServiceList(objectList);
+        }
+        Map<String, String> param = new HashMap<>();
+        param.put("orderId", order.getId());
+        List<OrderItem> orderItems = orderItemService.listByOrderIdPos(param);
+        order.setOrderItems(orderItems);
+        Customer cus = customerService.selectById(order.getCustomerId());
+        order.setCustomer(cus);
+        return order;
+    }
 
     @Override
     public List<Order> selectHistoryOrderList(String currentShopId, Date date, Integer shopMode) {

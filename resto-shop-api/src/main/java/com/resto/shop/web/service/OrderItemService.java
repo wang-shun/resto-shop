@@ -15,6 +15,8 @@ public interface OrderItemService extends GenericService<OrderItem, String> {
 	 */
 	public List<OrderItem> listByOrderId(Map<String, String> param);
 
+	public List<OrderItem> listByOrderIdPos(Map<String, String> param);
+
 	public List<OrderItem> listByParentId(String orderId);
 
 	/**
