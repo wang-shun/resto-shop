@@ -103,6 +103,8 @@ public interface OrderService extends GenericService<Order, String> {
 
 	public Order getOrderInfo(String orderId);
 
+	public Order getOrderInfoPos(String orderId);
+
 	public List<Order> selectHistoryOrderList(String currentShopId, Date date, Integer shopMode);
 
 	public List<Order> selectErrorOrderList(String currentShopId, Date date);

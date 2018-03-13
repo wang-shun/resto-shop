@@ -25,6 +25,8 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
     //根据订单ID查询订单项
     List<OrderItem> listByOrderId(Map<String, String> param);
 
+    List<OrderItem> listByOrderIdPos(Map<String, String> param);
+
     //套餐
     List<OrderItem> listTotalByOrderId(@Param("orderId") String orderId);
 
