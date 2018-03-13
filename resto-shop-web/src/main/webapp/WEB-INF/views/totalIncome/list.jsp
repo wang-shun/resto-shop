@@ -175,6 +175,7 @@
     });
 
     var tb1 = $("#brandReportTable").DataTable({
+        ordering:  false,
         data:dataSource.brandIncome,
         dom:'i',
         columns : [
@@ -183,71 +184,71 @@
                 data : "shopName",
             },
             {
-                title : "原价销售总额(元)",
+                title : "原价销售总额",
                 data : "originalAmount"
             },
             {
-                title : "订单总额(元)",
+                title : "订单总额",
                 data : "totalIncome",
             },
             {
-                title : "微信支付(元)",
+                title : "微信支付",
                 data : "wechatIncome",
             },
             {
-                title : "充值账户支付(元)",
+                title : "充值账户支付",
                 data : "chargeAccountIncome",
             },
             {
-                title : "红包支付(元)",
+                title : "红包支付",
                 data : "redIncome",
             },
             {
-                title : "优惠券支付(元)",
+                title : "优惠券支付",
                 data : "couponIncome",
             },
             {
-                title : "充值赠送支付(元)",
+                title : "充值赠送支付",
                 data : "chargeGifAccountIncome",
             },
             {
-                title : "等位红包支付(元)",
+                title : "等位红包支付",
                 data : "waitNumberIncome",
             },
             {
-                title : "支付宝支付(元)",
+                title : "支付宝支付",
                 data : "aliPayment"
             },
             {
-                title : "刷卡支付(元)",
+                title : "刷卡支付",
                 data : "backCartPay"
             },
             {
-                title : "现金实收(元)",
+                title : "现金实收",
                 data : "moneyPay"
             },
             {
-                title : "闪惠支付(元)",
+                title : "闪惠支付",
                 data : "shanhuiPayment"
             },
             {
-                title : "会员支付(元)",
+                title : "会员支付",
                 data : "integralPayment"
             },
             {
-                title : "退菜返还红包(元)",
+                title : "退菜返还红包",
                 data:"articleBackPay"
             },
 //            {
-//                title : "找零(元)",
+//                title : "找零",
 //                data:"giveChangePayment"
 //            },
             {
-                title : "其他方式支付(元)",
+                title : "其他方式支付",
                 data : "otherPayment"
             },
             {
-                title : "现金退款(元)",
+                title : "现金退款",
                 data : "refundCrashPayment"
             }
 
@@ -263,72 +264,72 @@
                 data : "shopName",
             },
             {
-                title : "原价销售总额(元)",
+                title : "原价销售总额",
                 data : "originalAmount"
             },
             {
-                title : "订单总额(元)",
+                title : "订单总额",
                 data : "totalIncome",
             },
             {
-                title : "微信支付(元)",
+                title : "微信支付",
                 data : "wechatIncome",
             },
             {
-                title : "充值账户支付(元)",
+                title : "充值账户支付",
                 data : "chargeAccountIncome",
             },
             {
-                title : "红包支付(元)",
+                title : "红包支付",
                 data : "redIncome",
             },
             {
-                title : "优惠券支付(元)",
+                title : "优惠券支付",
                 data : "couponIncome",
             },
 
             {
-                title : "充值赠送支付(元)",
+                title : "充值赠送支付",
                 data : "chargeGifAccountIncome",
             },
             {
-                title : "等位红包支付(元)",
+                title : "等位红包支付",
                 data : "waitNumberIncome",
             },
             {
-                title : "支付宝支付(元)",
+                title : "支付宝支付",
                 data : "aliPayment",
             },
             {
-                title : "刷卡支付(元)",
+                title : "刷卡支付",
                 data : "backCartPay"
             },
             {
-                title : "现金实收(元)",
+                title : "现金实收",
                 data : "moneyPay"
             },
             {
-                title : "闪惠支付(元)",
+                title : "闪惠支付",
                 data : "shanhuiPayment"
             },
             {
-                title : "会员支付(元)",
+                title : "会员支付",
                 data : "integralPayment"
             },
             {
-                title : "退菜返还红包(元)",
+                title : "退菜返还红包",
                 data:"articleBackPay"
             },
 //            {
-//                title : "找零(元)",
+//                title : "找零",
 //                data:"giveChangePayment"
 //            },
             {
-                title : "其他方式支付(元)",
+                title : "其他方式支付",
                 data : "otherPayment"
             },
             {
-                title : "现金退款(元)",
+                title : "现金退款",
                 data : "refundCrashPayment"
             },
             {
