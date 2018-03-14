@@ -1157,7 +1157,7 @@ public class PosServiceImpl implements PosService {
                     paymentItem.setRemark("余额支付:" + payValue);
                     paymentItem.setOrderId(order.getId());
                     paymentItem.setToPayId(account.getId());
-                    orderPaymentItemService.insert(paymentItem);
+//                    orderPaymentItemService.insert(paymentItem);
                     //返回的支付信息
                     returnPayment = new JSONObject(paymentItem);
                     returnPayment.put("payTime", paymentItem.getPayTime().getTime());
