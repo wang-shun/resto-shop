@@ -2461,6 +2461,9 @@ GROUP BY r.table_number
         and table_number is not null
         and allow_continue_order = 1
         and production_status != 6
+        <if test="tableNumber != null and tableNumber != '' ">
+            and table_number = tableNumber
+        </if>
         order by create_time desc limit 1
     </select>
 

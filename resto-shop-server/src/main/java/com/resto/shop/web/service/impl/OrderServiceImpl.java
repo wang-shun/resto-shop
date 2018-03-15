@@ -7161,7 +7161,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public Order lastOrderByCustomer(String customerId, String shopId,String groupId) {
+    public Order lastOrderByCustomer(String customerId, String shopId,String groupId, String tableNumber) {
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
         //得到自己购买的最新的一比允许加菜的订单
@@ -7171,7 +7171,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //获取这个人在这个组内的订单
             order = orderMapper.getGroupOrderByGroupId(groupId);
         }else{
-            order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime());
+            order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime(), tableNumber);
         }
         //如果是存在组 则把该人的当前购物车添加进入组
         if(order != null && order.getGroupId() != null){
