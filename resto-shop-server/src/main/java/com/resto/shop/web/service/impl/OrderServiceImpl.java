@@ -7286,7 +7286,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
         List<Order> childs = orderMapper.selectByParentId(orderId, parent.getPayType());
         List<Order> result = new ArrayList<>();
         for (Order child : childs) {
-            Order order = getOrderInfo(child.getId());
+            Order order = getOrderInfoPos(child.getId());
             result.add(order);
         }
 
