@@ -30,8 +30,6 @@ public interface OrderItemMapper  extends GenericDao<OrderItem,String> {
     //套餐
     List<OrderItem> listTotalByOrderId(@Param("orderId") String orderId);
 
-    List<OrderItem> listTotalByOrderIdPos(@Param("orderId") String orderId);
-
     List<OrderItem> listByParentId(String orderId);
 
     void updateOrderIdByBeforeId(@Param("orderId") String orderId, @Param("beforeId") String beforeId);

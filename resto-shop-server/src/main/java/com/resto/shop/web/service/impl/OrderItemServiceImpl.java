@@ -48,7 +48,7 @@ public class OrderItemServiceImpl extends GenericServiceImpl<OrderItem, String> 
     public List<OrderItem> listByOrderIdPos(Map<String, String> param) {
         List<OrderItem> orderItems = orderitemMapper.listByOrderIdPos(param);
 
-        List<OrderItem> other = orderitemMapper.listTotalByOrderIdPos(param.get("orderId"));
+        List<OrderItem> other = orderitemMapper.listTotalByOrderId(param.get("orderId"));
 
         orderItems.addAll(other);
 

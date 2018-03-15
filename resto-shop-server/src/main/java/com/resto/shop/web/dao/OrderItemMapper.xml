@@ -324,18 +324,6 @@
     ORDER BY create_time
   </select>
 
-    <select id="listTotalByOrderIdPos" resultType="OrderItem">
---         SELECT * from tb_order_item where order_id = #{orderId}
---         and type in (3,4) GROUP BY article_id,article_name,id
---         ORDER BY create_time
-        SELECT sum(count) as count,sum(orgin_count) as orgin_count, original_price,unit_price,
-        sum(final_price) as final_price,tb_order_item.*
-        from tb_order_item where order_id = #{orderId}
-        and type not in (3,4)
-        GROUP BY article_id,article_name,id
-        ORDER BY create_time
-    </select>
-
     <select id="listByOrderIds" resultType="OrderItem">
         SELECT * from tb_order_item where
         order_id in
