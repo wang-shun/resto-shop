@@ -206,7 +206,7 @@
                             </div>
 
                             <div class="form-group col-md-4">
-                                <label class="col-md-5 control-label">开启提醒</label>
+                                <label class="col-md-5 control-label">开启提醒(预点餐)</label>
                                 <div class="col-md-7 radio-list">
                                     <label class="radio-inline">
                                         <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
