@@ -45,7 +45,7 @@
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.WeightPackage">update tb_weight_package set iname = #{name}, create_time = #{createTime,jdbcType=DATE}, shop_id = #{shopId} where id = #{id,jdbcType=BIGINT}</update>
     <select id="selectList" resultType="WeightPackage">select * from tb_weight_package</select>
 
-    <select id="getAllWeightPackages" resultMap="UnitResultMap">
+    <select id="getAllWeightPackages" resultMap="BaseResultMap">
         select t.id ,t.name,t2.id as detail_id,t2.name as detail_name,t2.sort as detail_sort
         from tb_weight_package t
         left join tb_weight_package_detail t2 on t2.weight_package_id = t.id
