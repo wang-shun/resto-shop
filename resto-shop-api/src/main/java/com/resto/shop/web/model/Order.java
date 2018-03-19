@@ -332,6 +332,16 @@ public class Order implements Serializable {
 
     private BigDecimal memberDiscount;
 
+    private Integer needConfirmOrderItem;
+
+    public Integer getNeedConfirmOrderItem() {
+        return needConfirmOrderItem;
+    }
+
+    public void setNeedConfirmOrderItem(Integer needConfirmOrderItem) {
+        this.needConfirmOrderItem = needConfirmOrderItem;
+    }
+
     public BigDecimal getMemberDiscount() {
         return memberDiscount;
     }
