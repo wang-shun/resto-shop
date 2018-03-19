@@ -611,9 +611,20 @@ public class SpringContextConfig {
     public DocPmsPoHeaderService docPmsPoHeaderService(){
         return proxy.create(DocPmsPoHeaderService.class);
     }
+
     @Bean
     public DocReturnHeaderService docDocReturnHeaderService(){
         return proxy.create(DocReturnHeaderService.class);
+    }
+
+    @Bean
+    public WeightPackageService weightPackageService(){
+        return proxy.create(WeightPackageService.class);
+    }
+
+    @Bean
+    public WeightPackageDetailService weightPackageDetailService(){
+        return proxy.create(WeightPackageDetailService.class);
     }
 
 
