@@ -28,6 +28,8 @@
         <result column="print_fail_flag" property="printFailFlag"/>
         <result column="meal_fee_number" property="mealFeeNumber"/>
         <result column="customer_id" property="customerId"/>
+        <result column="weight" property="weight"/>
+        <result column="need_remind" property="needRemind"/>
         <association property="orderRefundRemark" javaType="com.resto.shop.web.model.OrderRefundRemark">
             <id column="id1" property="id" jdbcType="BIGINT"/>
             <result column="article_id1" property="articleId" jdbcType="VARCHAR"/>
@@ -43,8 +45,8 @@
     </resultMap>
     <sql id="Base_Column_List">
     id, article_name, article_designation, `count`, original_price, unit_price, base_unit_price, final_price,
-    remark, pos_discount, sort, status, order_id, article_id, `type`, parent_id, create_time,meal_item_id,recommend_id,orgin_count,refund_count,
-    change_count,print_fail_flag,customer_id
+    remark, pos_discount, sort, status, order_id, article_id, `type`, parent_id, create_time, meal_item_id, recommend_id, orgin_count, refund_count,
+    change_count, print_fail_flag, customer_id, weight, need_remind
   </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
@@ -136,6 +138,12 @@
             <if test="customerId != null">
                 customer_id,
             </if>
+            <if test="weight != null">
+                weight,
+            </if>
+            <if test="needRemind != null">
+                need_remind,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -201,6 +209,12 @@
             <if test="customerId != null">
                 #{customerId},
             </if>
+            <if test="weight != null">
+                #{weight},
+            </if>
+            <if test="needRemind != null">
+                #{needRemind},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OrderItem">
@@ -265,6 +279,12 @@
             </if>
             <if test="customerId != null">
                 customer_id = #{customerId},
+            </if>
+            <if test="weight != null">
+                weight = #{weight},
+            </if>
+            <if test="needRemind != null">
+                need_remind = #{needRemind},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -363,15 +383,14 @@
   </select>
 
     <select id="getListBySort" resultType="OrderItem">
-select t.print_sort,t3.* from tb_meal_attr  t
-INNER JOIN tb_meal_item t2 on t2.meal_attr_id = t.id
-left join tb_order_item t3 on t3.article_id = t2.article_id
+        select t.print_sort,t3.* from tb_meal_attr  t
+        INNER JOIN tb_meal_item t2 on t2.meal_attr_id = t.id
+        left join tb_order_item t3 on t3.article_id = t2.article_id
 
-where  t.article_id =  #{articleid}
-and t3.parent_id = #{parentid}
-GROUP BY t3.id
-order by t.print_sort asc
-
+        where  t.article_id =  #{articleid}
+        and t3.parent_id = #{parentid}
+        GROUP BY t3.id
+        order by t.print_sort asc
   </select>
 
 

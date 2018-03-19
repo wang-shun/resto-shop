@@ -136,6 +136,26 @@ public class OrderItem implements Serializable {
 
     private String verCode;
 
+    private BigDecimal weight;
+
+    private Integer needRemind;
+
+    public BigDecimal getWeight() {
+        return weight;
+    }
+
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
+    }
+
+    public Integer getNeedRemind() {
+        return needRemind;
+    }
+
+    public void setNeedRemind(Integer needRemind) {
+        this.needRemind = needRemind;
+    }
+
     public String getVerCode() {
         return verCode;
     }
