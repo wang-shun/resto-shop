@@ -1331,7 +1331,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     public Result checkArticleList(OrderItem orderItem, int count) {
-
         Boolean result = true;
         String msg = "";
 
