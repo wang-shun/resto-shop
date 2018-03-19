@@ -24,7 +24,7 @@
         <div class="modal-dialog " style="width:90%;">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">规格属性</h4>
+                    <h4 class="modal-title">重量属性</h4>
                 </div>
                 <form class="form-horizontal" role="form"
                       @submit.prevent="save">
@@ -198,7 +198,7 @@
     </div>
     <div class="table-div">
         <div class="table-operator">
-            <s:hasPermission name="unit/add">
+            <s:hasPermission name="weightPackage/add">
                 <button class="btn green pull-right" @click="create(2)">新建</button>
             </s:hasPermission>
         </div>
@@ -230,7 +230,7 @@
 
         var tb = $table.DataTable({
             ajax: {
-                url: "unit/list_all",
+                url: "weightPackage/list_all",
                 dataSrc: ""
             },
             columns: [
@@ -262,10 +262,10 @@
                     data: "id",
                     createdCell: function (td, tdData, rowData, row) {
                         var operator = [
-                            <s:hasPermission name="unit/delete">
-                            C.createDelBtn(tdData, "unit/delete"),
+                            <s:hasPermission name="weightPackage/delete">
+                            C.createDelBtn(tdData, "weightPackage/delete"),
                             </s:hasPermission>
-                            <s:hasPermission name="unit/edit">
+                            <s:hasPermission name="weightPackage/edit">
                             C.createEditBtn(rowData),
                             </s:hasPermission>
                         ];
@@ -313,10 +313,8 @@
                         articleattrs: [],
                         articles: [],
                         unit: new HashMap(),
-
                         articleunits: {},
                         familyLis: [],
-
                         unitPrices: [],
                         mealtempList: [],
                         articleList: [],
@@ -396,27 +394,8 @@
                                 });
                             }
 
-
-//
-//                            if(attr.detailList){
-//                                attr.detailList.push({
-//                                    name: null,
-//                                    spread: null,
-//                                    sort: null
-//                                });
-//                            }else{
-//                                attr.detailList = [{ name: null,
-//                                    spread: null,
-//                                    sort: null}];
-//                            }
-
-
-
                         },
                         addMealItem: function (arr) {
-//                            this.choiceArticleShow.show = true;
-//                            this.choiceArticleShow.items = this.articles;
-//                            this.choiceArticleShow.itemsLess = articleList;
                             var len = this.unit.familyList.length;
                             var family = {
                                 no: len,
@@ -427,13 +406,6 @@
                             }
 
                             this.unit.familyList.push(family);
-//                            this.$nextTick(function () {
-//                                $("#article-choice-dialog").modal('show');
-//                                var that = this;
-//                                $("#article-choice-dialog").on('hidden.bs.modal', function () {
-//                                    that.choiceArticleShow.show = false;
-//                                });
-//                            })
                         },
 
                         delMealAttr: function (meal) {
@@ -768,39 +740,6 @@
                             }
                         });
 
-
-                        $.post("article/singo_article", null, function (data) {
-                            that.articleList = data;
-                            articleList = data;
-                            all = data;
-                        });
-                        $.post("articlefamily/list_all", null, function (data) {
-                            that.articlefamilys = data;
-                        });
-                        $.post("supporttime/list_all", null, function (data) {
-                            that.supportTimes = data;
-                        });
-                        $.post("kitchen/list_all", null, function (data) {
-                            that.kitchenList = data;
-                        });
-                        $.post("mealtemp/list_all", null, function (data) {
-                            that.mealtempList = data;
-                        });
-                        $.post("articleattr/list_all", null, function (data) {
-                            var article_units = {};
-                            for (var i in data) {
-                                var attr = data[i];
-                                attr.checkedUnit = [];
-                                var units = attr.articleUnits;
-                                for (var i in units) {
-                                    var unit = units[i];
-                                    unit.attr = attr;
-                                    article_units[unit.id] = unit;
-                                }
-                            }
-                            that.articleunits = article_units;
-                            that.articleattrs = data;
-                        });
                     }
                 })
                 ;

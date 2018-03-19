@@ -2,6 +2,7 @@ package com.resto.shop.web.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class WeightPackage implements Serializable {
 
@@ -12,6 +13,8 @@ public class WeightPackage implements Serializable {
     private Date createTime;
 
     private String shopId;
+
+    private List<WeightPackageDetail> details;
 
     public Long getId() {
         return id;
@@ -43,5 +46,13 @@ public class WeightPackage implements Serializable {
 
     public void setShopId(String shopId) {
         this.shopId = shopId;
+    }
+
+    public List<WeightPackageDetail> getDetails() {
+        return details;
+    }
+
+    public void setDetails(List<WeightPackageDetail> details) {
+        this.details = details;
     }
 }

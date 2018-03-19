@@ -7,6 +7,13 @@
         <result column="name" property="name" jdbcType="VARCHAR"/>
         <result column="create_time" property="createTime" jdbcType="DATE"/>
         <result column="shop_id" property="shopId" jdbcType="VARCHAR"/>
+        <collection property="details" javaType="List" ofType="com.resto.shop.web.model.WeightPackageDetail">
+            <id column="detail_id" property="id"/>
+            <result column="detail_name" property="name"/>
+            <result column="detail_sort" property="sort"/>
+            <result column="detail_used" property="isUsed"/>
+            <result column="detail_price" property="price"/>
+        </collection>
     </resultMap>
     <sql id="Base_Column_List">id, name, create_time, shop_id</sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select
@@ -37,4 +44,11 @@
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.WeightPackage">update tb_weight_package set iname = #{name}, create_time = #{createTime,jdbcType=DATE}, shop_id = #{shopId} where id = #{id,jdbcType=BIGINT}</update>
     <select id="selectList" resultType="WeightPackage">select * from tb_weight_package</select>
+
+    <select id="getAllWeightPackages" resultMap="UnitResultMap">
+        select t.id ,t.name,t2.id as detail_id,t2.name as detail_name,t2.sort as detail_sort
+        from tb_weight_package t
+        left join tb_weight_package_detail t2 on t2.weight_package_id = t.id
+        where t.shop_id = #{shopId}
+    </select>
 </mapper>

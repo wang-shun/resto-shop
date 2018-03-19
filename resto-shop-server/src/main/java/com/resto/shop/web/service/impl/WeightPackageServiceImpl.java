@@ -7,6 +7,7 @@ import com.resto.shop.web.model.WeightPackage;
 import com.resto.shop.web.service.WeightPackageService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 public class WeightPackageServiceImpl extends GenericServiceImpl<WeightPackage, Long> implements WeightPackageService {
 
@@ -16,5 +17,10 @@ public class WeightPackageServiceImpl extends GenericServiceImpl<WeightPackage, 
     @Override
     public GenericDao<WeightPackage, Long> getDao() {
         return weightPackageMapper;
+    }
+
+    @Override
+    public List<WeightPackage> getAllWeightPackages(String shopId) {
+        return weightPackageMapper.getAllWeightPackages(shopId);
     }
 }
