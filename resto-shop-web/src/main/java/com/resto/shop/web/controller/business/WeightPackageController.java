@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 /**
  * Created by carl on 2018/03/19.
  */
-@RequestMapping("WeightPackage")
+@RequestMapping("weightPackage")
 @Controller
 public class WeightPackageController extends GenericController {
 
