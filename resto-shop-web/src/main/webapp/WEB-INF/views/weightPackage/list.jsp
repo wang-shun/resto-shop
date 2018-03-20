@@ -324,14 +324,6 @@
                         choiceArticleShow: {show: false, mealAttr: null, items: [], itemsLess: [], currentFamily: ""}
                     },
                     methods: {
-                        itemDefaultChange: function (attr, item) {
-                            for (var i in attr.mealItems) {
-                                var m = attr.mealItems[i];
-                                if (m != item) {
-                                    m.isDefault = false;
-                                }
-                            }
-                        },
 
                         updateAttrItems: function () {
 //                            this.choiceArticleShow.mealAttr.mealItems = $.extend(true, {}, this.choiceArticleShow).items;

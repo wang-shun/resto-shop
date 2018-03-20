@@ -1,5 +1,6 @@
 package com.resto.shop.web.service.impl;
 
+import cn.restoplus.rpc.server.RpcService;
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.brand.core.generic.GenericServiceImpl;
 import com.resto.brand.core.util.ApplicationUtils;
@@ -15,6 +16,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.List;
 
+@RpcService
 public class WeightPackageServiceImpl extends GenericServiceImpl<WeightPackage, Long> implements WeightPackageService {
 
     @Resource
