@@ -52,21 +52,20 @@
                                             <div class="portlet-body">
                                                 <div class="form-group col-md-12" v-for="item in unit.detailList">
                                                     <div class="flex-row" style="text-align: center">
-
+                                                        <div class="flex-2">重量(斤)</div>
                                                         <div class="flex-2">名称</div>
-                                                        <div class="flex-2">重量</div>
                                                         <div class="flex-2">排序</div>
                                                         <div class="flex-2">移除</div>
                                                     </div>
                                                     <div class="flex-row" style="text-align: center">
                                                         <div class="flex-2">
                                                             <input type="text" class="form-control"
-                                                                   v-model="item.name" name="name"
+                                                                   v-model="item.weight" name="weight"
                                                                    required/>
                                                         </div>
                                                         <div class="flex-2">
                                                             <input type="text" class="form-control"
-                                                                   v-model="item.weight" name="weight"
+                                                                   v-model="item.name" name="name"
                                                                    required/>
                                                         </div>
                                                         <div class="flex-2">
