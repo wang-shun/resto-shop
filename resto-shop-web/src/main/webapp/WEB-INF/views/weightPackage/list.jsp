@@ -225,7 +225,8 @@
                         articleunits: {},
                         unitPrices: [],
                         articleList: [],
-                        choiceArticleShow: {show: false, mealAttr: null, items: [], itemsLess: [], currentFamily: ""}
+                        choiceArticleShow: {show: false, mealAttr: null, items: [], itemsLess: [], currentFamily: ""},
+                        btnflag: true,
                     },
                     methods: {
                         updateAttrItems: function () {
@@ -281,12 +282,11 @@
 
                             unitId = model.id;
                             that.showform = true;
-                            $.post("weightPackage/getUnitById", {id: model.id}, function (result) {
+                            $.post("weightPackage/getWeightPackageById", {id: model.id}, function (result) {
                                 $('#uName').val(result.name);
                                 $('#uSort').val(result.sort);
                                 var arr = [];
                                 for (var i = 0; i < result.details.length; i++) {
-
                                     var detail = {
                                         id:result.details[i].id,
                                         no: i,
@@ -307,6 +307,13 @@
                         },
                         save: function (e) {
                             var that = this;
+                            if(!that.btnflag){
+                                return false;
+                            }
+                            that.btnflag = false;
+                            setTimeout(function () {
+                                that.btnflag = true;
+                            },4000);
                             this.m.prices = this.unitPrices;
                             this.m.hasUnit = this.checkedUnit.join() || " ";
                             var m = this.m;

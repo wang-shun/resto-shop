@@ -14,4 +14,6 @@ public interface WeightPackageService extends GenericService<WeightPackage, Long
     void initWeightPackageDetail(WeightPackage weightPackage);
 
     WeightPackage selectByDateShopId(String name, String shopId);
+
+    WeightPackage getWeightPackageById(String id);
 }

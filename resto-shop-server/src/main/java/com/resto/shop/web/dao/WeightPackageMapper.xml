@@ -57,4 +57,12 @@
     <select id="selectByDateShopId" resultType="WeightPackage">
         select * from tb_weight_package where name = #{name} and shop_id = #{shopId}
     </select>
+
+    <select id="getWeightPackageById" resultMap="BaseResultMap">
+        select t.id ,t.name,t2.id as detail_id,t2.name as detail_name,t2.sort as detail_sort,
+        t2.weight as detail_weight
+        from tb_weight_package t
+        left join tb_weight_package_detail t2 on t2.weight_package_id = t.id
+        where t.id = #{id} order by t2.sort
+    </select>
 </mapper>
