@@ -2,7 +2,6 @@ package com.resto.shop.web.controller.business;
 
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.controller.GenericController;
-import com.resto.shop.web.model.Unit;
 import com.resto.shop.web.model.WeightPackage;
 import com.resto.shop.web.service.WeightPackageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +66,7 @@ public class WeightPackageController extends GenericController {
 
     @RequestMapping("/getWeightPackageById")
     @ResponseBody
-    public Unit getWeightPackageById(String id) {
+    public WeightPackage getWeightPackageById(String id) {
         return weightPackageService.getWeightPackageById(id);
     }
 }
