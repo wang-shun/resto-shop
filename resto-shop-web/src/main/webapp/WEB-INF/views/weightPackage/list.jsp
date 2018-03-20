@@ -106,7 +106,7 @@
                                                 <div class="col-md-4 col-md-offset-8">
                                                     <button class="btn btn-block blue" type="button"
                                                             @click="addItem"><i class="fa fa-cutlery"></i>
-                                                        添加规格
+                                                        添加重量
                                                     </button>
                                                 </div>
                                                 <div class="clearfix"></div>
@@ -402,67 +402,11 @@
 
                         delMealAttr: function (meal) {
                             this.unit.familyList.$remove(meal);
-                        }
-                        ,
-                        addMealAttr: function () {
-                            var sort = this.maxarticlesort + 1;
-                            this.m.articles.push({
-                                article_name: "餐品属性" + sort,
-                                sort: sort,
-                                mealItems: [],
-                            });
-                        }
-                        ,
-                        choiceMealTemp: function (e) {
-                            var that = this;
-                            C.confirmDialog("切换模板后，所有套餐编辑的内容将被清空，你确定要切换模板吗?", "提示", function () {
-                                that.lastChoiceTemp = $(e.target).val();
-                                var articles = [];
-                                for (var i = 0; i < that.mealtempList.length; i++) {
-                                    var temp = that.mealtempList[i];
-                                    if (temp.id == that.lastChoiceTemp) {
-                                        for (var n = 0; n < temp.attrs.length; n++) {
-                                            var attr = temp.attrs[n];
-                                            articles.push({
-                                                name: attr.name,
-                                                sort: attr.sort,
-                                                mealItems: [],
-                                            });
-                                        }
-                                        that.m.articles = articles;
-                                        return false;
-                                    }
-                                }
-                                that.m.articles = [];
-                            }, function () {
-                                that.choiceTemp = that.lastChoiceTemp.toString();
-                            });
-                        }
-                        ,
-                        selectAllTimes: function (m, e) {
-                            var isCheck = $(e.target).is(":checked");
-                            if (isCheck) {
-                                for (var i = 0; i < this.supportTimes.length; i++) {
-                                    var t = this.supportTimes[i];
-                                    m.supportTimes.push(t.id);
-                                }
-                            } else {
-                                m.supportTimes = [];
-                            }
-                        }
-                        ,
+                        },
                         create: function (article_type) {
-
-
-//                            this.unit = null;
-
                             var unit = {
                                 detailList : []
                             }
-
-
-
-
                             this.unit = unit;
 
                             action = "create";
@@ -470,44 +414,25 @@
                             this.m = {
                                 articleFamilyId: this.articlefamilys[0].id,
                                 articleList: [],
-//                                supportTimes: [],
-//                                kitchenList: [],
-
                                 isRemind: false,
                                 activated: true,
                                 showDesc: true,
                                 showBig: true,
-                                isEmpty: false,
-//                                sort: 0,
-//                                articleType: article_type,
+                                isEmpty: false
                             };
                             this.checkedUnit = [];
                             this.showform = true;
 //                            articleList = [];
                             this.articles = [];
                             articleList = all.concat();
-
-
-                        }
-                        ,
-                        uploadSuccess: function (url) {
-                            console.log(url);
-                            $("[name='photoSmall']").val(url).trigger("change");
-                            C.simpleMsg("上传成功");
-                            $("#photoSmall").attr("src", "/" + url);
-                        }
-                        ,
-                        uploadError: function (msg) {
-                            C.errorMsg(msg);
-                        }
-                        ,
+                        },
                         edit: function (model) {
                             var that = this;
                             action = "edit";
 
                             unitId = model.id;
                             that.showform = true;
-                            $.post("unit/getUnitById", {id: model.id}, function (result) {
+                            $.post("weightPackage/getUnitById", {id: model.id}, function (result) {
                                 $('#uName').val(result.name);
                                 $('#uSort').val(result.sort);
                                 var arr = [];
@@ -529,23 +454,7 @@
                                 that.unit = unit;
                             });
 
-                        }
-                        ,
-                        filterTable: function (e) {
-                            var s = $(e.target);
-                            var val = s.val();
-                            if (val == "-1") {
-                                tb.search("").draw();
-                                return;
-                            }
-                            tb.search(val).draw();
-                        }
-                        ,
-                        changeColor: function (val) {
-                            $(".color-mini").minicolors("value", val);
-                        }
-                        ,
-
+                        },
                         save: function (e) {
                             var that = this;
                             this.m.prices = this.unitPrices;
@@ -591,118 +500,6 @@
                             });
                         }
                     },
-                    computed: {
-                        choiceArticleCanChoice: function () {
-                            var arts = [];
-                            for (var i in this.allArticles) {
-                                var art = this.allArticles[i];
-                                var has = false;
-                                for (var n in this.choiceArticleShow.items) {
-                                    var mealItem = this.choiceArticleShow.items[n];
-                                    if (mealItem.articleId == art.id) {
-                                        has = true;
-                                        break;
-                                    }
-                                }
-                                if (!has && art.articleType == 1 && (this.choiceArticleShow.currentFamily == art.articleFamilyName || this.choiceArticleShow.currentFamily == "")) {
-                                    arts.push(art);
-                                }
-                            }
-                            return arts;
-                        }
-                        ,
-                        maxarticlesort: function () {
-                            var sort = 0;
-                            for (var i in this.m.articles) {
-                                var meal = this.m.articles[i];
-                                if (meal.sort > sort) {
-                                    sort = meal.sort;
-                                }
-                            }
-                            return parseInt(sort);
-                        }
-                        ,
-                        allUnitPrice: function () {
-                            var result = [];
-                            console.log(this.checkedUnit);
-                            for (var i = 0; i < this.articleattrs.length; i++) {
-                                var attr = this.articleattrs[i];
-                                var checked = [];
-                                if (!attr.articleUnits) {
-                                    continue;
-                                }
-                                for (var j = 0; j < attr.articleUnits.length; j++) {
-                                    var c = attr.articleUnits[j];
-                                    for (var n in this.checkedUnit) {
-                                        if (c.id == this.checkedUnit[n]) {
-                                            checked.push({
-                                                unitIds: c.id,
-                                                name: "(" + c.name + ")"
-                                            })
-                                            break;
-                                        }
-                                    }
-                                }
-                                checked.length && result.push(checked);
-                            }
-
-
-                            function getAll(allData) {
-                                var root = [];
-                                for (var i in allData) {
-                                    var currentData = allData[i];
-                                    if (i > 0) {
-                                        for (var p  in allData[i - 1]) {
-                                            var parent = allData[i - 1][p];
-                                            parent.children = currentData;
-                                        }
-                                    } else {
-                                        root = currentData;
-                                    }
-                                }
-                                var allItems = [];
-                                for (var n in root) {
-                                    var r = root[n];
-                                    getTreeAll(r, allItems);
-                                }
-                                return allItems;
-                            }
-
-                            function getTreeAll(tree, allItems) {
-                                tree = $.extend({}, tree);
-                                if (!tree.children) {
-                                    allItems.push($.extend({}, tree));
-                                    return allItems;
-                                }
-                                for (var i in tree.children) {
-                                    var c = tree.children[i];
-                                    c = $.extend({}, c);
-                                    c.unitIds = tree.unitIds + "," + c.unitIds;
-                                    c.name = tree.name + c.name;
-                                    if (!c.children) {
-                                        allItems.push(c);
-                                    } else {
-                                        getTreeAll(c, allItems);
-                                    }
-                                }
-                                return allItems;
-                            }
-
-                            var allItems = getAll(result);
-                            for (var i in allItems) {
-                                var item = allItems[i];
-                                for (var i in this.unitPrices) {
-                                    var p = this.unitPrices[i];
-                                    if (item.unitIds == p.unitIds) {
-                                        item = $.extend(item, p);
-                                    }
-                                }
-                            }
-                            this.unitPrices = allItems;
-                            return allItems;
-                        }
-                    }
-                    ,
                     created: function () {
                         tb.search("").draw();
                         var that = this;
