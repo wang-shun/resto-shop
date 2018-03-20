@@ -3,6 +3,7 @@ package com.resto.shop.web.controller.business;
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.WeightPackage;
+import com.resto.shop.web.service.WeightPackageDetailService;
 import com.resto.shop.web.service.WeightPackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,9 @@ public class WeightPackageController extends GenericController {
 
     @Autowired
     private WeightPackageService weightPackageService;
+
+    @Autowired
+    private WeightPackageDetailService weightPackageDetailService;
 
     @RequestMapping("/list")
     public void list(){
@@ -68,5 +72,13 @@ public class WeightPackageController extends GenericController {
     @ResponseBody
     public WeightPackage getWeightPackageById(String id) {
         return weightPackageService.getWeightPackageById(id);
+    }
+
+    @RequestMapping("/delete")
+    @ResponseBody
+    public Result delete(Long id) {
+        weightPackageService.delete(id);
+        weightPackageDetailService.deleteDetails(id);
+        return Result.getSuccess();
     }
 }
