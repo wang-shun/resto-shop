@@ -269,15 +269,9 @@
                             unitId = null;
                             this.m = {
                                 articleList: [],
-                                isRemind: false,
-                                activated: true,
-                                showDesc: true,
-                                showBig: true,
-                                isEmpty: false
                             };
                             this.checkedUnit = [];
                             this.showform = true;
-//                            articleList = [];
                             this.articles = [];
                             articleList = all.concat();
                         },
@@ -355,10 +349,21 @@
                             });
                         }
                     },
-                    created: function () {
-
-
-                    }
+                created: function () {
+                    tb.search("").draw();
+                    var that = this;
+                    this.$watch("showform", function () {
+                        if (this.showform) {
+                            $("#article-dialog").modal("show");
+                            $("#article-dialog").on("hidden.bs.modal", function () {
+                                that.showform = false;
+                            });
+                        } else {
+                            $("#article-dialog").modal("hide");
+                            $(".modal-backdrop.fade.in").remove();
+                        }
+                    });
+                }
                 })
                 ;
         C.vue = vueObj;
