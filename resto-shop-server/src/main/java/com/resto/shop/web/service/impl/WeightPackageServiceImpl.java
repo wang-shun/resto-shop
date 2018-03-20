@@ -47,4 +47,9 @@ public class WeightPackageServiceImpl extends GenericServiceImpl<WeightPackage, 
     public void initWeightPackageDetail(WeightPackage weightPackage) {
         weightPackageDetailService.deleteDetails(weightPackage.getId());
     }
+
+    @Override
+    public WeightPackage selectByDateShopId(String name, String shopId) {
+        return weightPackageMapper.selectByDateShopId(name, shopId);
+    }
 }

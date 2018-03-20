@@ -53,4 +53,8 @@
         left join tb_weight_package_detail t2 on t2.weight_package_id = t.id
         where t.shop_id = #{shopId}
     </select>
+
+    <select id="selectByDateShopId" resultType="WeightPackage">
+        select * from tb_weight_package where name = #{name} and shop_id = #{shopId}
+    </select>
 </mapper>

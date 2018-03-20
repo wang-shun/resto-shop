@@ -38,11 +38,18 @@ public class WeightPackageController extends GenericController {
     @RequestMapping("/create")
     @ResponseBody
     public Result create(@Valid @RequestBody WeightPackage weightPackage) {
+        WeightPackage w = weightPackageService.selectByDateShopId(weightPackage.getName(), weightPackage.getShopId());
+        if(w != null){
+            return new Result("存在同名的重量包", false);
+        }
         //创建主表
+        Date time = new Date();
         weightPackage.setShopId(getCurrentShopId());
-        weightPackage.setCreateTime(new Date());
+        weightPackage.setCreateTime(time);
         weightPackageService.insert(weightPackage);
+        WeightPackage wp = weightPackageService.selectByDateShopId(weightPackage.getName(), weightPackage.getShopId());
         //创建属性
+        weightPackage.setId(wp.getId());
         weightPackageService.insertDetail(weightPackage);
         return new Result(true);
     }

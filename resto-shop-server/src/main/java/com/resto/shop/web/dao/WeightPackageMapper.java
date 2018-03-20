@@ -2,6 +2,7 @@ package com.resto.shop.web.dao;
 
 import com.resto.brand.core.generic.GenericDao;
 import com.resto.shop.web.model.WeightPackage;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -20,4 +21,6 @@ public interface WeightPackageMapper extends GenericDao<WeightPackage,Long> {
     int updateByPrimaryKey(WeightPackage record);
 
     List<WeightPackage> getAllWeightPackages(String shopId);
+
+    WeightPackage selectByDateShopId(@Param("name") String name, @Param("shopId") String shopId);
 }
