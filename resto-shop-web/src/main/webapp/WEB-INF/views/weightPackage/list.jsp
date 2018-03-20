@@ -219,41 +219,25 @@
                     el: "#control",
                     mixins: [C.formVueMix],
                     data: {
-                        supportTimes: [],
-                        kitchenList: [],
                         checkedUnit: [],
-                        articleattrs: [],
                         articles: [],
                         unit: new HashMap(),
                         articleunits: {},
-                        familyLis: [],
                         unitPrices: [],
-                        mealtempList: [],
                         articleList: [],
-                        choiceTemp: "",
-                        lastChoiceTemp: "",
                         choiceArticleShow: {show: false, mealAttr: null, items: [], itemsLess: [], currentFamily: ""}
                     },
                     methods: {
-
                         updateAttrItems: function () {
-//                            this.choiceArticleShow.mealAttr.mealItems = $.extend(true, {}, this.choiceArticleShow).items;
                             var items = $.extend(true, {}, this.choiceArticleShow).items;
                             this.articles = [];
                             for (var i = 0; i < items.length; i++) {
                                 this.articles.push(items[i]);
                             }
-
                             $("#article-choice-dialog").modal('hide');
                         },
                         removeMealItem: function (item) {
                             this.unit.detailList.$remove(item);
-//                            this.unit.detailList.$remove(attr);
-
-//                            articleList.push(attr);
-
-//                            this.choiceArticleShow.items = this.articles;
-
                         },
                         removeArticleItem: function (mealItem) {
                             this.choiceArticleShow.items.$remove(mealItem);
@@ -263,31 +247,17 @@
                             if(!this.unit.detailList){
                                 this.unit.detailList = [{
                                     name : null,
+                                    weight : null,
                                     sort : null
                                 }];
                             }else{
                                 this.unit.detailList.push({
                                     name : null,
+                                    weight : null,
                                     sort : null
                                 });
                             }
 
-                        },
-                        addMealItem: function (arr) {
-                            var len = this.unit.familyList.length;
-                            var family = {
-                                no: len,
-                                name: null,
-                                sort: null,
-                                type: null,
-                                detailList: []
-                            }
-
-                            this.unit.familyList.push(family);
-                        },
-
-                        delMealAttr: function (meal) {
-                            this.unit.familyList.$remove(meal);
                         },
                         create: function (article_type) {
                             var unit = {
@@ -327,6 +297,7 @@
                                         id:result.details[i].id,
                                         no: i,
                                         name: result.details[i].name,
+                                        weight: result.details[i].weight,
                                         sort: result.details[i].sort
 
                                     }
@@ -354,7 +325,6 @@
 
                             data.details = this.unit.detailList;
                             
-//                            if($('#id').val())
                             var jsonData = JSON.stringify(this.data);
                             var url;
                             if (action == "edit") {
@@ -386,33 +356,7 @@
                         }
                     },
                     created: function () {
-                        tb.search("").draw();
-                        var that = this;
-                        this.$watch("showform", function () {
-                            if (this.showform) {
-                                $("#article-dialog").modal("show");
-                                var n = $('.color-mini').minicolors({
-                                    change: function (hex, opacity) {
-                                        if (!hex) return;
-                                        if (typeof console === 'object') {
-                                            $(this).attr("value", hex);
-                                        }
-                                    },
-                                    theme: 'bootstrap'
-                                });
-                                $("#article-dialog").on("hidden.bs.modal", function () {
-                                    that.showform = false;
-                                });
-                            } else {
-                                $("#article-dialog").modal("hide");
-                                $(".modal-backdrop.fade.in").remove();
-                            }
-                        });
-                        this.$watch("m", function () {
-                            if (this.m.id) {
-                                $('.color-mini').minicolors("value", this.m.controlColor);
-                            }
-                        });
+
 
                     }
                 })
