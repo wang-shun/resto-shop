@@ -9,8 +9,9 @@
         <result column="create_time" property="createTime" jdbcType="DATE"/>
         <result column="is_used" property="isUsed" jdbcType="INTEGER"/>
         <result column="weight_package_id" property="weightPackageId" jdbcType="BIGINT"/>
+        <result column="weight" property="weight"/>
     </resultMap>
-    <sql id="Base_Column_List">id, name, sort, create_time, is_used, weight_package_id</sql>
+    <sql id="Base_Column_List">id, name, sort, create_time, is_used, weight_package_id, weight</sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long">select
         <include refid="Base_Column_List"/> from tb_weight_package_detail where id = #{id,jdbcType=BIGINT}
     </select>
@@ -24,6 +25,7 @@
             <if test="createTime != null">create_time,</if>
             <if test="isUsed != null">is_used,</if>
             <if test="weightPackageId != null">weight_package_id,</if>
+            <if test="weight != null">weight,</if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">#{id,jdbcType=BIGINT},</if>
@@ -32,6 +34,7 @@
             <if test="createTime != null">#{createTime,jdbcType=DATE},</if>
             <if test="isUsed != null">#{isUsed},</if>
             <if test="weightPackageId != null">#{weightPackageId},</if>
+            <if test="weight != null">#{weight},</if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.WeightPackageDetail">update tb_weight_package_detail
@@ -41,6 +44,7 @@
             <if test="createTime != null">create_time = #{createTime,jdbcType=DATE},</if>
             <if test="isUsed != null">is_used = #{isUsed},</if>
             <if test="weightPackageId != null">weight_package_id = #{weightPackageId},</if>
+            <if test="weight != null">weight = #{weight},</if>
         </set> where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.WeightPackageDetail">update tb_weight_package_detail set iname = #{name}, sort = #{sort}, create_time = #{createTime,jdbcType=DATE}, is_used = #{isUsed}, weight_package_id = #{weightPackageId} where id = #{id,jdbcType=BIGINT}</update>

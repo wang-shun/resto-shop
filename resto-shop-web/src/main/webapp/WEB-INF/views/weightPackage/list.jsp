@@ -48,32 +48,13 @@
                                                     </div>
 
                                                 </div>
-
-
-                                                <div class="caption">
-                                                    <label class="control-label col-md-4"
-                                                           style="width:200px">排序&nbsp;</label>
-                                                    <div class="col-md-6">
-                                                        <input class="form-control" type="text" v-model="m.sort"
-                                                               id="uSort" required="required" name="sort" lazy
-                                                        >
-                                                    </div>
-
-                                                </div>
-
-
-                                                <%--<div class="tools">--%>
-                                                    <%--<a href="javascript:;" class="remove"--%>
-                                                       <%--@click="delMealAttr(attr)"></a>--%>
-                                                <%--</div>--%>
                                             </div>
-                                            <div class="portlet-body"> <!--v-for="attr in articles "-->
-                                                <%--<div class="portlet-body" v-if="m.id != null" v-for="attr in m.articles "  >--%>
+                                            <div class="portlet-body">
                                                 <div class="form-group col-md-12" v-for="item in unit.detailList">
                                                     <div class="flex-row" style="text-align: center">
 
                                                         <div class="flex-2">名称</div>
-                                                        <%--<div class="flex-2">差价</div>--%>
+                                                        <div class="flex-2">重量</div>
                                                         <div class="flex-2">排序</div>
                                                         <div class="flex-2">移除</div>
                                                     </div>
@@ -85,11 +66,7 @@
                                                                    v-model="item.name" name="name"
                                                                    required="required"/>
                                                         </div>
-                                                        <%--<div class="flex-2">--%>
-                                                            <%--<input type="text" class="form-control"--%>
-                                                                   <%--v-model="item.spread" name="spread"--%>
-                                                                   <%--required="required"/>--%>
-                                                        <%--</div>--%>
+
                                                         <div class="flex-2">
                                                             <input type="text" class="form-control" name="sort"
                                                                    v-model="item.sort"

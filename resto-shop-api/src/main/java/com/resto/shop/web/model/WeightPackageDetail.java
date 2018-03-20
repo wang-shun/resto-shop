@@ -1,6 +1,7 @@
 package com.resto.shop.web.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class WeightPackageDetail implements Serializable {
@@ -16,6 +17,8 @@ public class WeightPackageDetail implements Serializable {
     private Integer isUsed;
 
     private Long weightPackageId;
+
+    private BigDecimal weight;
 
     public Long getId() {
         return id;
@@ -63,5 +66,13 @@ public class WeightPackageDetail implements Serializable {
 
     public void setWeightPackageId(Long weightPackageId) {
         this.weightPackageId = weightPackageId;
+    }
+
+    public BigDecimal getWeight() {
+        return weight;
+    }
+
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
     }
 }
