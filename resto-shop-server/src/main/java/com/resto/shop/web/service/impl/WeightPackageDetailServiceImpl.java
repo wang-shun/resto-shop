@@ -17,4 +17,10 @@ public class WeightPackageDetailServiceImpl extends GenericServiceImpl<WeightPac
     public GenericDao<WeightPackageDetail, Long> getDao() {
         return weightPackageDetailMapper;
     }
+
+    @Override
+    public int insertDetail(Long weightPackageId, WeightPackageDetail weightPackageDetail) {
+        weightPackageDetail.setWeightPackageId(weightPackageId);
+        return weightPackageDetailMapper.insert(weightPackageDetail);
+    }
 }

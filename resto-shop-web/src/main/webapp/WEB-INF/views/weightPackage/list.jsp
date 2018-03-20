@@ -572,9 +572,9 @@
                             var jsonData = JSON.stringify(this.data);
                             var url;
                             if (action == "edit") {
-                                url = "unit/modify";
+                                url = "weightPackage/modify";
                             } else {
-                                url = "unit/create";
+                                url = "weightPackage/create";
                             }
 
                             $.ajax({

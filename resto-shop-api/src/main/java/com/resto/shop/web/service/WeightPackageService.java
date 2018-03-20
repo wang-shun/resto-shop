@@ -9,4 +9,6 @@ public interface WeightPackageService extends GenericService<WeightPackage, Long
 
     List<WeightPackage> getAllWeightPackages(String shopId);
 
+    WeightPackage insertDetail(WeightPackage weightPackage);
+
 }
