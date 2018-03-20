@@ -45,4 +45,9 @@
     </update>
     <update id="updateByPrimaryKey" parameterType="com.resto.shop.web.model.WeightPackageDetail">update tb_weight_package_detail set iname = #{name}, sort = #{sort}, create_time = #{createTime,jdbcType=DATE}, is_used = #{isUsed}, weight_package_id = #{weightPackageId} where id = #{id,jdbcType=BIGINT}</update>
     <select id="selectList" resultType="WeightPackageDetail">select * from tb_weight_package_detail</select>
+
+    <delete id="deleteDetails" parameterType="java.lang.Long">
+      delete from tb_weight_package_detail where weight_package_id = #{weightPackageId}
+    </delete>
+
 </mapper>

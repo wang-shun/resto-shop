@@ -8,4 +8,6 @@ public interface WeightPackageDetailService extends GenericService<WeightPackage
 
     int insertDetail(Long weightPackageId, WeightPackageDetail weightPackageDetail);
 
+    void deleteDetails(Long weightPackageId);
+
 }

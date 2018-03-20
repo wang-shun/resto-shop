@@ -3,7 +3,6 @@ package com.resto.shop.web.controller.business;
 import com.resto.brand.core.entity.Result;
 import com.resto.shop.web.controller.GenericController;
 import com.resto.shop.web.model.WeightPackage;
-import com.resto.shop.web.service.WeightPackageDetailService;
 import com.resto.shop.web.service.WeightPackageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -23,9 +22,6 @@ public class WeightPackageController extends GenericController {
 
     @Autowired
     private WeightPackageService weightPackageService;
-
-    @Autowired
-    private WeightPackageDetailService weightPackageDetailService;
 
     @RequestMapping("/list")
     public void list(){
@@ -53,12 +49,10 @@ public class WeightPackageController extends GenericController {
     @ResponseBody
     public Result modify(@Valid @RequestBody WeightPackage weightPackage) {
         weightPackageService.update(weightPackage);
-        weightPackageService.initUnit(weightPackage);
+        weightPackageService.initWeightPackageDetail(weightPackage);
         //创建属性
-        WeightPackage u = unitService.insertDetail(weightPackage);
+        WeightPackage u = weightPackageService.insertDetail(weightPackage);
 
-        //同步更新 使用该规格包的菜品信息
-        unitService.modifyUnit(u);
         return new Result(true);
     }
 }

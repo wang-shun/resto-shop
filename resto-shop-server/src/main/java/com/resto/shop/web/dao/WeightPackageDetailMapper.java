@@ -17,4 +17,5 @@ public interface WeightPackageDetailMapper extends GenericDao<WeightPackageDetai
 
     int updateByPrimaryKey(WeightPackageDetail record);
 
+    void deleteDetails(Long weightPackageId);
 }

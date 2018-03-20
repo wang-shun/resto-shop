@@ -11,4 +11,6 @@ public interface WeightPackageService extends GenericService<WeightPackage, Long
 
     WeightPackage insertDetail(WeightPackage weightPackage);
 
+    void initWeightPackageDetail(WeightPackage weightPackage);
+
 }
