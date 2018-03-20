@@ -89,13 +89,6 @@
                                                 <div class="clearfix"></div>
                                             </div>
                                         </div>
-                                        <%--<div class="col-md-4 col-md-offset-4">--%>
-                                            <%--<button class="btn btn-block blue" type="button"--%>
-                                                    <%--@click="addMealItem(unit.familyList)">--%>
-                                                <%--<i class="fa fa-plus"></i>--%>
-                                                <%--添加规格包属性--%>
-                                            <%--</button>--%>
-                                        <%--</div>--%>
                                         <div class="clearfix"></div>
                                     </div>
                                 </div>
@@ -166,18 +159,12 @@
 
 <script>
     (function () {
-        var cid = "#control";
         var action;
         var unitId = null;
 
         var $table = $(".table-body>table");
-        var allArticles = [];
         var articleList = [];
         var all = [];
-        var articleType = {
-            1: "单品",
-            2: "套餐"
-        }
 
 
         var tb = $table.DataTable({
@@ -223,34 +210,7 @@
                         ];
                         $(td).html(operator);
                     }
-                }],
-            initComplete: function () {
-                var api = this.api();
-                api.search('');
-                var data = api.data();
-                for (var i = 0; i < data.length; i++) {
-                    allArticles.push(data[i]);
-                }
-                var columnsSetting = api.settings()[0].oInit.columns;
-                $(columnsSetting).each(function (i) {
-                    if (this.s_filter) {
-                        var column = api.column(i);
-                        var title = this.title;
-                        var select = $('<select><option value="">' + this.title + '(全部)</option></select>');
-                        var that = this;
-                        column.data().unique().each(function (d) {
-                            select.append('<option value="' + d + '">' + ((that.s_render && that.s_render(d)) || d) + '</option>')
-                        });
-
-                        select.appendTo($(column.header()).empty()).on('change', function () {
-                            var val = $.fn.dataTable.util.escapeRegex(
-                                    $(this).val()
-                            );
-                            column.search(val ? '^' + val + '$' : '', true, false).draw();
-                        });
-                    }
-                });
-            }
+                }]
         });
 
         var C = new Controller(null, tb);
@@ -271,7 +231,6 @@
                         articleList: [],
                         choiceTemp: "",
                         lastChoiceTemp: "",
-                        allArticles: allArticles,
                         choiceArticleShow: {show: false, mealAttr: null, items: [], itemsLess: [], currentFamily: ""}
                     },
                     methods: {
@@ -298,31 +257,6 @@
                         removeArticleItem: function (mealItem) {
                             this.choiceArticleShow.items.$remove(mealItem);
                             articleList.push(mealItem);
-                        },
-
-                        addArticleItem: function (art) {
-                            var item = {
-                                name: art.name,
-                                sort: art.sort,
-                                articleName: art.name,
-//                                priceDif: 0,
-                                articleId: art.id,
-//                                photoSmall: art.photoSmall,
-                                isDefault: false,
-                                price: art.price,
-                                articleFamilyName: art.articleFamilyName
-                            };
-
-                            for (var i = 0; i < articleList.length; i++) {
-                                if (articleList[i].id == art.id) {
-                                    articleList.$remove(art);
-                                }
-                            }
-
-                            if (!this.choiceArticleShow.items.length) {
-                                item.isDefault = true;
-                            }
-                            this.choiceArticleShow.items.push(item);
                         },
                         addItem: function () {
                             if(!this.unit.detailList){
