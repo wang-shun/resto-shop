@@ -23,7 +23,7 @@ public class WeightPackageDetailServiceImpl extends GenericServiceImpl<WeightPac
     @Override
     public int insertDetail(Long weightPackageId, WeightPackageDetail weightPackageDetail) {
         weightPackageDetail.setWeightPackageId(weightPackageId);
-        return weightPackageDetailMapper.insert(weightPackageDetail);
+        return weightPackageDetailMapper.insertSelective(weightPackageDetail);
     }
 
     @Override

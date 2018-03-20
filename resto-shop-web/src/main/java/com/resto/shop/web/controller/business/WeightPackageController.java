@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.validation.Valid;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -39,6 +40,7 @@ public class WeightPackageController extends GenericController {
     public Result create(@Valid @RequestBody WeightPackage weightPackage) {
         //创建主表
         weightPackage.setShopId(getCurrentShopId());
+        weightPackage.setCreateTime(new Date());
         weightPackageService.insert(weightPackage);
         //创建属性
         weightPackageService.insertDetail(weightPackage);
