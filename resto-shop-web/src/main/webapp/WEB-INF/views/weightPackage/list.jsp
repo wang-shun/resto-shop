@@ -148,31 +148,6 @@
                             <table class="table">
                                 <thead>
                                 <tr>
-                                    <th>
-                                        <select v-model="choiceArticleShow.currentFamily">
-                                            <option value="">餐品分类(全部)</option>
-                                            <option :value="f.name" v-for="f in articlefamilys">{{f.name}}</option>
-                                        </select>
-                                    </th>
-                                    <th>餐品名称</th>
-                                    <th>添加</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr v-for="art in choiceArticleShow.itemsLess">
-                                    <td>{{art.articleFamilyName}}</td>
-                                    <td>{{art.name}}</td>
-                                    <td>
-                                        <button class="btn blue" type="button" @click="addArticleItem(art)">添加</button>
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table">
-                                <thead>
-                                <tr>
                                     <th>餐品名称(已添加)</th>
                                     <th>移除</th>
                                 </tr>
@@ -306,7 +281,6 @@
                     el: "#control",
                     mixins: [C.formVueMix],
                     data: {
-                        articlefamilys: [],
                         supportTimes: [],
                         kitchenList: [],
                         checkedUnit: [],
@@ -412,7 +386,6 @@
                             action = "create";
                             unitId = null;
                             this.m = {
-                                articleFamilyId: this.articlefamilys[0].id,
                                 articleList: [],
                                 isRemind: false,
                                 activated: true,
