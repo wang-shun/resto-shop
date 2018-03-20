@@ -59,20 +59,21 @@
                                                         <div class="flex-2">移除</div>
                                                     </div>
                                                     <div class="flex-row" style="text-align: center">
-
-
                                                         <div class="flex-2">
                                                             <input type="text" class="form-control"
                                                                    v-model="item.name" name="name"
-                                                                   required="required"/>
+                                                                   required/>
                                                         </div>
-
+                                                        <div class="flex-2">
+                                                            <input type="text" class="form-control"
+                                                                   v-model="item.weight" name="weight"
+                                                                   required/>
+                                                        </div>
                                                         <div class="flex-2">
                                                             <input type="text" class="form-control" name="sort"
                                                                    v-model="item.sort"
-                                                                   required="required" lazy/>
+                                                                   required lazy/>
                                                         </div>
-
                                                         <div class="flex-2">
                                                             <button class="btn red" type="button"
                                                                     @click="removeMealItem(item)">移除
