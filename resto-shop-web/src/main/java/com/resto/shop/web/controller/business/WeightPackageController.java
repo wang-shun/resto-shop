@@ -70,7 +70,7 @@ public class WeightPackageController extends GenericController {
 
     @RequestMapping("/getWeightPackageById")
     @ResponseBody
-    public WeightPackage getWeightPackageById(String id) {
+    public WeightPackage getWeightPackageById(Long id) {
         return weightPackageService.getWeightPackageById(id);
     }
 

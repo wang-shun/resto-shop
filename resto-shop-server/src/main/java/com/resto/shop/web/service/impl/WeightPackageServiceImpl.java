@@ -50,7 +50,7 @@ public class WeightPackageServiceImpl extends GenericServiceImpl<WeightPackage, 
     }
 
     @Override
-    public WeightPackage getWeightPackageById(String id) {
+    public WeightPackage getWeightPackageById(Long id) {
         return weightPackageMapper.getWeightPackageById(id);
     }
 }
