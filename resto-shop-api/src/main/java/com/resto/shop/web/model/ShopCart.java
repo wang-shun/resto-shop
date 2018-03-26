@@ -40,6 +40,8 @@ public class ShopCart implements Serializable {
 
     private String groupId;
 
+    private Long weightPackageId;
+
     public String getUuid() {
         return uuid;
     }
@@ -160,6 +162,14 @@ public class ShopCart implements Serializable {
         this.groupId = groupId;
     }
 
+    public Long getWeightPackageId() {
+        return weightPackageId;
+    }
+
+    public void setWeightPackageId(Long weightPackageId) {
+        this.weightPackageId = weightPackageId;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -180,6 +190,7 @@ public class ShopCart implements Serializable {
                 .append("unitList", unitList)
                 .append("uuid", uuid)
                 .append("groupId", groupId)
+                .append("weightPackageId", weightPackageId)
                 .toString();
     }
 }
