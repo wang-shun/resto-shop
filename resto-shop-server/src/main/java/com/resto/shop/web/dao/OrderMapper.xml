@@ -3348,7 +3348,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
 
     <select id="serverExceptionOrderList" resultType="java.lang.String">
         SELECT id from tb_order where shop_detail_id = #{shopId}
-        <if test="isFirstPay == true or isFirstPay == 'true'">
+        <if test="isFirstPay == true">
             and order_state in (2, 10, 11)
         </if>
         and production_status = 1
