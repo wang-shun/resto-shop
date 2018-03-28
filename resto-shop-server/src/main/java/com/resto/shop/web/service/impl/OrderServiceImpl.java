@@ -646,6 +646,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     fans_price = item.getPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
+                case OrderItemType.WEIGHT_PACKAGE_ARTICLE:
+                    a = articleMap.get(item.getArticleId());
+                    item.setArticleName(item.getName());
+                    org_price = item.getPrice();
+                    price = item.getPrice();
+                    fans_price = item.getPrice();
+                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
+                    break;
                 case OrderItemType.SETMEALS://套餐主品
                     a = articleMap.get(item.getArticleId());
                     if (a.getIsEmpty()) {

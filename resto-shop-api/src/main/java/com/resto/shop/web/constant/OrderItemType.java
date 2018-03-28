@@ -10,6 +10,12 @@ public class OrderItemType {
 
 	public static final int RECOMMEND = 6; //推荐餐包
 
+	//重量包属性单品
+	public static final int WEIGHT_PACKAGE_ARTICLE = 8;
+
+	//重量包属性明细
+	public static final int WEIGHT_PACKAGE_ARTICLE_DETAIL = 9;
+
 	public static String getPayModeName(int state){
 		switch (state) {
 			case ARTICLE:
@@ -24,6 +30,10 @@ public class OrderItemType {
 				return "新规格单品";
 			case RECOMMEND:
 				return "推荐餐品";
+			case WEIGHT_PACKAGE_ARTICLE:
+				return "重量包属性单品";
+			case WEIGHT_PACKAGE_ARTICLE_DETAIL:
+				return "重量包属性明细";
 			default:
 				return "未知";
 		}
