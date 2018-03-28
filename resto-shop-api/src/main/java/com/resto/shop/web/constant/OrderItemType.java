@@ -5,16 +5,10 @@ public class OrderItemType {
 	public final static int UNITPRICE=2;  //价格类型
 	public static final int SETMEALS = 3; //套餐类型
 	public static final int MEALS_CHILDREN = 4; //套餐子项
-
 	public static final int UNIT_NEW = 5; //新规格
-
 	public static final int RECOMMEND = 6; //推荐餐包
+	public static final int WEIGHT_PACKAGE_ARTICLE = 8; //重量包属性单品
 
-	//重量包属性单品
-	public static final int WEIGHT_PACKAGE_ARTICLE = 8;
-
-	//重量包属性明细
-	public static final int WEIGHT_PACKAGE_ARTICLE_DETAIL = 9;
 
 	public static String getPayModeName(int state){
 		switch (state) {
@@ -31,9 +25,7 @@ public class OrderItemType {
 			case RECOMMEND:
 				return "推荐餐品";
 			case WEIGHT_PACKAGE_ARTICLE:
-				return "重量包属性单品";
-			case WEIGHT_PACKAGE_ARTICLE_DETAIL:
-				return "重量包属性明细";
+				return "重量包属性餐品";
 			default:
 				return "未知";
 		}
