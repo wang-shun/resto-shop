@@ -6665,6 +6665,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //如果是套餐子项，那么更新子项库存
                 case OrderItemType.UNIT_NEW:
                     //如果是没有规格的单品信息,那么更新该单品的库存
+                case OrderItemType.WEIGHT_PACKAGE_ARTICLE:
+                    //如果是没有规格的单品信息,那么更新该单品的库存
                 case OrderItemType.ARTICLE:
                     //如果是没有规格的单品信息,那么更新该单品的库存
                 case OrderItemType.RECOMMEND:
