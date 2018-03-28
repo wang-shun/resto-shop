@@ -792,6 +792,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             } else if (item.getType() == OrderItemType.WEIGHT_PACKAGE_ARTICLE) {
                 item.setNeedRemind(1);
                 order.setNeedConfirmOrderItem(1);
+                check = new Result(true);
             }
             jsonResult.setMessage(check.getMessage());
             jsonResult.setSuccess(check.isSuccess());
