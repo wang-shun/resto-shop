@@ -1242,4 +1242,25 @@ public class PosServiceImpl implements PosService {
         }
         return returnObject.toString();
     }
+
+    /**
+     * 通过实体名去修改对应的表的数据
+     * @param key
+     * @param value
+     */
+    private void execution(String key, String value){
+        switch (key){
+            case "order":
+                Order order = JSON.parseObject(value, Order.class);
+                orderService.update(order);
+                break;
+            case "orderItem":
+                OrderItem orderItem = JSON.parseObject(value, OrderItem.class);
+                orderItemService.update(orderItem);
+                break;
+            default:
+                log.error("参数错误");
+                break;
+        }
+    }
 }
