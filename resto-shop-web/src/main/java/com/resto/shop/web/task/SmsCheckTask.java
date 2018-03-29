@@ -66,7 +66,7 @@
 //                //设置登录参数
 //                Map<String, String> parameterMap = new HashMap<>();
 //                parameterMap.put("username", brandUser.getUsername());
-//                parameterMap.put("password", "Vino.2016");// 527527527
+//                parameterMap.put("password", "Vino.2018");// 527527527
 //                //登录
 //                System.err.println("登入品牌为"+brand.getBrandName());
 //                HttpResponse loginResponse = doPostAnsc(client, loginUrl, parameterMap);

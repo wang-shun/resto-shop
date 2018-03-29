@@ -173,6 +173,6 @@
         <if test="shopDetailId != null">
           and td.shop_detail_id = #{shopDetailId}
         </if>
-        where toi.type in (#{type});
+        where toi.type in (${type});
     </select>
 </mapper>
