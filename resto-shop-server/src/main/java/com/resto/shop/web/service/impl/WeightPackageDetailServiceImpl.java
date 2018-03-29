@@ -8,6 +8,7 @@ import com.resto.shop.web.model.WeightPackageDetail;
 import com.resto.shop.web.service.WeightPackageDetailService;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @RpcService
 public class WeightPackageDetailServiceImpl extends GenericServiceImpl<WeightPackageDetail, Long> implements WeightPackageDetailService {
@@ -29,5 +30,10 @@ public class WeightPackageDetailServiceImpl extends GenericServiceImpl<WeightPac
     @Override
     public void deleteDetails(Long weightPackageId) {
         weightPackageDetailMapper.deleteDetails(weightPackageId);
+    }
+
+    @Override
+    public List<WeightPackageDetail> selectWeightPackageDetailByShopId(String shopId) {
+        return weightPackageDetailMapper.selectWeightPackageDetailByShopId(shopId);
     }
 }

@@ -54,4 +54,7 @@
       delete from tb_weight_package_detail where weight_package_id = #{weightPackageId}
     </delete>
 
+    <select id="selectWeightPackageDetailByShopId" resultType="WeightPackageDetail">
+      select wpd.* from tb_weight_package_detail wpd LEFT JOIN tb_weight_package wp on wpd.weight_package_id = wp.id where wp.shop_id = #{shopId}
+    </select>
 </mapper>
