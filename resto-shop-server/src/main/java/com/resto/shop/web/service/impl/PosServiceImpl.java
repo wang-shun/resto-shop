@@ -2,6 +2,7 @@ package com.resto.shop.web.service.impl;
 
 import cn.restoplus.rpc.server.RpcService;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.resto.brand.core.util.*;
 import com.resto.brand.web.model.*;
@@ -1287,6 +1288,31 @@ public class PosServiceImpl implements PosService {
             e.printStackTrace();
             returnObject.put("success", false);
             returnObject.put("message","撤销支付订单出错，请线下处理");
+        }
+        return returnObject.toString();
+    }
+
+    @Override
+    public String updateData(String data) {
+        log.info("接收到要修改的数据" + data + ", 开始执行修改操作");
+        //定义返回信息
+        JSONObject returnObject = new JSONObject();
+        returnObject.put("success", true);
+        try{
+            JSONObject paramInfo = new JSONObject(data);
+            //得到要修改的数据信息
+            List<Map<String, String>> dataList = JSON.parseObject(paramInfo.getString("dataList"), new TypeReference<List<Map<String, String>>>(){});
+            //遍历dataList
+            dataList.forEach(dataInfo -> {
+                dataInfo.forEach((key, value) -> {
+                    execution(key, value);
+                });
+            });
+        }catch (Exception e){
+            e.printStackTrace();
+            log.error(e.getMessage());
+            returnObject.put("success", false);
+            returnObject.put("message", "修改数据出错，事务回滚");
         }
         return returnObject.toString();
     }
