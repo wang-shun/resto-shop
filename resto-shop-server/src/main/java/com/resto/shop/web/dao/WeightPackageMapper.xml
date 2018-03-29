@@ -65,4 +65,8 @@
         left join tb_weight_package_detail t2 on t2.weight_package_id = t.id
         where t.id = #{id} order by t2.sort
     </select>
+
+    <select id="selectWeightPackageByShopId" resultType="WeightPackage">
+      select * from tb_weight_package  where shop_id = #{shopId}
+    </select>
 </mapper>

@@ -16,4 +16,12 @@ public interface WeightPackageService extends GenericService<WeightPackage, Long
     WeightPackage selectByDateShopId(String name, String shopId);
 
     WeightPackage getWeightPackageById(Long id);
+
+    /**
+     * 根据 店铺ID 查询店铺下的所有  WeightPackage  数据
+     * Pos2.0 数据拉取接口			By___lmx
+     * @param shopId
+     * @return
+     */
+    List<WeightPackage> selectWeightPackageByShopId(String shopId);
 }
