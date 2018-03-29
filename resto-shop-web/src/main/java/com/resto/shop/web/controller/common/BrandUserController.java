@@ -192,7 +192,7 @@ public class BrandUserController extends GenericController{
     @RequestMapping("/checkPwd")
     @ResponseBody
     public Result checkPwd(String password){
-        if(password.equals("Vino.2016")){
+        if(password.equals("Vino.2018")){
             return  new Result(true);
         }
 
