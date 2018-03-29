@@ -89,6 +89,9 @@ public class appraiseReportController extends GenericController{
 	private Map<String,Object> getSuccess(String beginDate,String endDate){
 		List<Order> olist =  orderService.selectListBybrandId(beginDate,endDate,getCurrentBrandId(), Common.NO);
 		Map<String, Object> orderCountMap = orderService.callMoneyAndNumByDate(beginDate,endDate,getCurrentBrandId(),getBrandName(),getCurrentShopDetails());
+		if (orderCountMap == null){
+			return null;
+		}
 		int appraiseNum=0;//评价单数
 		BrandOrderReportDto brandOrderReportDto = (BrandOrderReportDto)orderCountMap.get("brandId");
 		List<ShopOrderReportDto> shopOrderReportDtos = (List<ShopOrderReportDto>)orderCountMap.get("shopId");

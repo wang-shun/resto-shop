@@ -36,6 +36,8 @@ public class ShopCart implements Serializable {
 
     private List<ShopCart> unitList;
 
+    private List<ShopCart> weightList;
+
     private String uuid;
 
     private String groupId;
@@ -170,6 +172,14 @@ public class ShopCart implements Serializable {
         this.weightPackageId = weightPackageId;
     }
 
+    public List<ShopCart> getWeightList() {
+        return weightList;
+    }
+
+    public void setWeightList(List<ShopCart> weightList) {
+        this.weightList = weightList;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this)
@@ -188,6 +198,7 @@ public class ShopCart implements Serializable {
                 .append("recommendArticleId", recommendArticleId)
                 .append("unitNewId", unitNewId)
                 .append("unitList", unitList)
+                .append("weightList", weightList)
                 .append("uuid", uuid)
                 .append("groupId", groupId)
                 .append("weightPackageId", weightPackageId)

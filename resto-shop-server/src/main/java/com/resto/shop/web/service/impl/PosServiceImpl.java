@@ -827,9 +827,57 @@ public class PosServiceImpl implements PosService {
         log.info( "\n\n" + shopDetail.getName() + "  isFirstPay：" + isFirstPay + "\n\n" );
         List<String> orderIds = orderMapper.serverExceptionOrderList(shopId, isFirstPay, beginDate, endDate);
         for(String orderId : orderIds){
-            orderList.put(syncOrderCreated(orderId));
+            orderList.put(selectOrderRelationInfo(orderId));
         }
         return orderList;
+    }
+
+    public String selectOrderRelationInfo(String orderId){
+        Order order = orderService.selectById(orderId);
+        if(order == null){
+            return "";
+        }
+        OrderDto orderDto = new OrderDto(order);
+        JSONObject jsonObject = new JSONObject(orderDto);
+
+        //  tb_order_item
+        List<OrderItem> orderItems = orderItemService.posSyncListByOrderId(orderId);
+        List<OrderItemDto> orderItemDtos = new ArrayList<>();
+        for(OrderItem orderItem : orderItems){
+            OrderItemDto orderItemDto = new OrderItemDto(orderItem);
+            orderItemDtos.add(orderItemDto);
+        }
+        jsonObject.put("orderItem", orderItemDtos);
+
+        //  tb_order_payment_item
+        List<OrderPaymentItem> payItemsList = orderPaymentItemService.selectByOrderId(order.getId());
+        List<OrderPaymentDto> orderPaymentDtos = new ArrayList<>();
+        for(OrderPaymentItem orderPaymentItem : payItemsList){
+            OrderPaymentDto orderPaymentDto = new OrderPaymentDto(orderPaymentItem);
+            if(orderPaymentDto.getPaymentModeId() == PayMode.COUPON_PAY){
+                orderPaymentDto.setResultData("手机端完成的优惠券支付");
+            }
+            if(orderPaymentDto.getPaymentModeId() == PayMode.ACCOUNT_PAY){
+                orderPaymentDto.setResultData("手机端完成的余额支付");
+            }
+            if(orderPaymentDto.getPaymentModeId() == PayMode.REWARD_PAY){
+                orderPaymentDto.setResultData("手机端完成的充值赠送金额支付");
+            }
+            orderPaymentDtos.add(orderPaymentDto);
+        }
+        jsonObject.put("orderPayment", orderPaymentDtos);
+
+        //  tb_customer & tb_customer_address todo: 如果是外带则查询用户收货地址
+        Customer customer = customerService.selectById(order.getCustomerId());
+        if(customer != null){
+            jsonObject.put("customer", new JSONObject(new CustomerDto(customer)));
+        }
+        CustomerAddress customerAddress = customerAddressService.selectByPrimaryKey(order.getCustomerAddressId());
+        if(customerAddress != null){
+            CustomerAddressDto customerAddressDto = new CustomerAddressDto(customerAddress);
+            jsonObject.put("customerAddress",new JSONObject(customerAddressDto));
+        }
+        return jsonObject.toString();
     }
 
     public void syncPosLocalOrder(OrderDto orderDto, ShopDetail shopDetail){
@@ -1241,5 +1289,26 @@ public class PosServiceImpl implements PosService {
             returnObject.put("message","撤销支付订单出错，请线下处理");
         }
         return returnObject.toString();
+    }
+
+    /**
+     * 通过实体名去修改对应的表的数据
+     * @param key
+     * @param value
+     */
+    private void execution(String key, String value){
+        switch (key){
+            case "order":
+                Order order = JSON.parseObject(value, Order.class);
+                orderService.update(order);
+                break;
+            case "orderItem":
+                OrderItem orderItem = JSON.parseObject(value, OrderItem.class);
+                orderItemService.update(orderItem);
+                break;
+            default:
+                log.error("参数错误");
+                break;
+        }
     }
 }

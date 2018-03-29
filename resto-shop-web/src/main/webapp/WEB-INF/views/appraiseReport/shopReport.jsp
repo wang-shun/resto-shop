@@ -95,7 +95,27 @@
                     columns : [
                         {
                             title:'评分',
-                            data:'levelName'
+                            data:'level',
+                            createdCell: function (td, tdData) {
+                                var levelName = "一星";
+                                switch (tdData){
+                                    case 2:
+                                        levelName = "二星";
+                                        break;
+                                    case 3:
+                                        levelName = "三星";
+                                        break;
+                                    case 4:
+                                        levelName = "四星";
+                                        break;
+                                    case 5:
+                                        levelName = "五星";
+                                        break;
+                                    default:
+                                        break;
+                                };
+                                $(td).html(levelName);
+                            }
                         },
                         {
                             title:'区域',

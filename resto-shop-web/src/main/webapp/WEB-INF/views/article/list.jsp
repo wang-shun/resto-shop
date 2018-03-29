@@ -82,7 +82,7 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-4" v-if="shop.posVersion == 1 && shop.allowAfterPay == 0">
                                 <label class="col-md-5 control-label">是否是称重菜品</label>
                                 <div class="col-md-7 radio-list">
                                     <label class="radio-inline">
@@ -952,6 +952,8 @@
                         singleItem:[],
                         searchNameLike : "",
                         canSave : true, //用于判断是否可以点击保存按钮
+                        shop: {},
+                        brand: {},
                     },
                     methods: {
                         itemDefaultChange: function (attr, item) {
@@ -1520,6 +1522,15 @@
                         });
                         $.post("virtual/listAll", null, function (data) {
                             that.virtualList = data;
+                        });
+                        $.ajax({
+                            url:"shopInfo/list_one",
+                            type:"post",
+                            dataType:"json",
+                            success:function (resultData) {
+                                that.shop = resultData.data.shop;
+                                that.brand = resultData.data.brand;
+                            }
                         });
                         $.post("articleattr/list_all", null, function (data) {
                             var article_units = {};

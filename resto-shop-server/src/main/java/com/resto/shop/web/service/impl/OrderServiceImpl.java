@@ -646,6 +646,14 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     fans_price = item.getPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
+                case OrderItemType.WEIGHT_PACKAGE_ARTICLE:
+                    a = articleMap.get(item.getArticleId());
+                    item.setArticleName(item.getName());
+                    org_price = item.getPrice();
+                    price = item.getPrice();
+                    fans_price = item.getPrice();
+                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
+                    break;
                 case OrderItemType.SETMEALS://套餐主品
                     a = articleMap.get(item.getArticleId());
                     if (a.getIsEmpty()) {
@@ -781,6 +789,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 check = checkArticleList(item, item.getCount());
             } else if (item.getType() == OrderItemType.RECOMMEND) {
                 check = checkArticleList(item, item.getCount());
+            } else if (item.getType() == OrderItemType.WEIGHT_PACKAGE_ARTICLE) {
+                item.setNeedRemind(1);
+                order.setNeedConfirmOrderItem(1);
+                check = new Result(true);
             }
             jsonResult.setMessage(check.getMessage());
             jsonResult.setSuccess(check.isSuccess());
@@ -6652,6 +6664,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 case OrderItemType.MEALS_CHILDREN:
                     //如果是套餐子项，那么更新子项库存
                 case OrderItemType.UNIT_NEW:
+                    //如果是没有规格的单品信息,那么更新该单品的库存
+                case OrderItemType.WEIGHT_PACKAGE_ARTICLE:
                     //如果是没有规格的单品信息,那么更新该单品的库存
                 case OrderItemType.ARTICLE:
                     //如果是没有规格的单品信息,那么更新该单品的库存
