@@ -354,13 +354,149 @@
     </select>
     <insert id="insertBatch">
         insert into tb_order_item
-        (id, article_name, article_designation, count, original_price, unit_price, base_unit_price, final_price, remark, pos_discount, sort, status,
-        order_id, article_id,type,parent_id,meal_item_id,recommend_id,orgin_count,meal_fee_number,weight)
-        values
-        <foreach collection="list" item="t" separator=",">
-            (#{t.id},#{t.articleName},#{t.articleDesignation},#{t.count},#{t.originalPrice},
-            #{t.unitPrice},#{t.baseUnitPrice},#{t.finalPrice},#{t.remark},#{t.posDiscount},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},
-            #{t.type},#{t.parentId},#{t.mealItemId},#{t.recommendId},#{t.count},#{t.mealFeeNumber},#{t.weight})
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="articleName != null">
+                article_name,
+            </if>
+            <if test="articleDesignation != null">
+                article_designation,
+            </if>
+            <if test="count != null">
+                `count`,
+            </if>
+            <if test="originalPrice != null">
+                original_price,
+            </if>
+            <if test="unitPrice != null">
+                unit_price,
+            </if>
+            <if test="baseUnitPrice != null">
+                base_unit_price,
+            </if>
+            <if test="finalPrice != null">
+                final_price,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="posDiscount != null">
+                pos_discount,
+            </if>
+            <if test="sort != null">
+                sort,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="orderId != null">
+                order_id,
+            </if>
+            <if test="articleId != null">
+                article_id,
+            </if>
+            <if test="type != null">
+                `type`,
+            </if>
+            <if test="parentId != null">
+                parent_id,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="count != null">
+                orgin_count,
+            </if>
+            <if test="changeCount != null">
+                change_count,
+            </if>
+            <if test="printFailFlag != null">
+                print_fail_flag,
+            </if>
+            <if test="customerId != null">
+                customer_id,
+            </if>
+            <if test="weight != null">
+                weight,
+            </if>
+            <if test="needRemind != null">
+                need_remind,
+            </if>
+        </trim>
+        <foreach collection="list" item="item" separator="," open="(" close=")">
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">
+                    #{item.id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.articleName != null">
+                    #{item.articleName,jdbcType=VARCHAR},
+                </if>
+                <if test="item.articleDesignation != null">
+                    #{item.articleDesignation,jdbcType=VARCHAR},
+                </if>
+                <if test="item.count != null">
+                    #{item.count,jdbcType=INTEGER},
+                </if>
+                <if test="item.originalPrice != null">
+                    #{item.originalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.unitPrice != null">
+                    #{item.unitPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.baseUnitPrice != null">
+                    #{item.baseUnitPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.finalPrice != null">
+                    #{item.finalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.remark != null">
+                    #{item.remark,jdbcType=VARCHAR},
+                </if>
+                <if test="item.posDiscount != null">
+                    #{item.posDiscount,jdbcType=VARCHAR},
+                </if>
+                <if test="item.sort != null">
+                    #{item.sort,jdbcType=INTEGER},
+                </if>
+                <if test="item.status != null">
+                    #{item.status,jdbcType=INTEGER},
+                </if>
+                <if test="item.orderId != null">
+                    #{item.orderId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.articleId != null">
+                    #{item.articleId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.type != null">
+                    #{item.type,jdbcType=INTEGER},
+                </if>
+                <if test="item.parentId != null">
+                    #{item.parentId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.createTime != null">
+                    #{item.createTime,jdbcType=TIMESTAMP},
+                </if>
+                <if test="item.count != null">
+                    #{item.count,jdbcType=INTEGER},
+                </if>
+                <if test="item.changeCount != null">
+                    #{item.changeCount,jdbcType=INTEGER},
+                </if>
+                <if test="item.printFailFlag != null">
+                    #{item.printFailFlag},
+                </if>
+                <if test="item.customerId != null">
+                    #{item.customerId},
+                </if>
+                <if test="item.weight != null">
+                    #{item.weight},
+                </if>
+                <if test="item.needRemind != null">
+                    #{item.needRemind},
+                </if>
+            </trim>
         </foreach>
     </insert>
 
