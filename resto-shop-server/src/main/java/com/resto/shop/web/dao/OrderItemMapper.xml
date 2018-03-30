@@ -353,79 +353,79 @@
         ORDER BY create_time
     </select>
     <insert id="insertBatch">
-        insert into tb_order_item
-        <trim prefix="(" suffix=")" suffixOverrides=",">
-            <if test="id != null">
-                id,
-            </if>
-            <if test="articleName != null">
-                article_name,
-            </if>
-            <if test="articleDesignation != null">
-                article_designation,
-            </if>
-            <if test="count != null">
-                `count`,
-            </if>
-            <if test="originalPrice != null">
-                original_price,
-            </if>
-            <if test="unitPrice != null">
-                unit_price,
-            </if>
-            <if test="baseUnitPrice != null">
-                base_unit_price,
-            </if>
-            <if test="finalPrice != null">
-                final_price,
-            </if>
-            <if test="remark != null">
-                remark,
-            </if>
-            <if test="posDiscount != null">
-                pos_discount,
-            </if>
-            <if test="sort != null">
-                sort,
-            </if>
-            <if test="status != null">
-                status,
-            </if>
-            <if test="orderId != null">
-                order_id,
-            </if>
-            <if test="articleId != null">
-                article_id,
-            </if>
-            <if test="type != null">
-                `type`,
-            </if>
-            <if test="parentId != null">
-                parent_id,
-            </if>
-            <if test="createTime != null">
-                create_time,
-            </if>
-            <if test="count != null">
-                orgin_count,
-            </if>
-            <if test="changeCount != null">
-                change_count,
-            </if>
-            <if test="printFailFlag != null">
-                print_fail_flag,
-            </if>
-            <if test="customerId != null">
-                customer_id,
-            </if>
-            <if test="weight != null">
-                weight,
-            </if>
-            <if test="needRemind != null">
-                need_remind,
-            </if>
-        </trim>
-        <foreach collection="list" item="item" separator="," open="(" close=")">
+        <foreach collection="list" item="item" separator=";">
+            insert into tb_order_item
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">
+                    id,
+                </if>
+                <if test="item.articleName != null">
+                    article_name,
+                </if>
+                <if test="item.articleDesignation != null">
+                    article_designation,
+                </if>
+                <if test="item.count != null">
+                    `count`,
+                </if>
+                <if test="item.originalPrice != null">
+                    original_price,
+                </if>
+                <if test="item.unitPrice != null">
+                    unit_price,
+                </if>
+                <if test="item.baseUnitPrice != null">
+                    base_unit_price,
+                </if>
+                <if test="item.finalPrice != null">
+                    final_price,
+                </if>
+                <if test="item.remark != null">
+                    remark,
+                </if>
+                <if test="item.posDiscount != null">
+                    pos_discount,
+                </if>
+                <if test="item.sort != null">
+                    sort,
+                </if>
+                <if test="item.status != null">
+                    status,
+                </if>
+                <if test="item.orderId != null">
+                    order_id,
+                </if>
+                <if test="item.articleId != null">
+                    article_id,
+                </if>
+                <if test="item.type != null">
+                    `type`,
+                </if>
+                <if test="item.parentId != null">
+                    parent_id,
+                </if>
+                <if test="item.createTime != null">
+                    create_time,
+                </if>
+                <if test="item.count != null">
+                    orgin_count,
+                </if>
+                <if test="item.changeCount != null">
+                    change_count,
+                </if>
+                <if test="item.printFailFlag != null">
+                    print_fail_flag,
+                </if>
+                <if test="item.customerId != null">
+                    customer_id,
+                </if>
+                <if test="item.weight != null">
+                    weight,
+                </if>
+                <if test="item.needRemind != null">
+                    need_remind,
+                </if>
+            </trim>
             <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="item.id != null">
                     #{item.id,jdbcType=VARCHAR},
