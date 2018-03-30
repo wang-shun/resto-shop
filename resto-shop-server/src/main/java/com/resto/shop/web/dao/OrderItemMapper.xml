@@ -360,7 +360,7 @@
         <foreach collection="list" item="t" separator=",">
             (#{t.id},#{t.articleName},#{t.articleDesignation},#{t.count},#{t.originalPrice},
             #{t.unitPrice},#{t.baseUnitPrice},#{t.finalPrice},#{t.remark},#{t.posDiscount},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},
-            #{t.type},#{t.parentId},#{t.mealItemId},#{t.recommendId},#{t.count},#{t.mealFeeNumber},#{weight})
+            #{t.type},#{t.parentId},#{t.mealItemId},#{t.recommendId},#{t.count},#{t.mealFeeNumber},#{t.weight})
         </foreach>
     </insert>
 
