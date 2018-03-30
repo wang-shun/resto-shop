@@ -8472,11 +8472,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         //微信支付
                         if (shopDetail.getWxServerId() == null) {
                             //独立商户模式
+                            String payCertPath = StringUtils.isEmpty(shopDetail.getPayCertPath()) ? config.getPayCertPath() : shopDetail.getPayCertPath();
+                            if (StringUtils.isBlank(payCertPath)){
+                                log.error("微信退款失败！失败信息：无退款证书");
+                                refundPayment.setRemark("微信退还金额：" + refund + "失败(无退款证书)，以线下退还现金的形式返还");
+                                refundPayment.setPaymentModeId(PayMode.REFUND_CRASH);
+                                continue;
+                            }
                             result = WeChatPayUtils.refund(refundPayment.getId(), payInfo.getString("transaction_id"), payInfo.getInt("total_fee")
                                     , refund.multiply(new BigDecimal(100)).intValue(), StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
                                     StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(),
                                     StringUtils.isEmpty(shopDetail.getMchkey()) ? config.getMchkey() : shopDetail.getMchkey(),
-                                    StringUtils.isEmpty(shopDetail.getPayCertPath()) ? config.getPayCertPath() : shopDetail.getPayCertPath());
+                                    payCertPath);
                         } else {
                             //服务商模式
                             WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
@@ -8486,7 +8493,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         }
                         if (result.containsKey("ERROR")) {
                             log.error("微信退款失败！失败信息：" + new JSONObject(result).toString());
-                            refundPayment.setRemark("微信退还金额：" + refund + "失败，以线下退还现金的形式返还");
+                            String remark = result.get("err_code_des");
+                            refundPayment.setRemark("微信退还金额：" + refund + "失败"+(StringUtils.isNotBlank(remark) ? "("+remark+")" : "")+"，以线下退还现金的形式返还");
                             refundPayment.setPaymentModeId(PayMode.REFUND_CRASH);
                         }else{
                             refundPayment.setResultData(JSON.toJSONString(result));

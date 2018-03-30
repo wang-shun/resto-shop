@@ -53,4 +53,9 @@ public class WeightPackageServiceImpl extends GenericServiceImpl<WeightPackage, 
     public WeightPackage getWeightPackageById(Long id) {
         return weightPackageMapper.getWeightPackageById(id);
     }
+
+    @Override
+    public List<WeightPackage> selectWeightPackageByShopId(String shopId) {
+        return weightPackageMapper.selectWeightPackageByShopId(shopId);
+    }
 }

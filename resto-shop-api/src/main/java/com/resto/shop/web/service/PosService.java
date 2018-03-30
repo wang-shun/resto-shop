@@ -216,4 +216,11 @@ public interface PosService {
      * @return
      */
     String revocationOfOrder(String data);
+
+    /**
+     * 动态修改业务数据
+     * @param data
+     * @return
+     */
+    String updateData(String data);
 }

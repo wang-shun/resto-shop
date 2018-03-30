@@ -25,4 +25,6 @@ public interface WeightPackageMapper extends GenericDao<WeightPackage,Long> {
     WeightPackage selectByDateShopId(@Param("name") String name, @Param("shopId") String shopId);
 
     WeightPackage getWeightPackageById(Long id);
+
+    List<WeightPackage> selectWeightPackageByShopId(String shopId);
 }
