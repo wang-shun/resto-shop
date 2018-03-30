@@ -653,6 +653,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     price = item.getPrice();
                     fans_price = item.getPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
+                    log.error("hahahhahah" + item.getWeight());
+                    item.setWeight(item.getWeight());
                     break;
                 case OrderItemType.SETMEALS://套餐主品
                     a = articleMap.get(item.getArticleId());
