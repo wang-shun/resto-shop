@@ -946,9 +946,9 @@
             <if test="remark != null">
                 remark = #{remark,jdbcType=VARCHAR},
             </if>
-            <if test="createTime != null">
-                create_time = #{createTime,jdbcType=TIMESTAMP},
-            </if>
+            <!--<if test="createTime != null">-->
+                <!--create_time = #{createTime,jdbcType=TIMESTAMP},-->
+            <!--</if>-->
             <if test="operatorId != null">
                 operator_id = #{operatorId,jdbcType=VARCHAR},
             </if>

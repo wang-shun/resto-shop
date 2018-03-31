@@ -265,9 +265,9 @@
             <if test="parentId != null">
                 parent_id = #{parentId,jdbcType=VARCHAR},
             </if>
-            <if test="createTime != null">
-                create_time = #{createTime,jdbcType=TIMESTAMP},
-            </if>
+            <!--<if test="createTime != null">-->
+                <!--create_time = #{createTime,jdbcType=TIMESTAMP},-->
+            <!--</if>-->
             <if test="refundCount != null">
                 refund_count = #{refundCount} + refund_count,
             </if>
