@@ -404,9 +404,6 @@
                 <if test="item.parentId != null">
                     parent_id,
                 </if>
-                <if test="item.createTime != null">
-                    create_time,
-                </if>
                 <if test="item.count != null">
                     orgin_count,
                 </if>
@@ -474,9 +471,6 @@
                 </if>
                 <if test="item.parentId != null">
                     #{item.parentId,jdbcType=VARCHAR},
-                </if>
-                <if test="item.createTime != null">
-                    #{item.createTime,jdbcType=TIMESTAMP},
                 </if>
                 <if test="item.count != null">
                     #{item.count,jdbcType=INTEGER},
