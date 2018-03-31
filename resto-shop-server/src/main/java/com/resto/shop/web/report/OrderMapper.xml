@@ -280,10 +280,10 @@
 			IF(o.distribution_mode_id = 1 AND ISNULL(o.parent_order_id), 1, 0) tangshiCount,
 			IF(o.distribution_mode_id = 3 AND ISNULL(o.parent_order_id), 1, 0) waidaiCount,
 			IF(o.distribution_mode_id = 2 AND ISNULL(o.parent_order_id), 1, 0) waimaiCount,
-			SUM(toi.unit_price * toi.count) + o.service_price + o.meal_fee_price orderPrice,
-			SUM(IF(o.distribution_mode_id=1, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price tangshiPrice,
-			SUM(IF(o.distribution_mode_id=3, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price waidaiPrice,
-			SUM(IF(o.distribution_mode_id=2, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price waimaiPrice
+			SUM(toi.final_price) + o.service_price + o.meal_fee_price orderPrice,
+			SUM(IF(o.distribution_mode_id=1, (toi.final_price),null)) + o.service_price + o.meal_fee_price tangshiPrice,
+			SUM(IF(o.distribution_mode_id=3, (toi.final_price),null)) + o.service_price + o.meal_fee_price waidaiPrice,
+			SUM(IF(o.distribution_mode_id=2, (toi.final_price),null)) + o.service_price + o.meal_fee_price waimaiPrice
 		FROM tb_order o
 		INNER JOIN tb_order_item toi
 		on o.id = toi.order_id
@@ -364,10 +364,10 @@
 			IF(o.distribution_mode_id = 1 AND ISNULL(o.parent_order_id), 1, 0) tangshiCount,
 			IF(o.distribution_mode_id = 3 AND ISNULL(o.parent_order_id), 1, 0) waidaiCount,
 			IF(o.distribution_mode_id = 2 AND ISNULL(o.parent_order_id), 1, 0) waimaiCount,
-			SUM(toi.unit_price * toi.count) + o.service_price + o.meal_fee_price orderPrice,
-			SUM(IF(o.distribution_mode_id=1, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price tangshiPrice,
-			SUM(IF(o.distribution_mode_id=3, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price waidaiPrice,
-			SUM(IF(o.distribution_mode_id=2, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price waimaiPrice
+			SUM(toi.final_price) + o.service_price + o.meal_fee_price orderPrice,
+			SUM(IF(o.distribution_mode_id=1, (toi.final_price),null)) + o.service_price + o.meal_fee_price tangshiPrice,
+			SUM(IF(o.distribution_mode_id=3, (toi.final_price),null)) + o.service_price + o.meal_fee_price waidaiPrice,
+			SUM(IF(o.distribution_mode_id=2, (toi.final_price),null)) + o.service_price + o.meal_fee_price waimaiPrice
 		FROM tb_order o
 		INNER JOIN tb_order_item toi
 		on o.id = toi.order_id

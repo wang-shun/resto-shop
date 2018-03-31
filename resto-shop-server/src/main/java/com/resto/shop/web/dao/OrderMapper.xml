@@ -2116,7 +2116,7 @@
         select group_concat(id) id,(count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal,
         sum(customer_count) as customer_count
 		from (select t.id,t.parent_order_id,
-        SUM(toi.unit_price * toi.count) + service_price + meal_fee_price as orderTotal,
+        SUM(toi.final_price) + service_price + meal_fee_price as orderTotal,
         if(t.parent_order_id
         is null,t.customer_count,0) customer_count
         from tb_order t
@@ -2133,7 +2133,7 @@
     <select id="getOrderAccountByTime" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
         select t.id, SUM(toi.original_price * toi.count) + service_price + meal_fee_price originalAmount,
         t.parent_order_id parentOrderId,
-        SUM(toi.unit_price * toi.count) + service_price + meal_fee_price orderMoney,
+        SUM(toi.final_price) + service_price + meal_fee_price orderMoney,
         SUM((toi.original_price - toi.unit_price) * toi.count) discountMoney,
         IFNULL(t.customer_count,0) customerCount,
         t.production_status productionStatus

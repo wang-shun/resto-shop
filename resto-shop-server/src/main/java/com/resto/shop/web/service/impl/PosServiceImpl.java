@@ -1327,13 +1327,16 @@ public class PosServiceImpl implements PosService {
      * @param value
      */
     private void execution(String key, String value){
+        log.info("key：" + key + "---value：" + value);
         switch (key){
             case "order":
                 Order order = JSON.parseObject(value, Order.class);
+                log.info("反序列化的Order：" + order.getId());
                 orderService.update(order);
                 break;
             case "orderItem":
                 OrderItem orderItem = JSON.parseObject(value, OrderItem.class);
+                log.info("反序列化的OrderItem：" + orderItem.getId());
                 orderItemService.update(orderItem);
                 break;
             default:
