@@ -1300,12 +1300,12 @@ public class PosServiceImpl implements PosService {
         returnObject.put("success", true);
         try{
             JSONObject paramInfo = new JSONObject(data);
-            //解密需要更新的数据
-            log.info("解密之前的数据：" + paramInfo.getString("dataList"));
-            String info = RSAEncryptionUtil.decryptBase64(paramInfo.getString("dataList"));
-            log.info("解密之后的数据：" + info);
+//            //解密需要更新的数据
+//            log.info("解密之前的数据：" + paramInfo.getString("dataList"));
+//            String info = RSAEncryptionUtil.decryptBase64(paramInfo.getString("dataList"));
+//            log.info("解密之后的数据：" + info);
             //得到要修改的数据信息
-            List<Map<String, String>> dataList = JSON.parseObject(info, new TypeReference<List<Map<String, String>>>(){});
+            List<Map<String, String>> dataList = JSON.parseObject(paramInfo.getString("dataList"), new TypeReference<List<Map<String, String>>>(){});
             //遍历dataList
             dataList.forEach(dataInfo -> {
                 dataInfo.forEach((key, value) -> {
