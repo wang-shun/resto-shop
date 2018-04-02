@@ -696,6 +696,7 @@
             a.need_remind,
             a.gif_url,
             a.current_working_stock,
+            a.weight_package_id,
           f.recommend_sort,
             (
                 SELECT
