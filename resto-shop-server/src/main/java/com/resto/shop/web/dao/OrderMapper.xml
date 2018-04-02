@@ -3392,7 +3392,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         <if test="isFirstPay == true">
             and order_state in (2, 10, 11)
         </if>
-        and production_status = 1
+        and production_status = 1 and now() - create_time > 40
         and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time ASC
     </select>
 
