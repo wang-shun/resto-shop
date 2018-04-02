@@ -23,6 +23,7 @@ import com.resto.shop.web.model.Appraise;
 import com.resto.shop.web.model.Order;
 import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.model.OrderPaymentItem;
+import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.OrderService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Controller;
@@ -45,8 +46,13 @@ public class OrderController extends GenericController{
 
 	@Resource
 	private OrderService orderService;
+
+	@Resource
+	private OrderItemService orderItemService;
+
 	@Resource
 	private ShopDetailService shopDetailService;
+
 	@Resource
 	private OrderExceptionService orderExceptionService;
 
@@ -216,105 +222,176 @@ public class OrderController extends GenericController{
 		List<OrderDetailDto> listDto = new ArrayList<>();
 		List<Order> list = orderService.callListByTime(beginDate,endDate,shopId,customerId);
 		for (Order o : list) {
-			OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(),o.getId(),"",o.getCreateTime(),"--",BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO
-            ,"0",false,BigDecimal.ZERO,BigDecimal.ZERO,BigDecimal.ZERO,1,"--","--","--","--",BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
-            ot.setCreateTime(DateUtil.formatDate(o.getCreateTime(),"yyyy-MM-dd HH:mm:ss"));
-			if(o.getCustomer()!=null){
-				//手机号
-				if(StringUtils.isNotBlank(o.getCustomer().getTelephone())){
-					ot.setTelephone(o.getCustomer().getTelephone());
+			//判断是否为主订单
+			if (StringUtils.isBlank(o.getParentOrderId())) {
+				OrderDetailDto ot = new OrderDetailDto(o.getShopDetailId(), o.getId(), "", o.getCreateTime(), "--", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO
+						, "0", false, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, 1, "--", "--", "--", "--", BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+				ot.setCreateTime(DateUtil.formatDate(o.getCreateTime(), "yyyy-MM-dd HH:mm:ss"));
+				if (o.getCustomer() != null) {
+					//手机号
+					if (StringUtils.isNotBlank(o.getCustomer().getTelephone())) {
+						ot.setTelephone(o.getCustomer().getTelephone());
+					}
 				}
-			}
-            if (StringUtils.isNotBlank(shopId)) {
-                ot.setShopName(shop.getName());
-            }else if (StringUtils.isNotBlank(customerId)){
-                for (ShopDetail shopDetail : shopDetails){
-                    if (o.getShopDetailId().equalsIgnoreCase(shopDetail.getId())){
-                        ot.setShopName(shopDetail.getName());
-                        break;
-                    }
-                }
-            }
-			if(o.getProductionStatus() == ProductionStatus.REFUND_ARTICLE){
-				ot.setOrderState("退菜取消");
-			}else{
-				ot.setOrderState(OrderState.getStateName(o.getOrderState()));
-			}
-			//订单支付
-			if(o.getOrderPaymentItems()!=null){
-				if(!o.getOrderPaymentItems().isEmpty()){
-					for(OrderPaymentItem oi : o.getOrderPaymentItems()){
-						if(null!=oi.getPaymentModeId()){
-							switch (oi.getPaymentModeId()) {
-								case PayMode.WEIXIN_PAY:
-									ot.setWeChatPay(ot.getWeChatPay().add(oi.getPayValue()));
-									break;
-								case PayMode.ACCOUNT_PAY:
-									ot.setAccountPay(ot.getAccountPay().add(oi.getPayValue()));
-									break;
-								case PayMode.COUPON_PAY:
-									ot.setCouponPay(ot.getCouponPay().add(oi.getPayValue()));
-									break;
-								case PayMode.CHARGE_PAY:
-									ot.setChargePay(ot.getChargePay().add(oi.getPayValue()));
-									break;
-								case PayMode.REWARD_PAY:
-									ot.setRewardPay(ot.getRewardPay().add(oi.getPayValue()));
-									break;
-								case PayMode.WAIT_MONEY:
-									ot.setWaitRedPay(ot.getWaitRedPay().add(oi.getPayValue()));
-								case PayMode.ALI_PAY:
-									ot.setAliPayment(ot.getAliPayment().add(oi.getPayValue()));
-									break;
-                                case PayMode.CRASH_PAY:
-                                    ot.setMoneyPay(ot.getMoneyPay().add(oi.getPayValue()));
-                                    break;
-                                case PayMode.BANK_CART_PAY:
-                                    ot.setBackCartPay(ot.getBackCartPay().add(oi.getPayValue()));
-                                    break;
-								case PayMode.ARTICLE_BACK_PAY:
-									ot.setArticleBackPay(ot.getArticleBackPay().add(oi.getPayValue().abs()));
-									break;
-                                case PayMode.INTEGRAL_PAY:
-                                    ot.setIntegralPay(ot.getIntegralPay().add(oi.getPayValue()));
-                                    break;
-                                case PayMode.SHANHUI_PAY:
-                                    ot.setShanhuiPay(ot.getShanhuiPay().add(oi.getPayValue()));
-                                    break;
-                                case PayMode.GIVE_CHANGE:
-                                    ot.setGiveChangePayment(ot.getGiveChangePayment().add(oi.getPayValue().abs()));
-                                    break;
-								case PayMode.REFUND_CRASH:
-									ot.setRefundCrashPayment(ot.getRefundCrashPayment().add(oi.getPayValue().abs()));
-									break;
-								default:
-									break;
+				if (StringUtils.isNotBlank(shopId)) {
+					ot.setShopName(shop.getName());
+				} else if (StringUtils.isNotBlank(customerId)) {
+					for (ShopDetail shopDetail : shopDetails) {
+						if (o.getShopDetailId().equalsIgnoreCase(shopDetail.getId())) {
+							ot.setShopName(shopDetail.getName());
+							break;
+						}
+					}
+				}
+				if (o.getProductionStatus() == ProductionStatus.REFUND_ARTICLE) {
+					ot.setOrderState("退菜取消");
+				} else {
+					ot.setOrderState(OrderState.getStateName(o.getOrderState()));
+				}
+				//订单支付
+				if (o.getOrderPaymentItems() != null) {
+					if (!o.getOrderPaymentItems().isEmpty()) {
+						for (OrderPaymentItem oi : o.getOrderPaymentItems()) {
+							if (null != oi.getPaymentModeId()) {
+								switch (oi.getPaymentModeId()) {
+									case PayMode.WEIXIN_PAY:
+										ot.setWeChatPay(ot.getWeChatPay().add(oi.getPayValue()));
+										break;
+									case PayMode.ACCOUNT_PAY:
+										ot.setAccountPay(ot.getAccountPay().add(oi.getPayValue()));
+										break;
+									case PayMode.COUPON_PAY:
+										ot.setCouponPay(ot.getCouponPay().add(oi.getPayValue()));
+										break;
+									case PayMode.CHARGE_PAY:
+										ot.setChargePay(ot.getChargePay().add(oi.getPayValue()));
+										break;
+									case PayMode.REWARD_PAY:
+										ot.setRewardPay(ot.getRewardPay().add(oi.getPayValue()));
+										break;
+									case PayMode.WAIT_MONEY:
+										ot.setWaitRedPay(ot.getWaitRedPay().add(oi.getPayValue()));
+									case PayMode.ALI_PAY:
+										ot.setAliPayment(ot.getAliPayment().add(oi.getPayValue()));
+										break;
+									case PayMode.CRASH_PAY:
+										ot.setMoneyPay(ot.getMoneyPay().add(oi.getPayValue()));
+										break;
+									case PayMode.BANK_CART_PAY:
+										ot.setBackCartPay(ot.getBackCartPay().add(oi.getPayValue()));
+										break;
+									case PayMode.ARTICLE_BACK_PAY:
+										ot.setArticleBackPay(ot.getArticleBackPay().add(oi.getPayValue().abs()));
+										break;
+									case PayMode.INTEGRAL_PAY:
+										ot.setIntegralPay(ot.getIntegralPay().add(oi.getPayValue()));
+										break;
+									case PayMode.SHANHUI_PAY:
+										ot.setShanhuiPay(ot.getShanhuiPay().add(oi.getPayValue()));
+										break;
+									case PayMode.GIVE_CHANGE:
+										ot.setGiveChangePayment(ot.getGiveChangePayment().add(oi.getPayValue().abs()));
+										break;
+									case PayMode.REFUND_CRASH:
+										ot.setRefundCrashPayment(ot.getRefundCrashPayment().add(oi.getPayValue().abs()));
+										break;
+									default:
+										break;
+								}
 							}
 						}
 					}
 				}
+				//设置营销撬动率  实际/虚拟
+				BigDecimal real = ot.getChargePay().add(ot.getWeChatPay()).add(ot.getAliPayment()).add(ot.getMoneyPay()).add(ot.getBackCartPay());
+				BigDecimal temp = ot.getAccountPay().add(ot.getCouponPay()).add(ot.getRewardPay());
+				if (temp.compareTo(BigDecimal.ZERO) > 0) {
+					ot.setIncomePrize(real.divide(temp, 2, BigDecimal.ROUND_HALF_UP) + "");
+				}
+				if (o.getTableNumber() != null) {
+					ot.setTableNumber(o.getTableNumber());
+				} else {
+					ot.setTableNumber("--");
+				}
+				//订单金额
+				ot.setOrderMoney(o.getOrderMoney());
+				ot.setMoneyPay(ot.getMoneyPay().subtract(ot.getGiveChangePayment()));
+				ot.setDistributionModeId(o.getDistributionModeId());
+				//找到这笔主订单下的子订单然后合并展示
+				list.forEach(order -> {
+					if (order.getParentOrderId().equalsIgnoreCase(o.getId()) && (order.getOrderState() == OrderState.PAYMENT
+							|| order.getOrderState() == OrderState.CONFIRM || order.getOrderState() == OrderState.HASAPPRAISE) &&
+							(order.getProductionStatus() == ProductionStatus.PRINTED || order.getProductionStatus() == ProductionStatus.HAS_CALL)){
+						mergeOrder(ot, order);
+					}
+				});
+				listDto.add(ot);
 			}
-			//设置营销撬动率  实际/虚拟
-			BigDecimal real = ot.getChargePay().add(ot.getWeChatPay()).add(ot.getAliPayment()).add(ot.getMoneyPay()).add(ot.getBackCartPay());
-			BigDecimal temp = ot.getAccountPay().add(ot.getCouponPay()).add(ot.getRewardPay());
-			if(temp.compareTo(BigDecimal.ZERO)>0){
-                ot.setIncomePrize(real.divide(temp,2,BigDecimal.ROUND_HALF_UP)+"");
-			}
-			if(o.getTableNumber()!=null){
-				ot.setTableNumber(o.getTableNumber());
-			}else {
-				ot.setTableNumber("--");
-			}
-			//订单金额
-			ot.setOrderMoney(o.getOrderMoney());
-			ot.setMoneyPay(ot.getMoneyPay().subtract(ot.getGiveChangePayment()));
-			ot.setDistributionModeId(o.getDistributionModeId());
-			listDto.add(ot);
 		}
 		return listDto;
 	}
 
-
+	/**
+	 *合并父子订单
+	 **/
+	public void mergeOrder(OrderDetailDto order, Order suborders){
+		//累加子订单的订单金额
+		order.setOrderMoney(suborders.getOrderMoney());
+		//订单支付
+		if (suborders.getOrderPaymentItems() != null) {
+			if (!suborders.getOrderPaymentItems().isEmpty()) {
+				for (OrderPaymentItem oi : suborders.getOrderPaymentItems()) {
+					if (null != oi.getPaymentModeId()) {
+						switch (oi.getPaymentModeId()) {
+							case PayMode.WEIXIN_PAY:
+								order.setWeChatPay(order.getWeChatPay().add(oi.getPayValue()));
+								break;
+							case PayMode.ACCOUNT_PAY:
+								order.setAccountPay(order.getAccountPay().add(oi.getPayValue()));
+								break;
+							case PayMode.COUPON_PAY:
+								order.setCouponPay(order.getCouponPay().add(oi.getPayValue()));
+								break;
+							case PayMode.CHARGE_PAY:
+								order.setChargePay(order.getChargePay().add(oi.getPayValue()));
+								break;
+							case PayMode.REWARD_PAY:
+								order.setRewardPay(order.getRewardPay().add(oi.getPayValue()));
+								break;
+							case PayMode.WAIT_MONEY:
+								order.setWaitRedPay(order.getWaitRedPay().add(oi.getPayValue()));
+							case PayMode.ALI_PAY:
+								order.setAliPayment(order.getAliPayment().add(oi.getPayValue()));
+								break;
+							case PayMode.CRASH_PAY:
+								order.setMoneyPay(order.getMoneyPay().add(oi.getPayValue()));
+								break;
+							case PayMode.BANK_CART_PAY:
+								order.setBackCartPay(order.getBackCartPay().add(oi.getPayValue()));
+								break;
+							case PayMode.ARTICLE_BACK_PAY:
+								order.setArticleBackPay(order.getArticleBackPay().add(oi.getPayValue().abs()));
+								break;
+							case PayMode.INTEGRAL_PAY:
+								order.setIntegralPay(order.getIntegralPay().add(oi.getPayValue()));
+								break;
+							case PayMode.SHANHUI_PAY:
+								order.setShanhuiPay(order.getShanhuiPay().add(oi.getPayValue()));
+								break;
+							case PayMode.GIVE_CHANGE:
+								order.setGiveChangePayment(order.getGiveChangePayment().add(oi.getPayValue().abs()));
+								break;
+							case PayMode.REFUND_CRASH:
+								order.setRefundCrashPayment(order.getRefundCrashPayment().add(oi.getPayValue().abs()));
+								break;
+							default:
+								break;
+						}
+					}
+				}
+			}
+		}
+	}
 
 	@RequestMapping("detailInfo")
 	@ResponseBody
@@ -339,7 +416,6 @@ public class OrderController extends GenericController{
                     object.put("telePhone",o.getCustomer().getTelephone());
                 }
             }
-            object.put("orderMoney",o.getOrderMoney());
             if(o.getAppraise() != null){
                 object.put("level",Appraise.getLevel(o.getAppraise().getLevel()));
                 object.put("levelValue",o.getAppraise().getContent());
@@ -350,9 +426,27 @@ public class OrderController extends GenericController{
 				object.put("orderState", OrderState.getStateName(o.getOrderState()));
 			}
             BigDecimal articleMoney = BigDecimal.ZERO;
-            for (OrderItem item : o.getOrderItems()){
-                articleMoney = articleMoney.add(item.getFinalPrice());
-            }
+			//查询该订单下的子订单
+			List<Order> orderList = orderService.selectListByParentId(orderId);
+			for (Order order : orderList){
+				if ((order.getOrderState() == OrderState.PAYMENT
+						|| order.getOrderState() == OrderState.CONFIRM || order.getOrderState() == OrderState.HASAPPRAISE) &&
+						(order.getProductionStatus() == ProductionStatus.PRINTED || order.getProductionStatus() == ProductionStatus.HAS_CALL)){
+					o.setOrderMoney(o.getOrderMoney().add(order.getOrderMoney()));
+					Map<String, Object> selectMap = new HashMap<>();
+					selectMap.put("orderId", order.getId());
+					selectMap.put("count", "1 = 1");
+					List<OrderItem> orderItems = orderItemService.selectOrderItemByOrderId(selectMap);
+					o.getOrderItems().addAll(orderItems);
+				}
+			}
+			//当菜品项不为空时
+			if (o.getOrderItems() != null) {
+				for (OrderItem item : o.getOrderItems()) {
+					articleMoney = articleMoney.add(item.getFinalPrice());
+				}
+			}
+			object.put("orderMoney",o.getOrderMoney());
             object.put("articleMoney",articleMoney);
             object.put("servicePrice",o.getServicePrice());
             object.put("orderItems",o.getOrderItems());
