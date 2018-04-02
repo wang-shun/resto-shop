@@ -713,6 +713,8 @@ public class OrderAspect {
             RedisUtil.set(shopId + "shopOrderCount", orderCount);
             RedisUtil.set(shopId + "shopOrderTotal", orderTotal);
             MQMessageProducer.sendPrintSuccess(shopId);
+            //后付款的订单  付完款则会可以评论收到推送！
+            MQMessageProducer.sendAutoConfirmOrder(order, 0);
         }
         if(order.getPayMode() != OrderPayMode.WX_PAY && order.getPayMode() != OrderPayMode.ALI_PAY){
             MQMessageProducer.sendOrderPay(order);
