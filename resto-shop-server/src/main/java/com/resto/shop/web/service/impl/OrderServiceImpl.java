@@ -8689,9 +8689,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     order.setAllowContinueOrder(false);
                     update(order);
                     updateChild(order);
-                    //后付 付款后直接确认订单  判断是否可以领取红包
-                    confirmOrder(order);
-
                 }
             }
         } catch (Exception e) {
