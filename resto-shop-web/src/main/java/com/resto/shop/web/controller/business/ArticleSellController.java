@@ -110,7 +110,7 @@ public class ArticleSellController extends GenericController{
             //查询所有的菜品销售信息
             List<ArticleSellDto> articleUnitSell = articleService.selectArticleByType(selectMap);
             //查出单品或套餐总的销售量及销售额
-            selectMap.put("type", OrderItemType.ARTICLE + "," + OrderItemType.UNITPRICE + "," + OrderItemType.UNIT_NEW + "," + OrderItemType.RECOMMEND);
+            selectMap.put("type", OrderItemType.ARTICLE + "," + OrderItemType.UNITPRICE + "," + OrderItemType.UNIT_NEW + "," + OrderItemType.RECOMMEND + "," + OrderItemType.WEIGHT_PACKAGE_ARTICLE);
             Map<String, Object> unitMap = articleService.callArticleOrderCount(selectMap);
             for (ArticleSellDto articleUnitSellDto : articleUnitSellDtos){
                 //计算销售量占比
@@ -158,6 +158,7 @@ public class ArticleSellController extends GenericController{
                 articleSellDto.setDiscountMoney(BigDecimal.ZERO);
                 articleSellDto.setRefundCount(0);
                 articleSellDto.setRefundTotal(BigDecimal.ZERO);
+                articleSellDto.setWeight(BigDecimal.ZERO);
                 articleUnitSellDtos.add(articleSellDto);
             }
             object.put("brandArticleUnit", articleUnitSellDtos);
@@ -214,6 +215,7 @@ public class ArticleSellController extends GenericController{
                 articleSellDto.setDiscountMoney(BigDecimal.ZERO);
                 articleSellDto.setRefundCount(0);
                 articleSellDto.setRefundTotal(BigDecimal.ZERO);
+                articleSellDto.setWeight(BigDecimal.ZERO);
                 articleFamilySellDtos.add(articleSellDto);
             }
             object.put("brandArticleFamily", articleFamilySellDtos);
