@@ -414,7 +414,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 return jsonResult;
             }
             Boolean checkTable = (Boolean) RedisUtil.get(order.getShopDetailId() + order.getTableNumber() + "status");
-            if (checkTable != null && !checkTable) {
+            if (checkTable != null && !checkTable && shopDetail.getAllowAfterPay() == 0 && shopDetail.getAllowFirstPay() == 1) {
                 jsonResult.setSuccess(false);
                 jsonResult.setMessage("当前桌位已被占用");
                 return jsonResult;
