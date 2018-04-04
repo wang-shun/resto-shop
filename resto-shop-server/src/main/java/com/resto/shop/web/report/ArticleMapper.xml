@@ -89,7 +89,8 @@
         IFNULL(IF(ta.article_type = 2, SUM(IF(toi.type != 4,toi.refund_count * toi.unit_price,0)) + IFNULL(SUM((select SUM(trd.unit_price * trd.refund_count) from tb_order_item trd where trd.parent_id = toi.id)),0)
         ,SUM(IF(toi.type != 4,toi.refund_count * toi.unit_price,0))),0) refundTotal,
         IFNULL(SUM((toi.original_price - toi.unit_price) * toi.count),0) discountMoney,
-        ta.likes likes
+        ta.likes likes,
+        IFNULL(SUM(toi.weight),0) weight
         from tb_article ta
         inner join tb_article_price tap
         on ta.id = tap.article_id
@@ -126,7 +127,8 @@
         IFNULL(IF(ta.article_type = 2, SUM(IF(toi.type != 4,toi.refund_count * toi.unit_price,0)) + IFNULL(SUM((select SUM(trd.unit_price * trd.refund_count) from tb_order_item trd where trd.parent_id = toi.id)),0)
         ,SUM(IF(toi.type != 4,toi.refund_count * toi.unit_price,0))),0) refundTotal,
         IFNULL(SUM((toi.original_price - toi.unit_price) * toi.count),0) discountMoney,
-        ta.likes likes
+        ta.likes likes,
+        IFNULL(SUM(toi.weight),0) weight
         from tb_article ta
         inner join tb_order_item toi
         on ta.id = toi.article_id

@@ -267,7 +267,14 @@ var vueObj = new Vue({
                     },
                     {
                         title : "销量(份)",
-                        data : "brandSellNum"
+                        data : "brandSellNum",
+                        createdCell: function (td, tdData, rowData) {
+                            var text = tdData;
+                            if (rowData.weight > 0){
+                                text = text + "/" + rowData.weight + "斤";
+							}
+                            $(td).html(text);
+                        }
                     },
                     {
                         title : "销量占比",

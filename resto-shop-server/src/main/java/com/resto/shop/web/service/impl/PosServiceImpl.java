@@ -1333,14 +1333,18 @@ public class PosServiceImpl implements PosService {
         log.info("key：" + key + "---value：" + value);
         switch (key){
             case "order":
-                Order order = JSON.parseObject(value, Order.class);
-                log.info("反序列化的Order：" + order.getId());
-                orderService.update(order);
+                List<Order> orderList = JSON.parseObject(value, new TypeReference<List<Order>>(){});
+                orderList.forEach(order -> {
+                    log.info("反序列化的Order：" + order.getId());
+                    orderService.update(order);
+                });
                 break;
             case "orderItem":
-                OrderItem orderItem = JSON.parseObject(value, OrderItem.class);
-                log.info("反序列化的OrderItem：" + orderItem.getId());
-                orderItemService.update(orderItem);
+                List<OrderItem> orderItemList = JSON.parseObject(value, new TypeReference<List<OrderItem>>(){});
+                orderItemList.forEach(orderItem -> {
+                    log.info("反序列化的OrderItem：" + orderItem.getId());
+                    orderItemService.update(orderItem);
+                });
                 break;
             default:
                 log.error("参数错误");
