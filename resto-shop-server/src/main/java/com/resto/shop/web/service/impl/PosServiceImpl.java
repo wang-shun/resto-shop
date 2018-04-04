@@ -415,11 +415,18 @@ public class PosServiceImpl implements PosService {
         JSONObject json = new JSONObject(data);
         Order order = orderService.selectById(json.getString("orderId"));
         if(order != null && order.getOrderState() == OrderState.SUBMIT){
-
+            Customer customer = customerService.selectById(order.getCustomerId());
+            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+            Brand brand = brandService.selectById(order.getBrandId());
             List<OrderPaymentDto> orderPaymentDtos = JSON.parseArray(json.get("orderPayment").toString(), OrderPaymentDto.class);
             for(OrderPaymentDto orderPaymentDto : orderPaymentDtos){
                 OrderPaymentItem orderPaymentItem = new OrderPaymentItem(orderPaymentDto);
-                orderPaymentItemService.insert(orderPaymentItem);
+                if (orderPaymentDto.getPaymentModeId() == PayMode.ACCOUNT_PAY){
+                    //如果是余额支付
+                    accountService.payOrder(order, orderPaymentItem.getPayValue(), customer, brand, shopDetail);
+                }else {
+                    orderPaymentItemService.insert(orderPaymentItem);
+                }
             }
             //  根据 pos 传输的数据为准
             if(json.has("isPosPay")){
@@ -439,15 +446,12 @@ public class PosServiceImpl implements PosService {
             RedisUtil.set(order.getShopDetailId()+order.getTableNumber()+"status",true);
             orderService.confirmBossOrder(order);
 
-            Customer customer = customerService.selectById(order.getCustomerId());
             if (org.apache.commons.lang3.StringUtils.isBlank(order.getParentOrderId()) && customer != null) {
                 //查询出所有消费返利优惠券
                 List<NewCustomCoupon> newCustomCoupons = newCustomCouponService.selectConsumptionRebateCoupon(order.getShopDetailId());
                 if (newCustomCoupons != null && newCustomCoupons.size() > 0) {
                     //查询出该笔订单的用户上一次领取到消费返利优惠券的时间
                     Coupon coupon = couponService.selectLastTimeRebate(order.getCustomerId());
-                    Brand brand = brandService.selectById(order.getBrandId());
-                    ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
                     BrandSetting brandSetting = brandSettingService.selectByBrandId(order.getBrandId());
                     WechatConfig wechatConfig = wechatConfigService.selectByBrandId(order.getBrandId());
                     for (NewCustomCoupon newCustomCoupon : newCustomCoupons) {
