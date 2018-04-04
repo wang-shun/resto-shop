@@ -1351,4 +1351,72 @@ public class PosServiceImpl implements PosService {
                 break;
         }
     }
+
+
+    /**
+     * 得到能用的余额和优惠券
+     * @param orderId
+     * @return
+     */
+    @Override
+    public String getCanUseAccountAndCoupon(String orderId) {
+        JSONObject returnInfo = new JSONObject();
+        //查询到对应订单
+        Order order = orderService.selectById(orderId);
+        //查询到订单对应的支付项
+        List<OrderPaymentItem> paymentItemList = orderPaymentItemService.selectByOrderId(orderId);
+        //判断当前订单是否占用了优惠券
+        BigDecimal usedCouponValue = BigDecimal.ZERO;
+        //订单待支付金额
+        BigDecimal payValue = order.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? order.getAmountWithChildren() : order.getOrderMoney();
+        //支付的余额
+        BigDecimal accountPayValue = BigDecimal.ZERO;
+        //支付的优惠券
+        BigDecimal couponValue = BigDecimal.ZERO;
+        for (OrderPaymentItem paymentItem : paymentItemList) {
+            if (paymentItem.getPaymentModeId() == PayMode.COUPON_PAY) {
+                usedCouponValue = paymentItem.getPayValue();
+                //待支付金额减去已使用过的优惠券
+                payValue = payValue.subtract(usedCouponValue);
+            }
+        }
+        //查询到订单对应用户
+        Customer customer = customerService.selectById(order.getCustomerId());
+        //查询到用户的账户信息
+        Account account = accountService.selectById(customer.getAccountId());
+        //如果没有使用过优惠券则查询出可用的优惠券
+        if (usedCouponValue.compareTo(BigDecimal.ZERO) == 0) {
+            Map<String, Object> selectMap = new HashMap<>();
+            selectMap.put("customerId", customer.getId());
+            selectMap.put("shopId", order.getShopDetailId());
+            selectMap.put("orderMoney", payValue);
+            if (account.getRemain().compareTo(BigDecimal.ZERO) > 0) {
+                selectMap.put("useWithAccount", 1);
+            }
+            Coupon coupon = couponService.selectPosPayOrderCanUseCoupon(selectMap);
+            if (coupon != null) {
+                payValue = payValue.subtract(coupon.getValue());
+                couponValue = coupon.getValue();
+                returnInfo.put("couponId", coupon.getId());
+            }
+        }
+        //判断剩余需要支付金额
+        if (payValue.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal oldRemain = account.getRemain();
+            BigDecimal remain = oldRemain;
+            if (remain.compareTo(BigDecimal.ZERO) > 0) {
+                returnInfo.put("accountId", account.getId());
+                remain = remain.subtract(payValue);
+                if (remain.compareTo(BigDecimal.ZERO) >= 0) {
+                    accountPayValue = payValue;
+                } else {
+                    accountPayValue = oldRemain;
+                }
+            }
+        }
+        returnInfo.put("accountPayValue", accountPayValue);
+        returnInfo.put("couponValue", couponValue);
+        returnInfo.put("useCouponValue", usedCouponValue);
+        return returnInfo.toString();
+    }
 }
