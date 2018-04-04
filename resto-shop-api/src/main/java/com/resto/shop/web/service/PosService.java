@@ -223,4 +223,11 @@ public interface PosService {
      * @return
      */
     String updateData(String data);
+
+    /**
+     * 得到能用的余额和优惠券
+     * @param orderId
+     * @return
+     */
+    String getCanUseAccountAndCoupon(String orderId);
 }
