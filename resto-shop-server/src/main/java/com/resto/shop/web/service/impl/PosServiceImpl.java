@@ -418,7 +418,7 @@ public class PosServiceImpl implements PosService {
             Customer customer = customerService.selectById(order.getCustomerId());
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             Brand brand = brandService.selectById(order.getBrandId());
-            List<OrderPaymentDto> orderPaymentDtos = JSON.parseArray(json.get("orderPayment").toString(), OrderPaymentDto.class);
+            List<OrderPaymentDto> orderPaymentDtos = JSON.parseObject(json.get("orderPayment").toString(), new TypeReference<List<OrderPaymentDto>>(){});
             for(OrderPaymentDto orderPaymentDto : orderPaymentDtos){
                 OrderPaymentItem orderPaymentItem = new OrderPaymentItem(orderPaymentDto);
                 if (orderPaymentDto.getPaymentModeId() == PayMode.ACCOUNT_PAY){
