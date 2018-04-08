@@ -1056,6 +1056,7 @@ public class PosServiceImpl implements PosService {
                     returnParam.put("message", "账户余额不足，请更换支付方式");
                 } else{
                     returnParam.put("outTradeNo", authCode);
+                    returnParam.put("customerId", customer.getId());
                 }
             }
         } catch (Exception e) {
@@ -1161,10 +1162,27 @@ public class PosServiceImpl implements PosService {
                     paymentItem.setResultData(resultInfo.toString());
                     paymentItem.setPayValue(order.getPayMode() == OrderPayMode.WX_PAY ? resultInfo.getBigDecimal("total_fee").divide(new BigDecimal(100))
                             : new BigDecimal(resultInfo.getString("total_amount")));
+                    orderPaymentItemService.insert(paymentItem);
                     JSONObject returnPayment = new JSONObject(paymentItem);
                     returnPayment.put("resultData", paymentItem.getRemark());
                     returnPayment.put("payTime", paymentItem.getPayTime().getTime());
                     orderPaymentItems.put(returnPayment);
+                    for (OrderPaymentItem payItem : order.getOrderPaymentItems()){
+                        if (payItem.getPaymentModeId() == PayMode.ACCOUNT_PAY){
+                            //余额支付
+                            Order newOrder = orderService.selectById(order.getId());
+                            Customer customer = customerService.selectByAccountId(payItem.getToPayId());
+                            accountService.payOrder(newOrder, payItem.getPayValue(), customer, brand, shopDetail);
+                        }else{
+                            //优惠券支付
+                            Coupon coupon = couponService.selectById(payItem.getToPayId());
+                            coupon.setUsingTime(new Date());
+                            coupon.setIsUsed(true);
+                            couponService.update(coupon);
+                        }
+                        returnPayment = new JSONObject(payItem);
+                        orderPaymentItems.put(returnPayment);
+                    }
                     returnParam.put("payMentInfo", orderPaymentItems);
                 }
             }else{
