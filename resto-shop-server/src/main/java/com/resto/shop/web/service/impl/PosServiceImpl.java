@@ -424,7 +424,14 @@ public class PosServiceImpl implements PosService {
                 if (orderPaymentDto.getPaymentModeId() == PayMode.ACCOUNT_PAY){
                     //如果是余额支付
                     accountService.payOrder(order, orderPaymentItem.getPayValue(), customer, brand, shopDetail);
-                }else {
+                }else{
+                    if (orderPaymentDto.getPaymentModeId() == PayMode.COUPON_PAY){
+                        //如果是优惠券支付
+                        Coupon coupon = couponService.selectById(orderPaymentDto.getToPayId());
+                        coupon.setIsUsed(true);
+                        coupon.setUsingTime(new Date());
+                        couponService.update(coupon);
+                    }
                     orderPaymentItemService.insert(orderPaymentItem);
                 }
             }
@@ -1076,154 +1083,7 @@ public class PosServiceImpl implements PosService {
         //存储返回的支付信息
         JSONArray orderPaymentItems = new JSONArray();
         try{
-            if (order.getPayMode().equals(OrderPayMode.WX_PAY)){
-                Map<String, String> map = new HashMap<>();
-                if (shopDetail.getWxServerId() == null){
-                    //普通商户
-                    map = queryPay(wechatConfig.getAppid(), wechatConfig.getMchid(), "", outTradeNo,wechatConfig.getMchkey());
-                }else{
-                    //服务商模式下的特约商户
-                    WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
-                    map = queryPay(wxServerConfig.getAppid(), wxServerConfig.getMchid(), shopDetail.getMchid(), outTradeNo, wxServerConfig.getMchkey());
-                }
-                if (Boolean.valueOf(map.get("success"))){
-                    //支付成功，退出轮询插入支付信息修改订单信息
-                    returnParam.put("isPolling", false);
-                    OrderPaymentItem paymentItem = new OrderPaymentItem();
-                    JSONObject resultInfo = new JSONObject(map.get("data"));
-                    paymentItem.setId(resultInfo.get("transaction_id").toString());
-                    paymentItem.setPaymentModeId(PayMode.WEIXIN_PAY);
-                    paymentItem.setRemark("微信支付：" + resultInfo.getBigDecimal("total_fee").divide(new BigDecimal(100)));
-                    paymentItem.setOrderId(order.getId());
-                    paymentItem.setPayTime(new Date());
-                    paymentItem.setResultData(map.get("data"));
-                    paymentItem.setPayValue(resultInfo.getBigDecimal("total_fee").divide(new BigDecimal(100)));
-                    orderPaymentItemService.insert(paymentItem);
-                    orderService.update(order);
-                    for (OrderItem orderItem : order.getOrderItems()){
-                        orderItemService.update(orderItem);
-                    }
-                    JSONObject returnPayment = new JSONObject(paymentItem);
-                    returnPayment.put("resultData", "微信支付");
-                    returnPayment.put("payTime", paymentItem.getPayTime().getTime());
-                    orderPaymentItems.put(returnPayment);
-                    returnParam.put("payMentInfo", orderPaymentItems);
-                }else{
-                    //如果正在支付中，则轮询继续去查。 反之则支付失败退出轮询
-                    if ((map.containsKey("trade_state") && !"USERPAYING".equalsIgnoreCase(map.get("trade_state")))
-                            || (map.containsKey("errCode") && !"SYSTEMERROR".equalsIgnoreCase(map.get("errCode")))){
-                        returnParam.put("isPolling", false);
-                        returnParam.put("message", map.get("msg"));
-                    }
-                    returnParam.put("success", false);
-                }
-            }else if (order.getPayMode().equals(OrderPayMode.ALI_PAY)){ //支付宝支付
-                com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject();
-                jsonObject.put("out_trade_no", outTradeNo);
-                //查询支付宝订单的支付进度
-                Map<String, Object> returnMap = AliPayUtils.tradeQuery(jsonObject);
-                //查询订单成功
-                if (Boolean.valueOf(returnMap.get("success").toString())){
-                    String trade_status = returnMap.get("trade_status").toString();
-                    if ("TRADE_SUCCESS".equalsIgnoreCase(trade_status) || "TRADE_FINISHED".equalsIgnoreCase(trade_status)){
-                        //已支付完成
-                        returnParam.put("isPolling", false);
-                        OrderPaymentItem paymentItem = new OrderPaymentItem();
-                        JSONObject resultInfo = new JSONObject(returnMap.get("msg").toString());
-                        paymentItem.setId(returnMap.get("trade_no").toString());
-                        paymentItem.setPaymentModeId(PayMode.ALI_PAY);
-                        paymentItem.setRemark("支付宝支付：" + returnMap.get("total_amount"));
-                        paymentItem.setOrderId(order.getId());
-                        paymentItem.setPayTime(new Date());
-                        paymentItem.setResultData(resultInfo.get("alipay_trade_query_response").toString());
-                        paymentItem.setPayValue(new BigDecimal(returnMap.get("total_amount").toString()));
-                        orderPaymentItemService.insert(paymentItem);
-                        orderService.update(order);
-                        for (OrderItem orderItem : order.getOrderItems()){
-                            orderItemService.update(orderItem);
-                        }
-                        JSONObject returnPayment = new JSONObject(paymentItem);
-                        returnPayment.put("resultData", "支付宝支付");
-                        returnPayment.put("payTime", paymentItem.getPayTime().getTime());
-                        orderPaymentItems.put(returnPayment);
-                        returnParam.put("payMentInfo", orderPaymentItems);
-                    }else {
-                        if ("TRADE_CLOSED".equalsIgnoreCase(trade_status)) {
-                            //未付款交易超时关闭，或支付完成后全额退款
-                            returnParam.put("isPolling", false);
-                            returnParam.put("message", "未付款交易超时关闭");
-                        }
-                        returnParam.put("success", false);
-                    }
-                }else{
-                    if ((returnMap.get("sub_code") != null
-                            && !returnMap.get("sub_code").toString().equalsIgnoreCase("ACQ.SYSTEM_ERROR"))
-                            || returnMap.get("sub_code") == null){
-                        returnParam.put("isPolling", false);
-                        returnParam.put("message", returnMap.get("msg"));
-                    }
-                    returnParam.put("success", false);
-                }
-            }else{ //余额支付
-                OrderPaymentItem paymentItem = new OrderPaymentItem();
-                JSONObject returnPayment;
-                //已支付完成
-                returnParam.put("isPolling", false);
-                BigDecimal payValue = object.getBigDecimal("paymentAmount");
-                Customer customer = customerService.selectByTelePhone(outTradeNo);
-                //查询出该笔订单的账户信息
-                Account account = accountService.selectById(customer.getAccountId());
-                //查询出该笔订单的优惠券信息
-                Map<String, Object> selectMap = new HashMap<>();
-                selectMap.put("customerId", customer.getId());
-                selectMap.put("shopId", shopDetail.getId());
-                selectMap.put("orderMoney", payValue);
-                if (account.getRemain().compareTo(BigDecimal.ZERO) > 0) {
-                    selectMap.put("useWithAccount", 1);
-                }
-                Coupon coupon = couponService.selectPosPayOrderCanUseCoupon(selectMap);
-                //有优惠券则待支付金额减去优惠券的金额
-                if (coupon != null) {
-                    payValue = payValue.subtract(coupon.getValue());
-                    //使用优惠券
-                    paymentItem.setId(ApplicationUtils.randomUUID());
-                    paymentItem.setPayTime(new Date());
-                    paymentItem.setPayValue(coupon.getValue());
-                    paymentItem.setPaymentModeId(PayMode.COUPON_PAY);
-                    paymentItem.setRemark("优惠券支付:" + coupon.getValue());
-                    paymentItem.setOrderId(order.getId());
-                    paymentItem.setToPayId(coupon.getId());
-                    orderPaymentItemService.insert(paymentItem);
-                    returnPayment = new JSONObject(paymentItem);
-                    returnPayment.put("payTime", paymentItem.getPayTime().getTime());
-                    orderPaymentItems.put(returnPayment);
-                }
-                //扫R+码支付时，将订单关联到对应的用户
-                order.setCustomerId(customer.getId());
-                orderService.update(order);
-                for (OrderItem orderItem : order.getOrderItems()){
-                    orderItemService.update(orderItem);
-                }
-                if (payValue.compareTo(BigDecimal.ZERO) > 0){
-                    paymentItem = new OrderPaymentItem();
-                    paymentItem.setId(ApplicationUtils.randomUUID());
-                    paymentItem.setPayTime(new Date());
-                    paymentItem.setPayValue(payValue);
-                    paymentItem.setPaymentModeId(PayMode.ACCOUNT_PAY);
-                    paymentItem.setRemark("余额支付:" + payValue);
-                    paymentItem.setOrderId(order.getId());
-                    paymentItem.setToPayId(account.getId());
-//                    orderPaymentItemService.insert(paymentItem);
-                    //返回的支付信息
-                    returnPayment = new JSONObject(paymentItem);
-                    returnPayment.put("payTime", paymentItem.getPayTime().getTime());
-                    orderPaymentItems.put(returnPayment);
-                    //使用余额明细
-                    Order newOrderInfo = orderService.selectById(order.getId());
-                    accountService.payOrder(newOrderInfo, payValue, customer, brand, shopDetail);
-                }
-                returnParam.put("payMentInfo", orderPaymentItems);
-            }
+
         }catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage());
