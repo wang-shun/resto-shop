@@ -418,8 +418,11 @@ public class PosServiceImpl implements PosService {
             Customer customer = customerService.selectById(order.getCustomerId());
             ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
             Brand brand = brandService.selectById(order.getBrandId());
+            log.info("接收到的支付项JSON信息：" + json.get("orderPayment").toString());
             List<OrderPaymentDto> orderPaymentDtos = JSON.parseObject(json.get("orderPayment").toString(), new TypeReference<List<OrderPaymentDto>>(){});
+            log.info("转换后的数组长度：" + orderPaymentDtos.size());
             for(OrderPaymentDto orderPaymentDto : orderPaymentDtos){
+                log.info("进入循环，插入支付项支付模式为：" + orderPaymentDto.getPaymentModeId());
                 OrderPaymentItem orderPaymentItem = new OrderPaymentItem(orderPaymentDto);
                 if (orderPaymentDto.getPaymentModeId() == PayMode.ACCOUNT_PAY){
                     //如果是余额支付
