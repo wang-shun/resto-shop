@@ -1322,6 +1322,8 @@ public class PosServiceImpl implements PosService {
         returnObject.put("success", true);
         try{
             JSONObject paramInfo = new JSONObject(data);
+            //修改的订单项的Id
+            List<String> orderItemIds = new ArrayList<>();
 //            //解密需要更新的数据
 //            log.info("解密之前的数据：" + paramInfo.getString("dataList"));
 //            String info = RSAEncryptionUtil.decryptBase64(paramInfo.getString("dataList"));
@@ -1331,7 +1333,7 @@ public class PosServiceImpl implements PosService {
             //遍历dataList
             dataList.forEach(dataInfo -> {
                 dataInfo.forEach((key, value) -> {
-                    execution(key, value);
+                    execution(key, value, returnObject);
                 });
             });
         }catch (Exception e){
@@ -1348,7 +1350,7 @@ public class PosServiceImpl implements PosService {
      * @param key
      * @param value
      */
-    private void execution(String key, String value){
+    private void execution(String key, String value, JSONObject returnObject){
         log.info("key：" + key + "---value：" + value);
         switch (key){
             case "order":
@@ -1356,6 +1358,13 @@ public class PosServiceImpl implements PosService {
                 orderList.forEach(order -> {
                     log.info("反序列化的Order：" + order.getId());
                     orderService.update(order);
+                    if (returnObject.get("orderIds") == null){
+                        List<String> orderIds = new ArrayList<>();
+                        orderIds.add(order.getId());
+                        returnObject.put("orderIds", orderIds);
+                    }else{
+                        returnObject.put("orderIds", ((List<String>)returnObject.get("orderIds")).add(order.getId()));
+                    }
                 });
                 break;
             case "orderItem":
@@ -1363,6 +1372,13 @@ public class PosServiceImpl implements PosService {
                 orderItemList.forEach(orderItem -> {
                     log.info("反序列化的OrderItem：" + orderItem.getId());
                     orderItemService.update(orderItem);
+                    if (returnObject.get("orderItemIds") == null){
+                        List<String> orderIds = new ArrayList<>();
+                        orderIds.add(orderItem.getId());
+                        returnObject.put("orderItemIds", orderIds);
+                    }else{
+                        returnObject.put("orderItemIds", ((List<String>)returnObject.get("orderItemIds")).add(orderItem.getId()));
+                    }
                 });
                 break;
             default:
