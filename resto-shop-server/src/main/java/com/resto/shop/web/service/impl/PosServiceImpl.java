@@ -1403,7 +1403,19 @@ public class PosServiceImpl implements PosService {
         //判断当前订单是否占用了优惠券
         BigDecimal usedCouponValue = BigDecimal.ZERO;
         //订单待支付金额
-        BigDecimal payValue = order.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? order.getAmountWithChildren() : order.getOrderMoney();
+        BigDecimal payValue = BigDecimal.ZERO;
+        //判断主订单是否支付
+        if (order.getOrderState() == OrderState.SUBMIT){
+            payValue = order.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? order.getAmountWithChildren() : order.getPaymentAmount();
+        }else{
+            //查询出该笔主订单下的子订单
+            List<Order> orderList = orderService.selectListByParentId(orderId);
+            for (Order subOrder : orderList){
+                if (subOrder.getOrderState() == OrderState.SUBMIT){
+                    payValue = subOrder.getPaymentAmount();
+                }
+            }
+        }
         //支付的余额
         BigDecimal accountPayValue = BigDecimal.ZERO;
         //支付的优惠券
