@@ -10,6 +10,8 @@ import com.resto.shop.web.model.OrderItem;
 import com.resto.shop.web.service.CustomerService;
 import com.resto.shop.web.service.OrderItemService;
 import com.resto.shop.web.service.OrderService;
+import com.resto.shop.web.util.RedisUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
@@ -57,9 +59,6 @@ public class PosAspect {
     CustomerService customerService;
 
     @Resource
-    BrandSettingService brandSettingService;
-
-    @Resource
     WechatConfigService wechatConfigService;
 
 
@@ -71,21 +70,21 @@ public class PosAspect {
         JSONObject param = new JSONObject(paramData);
         //得到此次修改数据的业务类型
         String serverType = param.getString("serverType");
+        JSONObject returnObject = new JSONObject(resultInfo);
+        List<String> orderIds = (List<String>) returnObject.get("orderIds");
+        Order order = new Order();
         //判断业务类型进行联动操作
         switch (serverType){
             case "weightPackage":
                 log.info("开始修改重量包后的后续操作");
                 //修改重量包
-                JSONObject returnObject = new JSONObject(resultInfo);
-                List<String> orderIds = (List<String>) returnObject.get("orderIds");
                 List<String> orderItemIds = (List<String>) returnObject.get("orderItemIds");
                 //得到当前订单
-                Order order = orderService.selectById(orderIds.get(0));
+                order = orderService.selectById(orderIds.get(0));
                 //查询到当前用户
                 Customer customer = customerService.selectById(order.getCustomerId());
                 if (customer != null){
-                    String sendMessage = "称重餐品核重后微信推送文案：\n" +
-                            "报告老板，商家已确认您的订单，香喷喷的美食马上就来~\n" +
+                    String sendMessage = "报告老板，商家已确认您的订单，香喷喷的美食马上就来~\n" +
                             "菜品明细：\n";
                     for (String orderItemId : orderItemIds){
                         OrderItem orderItem = orderItemService.selectById(orderItemId);
@@ -95,6 +94,22 @@ public class PosAspect {
                     log.info("发送微信消息：" + sendMessage);
                     WeChatUtils.sendCustomerMsg(sendMessage, customer.getWechatId(), wechatConfig.getAppid(), wechatConfig.getAppsecret());
                 }
+                break;
+            case "orderPay":
+                log.info("开始支付订单后的后续操作");
+                for (String orderId : orderIds){
+                    order = orderService.selectById(orderId);
+                    if (StringUtils.isBlank(order.getParentOrderId())){
+                        break;
+                    }
+                }
+                //释放桌位
+                RedisUtil.set(order.getShopDetailId()+order.getTableNumber()+"status",true);
+                //确认订单
+                orderService.confirmBossOrder(order);
+                break;
+            default:
+                log.info("本次调用无后续联动操作");
                 break;
         }
     }
