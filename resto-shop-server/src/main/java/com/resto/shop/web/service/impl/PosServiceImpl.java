@@ -1432,11 +1432,13 @@ public class PosServiceImpl implements PosService {
                             }
                         }
                     }else if (subOrder.getOrderState() != OrderState.CANCEL){
-                        orderPaymentItems = orderPaymentItemService.selectByOrderId(subOrder.getId());
-                        for (OrderPaymentItem paymentItem : orderPaymentItems){
-                            if (paymentItem.getPaymentModeId() == PayMode.COUPON_PAY){
-                                //支付金额减去已占用的优惠券金额
-                                usedCouponValue = paymentItem.getPayValue();
+                        if (usedCouponValue.compareTo(BigDecimal.ZERO) == 0) {
+                            orderPaymentItems = orderPaymentItemService.selectByOrderId(subOrder.getId());
+                            for (OrderPaymentItem paymentItem : orderPaymentItems) {
+                                if (paymentItem.getPaymentModeId() == PayMode.COUPON_PAY) {
+                                    //支付金额减去已占用的优惠券金额
+                                    usedCouponValue = paymentItem.getPayValue();
+                                }
                             }
                         }
                     }
