@@ -1322,6 +1322,7 @@ public class PosServiceImpl implements PosService {
         returnObject.put("success", true);
         try{
             JSONObject paramInfo = new JSONObject(data);
+            List<String> orderIds = new ArrayList<>();
             //修改的订单项的Id
             List<String> orderItemIds = new ArrayList<>();
 //            //解密需要更新的数据
@@ -1333,9 +1334,11 @@ public class PosServiceImpl implements PosService {
             //遍历dataList
             dataList.forEach(dataInfo -> {
                 dataInfo.forEach((key, value) -> {
-                    execution(key, value, returnObject);
+                    execution(key, value, orderIds, orderItemIds);
                 });
             });
+            returnObject.put("orderIds", orderIds);
+            returnObject.put("orderItemIds", orderItemIds);
         }catch (Exception e){
             e.printStackTrace();
             log.error(e.getMessage());
@@ -1350,7 +1353,7 @@ public class PosServiceImpl implements PosService {
      * @param key
      * @param value
      */
-    private void execution(String key, String value, JSONObject returnObject){
+    private void execution(String key, String value, List<String> orderIds, List<String> orderItemIds){
         log.info("key：" + key + "---value：" + value);
         switch (key){
             case "order":
@@ -1358,13 +1361,7 @@ public class PosServiceImpl implements PosService {
                 orderList.forEach(order -> {
                     log.info("反序列化的Order：" + order.getId());
                     orderService.update(order);
-                    if (returnObject.get("orderIds") == null){
-                        List<String> orderIds = new ArrayList<>();
-                        orderIds.add(order.getId());
-                        returnObject.put("orderIds", orderIds);
-                    }else{
-                        returnObject.put("orderIds", ((List<String>)returnObject.get("orderIds")).add(order.getId()));
-                    }
+                    orderIds.add(order.getId());
                 });
                 break;
             case "orderItem":
@@ -1372,13 +1369,7 @@ public class PosServiceImpl implements PosService {
                 orderItemList.forEach(orderItem -> {
                     log.info("反序列化的OrderItem：" + orderItem.getId());
                     orderItemService.update(orderItem);
-                    if (returnObject.get("orderItemIds") == null){
-                        List<String> orderIds = new ArrayList<>();
-                        orderIds.add(orderItem.getId());
-                        returnObject.put("orderItemIds", orderIds);
-                    }else{
-                        returnObject.put("orderItemIds", ((List<String>)returnObject.get("orderItemIds")).add(orderItem.getId()));
-                    }
+                    orderItemIds.add(orderItem.getId());
                 });
                 break;
             default:
@@ -1398,33 +1389,58 @@ public class PosServiceImpl implements PosService {
         JSONObject returnInfo = new JSONObject();
         //查询到对应订单
         Order order = orderService.selectById(orderId);
-        //查询到订单对应的支付项
-        List<OrderPaymentItem> paymentItemList = orderPaymentItemService.selectByOrderId(orderId);
+        //查找到当前主订单对应的支付项
+        List<OrderPaymentItem> orderPaymentItems = orderPaymentItemService.selectByOrderId(orderId);
         //判断当前订单是否占用了优惠券
         BigDecimal usedCouponValue = BigDecimal.ZERO;
         //订单待支付金额
         BigDecimal payValue = BigDecimal.ZERO;
+        //支付的余额
+        BigDecimal accountPayValue = BigDecimal.ZERO;
+        //支付的优惠券
+        BigDecimal couponValue = BigDecimal.ZERO;
         //判断主订单是否支付
         if (order.getOrderState() == OrderState.SUBMIT){
+            //如果是主订单未支付，则父子订单一起支付
             payValue = order.getAmountWithChildren().compareTo(BigDecimal.ZERO) > 0 ? order.getAmountWithChildren() : order.getPaymentAmount();
+            for (OrderPaymentItem paymentItem : orderPaymentItems){
+                if (paymentItem.getPaymentModeId() == PayMode.COUPON_PAY){
+                    //支付金额减去已占用的优惠券金额
+                    payValue = payValue.subtract(paymentItem.getPayValue());
+                    usedCouponValue = paymentItem.getPayValue();
+                }
+            }
         }else{
+            for (OrderPaymentItem paymentItem : orderPaymentItems){
+                if (paymentItem.getPaymentModeId() == PayMode.COUPON_PAY){
+                    //支付金额减去已占用的优惠券金额
+                    usedCouponValue = paymentItem.getPayValue();
+                }
+            }
             //查询出该笔主订单下的子订单
             List<Order> orderList = orderService.selectListByParentId(orderId);
             for (Order subOrder : orderList){
                 if (subOrder.getOrderState() == OrderState.SUBMIT){
                     payValue = subOrder.getPaymentAmount();
+                    if (usedCouponValue.compareTo(BigDecimal.ZERO) == 0){
+                        orderPaymentItems = orderPaymentItemService.selectByOrderId(subOrder.getId());
+                        for (OrderPaymentItem paymentItem : orderPaymentItems){
+                            if (paymentItem.getPaymentModeId() == PayMode.COUPON_PAY){
+                                //支付金额减去已占用的优惠券金额
+                                payValue = payValue.subtract(paymentItem.getPayValue());
+                                usedCouponValue = paymentItem.getPayValue();
+                            }
+                        }
+                    }else if (subOrder.getOrderState() != OrderState.CANCEL){
+                        orderPaymentItems = orderPaymentItemService.selectByOrderId(subOrder.getId());
+                        for (OrderPaymentItem paymentItem : orderPaymentItems){
+                            if (paymentItem.getPaymentModeId() == PayMode.COUPON_PAY){
+                                //支付金额减去已占用的优惠券金额
+                                usedCouponValue = paymentItem.getPayValue();
+                            }
+                        }
+                    }
                 }
-            }
-        }
-        //支付的余额
-        BigDecimal accountPayValue = BigDecimal.ZERO;
-        //支付的优惠券
-        BigDecimal couponValue = BigDecimal.ZERO;
-        for (OrderPaymentItem paymentItem : paymentItemList) {
-            if (paymentItem.getPaymentModeId() == PayMode.COUPON_PAY) {
-                usedCouponValue = paymentItem.getPayValue();
-                //待支付金额减去已使用过的优惠券
-                payValue = payValue.subtract(usedCouponValue);
             }
         }
         //查询到订单对应用户
