@@ -37,6 +37,8 @@ public class OrderItemDto implements Serializable {
         this.kitchenId = "";
         this.parentId = orderItem.getParentId() == null ? "" : orderItem.getParentId();
         this.mealItemId = orderItem.getMealItemId();
+        this.weight = orderItem.getWeight();
+        this.needRemind = orderItem.getNeedRemind();
     }
 
     //状态
@@ -84,8 +86,25 @@ public class OrderItemDto implements Serializable {
     //套餐子项id
     private Integer mealItemId;
 
+    private BigDecimal weight;
 
+    private Integer needRemind;
 
+    public BigDecimal getWeight() {
+        return weight;
+    }
+
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
+    }
+
+    public Integer getNeedRemind() {
+        return needRemind;
+    }
+
+    public void setNeedRemind(Integer needRemind) {
+        this.needRemind = needRemind;
+    }
 
     public Integer getPrintFailFlag() {
         return printFailFlag;

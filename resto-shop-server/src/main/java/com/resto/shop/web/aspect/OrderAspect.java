@@ -1801,11 +1801,11 @@ public class OrderAspect {
         Customer customer = customerService.selectById(order.getCustomerId());
         if (customer != null) {
             WechatConfig config = wechatConfigService.selectByBrandId(customer.getBrandId());
-            ShopDetail shopDetail = shopDetailService.selectById(order.getShopDetailId());
+            BrandSetting setting = brandSettingService.selectByBrandId(order.getBrandId());
             Brand brand = brandService.selectById(order.getBrandId());
             StringBuffer msg = new StringBuffer();
             msg.append("交易码:" + order.getVerCode() + "\n");
-            msg.append("请留意叫号信息");
+            msg.append("<a href='" + setting.getWechatWelcomeUrl() + "?subpage=my&waitQueue=" + order.getId() + "&shopId=" + order.getShopDetailId() + "'>请留意叫号信息</a>");
             String result = WeChatUtils.sendCustomerMsg(msg.toString(), customer.getWechatId(), config.getAppid(), config.getAppsecret());
 //        UserActionUtils.writeToFtp(LogType.ORDER_LOG, brand.getBrandName(), shopDetail.getName(), order.getId(),
 //                "订单发送推送：" + msg.toString());

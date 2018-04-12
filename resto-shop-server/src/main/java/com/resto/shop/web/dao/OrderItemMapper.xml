@@ -28,6 +28,8 @@
         <result column="print_fail_flag" property="printFailFlag"/>
         <result column="meal_fee_number" property="mealFeeNumber"/>
         <result column="customer_id" property="customerId"/>
+        <result column="weight" property="weight"/>
+        <result column="need_remind" property="needRemind"/>
         <association property="orderRefundRemark" javaType="com.resto.shop.web.model.OrderRefundRemark">
             <id column="id1" property="id" jdbcType="BIGINT"/>
             <result column="article_id1" property="articleId" jdbcType="VARCHAR"/>
@@ -43,8 +45,8 @@
     </resultMap>
     <sql id="Base_Column_List">
     id, article_name, article_designation, `count`, original_price, unit_price, base_unit_price, final_price,
-    remark, pos_discount, sort, status, order_id, article_id, `type`, parent_id, create_time,meal_item_id,recommend_id,orgin_count,refund_count,
-    change_count,print_fail_flag,customer_id
+    remark, pos_discount, sort, status, order_id, article_id, `type`, parent_id, create_time, meal_item_id, recommend_id, orgin_count, refund_count,
+    change_count, print_fail_flag, customer_id, weight, need_remind
   </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
         select
@@ -136,6 +138,12 @@
             <if test="customerId != null">
                 customer_id,
             </if>
+            <if test="weight != null">
+                weight,
+            </if>
+            <if test="needRemind != null">
+                need_remind,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -201,6 +209,12 @@
             <if test="customerId != null">
                 #{customerId},
             </if>
+            <if test="weight != null">
+                #{weight},
+            </if>
+            <if test="needRemind != null">
+                #{needRemind},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.OrderItem">
@@ -251,9 +265,9 @@
             <if test="parentId != null">
                 parent_id = #{parentId,jdbcType=VARCHAR},
             </if>
-            <if test="createTime != null">
-                create_time = #{createTime,jdbcType=TIMESTAMP},
-            </if>
+            <!--<if test="createTime != null">-->
+                <!--create_time = #{createTime,jdbcType=TIMESTAMP},-->
+            <!--</if>-->
             <if test="refundCount != null">
                 refund_count = #{refundCount} + refund_count,
             </if>
@@ -265,6 +279,12 @@
             </if>
             <if test="customerId != null">
                 customer_id = #{customerId},
+            </if>
+            <if test="weight != null">
+                weight = #{weight},
+            </if>
+            <if test="needRemind != null">
+                need_remind = #{needRemind},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -333,14 +353,144 @@
         ORDER BY create_time
     </select>
     <insert id="insertBatch">
-        insert into tb_order_item
-        (id, article_name, article_designation, count, original_price, unit_price, base_unit_price, final_price, remark, pos_discount, sort, status,
-        order_id, article_id,type,parent_id,meal_item_id,recommend_id,orgin_count,meal_fee_number)
-        values
-        <foreach collection="list" item="t" separator=",">
-            (#{t.id},#{t.articleName},#{t.articleDesignation},#{t.count},#{t.originalPrice},
-            #{t.unitPrice},#{t.baseUnitPrice},#{t.finalPrice},#{t.remark},#{t.posDiscount},#{t.sort},#{t.status},#{t.orderId},#{t.articleId},
-            #{t.type},#{t.parentId},#{t.mealItemId},#{t.recommendId},#{t.count},#{t.mealFeeNumber})
+        <foreach collection="list" item="item" separator=";">
+            insert into tb_order_item
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">
+                    id,
+                </if>
+                <if test="item.articleName != null">
+                    article_name,
+                </if>
+                <if test="item.articleDesignation != null">
+                    article_designation,
+                </if>
+                <if test="item.count != null">
+                    `count`,
+                </if>
+                <if test="item.originalPrice != null">
+                    original_price,
+                </if>
+                <if test="item.unitPrice != null">
+                    unit_price,
+                </if>
+                <if test="item.baseUnitPrice != null">
+                    base_unit_price,
+                </if>
+                <if test="item.finalPrice != null">
+                    final_price,
+                </if>
+                <if test="item.remark != null">
+                    remark,
+                </if>
+                <if test="item.posDiscount != null">
+                    pos_discount,
+                </if>
+                <if test="item.sort != null">
+                    sort,
+                </if>
+                <if test="item.status != null">
+                    status,
+                </if>
+                <if test="item.orderId != null">
+                    order_id,
+                </if>
+                <if test="item.articleId != null">
+                    article_id,
+                </if>
+                <if test="item.type != null">
+                    `type`,
+                </if>
+                <if test="item.parentId != null">
+                    parent_id,
+                </if>
+                <if test="item.count != null">
+                    orgin_count,
+                </if>
+                <if test="item.changeCount != null">
+                    change_count,
+                </if>
+                <if test="item.printFailFlag != null">
+                    print_fail_flag,
+                </if>
+                <if test="item.customerId != null">
+                    customer_id,
+                </if>
+                <if test="item.weight != null">
+                    weight,
+                </if>
+                <if test="item.needRemind != null">
+                    need_remind,
+                </if>
+            </trim>
+            <trim prefix="values (" suffix=")" suffixOverrides=",">
+                <if test="item.id != null">
+                    #{item.id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.articleName != null">
+                    #{item.articleName,jdbcType=VARCHAR},
+                </if>
+                <if test="item.articleDesignation != null">
+                    #{item.articleDesignation,jdbcType=VARCHAR},
+                </if>
+                <if test="item.count != null">
+                    #{item.count,jdbcType=INTEGER},
+                </if>
+                <if test="item.originalPrice != null">
+                    #{item.originalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.unitPrice != null">
+                    #{item.unitPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.baseUnitPrice != null">
+                    #{item.baseUnitPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.finalPrice != null">
+                    #{item.finalPrice,jdbcType=DECIMAL},
+                </if>
+                <if test="item.remark != null">
+                    #{item.remark,jdbcType=VARCHAR},
+                </if>
+                <if test="item.posDiscount != null">
+                    #{item.posDiscount,jdbcType=VARCHAR},
+                </if>
+                <if test="item.sort != null">
+                    #{item.sort,jdbcType=INTEGER},
+                </if>
+                <if test="item.status != null">
+                    #{item.status,jdbcType=INTEGER},
+                </if>
+                <if test="item.orderId != null">
+                    #{item.orderId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.articleId != null">
+                    #{item.articleId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.type != null">
+                    #{item.type,jdbcType=INTEGER},
+                </if>
+                <if test="item.parentId != null">
+                    #{item.parentId,jdbcType=VARCHAR},
+                </if>
+                <if test="item.count != null">
+                    #{item.count,jdbcType=INTEGER},
+                </if>
+                <if test="item.changeCount != null">
+                    #{item.changeCount,jdbcType=INTEGER},
+                </if>
+                <if test="item.printFailFlag != null">
+                    #{item.printFailFlag},
+                </if>
+                <if test="item.customerId != null">
+                    #{item.customerId},
+                </if>
+                <if test="item.weight != null">
+                    #{item.weight},
+                </if>
+                <if test="item.needRemind != null">
+                    #{item.needRemind},
+                </if>
+            </trim>
         </foreach>
     </insert>
 
@@ -363,15 +513,14 @@
   </select>
 
     <select id="getListBySort" resultType="OrderItem">
-select t.print_sort,t3.* from tb_meal_attr  t
-INNER JOIN tb_meal_item t2 on t2.meal_attr_id = t.id
-left join tb_order_item t3 on t3.article_id = t2.article_id
+        select t.print_sort,t3.* from tb_meal_attr  t
+        INNER JOIN tb_meal_item t2 on t2.meal_attr_id = t.id
+        left join tb_order_item t3 on t3.article_id = t2.article_id
 
-where  t.article_id =  #{articleid}
-and t3.parent_id = #{parentid}
-GROUP BY t3.id
-order by t.print_sort asc
-
+        where  t.article_id =  #{articleid}
+        and t3.parent_id = #{parentid}
+        GROUP BY t3.id
+        order by t.print_sort asc
   </select>
 
 

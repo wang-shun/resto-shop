@@ -77,6 +77,9 @@
         <result column="order_pos_discount_money" property="orderPosDiscountMoney"/>
         <result column="member_discount_money" property="memberDiscountMoney"/>
         <result column="member_discount" property="memberDiscount"/>
+        <result column="need_confirm_order_item" property="needConfirmOrderItem"/>
+        <result column="reduce_money" property="reduceMoney"/>
+        <result column="real_erase_money" property="realEraseMoney"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -211,7 +214,7 @@
         ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
         print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, is_consumption_rebate, group_id, before_id, order_before
         ,sauce_fee_count,sauce_fee_price,towel_fee_count,towel_fee_price,tableware_fee_count,tableware_fee_price,is_use_new_service,data_origin,
-        order_pos_discount_money,member_discount_money,member_discount
+        order_pos_discount_money,member_discount_money,member_discount,need_confirm_order_item,reduce_money，real_erase_money
     </sql>
 
 
@@ -279,10 +282,10 @@
 			IF(o.distribution_mode_id = 1 AND ISNULL(o.parent_order_id), 1, 0) tangshiCount,
 			IF(o.distribution_mode_id = 3 AND ISNULL(o.parent_order_id), 1, 0) waidaiCount,
 			IF(o.distribution_mode_id = 2 AND ISNULL(o.parent_order_id), 1, 0) waimaiCount,
-			SUM(toi.unit_price * toi.count) + o.service_price + o.meal_fee_price orderPrice,
-			SUM(IF(o.distribution_mode_id=1, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price tangshiPrice,
-			SUM(IF(o.distribution_mode_id=3, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price waidaiPrice,
-			SUM(IF(o.distribution_mode_id=2, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price waimaiPrice
+			SUM(toi.final_price) + o.service_price + o.meal_fee_price orderPrice,
+			SUM(IF(o.distribution_mode_id=1, (toi.final_price),null)) + o.service_price + o.meal_fee_price tangshiPrice,
+			SUM(IF(o.distribution_mode_id=3, (toi.final_price),null)) + o.service_price + o.meal_fee_price waidaiPrice,
+			SUM(IF(o.distribution_mode_id=2, (toi.final_price),null)) + o.service_price + o.meal_fee_price waimaiPrice
 		FROM tb_order o
 		INNER JOIN tb_order_item toi
 		on o.id = toi.order_id
@@ -363,10 +366,10 @@
 			IF(o.distribution_mode_id = 1 AND ISNULL(o.parent_order_id), 1, 0) tangshiCount,
 			IF(o.distribution_mode_id = 3 AND ISNULL(o.parent_order_id), 1, 0) waidaiCount,
 			IF(o.distribution_mode_id = 2 AND ISNULL(o.parent_order_id), 1, 0) waimaiCount,
-			SUM(toi.unit_price * toi.count) + o.service_price + o.meal_fee_price orderPrice,
-			SUM(IF(o.distribution_mode_id=1, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price tangshiPrice,
-			SUM(IF(o.distribution_mode_id=3, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price waidaiPrice,
-			SUM(IF(o.distribution_mode_id=2, (toi.unit_price * toi.count),null)) + o.service_price + o.meal_fee_price waimaiPrice
+			SUM(toi.final_price) + o.service_price + o.meal_fee_price orderPrice,
+			SUM(IF(o.distribution_mode_id=1, (toi.final_price),null)) + o.service_price + o.meal_fee_price tangshiPrice,
+			SUM(IF(o.distribution_mode_id=3, (toi.final_price),null)) + o.service_price + o.meal_fee_price waidaiPrice,
+			SUM(IF(o.distribution_mode_id=2, (toi.final_price),null)) + o.service_price + o.meal_fee_price waimaiPrice
 		FROM tb_order o
 		INNER JOIN tb_order_item toi
 		on o.id = toi.order_id

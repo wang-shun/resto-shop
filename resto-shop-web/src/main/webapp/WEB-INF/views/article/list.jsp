@@ -81,6 +81,24 @@
                                     <input type="text" class="form-control" name="fansPrice" v-model="m.fansPrice">
                                 </div>
                             </div>
+
+                            <div class="form-group col-md-4" v-if="shop.posVersion == 1 && shop.allowAfterPay == 0">
+                                <label class="col-md-5 control-label">是否是称重菜品</label>
+                                <div class="col-md-7 radio-list">
+                                    <label class="radio-inline">
+                                        <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
+                                               v-model="m.openCatty">开启
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-md-4">
+                                <label class="col-md-5 control-label">称斤价格(单位：元/斤)</label>
+                                <div class="col-md-7">
+                                    <input type="text" class="form-control" name="cattyMoney" v-model="m.cattyMoney">
+                                </div>
+                            </div>
+
                             <div class="form-group col-md-4">
                                 <label class="col-md-5 control-label">排序</label>
                                 <div class="col-md-7">
@@ -206,7 +224,7 @@
                             </div>
 
                             <div class="form-group col-md-4">
-                                <label class="col-md-5 control-label">开启提醒</label>
+                                <label class="col-md-5 control-label">开启提醒(预点餐)</label>
                                 <div class="col-md-7 radio-list">
                                     <label class="radio-inline">
                                         <input type="checkbox" v-bind:true-value="1" v-bind:false-value="0"
@@ -334,6 +352,17 @@
                             </div>
                             <div class="clearfix"></div>
 
+                            <div class="form-group col-md-10" v-if="m.openCatty==1">
+                                <label class="col-md-2 text-right">重量包</label>
+                                <div class="col-md-10">
+                                    <select name="weightPackageId" v-model="m.weightPackageId">
+                                        <option value="">未选择重量包</option>
+                                        <option :value="f.id" v-for="f in weightPackageList">
+                                            {{f.name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
 
                             <div class="form-group col-md-10" v-if="m.articleType==1">
                                 <label class="col-md-2 text-right">推荐餐品包</label>
@@ -905,6 +934,7 @@
                     data: {
                         articlefamilys: [],
                         recommendList: [],
+                        weightPackageList: [],
                         supportTimes: [],
                         kitchenList: [],
                         virtualList : [],
@@ -922,6 +952,8 @@
                         singleItem:[],
                         searchNameLike : "",
                         canSave : true, //用于判断是否可以点击保存按钮
+                        shop: {},
+                        brand: {},
                     },
                     methods: {
                         itemDefaultChange: function (attr, item) {
@@ -1475,6 +1507,10 @@
                             that.recommendList = data;
                         });
 
+                        $.post("weightPackage/list_all", null, function (data) {
+                            that.weightPackageList = data;
+                        });
+
                         $.post("supporttime/list_all", null, function (data) {
                             that.supportTimes = data;
                         });
@@ -1486,6 +1522,15 @@
                         });
                         $.post("virtual/listAll", null, function (data) {
                             that.virtualList = data;
+                        });
+                        $.ajax({
+                            url:"shopInfo/list_one",
+                            type:"post",
+                            dataType:"json",
+                            success:function (resultData) {
+                                that.shop = resultData.data.shop;
+                                that.brand = resultData.data.brand;
+                            }
                         });
                         $.post("articleattr/list_all", null, function (data) {
                             var article_units = {};

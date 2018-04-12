@@ -166,11 +166,21 @@ public class Article implements Serializable{
 
     private Integer openCatty;             //是否开启称斤买卖菜品
 
-    private BigDecimal cattyMoney;         //称斤买卖 价格 单位（g）
+    private BigDecimal cattyMoney;         //称斤买卖 价格 单位（500g  斤）
 
     private Integer needRemind;            //是否需要优先提醒添加此菜品
 
     private String gifUrl;                 //gif图片路径
+
+    private Integer weightPackageId;       //重量包id
+
+    public Integer getWeightPackageId() {
+        return weightPackageId;
+    }
+
+    public void setWeightPackageId(Integer weightPackageId) {
+        this.weightPackageId = weightPackageId;
+    }
 
     public String getPhotoSuper() {
         return photoSuper;

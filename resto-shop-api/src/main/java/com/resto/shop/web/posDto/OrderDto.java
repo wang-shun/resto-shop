@@ -51,6 +51,9 @@ public class OrderDto implements Serializable {
         this.mealFeePrice = order.getMealFeePrice();
         this.isPosPay = order.getIsPosPay();
         this.allowAppraise = order.getAllowAppraise();
+        this.needConfirmOrderItem = order.getNeedConfirmOrderItem();
+        this.reduceMoney = order.getReduceMoney();
+        this.realEraseMoney = order.getRealEraseMoney();
     }
 
     //订单id
@@ -129,6 +132,28 @@ public class OrderDto implements Serializable {
     private List<OrderRefundRemark> orderRefundRemarks;
 
     private Integer dataOrigin;
+
+    private Integer needConfirmOrderItem;
+
+    private BigDecimal reduceMoney;
+
+    private Integer realEraseMoney;
+
+    public BigDecimal getReduceMoney() {
+        return reduceMoney;
+    }
+
+    public void setReduceMoney(BigDecimal reduceMoney) {
+        this.reduceMoney = reduceMoney;
+    }
+
+    public Integer getRealEraseMoney() {
+        return realEraseMoney;
+    }
+
+    public void setRealEraseMoney(Integer realEraseMoney) {
+        this.realEraseMoney = realEraseMoney;
+    }
 
     public Integer getDataOrigin() {
         return dataOrigin;
@@ -434,5 +459,13 @@ public class OrderDto implements Serializable {
 
     public void setAllowAppraise(Boolean allowAppraise) {
         this.allowAppraise = allowAppraise;
+    }
+
+    public Integer getNeedConfirmOrderItem() {
+        return needConfirmOrderItem;
+    }
+
+    public void setNeedConfirmOrderItem(Integer needConfirmOrderItem) {
+        this.needConfirmOrderItem = needConfirmOrderItem;
     }
 }

@@ -56,6 +56,7 @@
         <result column="gif_url" property="gifUrl"></result>
         <result column="photo_super" property="photoSuper"></result>
         <result column="photo_square_original" property="photoSquareOriginal"></result>
+        <result column="weight_package_id" property="weightPackageId"></result>
     </resultMap>
     <sql id="Base_Column_List">
         id, name, name_alias, name_short, photo_big, photo_small, ingredients, description,
@@ -64,7 +65,8 @@
         fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc,
         is_remind,article_type,stock_working_day,stock_weekend,inventory_warning,current_working_stock,
         recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id,initials,
-        photo_type,photo_little,open_catty,catty_money,need_remind,gif_url,photo_super,photo_square_original
+        photo_type,photo_little,open_catty,catty_money,need_remind,gif_url,photo_super,photo_square_original,
+        weight_package_id
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
         select
@@ -261,6 +263,9 @@
             <if test="photoSquareOriginal != null">
                 photo_square_original,
             </if>
+            <if test="weightPackageId != null">
+                weight_package_id,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -416,6 +421,9 @@
             <if test="photoSquareOriginal != null">
                 #{photoSquareOriginal},
             </if>
+            <if test="weightPackageId != null">
+                #{weightPackageId},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Article">
@@ -570,6 +578,9 @@
             <if test="photoSquareOriginal != null">
                 photo_square_original = #{photoSquareOriginal},
             </if>
+            <if test="weightPackageId != null">
+                weight_package_id = #{weightPackageId},
+            </if>
             photo_square = null
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -644,7 +655,7 @@
         a.sort,a.remain_number,a.article_family_id,a.price,a.recommend_id,a.is_hidden,a.virtual_id,
         a.fans_price,a.has_unit,a.unit,a.article_type,a.likes,a.current_working_stock,
         a.photo_type,a.photo_little,a.open_catty,a.catty_money,a.need_remind,a.gif_url,
-        a.photo_super,a.photo_square_original,
+        a.photo_super,a.photo_square_original,a.weight_package_id,
         (select  count(1) from tb_article_unit_new where article_id = a.id) as newUnit,
         if(a.recommend_id is not null,1,0) as recommendCount
         FROM tb_article a,tb_article_family f
@@ -685,6 +696,7 @@
             a.need_remind,
             a.gif_url,
             a.current_working_stock,
+            a.weight_package_id,
           f.recommend_sort,
             (
                 SELECT
@@ -748,39 +760,38 @@
   	update tb_article set likes = #{1} where id=#{0}
   </update>
 
-    <update id="initSuitStock">
+  <update id="initSuitStock">
+    update tb_article t ,
+    (
+    select min(stock_working_day_count) as stock_working_day_count,
+    min(stock_weekend_count) as stock_weekend_count,
+    article_name,id from (select max(t4.stock_weekend) as stock_weekend_count ,max(t4.stock_working_day) as stock_working_day_count,
+    t2.name,t.name as article_name,t.id from tb_article t
+    INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
+    INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
+    INNER JOIN tb_article t4 on t4.id = t3.article_id
+    where t.article_type = 2
 
-update tb_article t ,
-(
-select min(stock_working_day_count) as stock_working_day_count,
-min(stock_weekend_count) as stock_weekend_count,
-article_name,id from (select max(t4.stock_weekend) as stock_weekend_count ,max(t4.stock_working_day) as stock_working_day_count,
-t2.name,t.name as article_name,t.id from tb_article t
-INNER JOIN tb_meal_attr t2 on t2.article_id = t.id
-INNER JOIN tb_meal_item t3 on t3.meal_attr_id = t2.id
-INNER JOIN tb_article t4 on t4.id = t3.article_id
-where t.article_type = 2
-
-GROUP BY t2.name
-) as r
-GROUP BY article_name
-) as b
-set t.stock_weekend = b.stock_weekend_count,
-t.stock_working_day = b.stock_working_day_count
-where t.id = b.id
+    GROUP BY t2.name
+    ) as r
+    GROUP BY article_name
+    ) as b
+    set t.stock_weekend = b.stock_weekend_count,
+    t.stock_working_day = b.stock_working_day_count
+    where t.id = b.id
   </update>
 
 
-    <update id="initSize">
+  <update id="initSize">
     update tb_article t ,(
-select article_id, sum(stock_working_day) as stock_working_day_count,
-sum(stock_weekend) as stock_weekend_count
- from tb_article_price
-GROUP BY article_id
-) as t2
-set t.stock_weekend = t2.stock_weekend_count,
-t.stock_working_day = t2.stock_working_day_count
-where t.id = t2.article_id
+    select article_id, sum(stock_working_day) as stock_working_day_count,
+    sum(stock_weekend) as stock_weekend_count
+     from tb_article_price
+    GROUP BY article_id
+    ) as t2
+    set t.stock_weekend = t2.stock_weekend_count,
+    t.stock_working_day = t2.stock_working_day_count
+    where t.id = t2.article_id
   </update>
 
 
@@ -866,12 +877,12 @@ where t.id = t2.article_id
 
     <update id="clearMain">
     update tb_article ,
- (select article_id from tb_article_price where id = #{articleId} ) as b
-set current_working_stock = 0
-, is_empty = 1 , empty_remark = #{emptyRemark}
-where id = b.article_id
-and (select count(1) from tb_article_price where article_id = b.article_id ) = (select count(1) from
-tb_article_price where article_id = b.article_id  and current_working_stock = 0)
+     (select article_id from tb_article_price where id = #{articleId} ) as b
+    set current_working_stock = 0
+    , is_empty = 1 , empty_remark = #{emptyRemark}
+    where id = b.article_id
+    and (select count(1) from tb_article_price where article_id = b.article_id ) = (select count(1) from
+    tb_article_price where article_id = b.article_id  and current_working_stock = 0)
   </update>
 
     <update id="initEmpty">
@@ -926,10 +937,10 @@ tb_article_price where article_id = b.article_id  and current_working_stock = 0)
     </select>
 
     <select id="getArticleByMeal" resultType="Article">
-select * from tb_article where id in (  select article_id from tb_meal_item where meal_attr_id in
-(select id from tb_meal_attr where article_id = #{articleId})
-GROUP BY article_id
-) and state = 1
+        select * from tb_article where id in (  select article_id from tb_meal_item where meal_attr_id in
+        (select id from tb_meal_attr where article_id = #{articleId})
+        GROUP BY article_id
+        ) and state = 1
     </select>
 
     <select id="selectByPid" resultType="Article">

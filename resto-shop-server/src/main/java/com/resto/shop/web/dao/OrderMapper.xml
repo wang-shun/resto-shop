@@ -215,6 +215,12 @@
         <result column="tableware_fee_price" property="tablewareFeePrice"/>
         <result column="is_use_new_service" property="isUseNewService"/>
         <result column="data_origin" property="dataOrigin"/>
+        <result column="order_pos_discount_money" property="orderPosDiscountMoney"/>
+        <result column="member_discount_money" property="memberDiscountMoney"/>
+        <result column="member_discount" property="memberDiscount"/>
+        <result column="need_confirm_order_item" property="needConfirmOrderItem"/>
+        <result column="reduce_money" property="reduceMoney"/>
+        <result column="real_erase_money" property="realEraseMoney"/>
         <collection property="orderPaymentItems" ofType="com.resto.shop.web.model.OrderPaymentItem" javaType="List">
             <id column="order_payment_id" property="id"/>
             <result column="pay_value" property="payValue"/>
@@ -383,7 +389,8 @@
         last_order_time,customer_count,service_price,pay_mode,base_money,base_order_money,base_customer_count,meal_fee_price,meal_all_number
         ,is_pay,need_scan, base_meal_all_count, pay_type,is_confirm, is_refund_order, is_get_share_coupon, give_change, is_pos_pay,
         print_fail_flag,print_kitchen_flag, pos_discount, erase_money, no_discount_money, is_consumption_rebate, group_id, before_id, order_before
-        ,sauce_fee_count,sauce_fee_price,towel_fee_count,towel_fee_price,tableware_fee_count,tableware_fee_price,is_use_new_service,data_origin
+        ,sauce_fee_count,sauce_fee_price,towel_fee_count,towel_fee_price,tableware_fee_count,tableware_fee_price,is_use_new_service,data_origin,
+        order_pos_discount_money,member_discount_money,member_discount,need_confirm_order_item,reduce_money,real_erase_money
     </sql>
     <select id="selectByPrimaryKey" resultMap="BaseResultMap"
             parameterType="java.lang.String">
@@ -655,6 +662,24 @@
             <if test="dataOrigin != null">
                 data_origin,
             </if>
+            <if test="orderPosDiscountMoney != null">
+                order_pos_discount_money,
+            </if>
+            <if test="memberDiscountMoney != null">
+                member_discount_money,
+            </if>
+            <if test="memberDiscount != null">
+                member_discount,
+            </if>
+            <if test="needConfirmOrderItem != null">
+                need_confirm_order_item,
+            </if>
+            <if test="reduceMoney != null">
+                reduce_money,
+            </if>
+            <if test="realEraseMoney != null">
+                real_erase_money,
+            </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="id != null">
@@ -858,6 +883,24 @@
             <if test="dataOrigin != null">
                 #{dataOrigin},
             </if>
+            <if test="orderPosDiscountMoney != null">
+                #{orderPosDiscountMoney},
+            </if>
+            <if test="memberDiscountMoney != null">
+                #{memberDiscountMoney},
+            </if>
+            <if test="memberDiscount != null">
+                #{memberDiscount},
+            </if>
+            <if test="needConfirmOrderItem != null">
+                #{needConfirmOrderItem},
+            </if>
+            <if test="reduceMoney != null">
+                #{reduceMoney},
+            </if>
+            <if test="realEraseMoney != null">
+                #{realEraseMoney},
+            </if>
         </trim>
     </insert>
     <update id="updateByPrimaryKeySelective" parameterType="com.resto.shop.web.model.Order">
@@ -917,9 +960,9 @@
             <if test="remark != null">
                 remark = #{remark,jdbcType=VARCHAR},
             </if>
-            <if test="createTime != null">
-                create_time = #{createTime,jdbcType=TIMESTAMP},
-            </if>
+            <!--<if test="createTime != null">-->
+                <!--create_time = #{createTime,jdbcType=TIMESTAMP},-->
+            <!--</if>-->
             <if test="operatorId != null">
                 operator_id = #{operatorId,jdbcType=VARCHAR},
             </if>
@@ -1058,6 +1101,24 @@
             </if>
             <if test="dataOrigin != null">
                 data_origin = #{dataOrigin},
+            </if>
+            <if test="orderPosDiscountMoney != null">
+                order_pos_discount_money = #{orderPosDiscountMoney},
+            </if>
+            <if test="memberDiscountMoney != null">
+                member_discount_money = #{memberDiscountMoney},
+            </if>
+            <if test="memberDiscount != null">
+                member_discount = #{memberDiscount},
+            </if>
+            <if test="needConfirmOrderItem != null">
+                need_confirm_order_item = #{needConfirmOrderItem},
+            </if>
+            <if test="reduceMoney != null">
+                reduce_money = #{reduceMoney},
+            </if>
+            <if test="realEraseMoney != null">
+                real_erase_money = #{realEraseMoney},
             </if>
         </set>
         where id = #{id,jdbcType=VARCHAR}
@@ -2075,7 +2136,7 @@
         select group_concat(id) id,(count(1) - count(parent_order_id)) as orderCount,sum(orderTotal) as orderTotal,
         sum(customer_count) as customer_count
 		from (select t.id,t.parent_order_id,
-        SUM(toi.unit_price * toi.count) + service_price + meal_fee_price as orderTotal,
+        SUM(toi.final_price) + service_price + meal_fee_price as orderTotal,
         if(t.parent_order_id
         is null,t.customer_count,0) customer_count
         from tb_order t
@@ -2092,7 +2153,7 @@
     <select id="getOrderAccountByTime" parameterType="java.util.Map" resultType="com.resto.shop.web.model.Order">
         select t.id, SUM(toi.original_price * toi.count) + service_price + meal_fee_price originalAmount,
         t.parent_order_id parentOrderId,
-        SUM(toi.unit_price * toi.count) + service_price + meal_fee_price orderMoney,
+        SUM(toi.final_price) + service_price + meal_fee_price orderMoney,
         SUM((toi.original_price - toi.unit_price) * toi.count) discountMoney,
         IFNULL(t.customer_count,0) customerCount,
         t.production_status productionStatus
@@ -3351,7 +3412,7 @@ o.create_time>#{beginDate} AND  o.create_time<#{endDate}
         <if test="isFirstPay == true">
             and order_state in (2, 10, 11)
         </if>
-        and production_status = 1
+        and production_status = 1 and now() - create_time > 40
         and <![CDATA[ create_time >= #{beginDate} and create_time <= #{endDate}]]> order by create_time ASC
     </select>
 

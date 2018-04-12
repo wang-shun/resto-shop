@@ -646,6 +646,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     fans_price = item.getPrice();
                     mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
                     break;
+                case OrderItemType.WEIGHT_PACKAGE_ARTICLE:
+                    a = articleMap.get(item.getArticleId());
+                    item.setArticleName(item.getName());
+                    org_price = item.getPrice();
+                    price = item.getPrice();
+                    fans_price = item.getPrice();
+                    mealFeeNumber = a.getMealFeeNumber() == null ? 0 : a.getMealFeeNumber();
+                    item.setWeight(item.getWeight());
+                    break;
                 case OrderItemType.SETMEALS://套餐主品
                     a = articleMap.get(item.getArticleId());
                     if (a.getIsEmpty()) {
@@ -781,6 +790,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                 check = checkArticleList(item, item.getCount());
             } else if (item.getType() == OrderItemType.RECOMMEND) {
                 check = checkArticleList(item, item.getCount());
+            } else if (item.getType() == OrderItemType.WEIGHT_PACKAGE_ARTICLE) {
+                item.setNeedRemind(1);
+                order.setNeedConfirmOrderItem(1);
+                check = new Result(true);
             }
             jsonResult.setMessage(check.getMessage());
             jsonResult.setSuccess(check.isSuccess());
@@ -1331,7 +1344,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
     }
 
     public Result checkArticleList(OrderItem orderItem, int count) {
-
         Boolean result = true;
         String msg = "";
 
@@ -6654,6 +6666,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     //如果是套餐子项，那么更新子项库存
                 case OrderItemType.UNIT_NEW:
                     //如果是没有规格的单品信息,那么更新该单品的库存
+                case OrderItemType.WEIGHT_PACKAGE_ARTICLE:
+                    //如果是没有规格的单品信息,那么更新该单品的库存
                 case OrderItemType.ARTICLE:
                     //如果是没有规格的单品信息,那么更新该单品的库存
                 case OrderItemType.RECOMMEND:
@@ -8457,11 +8471,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         //微信支付
                         if (shopDetail.getWxServerId() == null) {
                             //独立商户模式
+                            String payCertPath = StringUtils.isEmpty(shopDetail.getPayCertPath()) ? config.getPayCertPath() : shopDetail.getPayCertPath();
+                            if (StringUtils.isBlank(payCertPath)){
+                                log.error("微信退款失败！失败信息：无退款证书");
+                                refundPayment.setRemark("微信退还金额：" + refund + "失败(无退款证书)，以线下退还现金的形式返还");
+                                refundPayment.setPaymentModeId(PayMode.REFUND_CRASH);
+                                continue;
+                            }
                             result = WeChatPayUtils.refund(refundPayment.getId(), payInfo.getString("transaction_id"), payInfo.getInt("total_fee")
                                     , refund.multiply(new BigDecimal(100)).intValue(), StringUtils.isEmpty(shopDetail.getAppid()) ? config.getAppid() : shopDetail.getAppid(),
                                     StringUtils.isEmpty(shopDetail.getMchid()) ? config.getMchid() : shopDetail.getMchid(),
                                     StringUtils.isEmpty(shopDetail.getMchkey()) ? config.getMchkey() : shopDetail.getMchkey(),
-                                    StringUtils.isEmpty(shopDetail.getPayCertPath()) ? config.getPayCertPath() : shopDetail.getPayCertPath());
+                                    payCertPath);
                         } else {
                             //服务商模式
                             WxServerConfig wxServerConfig = wxServerConfigService.selectById(shopDetail.getWxServerId());
@@ -8471,7 +8492,8 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                         }
                         if (result.containsKey("ERROR")) {
                             log.error("微信退款失败！失败信息：" + new JSONObject(result).toString());
-                            refundPayment.setRemark("微信退还金额：" + refund + "失败，以线下退还现金的形式返还");
+                            String remark = result.get("err_code_des");
+                            refundPayment.setRemark("微信退还金额：" + refund + "失败"+(StringUtils.isNotBlank(remark) ? "("+remark+")" : "")+"，以线下退还现金的形式返还");
                             refundPayment.setPaymentModeId(PayMode.REFUND_CRASH);
                         }else{
                             refundPayment.setResultData(JSON.toJSONString(result));
@@ -8663,13 +8685,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     order.setAllowCancel(false);
                     order.setPrintTimes(1);
                     order.setPaymentAmount(BigDecimal.valueOf(0));
-                    //后付 付款后立马不可加菜
-                    order.setAllowContinueOrder(false);
+                    //后付 付款后立马不可加菜(此逻辑取消了)
+                    //order.setAllowContinueOrder(false);
                     update(order);
                     updateChild(order);
-                    //后付 付款后直接确认订单  判断是否可以领取红包
-                    confirmOrder(order);
-
                 }
             }
         } catch (Exception e) {

@@ -56,6 +56,7 @@
         <result column="gif_url" property="gifUrl"></result>
         <result column="photo_super" property="photoSuper"></result>
         <result column="photo_square_original" property="photoSquareOriginal"></result>
+        <result column="weight_package_id" property="weightPackageId"></result>
     </resultMap>
     <sql id="Base_Column_List">
         id, name, name_alias, name_short, photo_big, photo_small, ingredients, description,
@@ -64,7 +65,8 @@
         fans_price, has_mult_price, has_unit, peference, unit, show_big, control_color,show_desc,
         is_remind,article_type,stock_working_day,stock_weekend,inventory_warning,current_working_stock,
         recommend_id,is_hidden,eleme_name,photo_square,meal_fee_number,is_main_food,virtual_id,initials,
-        photo_type,photo_little,open_catty,catty_money,need_remind,gif_url,photo_super,photo_square_original
+        photo_type,photo_little,open_catty,catty_money,need_remind,gif_url,photo_super,photo_square_original,
+        weight_package_id
     </sql>
 
     <select id="queryOrderArtcile" parameterType="java.util.Map" resultType="com.resto.brand.web.dto.ArticleSellDto">
@@ -87,7 +89,8 @@
         IFNULL(IF(ta.article_type = 2, SUM(IF(toi.type != 4,toi.refund_count * toi.unit_price,0)) + IFNULL(SUM((select SUM(trd.unit_price * trd.refund_count) from tb_order_item trd where trd.parent_id = toi.id)),0)
         ,SUM(IF(toi.type != 4,toi.refund_count * toi.unit_price,0))),0) refundTotal,
         IFNULL(SUM((toi.original_price - toi.unit_price) * toi.count),0) discountMoney,
-        ta.likes likes
+        ta.likes likes,
+        IFNULL(SUM(toi.weight),0) weight
         from tb_article ta
         inner join tb_article_price tap
         on ta.id = tap.article_id
@@ -124,7 +127,8 @@
         IFNULL(IF(ta.article_type = 2, SUM(IF(toi.type != 4,toi.refund_count * toi.unit_price,0)) + IFNULL(SUM((select SUM(trd.unit_price * trd.refund_count) from tb_order_item trd where trd.parent_id = toi.id)),0)
         ,SUM(IF(toi.type != 4,toi.refund_count * toi.unit_price,0))),0) refundTotal,
         IFNULL(SUM((toi.original_price - toi.unit_price) * toi.count),0) discountMoney,
-        ta.likes likes
+        ta.likes likes,
+        IFNULL(SUM(toi.weight),0) weight
         from tb_article ta
         inner join tb_order_item toi
         on ta.id = toi.article_id
