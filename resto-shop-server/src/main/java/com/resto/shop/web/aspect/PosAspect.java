@@ -81,7 +81,7 @@ public class PosAspect {
             case "weightPackage":
                 log.info("开始修改重量包后的后续操作");
                 //修改重量包
-                List<String> orderItemIds = (List<String>) returnObject.get("orderItemIds");
+                List<String> orderItemIds = JSON.parseObject(returnObject.getJSONArray("orderItemIds").toString(), new TypeReference<List<String>>(){});
                 //得到当前订单
                 order = orderService.selectById(orderIds.get(0));
                 //查询到当前用户
