@@ -1,5 +1,7 @@
 package com.resto.shop.web.aspect;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import com.resto.brand.core.util.WeChatUtils;
 import com.resto.brand.web.model.WechatConfig;
 import com.resto.brand.web.service.BrandSettingService;
@@ -72,7 +74,7 @@ public class PosAspect {
         //得到此次修改数据的业务类型
         String serverType = param.getString("serverType");
         JSONObject returnObject = new JSONObject(resultInfo);
-        List<String> orderIds = (List<String>) returnObject.get("orderIds");
+        List<String> orderIds = JSON.parseObject(returnObject.getJSONArray("orderIds").toString(), new TypeReference<List<String>>(){});
         Order order = new Order();
         //判断业务类型进行联动操作
         switch (serverType){
