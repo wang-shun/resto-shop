@@ -57,6 +57,8 @@ public class Order implements Serializable {
         this.mealFeePrice = orderDto.getMealFeePrice() == null ? BigDecimal.valueOf(0) : orderDto.getMealFeePrice();
         this.verCode = orderDto.getVerCode() == null ? "" : orderDto.getVerCode();
         this.allowAppraise = orderDto.getAllowAppraise() == null ? false : orderDto.getAllowAppraise();
+        this.reduceMoney = orderDto.getReduceMoney();
+        this.realEraseMoney = orderDto.getRealEraseMoney();
     }
 
 
@@ -333,6 +335,26 @@ public class Order implements Serializable {
     private BigDecimal memberDiscount;
 
     private Integer needConfirmOrderItem;
+
+    private BigDecimal reduceMoney;
+
+    private Integer realEraseMoney;
+
+    public BigDecimal getReduceMoney() {
+        return reduceMoney;
+    }
+
+    public void setReduceMoney(BigDecimal reduceMoney) {
+        this.reduceMoney = reduceMoney;
+    }
+
+    public Integer getRealEraseMoney() {
+        return realEraseMoney;
+    }
+
+    public void setRealEraseMoney(Integer realEraseMoney) {
+        this.realEraseMoney = realEraseMoney;
+    }
 
     public Integer getNeedConfirmOrderItem() {
         return needConfirmOrderItem;
