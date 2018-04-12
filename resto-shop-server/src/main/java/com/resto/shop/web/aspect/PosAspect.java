@@ -67,6 +67,7 @@ public class PosAspect {
         log.info("修改数据完成，进入切面返回信息：" + resultInfo);
         //得到调用此方法时传递的参数
         String paramData = (String) point.getArgs()[0];
+        log.info("调用方法是传递的参数：" + paramData);
         JSONObject param = new JSONObject(paramData);
         //得到此次修改数据的业务类型
         String serverType = param.getString("serverType");
