@@ -422,6 +422,21 @@
                 <if test="item.needRemind != null">
                     need_remind,
                 </if>
+                <if test="item.mealItemId != null">
+                    meal_item_id,
+                </if>
+                <if test="item.kitchenId != null">
+                    kitchen_id,
+                </if>
+                <if test="item.recommendId != null">
+                    recommend_id,
+                </if>
+                <if test="item.refundCount != null">
+                    refund_count,
+                </if>
+                <if test="item.mealFeeNumber != null">
+                    meal_fee_number,
+                </if>
             </trim>
             <trim prefix="values (" suffix=")" suffixOverrides=",">
                 <if test="item.id != null">
@@ -489,6 +504,21 @@
                 </if>
                 <if test="item.needRemind != null">
                     #{item.needRemind},
+                </if>
+                <if test="item.mealItemId != null">
+                    #{item.mealItemId},
+                </if>
+                <if test="item.kitchenId != null">
+                    #{item.kitchenId},
+                </if>
+                <if test="item.recommendId != null">
+                    #{item.recommendId},
+                </if>
+                <if test="item.refundCount != null">
+                    #{item.refundCount},
+                </if>
+                <if test="item.mealFeeNumber != null">
+                    #{item.mealFeeNumber},
                 </if>
             </trim>
         </foreach>
