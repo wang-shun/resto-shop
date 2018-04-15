@@ -272,6 +272,11 @@ var vueObj = new Vue({
                             var text = tdData;
                             if (rowData.weight > 0){
                                 text = text + "/" + rowData.weight + "斤";
+//                                var button = $("<button class='btn green btn-xs'>查看详情</button>");
+//                                button.click(function () {
+//                                    openModal(tdData);
+//                                });
+//                                text = [text, button];
 							}
                             $(td).html(text);
                         }
