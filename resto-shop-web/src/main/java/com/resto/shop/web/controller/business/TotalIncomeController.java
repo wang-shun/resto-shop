@@ -87,7 +87,7 @@ public class TotalIncomeController extends GenericController {
             shopDetailList = shopDetailService.selectByBrandId(getCurrentBrandId());
         }
         //封装品牌信息
-        ShopIncomeDto brandIncomeDto = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, getBrandName(), getCurrentBrandId(),BigDecimal.ZERO,BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+        ShopIncomeDto brandIncomeDto = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, getBrandName(), getCurrentBrandId(),BigDecimal.ZERO,BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         //封装店铺的信息
         List<ShopIncomeDto> shopIncomeDtos = new ArrayList<>();
 
@@ -95,7 +95,7 @@ public class TotalIncomeController extends GenericController {
         Map<String,String> mapRatio = new HashMap<>(16);
         //给每个店铺赋初始值
         for (ShopDetail s : shopDetailList) {
-            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, s.getName(), s.getId(),BigDecimal.ZERO,BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+            ShopIncomeDto sin = new ShopIncomeDto(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, s.getName(), s.getId(),BigDecimal.ZERO,BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
             shopIncomeDtos.add(sin);
             mapRatio.put(s.getId(),"");
 
@@ -176,6 +176,9 @@ public class TotalIncomeController extends GenericController {
                     shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(shopIncomeDtoPayMent.getArticleBackPay()));
                     shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(shopIncomeDtoPayMent.getOtherPayment()));
                     shopIncomeDto.setRefundCrashPayment(shopIncomeDto.getRefundCrashPayment().add(shopIncomeDtoPayMent.getRefundCrashPayment().abs()));
+                    //累加店铺实收金额 实收金额=微信支付+支付宝+现金+银联+充值金额支付+闪惠支付
+                    shopIncomeDto.setAmountCollected(shopIncomeDto.getAmountCollected().add(shopIncomeDtoPayMent.getWechatIncome()).add(shopIncomeDtoPayMent.getAliPayment()).add(shopIncomeDtoPayMent.getBackCartPay())
+                    .add(shopIncomeDtoPayMent.getMoneyPay()).add(shopIncomeDtoPayMent.getChargeAccountIncome()).add(shopIncomeDtoPayMent.getShanhuiPayment()));
                 }
             }
             brandIncomeDto.setOriginalAmount(brandIncomeDto.getOriginalAmount().add(shopIncomeDto.getOriginalAmount()));
@@ -194,6 +197,8 @@ public class TotalIncomeController extends GenericController {
             brandIncomeDto.setArticleBackPay(brandIncomeDto.getArticleBackPay().add(shopIncomeDto.getArticleBackPay()));
             brandIncomeDto.setOtherPayment(brandIncomeDto.getOtherPayment().add(shopIncomeDto.getOtherPayment()));
             brandIncomeDto.setRefundCrashPayment(brandIncomeDto.getRefundCrashPayment().add(shopIncomeDto.getRefundCrashPayment()));
+            //品牌累加实收金额
+            brandIncomeDto.setAmountCollected(brandIncomeDto.getAmountCollected().add(shopIncomeDto.getAmountCollected()));
         }
 
 
@@ -250,15 +255,15 @@ public class TotalIncomeController extends GenericController {
         map.put("beginDate", beginDate);
         map.put("reportType", "品牌营业额报表");// 表的头，第一行内容
         map.put("endDate", endDate);
-        map.put("num", "16");// 显示的位置
+        map.put("num", "17");// 显示的位置
         map.put("reportTitle", "品牌收入条目");// 表的名字
         map.put("timeType", "yyyy-MM-dd");
 
-        String[][] headers = {{"品牌/店铺", "20"}, {"原价销售总额(元)", "20"}, {"订单总额(元)", "16"}, {"微信支付(元)", "16"}, {"充值账户支付(元)", "19"}, {"红包支付(元)", "16"}, {"优惠券支付(元)", "17"},
-                {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"支付宝支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金实收(元)", "23"}, {"闪惠支付(元)", "23"}, {"会员支付(元)", "23"}
+        String[][] headers = {{"品牌/店铺", "20"}, {"原价销售总额(元)", "20"}, {"订单总额(元)", "16"}, {"实收金额(元)", "16"}, {"微信支付(元)", "16"}, {"支付宝支付(元)", "23"}, {"充值账户支付(元)", "19"}, {"红包支付(元)", "16"}, {"优惠券支付(元)", "17"},
+                {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金实收(元)", "23"}, {"闪惠支付(元)", "23"}, {"会员支付(元)", "23"}
                 , {"退菜返还红包(元)", "23"}, {"其它支付(元)", "23"}, {"现金退款(元)", "23"}};
-        String[] columns = {"shopName", "originalAmount", "totalIncome", "wechatIncome", "chargeAccountIncome", "redIncome", "couponIncome",
-                "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment"
+        String[] columns = {"shopName", "originalAmount", "totalIncome", "amountCollected", "wechatIncome", "aliPayment", "chargeAccountIncome", "redIncome", "couponIncome",
+                "chargeGifAccountIncome", "waitNumberIncome", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment"
                 ,"articleBackPay", "otherPayment", "refundCrashPayment"};
 
         List<ShopIncomeDto> result = new ArrayList<>();
@@ -367,7 +372,7 @@ public class TotalIncomeController extends GenericController {
                     for (int day = 0; day < monthDay; day++) {
                         Date beginDate = getBeginDay(year, month, day);
                         Date endDate = getEndDay(year, month, day);
-                        ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, shopDetail.getName(), shopDetail.getId(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+                        ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, shopDetail.getName(), shopDetail.getId(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
                         for (ShopIncomeDto incomeDto : shopIncomeDtosItems){
                             if (endDate.getTime() >= incomeDto.getCreateTime().getTime() && beginDate.getTime() <= incomeDto.getCreateTime().getTime()) {
                                 shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(incomeDto.getOriginalAmount()));
@@ -390,6 +395,9 @@ public class TotalIncomeController extends GenericController {
                                 shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(incomeDto.getArticleBackPay()));
                                 shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(incomeDto.getOtherPayment()));
                                 shopIncomeDto.setRefundCrashPayment(shopIncomeDto.getRefundCrashPayment().add(incomeDto.getRefundCrashPayment()));
+                                //累加店铺实收金额 实收金额=微信支付+支付宝+现金+银联+充值金额支付+闪惠支付
+                                shopIncomeDto.setAmountCollected(shopIncomeDto.getAmountCollected().add(incomeDto.getWechatIncome()).add(incomeDto.getAliPayment()).add(incomeDto.getBackCartPay())
+                                        .add(incomeDto.getMoneyPay()).add(incomeDto.getChargeAccountIncome()).add(incomeDto.getShanhuiPayment()));
                             }
                         }
                         int restoNum = 0;
@@ -454,7 +462,7 @@ public class TotalIncomeController extends GenericController {
                 for (int day = 0; day < monthDay; day++) {
                     Date beginDate = getBeginDay(year, month, day);
                     Date endDate = getEndDay(year, month, day);
-                    ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, getBrandName(), getCurrentBrandId(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
+                    ShopIncomeDto shopIncomeDto = new ShopIncomeDto(format.format(beginDate), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, getBrandName(), getCurrentBrandId(), BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
                     for (ShopIncomeDto incomeDto : shopIncomeDtosItems){
                         if (endDate.getTime() >= incomeDto.getCreateTime().getTime() && beginDate.getTime() <= incomeDto.getCreateTime().getTime()) {
                             shopIncomeDto.setOriginalAmount(shopIncomeDto.getOriginalAmount().add(incomeDto.getOriginalAmount()));
@@ -477,6 +485,9 @@ public class TotalIncomeController extends GenericController {
                             shopIncomeDto.setArticleBackPay(shopIncomeDto.getArticleBackPay().add(incomeDto.getArticleBackPay()));
                             shopIncomeDto.setOtherPayment(shopIncomeDto.getOtherPayment().add(incomeDto.getOtherPayment()));
                             shopIncomeDto.setRefundCrashPayment(shopIncomeDto.getRefundCrashPayment().add(incomeDto.getRefundCrashPayment()));
+                            //累加品牌实收金额 实收金额=微信支付+支付宝+现金+银联+充值金额支付+闪惠支付
+                            shopIncomeDto.setAmountCollected(shopIncomeDto.getAmountCollected().add(incomeDto.getWechatIncome()).add(incomeDto.getAliPayment()).add(incomeDto.getBackCartPay())
+                                    .add(incomeDto.getMoneyPay()).add(incomeDto.getChargeAccountIncome()).add(incomeDto.getShanhuiPayment()));
                         }
                     }
                     result[0][j] = shopIncomeDto;
@@ -488,14 +499,14 @@ public class TotalIncomeController extends GenericController {
             map.put("beginDate", year.concat("-").concat(month).concat("-01"));
             map.put("reportType", typeName);// 表的头，第一行内容
             map.put("endDate", year.concat("-").concat(month).concat("-").concat(String.valueOf(monthDay)));
-            map.put("num", "15");// 显示的位置
+            map.put("num", "18");// 显示的位置
             map.put("timeType", "yyyy-MM-dd");
             map.put("reportTitle", shopNames);// 表的名字
-            String[][] headers = {{"日期", "20"}, {"原价销售总额(元)", "20"}, {"订单总额(元)", "16"}, {"微信支付(元)", "16"}, {"充值账户支付(元)", "19"}, {"红包支付(元)", "16"}, {"优惠券支付(元)", "17"},
-                    {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"支付宝支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金实收(元)", "23"}, {"闪惠支付(元)", "23"}, {"会员支付(元)", "23"}
+            String[][] headers = {{"日期", "20"}, {"原价销售总额(元)", "20"}, {"订单总额(元)", "16"}, {"实收金额(元)", "16"}, {"微信支付(元)", "16"}, {"支付宝支付(元)", "23"}, {"充值账户支付(元)", "19"}, {"红包支付(元)", "16"}, {"优惠券支付(元)", "17"},
+                    {"充值赠送支付(元)", "23"}, {"等位红包支付(元)", "23"}, {"银联支付(元)", "23"}, {"现金实收(元)", "23"}, {"闪惠支付(元)", "23"}, {"会员支付(元)", "23"}
                     , {"退菜返还红包(元)", "23"}, {"其它支付(元)", "23"}, {"现金退款(元)", "23"},{"连接率","23"}};
-            String[] columns = {"date", "originalAmount", "totalIncome", "wechatIncome", "chargeAccountIncome", "redIncome", "couponIncome",
-                    "chargeGifAccountIncome", "waitNumberIncome", "aliPayment", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment"
+            String[] columns = {"date", "originalAmount", "totalIncome", "amountCollected", "wechatIncome", "aliPayment", "chargeAccountIncome", "redIncome", "couponIncome",
+                    "chargeGifAccountIncome", "waitNumberIncome", "backCartPay", "moneyPay", "shanhuiPayment","integralPayment"
                     ,"articleBackPay", "otherPayment", "refundCrashPayment","connctRatio"};
             ExcelUtil<ShopIncomeDto> excelUtil = new ExcelUtil<>();
             OutputStream out = new FileOutputStream(path);

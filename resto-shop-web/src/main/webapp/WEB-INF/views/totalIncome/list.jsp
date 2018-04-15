@@ -192,8 +192,16 @@
                 data : "totalIncome",
             },
             {
+                title : "实收金额",
+                data : "amountCollected",
+            },
+            {
                 title : "微信支付",
                 data : "wechatIncome",
+            },
+            {
+                title : "支付宝支付",
+                data : "aliPayment"
             },
             {
                 title : "充值账户支付",
@@ -214,10 +222,6 @@
             {
                 title : "等位红包支付",
                 data : "waitNumberIncome",
-            },
-            {
-                title : "支付宝支付",
-                data : "aliPayment"
             },
             {
                 title : "刷卡支付",
@@ -272,8 +276,16 @@
                 data : "totalIncome",
             },
             {
+                title : "实收金额",
+                data : "amountCollected",
+            },
+            {
                 title : "微信支付",
                 data : "wechatIncome",
+            },
+            {
+                title : "支付宝支付",
+                data : "aliPayment",
             },
             {
                 title : "充值账户支付",
@@ -295,10 +307,6 @@
             {
                 title : "等位红包支付",
                 data : "waitNumberIncome",
-            },
-            {
-                title : "支付宝支付",
-                data : "aliPayment",
             },
             {
                 title : "刷卡支付",
