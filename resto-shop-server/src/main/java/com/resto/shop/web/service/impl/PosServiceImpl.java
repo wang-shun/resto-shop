@@ -565,17 +565,12 @@ public class PosServiceImpl implements PosService {
             if (refundOrder.getOrderState() == OrderState.SUBMIT) {
                 for (OrderItem orderItem : order.getOrderItems()) {
                     OrderItem item = orderItemService.selectById(orderItem.getId());
-//                    if (orderItem.getType() != ArticleType.ARTICLE) {
-//                        //此处退的是服务费
-//                        item = new OrderItem();
-//                        item.setOrderId(orderItem.getOrderId());
-//                        item.setCount(order.getCustomerCount());
-//                    }
-                    //  如果退的是老版服务费
-                    if(orderItem.getType() == ArticleType.SERVICE_PRICE){
+                    if (orderItem.getType() != ArticleType.ARTICLE) {
+                        Order o = orderMapper.selectByPrimaryKey(orderItem.getOrderId());
+                        //此处退的是服务费
                         item = new OrderItem();
                         item.setOrderId(orderItem.getOrderId());
-                        item.setCount(order.getCustomerCount());
+                        item.setCount(o.getCustomerCount());
                     }
                     orderService.updateOrderItem(item.getOrderId(), item.getCount() - orderItem.getCount(), orderItem.getId(), orderItem.getType());
                 }
