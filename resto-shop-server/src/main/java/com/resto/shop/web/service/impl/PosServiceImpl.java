@@ -573,6 +573,8 @@ public class PosServiceImpl implements PosService {
 //                    }
                     //  如果退的是老版服务费
                     if(orderItem.getType() == ArticleType.SERVICE_PRICE){
+                        item = new OrderItem();
+                        item.setOrderId(orderItem.getOrderId());
                         item.setCount(order.getCustomerCount());
                     }
                     orderService.updateOrderItem(item.getOrderId(), item.getCount() - orderItem.getCount(), orderItem.getId(), orderItem.getType());
