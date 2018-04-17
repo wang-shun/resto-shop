@@ -1337,7 +1337,7 @@ public class PosServiceImpl implements PosService {
 //            String info = RSAEncryptionUtil.decryptBase64(paramInfo.getString("dataList"));
 //            log.info("解密之后的数据：" + info);
             //得到要修改的数据信息
-            List<Map<String, String>> dataList = JSON.parseObject(paramInfo.getString("dataList"), new TypeReference<List<Map<String, String>>>(){});
+            List<Map<String, Object>> dataList = JSON.parseObject(paramInfo.getString("dataList"), new TypeReference<List<Map<String, Object>>>(){});
             //遍历dataList
             dataList.forEach(dataInfo -> {
                 dataInfo.forEach((key, value) -> {
@@ -1360,11 +1360,11 @@ public class PosServiceImpl implements PosService {
      * @param key
      * @param value
      */
-    private void execution(String key, String value, List<String> orderIds, List<String> orderItemIds){
+    private void execution(String key, Object value, List<String> orderIds, List<String> orderItemIds){
         log.info("key：" + key + "---value：" + value);
         switch (key){
             case "order":
-                List<Order> orderList = JSON.parseObject(value, new TypeReference<List<Order>>(){});
+                List<Order> orderList = JSON.parseObject(value.toString(), new TypeReference<List<Order>>(){});
                 orderList.forEach(order -> {
                     log.info("反序列化的Order：" + order.getId());
                     orderService.update(order);
@@ -1372,7 +1372,7 @@ public class PosServiceImpl implements PosService {
                 });
                 break;
             case "orderItem":
-                List<OrderItem> orderItemList = JSON.parseObject(value, new TypeReference<List<OrderItem>>(){});
+                List<OrderItem> orderItemList = JSON.parseObject(value.toString(), new TypeReference<List<OrderItem>>(){});
                 orderItemList.forEach(orderItem -> {
                     log.info("反序列化的OrderItem：" + orderItem.getId());
                     orderItemService.update(orderItem);
