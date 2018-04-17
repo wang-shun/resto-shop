@@ -338,7 +338,7 @@ public class Order implements Serializable {
 
     private BigDecimal reduceMoney;
 
-    private Integer realEraseMoney;
+    private BigDecimal realEraseMoney;
 
     public BigDecimal getReduceMoney() {
         return reduceMoney;
@@ -348,11 +348,11 @@ public class Order implements Serializable {
         this.reduceMoney = reduceMoney;
     }
 
-    public Integer getRealEraseMoney() {
+    public BigDecimal getRealEraseMoney() {
         return realEraseMoney;
     }
 
-    public void setRealEraseMoney(Integer realEraseMoney) {
+    public void setRealEraseMoney(BigDecimal realEraseMoney) {
         this.realEraseMoney = realEraseMoney;
     }
 
