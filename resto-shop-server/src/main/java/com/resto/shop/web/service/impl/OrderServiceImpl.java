@@ -7201,7 +7201,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
             log.info("未查询到子订单对应的主订单返回null");
         } else {
-            log.info("此次查询结果不为null且是父订单");
+            log.info("此次查询结果为null或者是父订单");
             return order;
         }
         log.info("此次查询结果为null");
