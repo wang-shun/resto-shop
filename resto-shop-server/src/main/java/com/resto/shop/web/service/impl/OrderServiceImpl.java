@@ -8481,6 +8481,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 log.error("微信退款失败！失败信息：无退款证书");
                                 refundPayment.setRemark("微信退还金额：" + refund + "失败(无退款证书)，以线下退还现金的形式返还");
                                 refundPayment.setPaymentModeId(PayMode.REFUND_CRASH);
+                                orderPaymentItemService.insert(refundPayment);
+                                refundPaymentList.add(refundPayment);
+                                refundValue = refundValue.subtract(refund);
                                 continue;
                             }
                             result = WeChatPayUtils.refund(refundPayment.getId(), payInfo.getString("transaction_id"), payInfo.getInt("total_fee")
