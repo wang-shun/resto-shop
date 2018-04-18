@@ -7193,15 +7193,15 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             shopCartService.updateGroupNew(customerId, shopId, order.getGroupId());
         }
         if (order != null && order.getParentOrderId() != null) {
-            log.info("此次查询结果不为null且是子订单，订单Id为：" + order.getId());
+            log.info("此次查询结果不为null且是子订单");
             Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
             if (parent != null && parent.getAllowContinueOrder()) {
-                log.info("查询到子订单对应的主订单，订单Id为：" + parent.getId());
+                log.info("查询到子订单对应的主订单");
                 return parent;
             }
             log.info("未查询到子订单对应的主订单返回null");
         } else {
-            log.info("此次查询结果不为null且是父订单，订单Id为：" + order.getId());
+            log.info("此次查询结果不为null且是父订单");
             return order;
         }
         log.info("此次查询结果为null");
