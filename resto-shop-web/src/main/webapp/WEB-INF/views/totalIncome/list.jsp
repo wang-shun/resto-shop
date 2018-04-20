@@ -192,6 +192,18 @@
                 data : "totalIncome",
             },
             {
+                title : "POS端折扣",
+                data : "orderPosDiscountMoney",
+            },
+            {
+                title : "会员折扣",
+                data : "memberDiscountMoney",
+            },
+            {
+                title : "抹零",
+                data : "realEraseMoney",
+            },
+            {
                 title : "实收金额",
                 data : "amountCollected",
             },
@@ -274,6 +286,18 @@
             {
                 title : "订单总额",
                 data : "totalIncome",
+            },
+            {
+                title : "POS端折扣",
+                data : "orderPosDiscountMoney",
+            },
+            {
+                title : "会员折扣",
+                data : "memberDiscountMoney",
+            },
+            {
+                title : "抹零",
+                data : "realEraseMoney",
             },
             {
                 title : "实收金额",

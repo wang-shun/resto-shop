@@ -303,7 +303,10 @@
             td.parent_order_id parentOrderId,
             td.create_time createTime,
             td.original_amount originalAmount,
-            td.order_money totalIncome
+            td.order_money totalIncome,
+            td.order_pos_discount_money orderPosDiscountMoney,
+            td.member_discount_money memberDiscountMoney,
+            td.real_erase_money realEraseMoney
         FROM
         tb_order td
         WHERE
