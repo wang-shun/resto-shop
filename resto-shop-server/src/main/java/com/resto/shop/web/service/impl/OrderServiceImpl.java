@@ -7176,6 +7176,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
     @Override
     public Order lastOrderByCustomer(String customerId, String shopId,String groupId, String tableNumber) {
+        log.info("进入service查询");
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
         //得到自己购买的最新的一比允许加菜的订单
@@ -7192,14 +7193,18 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             shopCartService.updateGroupNew(customerId, shopId, order.getGroupId());
         }
         if (order != null && order.getParentOrderId() != null) {
+            log.info("此次查询结果不为null且是子订单");
             Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
             if (parent != null && parent.getAllowContinueOrder()) {
+                log.info("查询到子订单对应的主订单");
                 return parent;
             }
+            log.info("未查询到子订单对应的主订单返回null");
         } else {
+            log.info("此次查询结果为null或者是父订单");
             return order;
         }
-
+        log.info("此次查询结果为null");
         return null;
 
     }
@@ -8476,6 +8481,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 log.error("微信退款失败！失败信息：无退款证书");
                                 refundPayment.setRemark("微信退还金额：" + refund + "失败(无退款证书)，以线下退还现金的形式返还");
                                 refundPayment.setPaymentModeId(PayMode.REFUND_CRASH);
+                                orderPaymentItemService.insert(refundPayment);
+                                refundPaymentList.add(refundPayment);
+                                refundValue = refundValue.subtract(refund);
                                 continue;
                             }
                             result = WeChatPayUtils.refund(refundPayment.getId(), payInfo.getString("transaction_id"), payInfo.getInt("total_fee")

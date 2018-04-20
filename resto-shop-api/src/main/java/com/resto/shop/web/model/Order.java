@@ -57,8 +57,8 @@ public class Order implements Serializable {
         this.mealFeePrice = orderDto.getMealFeePrice() == null ? BigDecimal.valueOf(0) : orderDto.getMealFeePrice();
         this.verCode = orderDto.getVerCode() == null ? "" : orderDto.getVerCode();
         this.allowAppraise = orderDto.getAllowAppraise() == null ? false : orderDto.getAllowAppraise();
-        this.reduceMoney = orderDto.getReduceMoney();
-        this.realEraseMoney = orderDto.getRealEraseMoney();
+        this.reduceMoney = orderDto.getReduceMoney() == null ? BigDecimal.valueOf(0) : orderDto.getReduceMoney();
+        this.realEraseMoney = orderDto.getRealEraseMoney() == null ? BigDecimal.ZERO : orderDto.getRealEraseMoney();
     }
 
 
@@ -338,7 +338,7 @@ public class Order implements Serializable {
 
     private BigDecimal reduceMoney;
 
-    private Integer realEraseMoney;
+    private BigDecimal realEraseMoney;
 
     public BigDecimal getReduceMoney() {
         return reduceMoney;
@@ -348,11 +348,11 @@ public class Order implements Serializable {
         this.reduceMoney = reduceMoney;
     }
 
-    public Integer getRealEraseMoney() {
+    public BigDecimal getRealEraseMoney() {
         return realEraseMoney;
     }
 
-    public void setRealEraseMoney(Integer realEraseMoney) {
+    public void setRealEraseMoney(BigDecimal realEraseMoney) {
         this.realEraseMoney = realEraseMoney;
     }
 
