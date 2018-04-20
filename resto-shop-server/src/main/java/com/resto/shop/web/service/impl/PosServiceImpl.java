@@ -670,8 +670,12 @@ public class PosServiceImpl implements PosService {
         if(order == null){
             return;
         }
+        //  释放老桌位
+        RedisUtil.set(order.getShopDetailId()+order.getTableNumber()+"status", true);
         order.setTableNumber(tableNumber);
         orderService.update(order);
+        //  绑定新桌位
+        RedisUtil.set(order.getShopDetailId()+tableNumber+"status", false);
     }
 
     @Override
