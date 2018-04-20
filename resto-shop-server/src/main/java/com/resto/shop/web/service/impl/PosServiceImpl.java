@@ -1243,15 +1243,14 @@ public class PosServiceImpl implements PosService {
             Order newOrderInfo = orderService.selectById(orderId);
             Customer customer = customerService.selectById(newOrderInfo.getCustomerId());
             accountService.payOrder(newOrderInfo, payValue, customer, brand, shopDetail);
-        }else if (payModeId == PayMode.COUPON_PAY){
-            //优惠券支付
-            Coupon coupon = couponService.selectById(toPayId);
-            coupon.setUsingTime(new Date());
-            coupon.setIsUsed(true);
-            couponService.update(coupon);
-            orderPaymentItemService.insert(paymentItem);
         }else{
-            //微信、支付宝支付
+            if (payModeId == PayMode.COUPON_PAY) {
+                //优惠券支付
+                Coupon coupon = couponService.selectById(toPayId);
+                coupon.setUsingTime(new Date());
+                coupon.setIsUsed(true);
+                couponService.update(coupon);
+            }
             orderPaymentItemService.insert(paymentItem);
         }
         //返回的支付信息
