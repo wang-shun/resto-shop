@@ -1211,6 +1211,10 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     Double amountWithChildren = orderMapper.selectParentAmount(parent.getId(), parent.getOrderMode());
                     parent.setCountWithChild(articleCountWithChildren);
                     parent.setAmountWithChildren(new BigDecimal(amountWithChildren));
+                    //如果子订单有重量包  则考虑主订单是否存在需要pos端确认  不需要确认的情况下需要改为需要确认。
+                    if(parent.getNeedConfirmOrderItem() == 0 && order.getNeedConfirmOrderItem() == 1){
+                        parent.setNeedConfirmOrderItem(1);
+                    }
                     update(parent);
                 }
             } else if (order.getPayType() == PayType.NOPAY && order.getOrderMode() == ShopMode.BOSS_ORDER) {
