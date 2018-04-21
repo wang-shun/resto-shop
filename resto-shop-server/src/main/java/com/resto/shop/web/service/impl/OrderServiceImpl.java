@@ -7196,6 +7196,9 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             }
         }else{
             order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime(), tableNumber);
+            if(order == null){
+                return null;
+            }
             if(order.getParentOrderId() == null){
                 return order;
             }else{
@@ -7204,9 +7207,6 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                     log.info("查询到子订单对应的主订单");
                     return parent;
                 }
-            }
-            if(order == null){
-                return null;
             }
         }
         //如果是存在组 则把该人的当前购物车添加进入组
