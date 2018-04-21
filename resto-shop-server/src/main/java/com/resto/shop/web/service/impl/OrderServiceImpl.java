@@ -7191,28 +7191,29 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
             //如果店铺开启了多人点餐
             //获取这个人在这个组内的订单
             order = orderMapper.getGroupOrderByGroupId(groupId);
+            if(order == null){
+                return null;
+            }
         }else{
             order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime(), tableNumber);
+            if(order.getParentOrderId() == null){
+                return order;
+            }else{
+                Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
+                if (parent != null && parent.getAllowContinueOrder()) {
+                    log.info("查询到子订单对应的主订单");
+                    return parent;
+                }
+            }
+            if(order == null){
+                return null;
+            }
         }
         //如果是存在组 则把该人的当前购物车添加进入组
         if(order != null && order.getGroupId() != null){
             shopCartService.updateGroupNew(customerId, shopId, order.getGroupId());
         }
-        if (order != null && order.getParentOrderId() != null) {
-            log.info("此次查询结果不为null且是子订单");
-            Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
-            if (parent != null && parent.getAllowContinueOrder()) {
-                log.info("查询到子订单对应的主订单");
-                return parent;
-            }
-            log.info("未查询到子订单对应的主订单返回null");
-        } else {
-            log.info("此次查询结果为null或者是父订单");
-            return order;
-        }
-        log.info("此次查询结果为null");
-        return null;
-
+        return order;
     }
 
     @Override
