@@ -319,7 +319,7 @@ public class OrderController extends GenericController{
 				ot.setDistributionModeId(o.getDistributionModeId());
 				//找到这笔主订单下的子订单然后合并展示
 				list.forEach(order -> {
-					if (order.getParentOrderId().equalsIgnoreCase(o.getId()) && (order.getOrderState() == OrderState.PAYMENT
+					if (o.getId().equalsIgnoreCase(order.getParentOrderId()) && (order.getOrderState() == OrderState.PAYMENT
 							|| order.getOrderState() == OrderState.CONFIRM || order.getOrderState() == OrderState.HASAPPRAISE) &&
 							(order.getProductionStatus() == ProductionStatus.PRINTED || order.getProductionStatus() == ProductionStatus.HAS_CALL)){
 						mergeOrder(ot, order);
