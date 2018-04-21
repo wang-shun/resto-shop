@@ -497,9 +497,9 @@ public List<Order> callListByTime(String beginDate, String endDate, String shopI
 
 	JSONResult createOrderByEmployee(Order order) throws AppException;
 
-	Order lastOrderByCustomer(String customerId,String shopId,String groupId,String tableNumber);
+	Order lastOrderByCustomer(String customerId,String shopId,String tableNumber);
 
-
+	Order lastOrderByCustomerGroupId(String customerId,String shopId,String groupId,String tableNumber);
 
 
     public boolean cancelWXPayOrder(String orderId);

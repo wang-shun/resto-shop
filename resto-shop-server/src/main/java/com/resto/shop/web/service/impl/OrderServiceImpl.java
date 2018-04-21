@@ -7181,34 +7181,22 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
 
 
     @Override
-    public Order lastOrderByCustomer(String customerId, String shopId,String groupId, String tableNumber) {
+    public Order lastOrderByCustomer(String customerId, String shopId, String tableNumber) {
         log.info("进入service查询");
         ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
         BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
         //得到自己购买的最新的一比允许加菜的订单
-        Order order = null;
-        if(!StringUtils.isEmpty(groupId)){
-            //如果店铺开启了多人点餐
-            //获取这个人在这个组内的订单
-            order = orderMapper.getGroupOrderByGroupId(groupId);
-            if(order == null){
-                return null;
-            }
-        }else{
-            order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime(), tableNumber);
-            if(order == null){
-                return null;
-            }
-            if(order.getParentOrderId() == null){
-                return order;
-            }else{
-                Order parent = orderMapper.selectByPrimaryKey(order.getParentOrderId());
-                if (parent != null && parent.getAllowContinueOrder()) {
-                    log.info("查询到子订单对应的主订单");
-                    return parent;
-                }
-            }
-        }
+        Order order = orderMapper.getLastOrderByCustomer(customerId, shopId, brandSetting.getCloseContinueTime(), tableNumber);
+        return order;
+    }
+
+    @Override
+    public Order lastOrderByCustomerGroupId(String customerId, String shopId,String groupId, String tableNumber) {
+        log.info("进入service查询");
+        ShopDetail shopDetail = shopDetailService.selectByPrimaryKey(shopId);
+        BrandSetting brandSetting = brandSettingService.selectByBrandId(shopDetail.getBrandId());
+        //得到自己购买的最新的一比允许加菜的订单
+        Order order = orderMapper.getGroupOrderByGroupId(groupId);
         //如果是存在组 则把该人的当前购物车添加进入组
         if(order != null && order.getGroupId() != null){
             shopCartService.updateGroupNew(customerId, shopId, order.getGroupId());
