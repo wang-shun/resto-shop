@@ -1074,6 +1074,7 @@ public class OrderServiceImpl extends GenericServiceImpl<Order, String> implemen
                                 order.setTableNumber(parent.getTableNumber());
                                 order.setVerCode(parent.getVerCode());
                                 order.setCustomerCount(parent.getCustomerCount());
+                                order.setServicePrice(new BigDecimal(0));
                             }
                         }
                     } else {
